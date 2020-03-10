@@ -4,12 +4,17 @@ import { useStripeCart } from 'use-stripe-cart';
 import { Box, Flex, Button } from 'theme-ui';
 
 const App = () => {
-  const { cartCount, addItem, total, redirectToCheckout } = useStripeCart();
+  const {
+    cartCount,
+    addItem,
+    totalPrice,
+    redirectToCheckout,
+  } = useStripeCart();
 
   return (
     <Box>
       <Box>Total items in cart: {cartCount}</Box>
-      <Box>Total price: {total}</Box>
+      <Box>Total price: {totalPrice()}</Box>
       <Flex>
         <Button
           sx={{ backgroundColor: 'blue' }}

@@ -206,7 +206,7 @@ export const useStripeCart = () => {
 
   const checkoutData = formatCheckoutCart(skus);
 
-  const totalPrices = () => {
+  const totalPrice = () => {
     let total = 0;
     let currency = 'usd';
     const totalPrice = cartDetails.reduce((acc, current) => {
@@ -276,6 +276,6 @@ export const useStripeCart = () => {
     detailedCart,
     handleCartHover,
     handleCloseCart,
-    totalPrices,
+    totalPrice,
   };
 };
