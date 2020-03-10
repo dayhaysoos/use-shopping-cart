@@ -1,11 +1,6 @@
 import React, { createContext, useReducer, useContext } from 'react';
 import { toCurrency } from './util';
 
-const formatPrice = num => {
-  const price = (num / 100).toFixed(2);
-  return `$${price}`;
-};
-
 /**
  * @function checkoutCart
  * @param skus {Object}
@@ -28,8 +23,8 @@ const checkoutCart = (skus, { sku }, quantity = 1) => {
   }
 };
 
-const formatDetailedCart = cartDetails => {
-  const details = cartDetails.reduce((acc, current) => {
+const formatDetailedCart = cartItems => {
+  const details = cartItems.reduce((acc, current) => {
     if (acc.hasOwnProperty(current.sku)) {
       acc = {
         [current.sku]: {
@@ -140,10 +135,10 @@ const reducer = (cart, action) => {
         ...cart,
         toggleRightMenu: false,
       };
-    case 'addToCartDetails':
+    case 'addToCartItems':
       return {
         ...cart,
-        cartDetails: [...cart.cartDetails, action.sku],
+        cartItems: [...cart.cartItems, action.sku],
       };
     default:
       console.error(`unknown action ${action.type}`);
@@ -170,7 +165,7 @@ export const CartProvider = ({
         lastClicked: '',
         skus: skuStorage ? skuStorage : {},
         toggleRightMenu: false,
-        cartDetails: [],
+        cartItems: [],
         stripe,
         billingAddressCollection,
         successUrl,
@@ -190,7 +185,7 @@ export const useStripeCart = () => {
     stripe,
     lastClicked,
     toggleRightMenu,
-    cartDetails,
+    cartItems,
     billingAddressCollection,
     successUrl,
     cancelUrl,
@@ -209,7 +204,7 @@ export const useStripeCart = () => {
   const totalPrice = () => {
     let total = 0;
     let currency = 'usd';
-    const totalPrice = cartDetails.reduce((acc, current) => {
+    const totalPrice = cartItems.reduce((acc, current) => {
       currency = current.currency;
       return acc + current.price;
     }, 0);
@@ -222,7 +217,7 @@ export const useStripeCart = () => {
   typeof localStorage === 'object' &&
     localStorage.setItem('skus', JSON.stringify(storageReference));
 
-  const detailedCart = formatDetailedCart(cartDetails);
+  const cartDetails = formatDetailedCart(cartItems);
 
   const cartCount = checkoutData.reduce(
     (acc, current) => acc + current.quantity,
@@ -231,7 +226,7 @@ export const useStripeCart = () => {
 
   const addItem = sku => {
     dispatch({ type: 'addToCheckoutCart', sku });
-    dispatch({ type: 'addToCartDetails', sku });
+    dispatch({ type: 'addToCartItems', sku });
   };
 
   const handleQuantityChange = (quantity, skuID) => {
@@ -272,8 +267,8 @@ export const useStripeCart = () => {
     storeLastClicked,
     toggleRightMenu,
     handleCartClick,
+    cartItems,
     cartDetails,
-    detailedCart,
     handleCartHover,
     handleCloseCart,
     totalPrice,
