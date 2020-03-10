@@ -1,0 +1,30 @@
+{
+  "name": "use-stripe-cart-example",
+  "homepage": "https://dayhaysoos.github.io/use-stripe-cart",
+  "version": "0.0.0",
+  "license": "MIT",
+  "private": true,
+  "dependencies": {
+    "@stripe/react-stripe-js": "^1.0.3",
+    "@stripe/stripe-js": "^1.0.2",
+    "prop-types": "^15.6.2",
+    "react": "link:../node_modules/react",
+    "react-dom": "^16.9.0",
+    "react-scripts": "^3.0.1",
+    "stripe": "^8.29.0",
+    "theme-ui": "^0.3.1",
+    "use-stripe-cart": "link:.."
+  },
+  "scripts": {
+    "start": "react-scripts start",
+    "build": "react-scripts build",
+    "test": "react-scripts test --env=jsdom",
+    "eject": "react-scripts eject"
+  },
+  "browserslist": [
+    ">0.2%",
+    "not dead",
+    "not ie <= 11",
+    "not op_mini all"
+  ]
+}
