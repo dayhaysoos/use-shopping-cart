@@ -2,8 +2,7 @@ import React from 'react';
 import { renderHook, act, cleanup } from '@testing-library/react-hooks';
 import { useStripeCart, CartProvider } from './index';
 
-// mock timer using jest
-jest.useFakeTimers();
+afterEach(() => window.localStorage.clear());
 
 const stripeMock = {
   redirectToCheckout: jest.fn().mockReturnValue(() => Promise.resolve()),
@@ -39,8 +38,7 @@ const createWrapper = () => ({ children }) => {
   );
 };
 
-describe('useStripeCart', async () => {
-  beforeEach(async () => await cleanup());
+describe('useStripeCart', () => {
   it('renderps', () => {
     const wrapper = createWrapper();
     const { result } = renderHook(() => useStripeCart(), { wrapper });
@@ -57,7 +55,6 @@ describe('useStripeCart', async () => {
     });
 
     expect(result.current.cartItems).toEqual([mockSku]);
-    cleanup();
   });
 
   it('cartCount increments when addItem is executed', () => {
