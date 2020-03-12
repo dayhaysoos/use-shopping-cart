@@ -1,29 +1,62 @@
-import { useMyHook } from './'
-import { renderHook, act } from "@testing-library/react-hooks";
+import React from 'react';
+import { renderHook, act } from '@testing-library/react-hooks';
+import { useStripeCart, CartProvider } from './index';
 
 // mock timer using jest
 jest.useFakeTimers();
 
-describe('useMyHook', () => {
-  it('updates every second', () => {
-    const { result } = renderHook(() => useMyHook());
+const stripeMock = {
+  redirectToCheckout: jest.fn().mockReturnValue(() => Promise.resolve()),
+};
 
-    expect(result.current).toBe(0);
+const INITIAL_STATE = {
+  lastClicked: '',
+  skus: {},
+  toggleRightMenu: false,
+  cartItems: [],
+  billingAddressCollection: false,
+  successUrl: 'https://egghead.io',
+  cancelUrl: 'https://egghead.io',
+};
 
-    // Fast-forward 1sec
-    act(() => {
-      jest.advanceTimersByTime(1000);
-    });
+describe('useStripeCart', () => {
+  it('renderps', () => {
+    const wrapper = ({ children }) => (
+      <CartProvider
+        billingAddressCollection={false}
+        successUrl={'https://egghead.io'}
+        cancelUrl={'https://egghead.io'}
+        stripe={stripeMock}
+      >
+        {children}
+      </CartProvider>
+    );
+    const { result } = renderHook(() => useStripeCart(), { wrapper });
 
-    // Check after total 1 sec
-    expect(result.current).toBe(1);
+    expect(result.current.cartItems).toEqual(INITIAL_STATE.cartItems);
+  });
+});
 
-    // Fast-forward 1 more sec
-    act(() => {
-      jest.advanceTimersByTime(1000);
-    });
+// describe('useMyHook', () => {
+//   it('updates every second', () => {
+//     const { result } = renderHook(() => useMyHook());
 
-    // Check after total 2 sec
-    expect(result.current).toBe(2);
-  })
-})
+//     expect(result.current).toBe(0);
+
+//     // Fast-forward 1sec
+//     act(() => {
+//       jest.advanceTimersByTime(1000);
+//     });
+
+//     // Check after total 1 sec
+//     expect(result.current).toBe(1);
+
+//     // Fast-forward 1 more sec
+//     act(() => {
+//       jest.advanceTimersByTime(1000);
+//     });
+
+//     // Check after total 2 sec
+//     expect(result.current).toBe(2);
+//   });
+// });
