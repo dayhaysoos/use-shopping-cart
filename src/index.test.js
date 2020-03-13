@@ -25,6 +25,13 @@ const mockSku = {
   currency: 'usd',
 };
 
+const mockSku2 = {
+  sku: 'sku_xyz456',
+  price: 300,
+  image: 'https://www.fillmurray.com/300/300',
+  currency: 'gbp',
+}
+
 const createWrapper = () => ({ children }) => {
   return (
     <CartProvider
@@ -118,4 +125,27 @@ describe('useStripeCart', () => {
 
     expect(result.current.skus).toEqual({});
   });
+
+  it('deleteItem remove the correct item from the cart', () => {
+    const wrapper = createWrapper();
+    const { result } = renderHook(() => useStripeCart(), { wrapper });
+
+    act(() => {
+      result.current.addItem(mockSku);
+      result.current.addItem(mockSku2)
+    })
+
+    expect(result.current.skus).toEqual({
+      [mockSku.sku]: 1,
+      [mockSku2.sku]: 1
+    })
+
+    act(() => {
+      result.current.deleteItem(mockSku.sku);
+    });
+
+    expect(result.current.skus).toEqual({
+      [mockSku2.sku]: 1
+    });
+  })
 });
