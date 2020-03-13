@@ -13,6 +13,12 @@
       "contributions": [
         "test"
       ]
+    },
+    {
+    "login": "theianjones",
+      "name": "Ian Jones",
+      "avatar_url": "https://avatars2.githubusercontent.com/u/4407263?v=4",
+      "profile": "https://ianjones.us/",
     }
   ],
   "contributorsPerLine": 7,
