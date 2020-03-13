@@ -84,43 +84,38 @@ describe('useStripeCart', () => {
       [mockSku.sku]: 1,
     });
   });
-});
 
-it('checkoutData builds an array of objects to prepare for redirectToCheckout', () => {
-  const wrapper = createWrapper();
-  const { result } = renderHook(() => useStripeCart(), { wrapper });
+  it('checkoutData builds an array of objects to prepare for redirectToCheckout', () => {
+    const wrapper = createWrapper();
+    const { result } = renderHook(() => useStripeCart(), { wrapper });
 
-  expect(result.current.checkoutData).toEqual([]);
+    expect(result.current.checkoutData).toEqual([]);
 
-  act(() => {
-    result.current.addItem(mockSku);
+    act(() => {
+      result.current.addItem(mockSku);
+    });
+
+    expect(result.current.checkoutData).toEqual([
+      { sku: mockSku.sku, quantity: 1 },
+    ]);
   });
 
-  expect(result.current.checkoutData).toEqual([
-    { sku: mockSku.sku, quantity: 1 },
-  ]);
+  it('deleteItem removes item from sku object', () => {
+    const wrapper = createWrapper();
+    const { result } = renderHook(() => useStripeCart(), { wrapper });
+
+    act(() => {
+      result.current.addItem(mockSku);
+    });
+
+    expect(result.current.skus).toEqual({
+      [mockSku.sku]: 1,
+    });
+
+    act(() => {
+      result.current.deleteItem(mockSku.sku);
+    });
+
+    expect(result.current.skus).toEqual({});
+  });
 });
-
-// describe('useMyHook', () => {
-//   it('updates every second', () => {
-//     const { result } = renderHook(() => useMyHook());
-
-//     expect(result.current).toBe(0);
-
-//     // Fast-forward 1sec
-//     act(() => {
-//       jest.advanceTimersByTime(1000);
-//     });
-
-//     // Check after total 1 sec
-//     expect(result.current).toBe(1);
-
-//     // Fast-forward 1 more sec
-//     act(() => {
-//       jest.advanceTimersByTime(1000);
-//     });
-
-//     // Check after total 2 sec
-//     expect(result.current).toBe(2);
-//   });
-// });
