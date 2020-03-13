@@ -1,5 +1,5 @@
 import React from 'react';
-import { renderHook, act, cleanup } from '@testing-library/react-hooks';
+import { renderHook, act } from '@testing-library/react-hooks';
 import { useStripeCart, CartProvider } from './index';
 
 afterEach(() => window.localStorage.clear());
