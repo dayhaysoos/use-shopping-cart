@@ -1,0 +1,24 @@
+{
+  "files": [
+    "README.md"
+  ],
+  "imageSize": 100,
+  "commit": false,
+  "contributors": [
+    {
+      "login": "theianjones",
+      "name": "Ian Jones",
+      "avatar_url": "https://avatars2.githubusercontent.com/u/4407263?v=4",
+      "profile": "https://ianjones.us/",
+      "contributions": [
+        "test"
+      ]
+    }
+  ],
+  "contributorsPerLine": 7,
+  "projectName": "use-stripe-cart",
+  "projectOwner": "dayhaysoos",
+  "repoType": "github",
+  "repoHost": "https://github.com",
+  "skipCi": true
+}
