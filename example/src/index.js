@@ -1,4 +1,4 @@
-/**@jsx jsx */
+/** @jsx jsx */
 import { jsx } from 'theme-ui';
 import ReactDOM from 'react-dom';
 import { CartProvider } from 'use-stripe-cart';
