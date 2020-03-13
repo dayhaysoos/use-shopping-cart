@@ -69,6 +69,36 @@ describe('useStripeCart', () => {
 
     expect(result.current.cartCount).toBe(1);
   });
+
+  it('skus object updates with sku id and quantity based on addItems', () => {
+    const wrapper = createWrapper();
+    const { result } = renderHook(() => useStripeCart(), { wrapper });
+
+    expect(result.current.skus).toEqual({});
+
+    act(() => {
+      result.current.addItem(mockSku);
+    });
+
+    expect(result.current.skus).toEqual({
+      [mockSku.sku]: 1,
+    });
+  });
+});
+
+it('checkoutData builds an array of objects to prepare for redirectToCheckout', () => {
+  const wrapper = createWrapper();
+  const { result } = renderHook(() => useStripeCart(), { wrapper });
+
+  expect(result.current.checkoutData).toEqual([]);
+
+  act(() => {
+    result.current.addItem(mockSku);
+  });
+
+  expect(result.current.checkoutData).toEqual([
+    { sku: mockSku.sku, quantity: 1 },
+  ]);
 });
 
 // describe('useMyHook', () => {
