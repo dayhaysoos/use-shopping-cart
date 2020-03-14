@@ -25,6 +25,13 @@ const mockSku = {
   currency: 'usd',
 };
 
+const mockSku2 = {
+  sku: 'sku_xyz456',
+  price: 300,
+  image: 'https://www.fillmurray.com/300/300',
+  currency: 'gbp',
+}
+
 const createWrapper = () => ({ children }) => {
   return (
     <CartProvider
@@ -118,4 +125,55 @@ describe('useStripeCart', () => {
 
     expect(result.current.skus).toEqual({});
   });
+
+  it('deleteItem remove the correct item from the cart', () => {
+    const wrapper = createWrapper();
+    const { result } = renderHook(() => useStripeCart(), { wrapper });
+
+    act(() => {
+      result.current.addItem(mockSku);
+      result.current.addItem(mockSku2)
+    })
+
+    expect(result.current.skus).toEqual({
+      [mockSku.sku]: 1,
+      [mockSku2.sku]: 1
+    })
+
+    act(() => {
+      result.current.deleteItem(mockSku.sku);
+    });
+
+    expect(result.current.skus).toEqual({
+      [mockSku2.sku]: 1
+    });
+  })
+
+  it('storeLastClicked stores the correct value', () => {
+    const wrapper = createWrapper();
+    const { result } = renderHook(() => useStripeCart(), { wrapper });
+
+    act(() => {
+      result.current.addItem(mockSku);
+      result.current.storeLastClicked(mockSku.sku);
+    })
+
+    expect(result.current.lastClicked).toBe(mockSku.sku)
+  })
+
+  it('handleQuantityChange changes the quantity correctly', () => {
+    const wrapper = createWrapper();
+    const { result } = renderHook(() => useStripeCart(), { wrapper });
+
+    act(() => {
+      result.current.addItem(mockSku)
+      result.current.handleQuantityChange(10, mockSku.sku)
+    })
+
+    expect(result.current.skus).toEqual({
+      [mockSku.sku]: 10
+    })
+    expect(result.current.cartCount).toBe(10)
+  })
+
 });
