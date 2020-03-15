@@ -132,7 +132,7 @@ describe('useStripeCart', () => {
     expect(result.current.skus).toEqual({});
   });
 
-  it('should update totalPrice when two items are added', () => {
+  it('deleteItem remove the correct item from the cart',, () => {
     const wrapper = createWrapper();
     const { result } = renderHook(() => useStripeCart(), { wrapper });
 
@@ -155,7 +155,7 @@ describe('useStripeCart', () => {
     });
   });
 
-  it('deleteItem remove the correct item from the cart', () => {
+  it('should update totalPrice when two items are added', () => {
     const wrapper = createWrapper();
     const { result } = renderHook(() => useStripeCart(), { wrapper });
 
