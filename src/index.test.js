@@ -176,4 +176,16 @@ describe('useStripeCart', () => {
     expect(result.current.cartCount).toBe(10)
   })
 
+  it('handleQuantityChange removes item from skus object when quantity reaches 0', () => {
+    const wrapper = createWrapper();
+    const { result } = renderHook(() => useStripeCart(), { wrapper });
+
+    act(() => {
+      result.current.addItem(mockSku)
+      result.current.handleQuantityChange(0, mockSku.sku)
+    })
+
+    expect(result.current.skus).toEqual({})
+  })
+
 });

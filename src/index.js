@@ -65,10 +65,10 @@ const formatCheckoutCart = checkoutData => {
 const updateQuantity = (quantity, skuID, skus) => {
   quantity = isNaN(quantity) ? 0 : quantity;
 
-  return {
-    ...skus,
-    [skuID]: quantity,
-  };
+  const updatedSkus = skus;
+  quantity === 0 ? delete updatedSkus[skuID] : updatedSkus[skuID] = quantity
+
+  return updatedSkus
 };
 
 const removeSku = (skuID, skus) => {
