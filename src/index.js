@@ -66,9 +66,9 @@ const updateQuantity = (quantity, skuID, skus) => {
   quantity = isNaN(quantity) ? 0 : quantity;
 
   const updatedSkus = skus;
-  quantity === 0 ? delete updatedSkus[skuID] : updatedSkus[skuID] = quantity
+  quantity === 0 ? delete updatedSkus[skuID] : (updatedSkus[skuID] = quantity);
 
-  return updatedSkus
+  return updatedSkus;
 };
 
 const removeSku = (skuID, skus) => {
@@ -121,19 +121,19 @@ const reducer = (cart, action) => {
     case 'cartClick':
       return {
         ...cart,
-        toggleRightMenu: !cart.toggleRightMenu,
+        shouldDisplayCart: !cart.shouldDisplayCart,
       };
 
     case 'cartHover':
       return {
         ...cart,
-        toggleRightMenu: true,
+        shouldDisplayCart: true,
       };
 
     case 'closeCart':
       return {
         ...cart,
-        toggleRightMenu: false,
+        shouldDisplayCart: false,
       };
     case 'addToCartItems':
       return {
@@ -163,8 +163,8 @@ export const CartProvider = ({
     <CartContext.Provider
       value={useReducer(reducer, {
         lastClicked: '',
-        skus: skuStorage ? skuStorage : {},
-        toggleRightMenu: false,
+        skus: skuStorage || {},
+        shouldDisplayCart: false,
         cartItems: [],
         stripe,
         billingAddressCollection,
@@ -184,7 +184,7 @@ export const useStripeCart = () => {
     skus,
     stripe,
     lastClicked,
-    toggleRightMenu,
+    shouldDisplayCart,
     cartItems,
     billingAddressCollection,
     successUrl,
@@ -265,7 +265,7 @@ export const useStripeCart = () => {
     handleQuantityChange,
     lastClicked,
     storeLastClicked,
-    toggleRightMenu,
+    shouldDisplayCart,
     handleCartClick,
     cartItems,
     cartDetails,

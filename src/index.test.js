@@ -30,7 +30,7 @@ const mockSku2 = {
   price: 300,
   image: 'https://www.fillmurray.com/300/300',
   currency: 'gbp',
-}
+};
 
 const createWrapper = () => ({ children }) => {
   return (
@@ -132,22 +132,22 @@ describe('useStripeCart', () => {
 
     act(() => {
       result.current.addItem(mockSku);
-      result.current.addItem(mockSku2)
-    })
+      result.current.addItem(mockSku2);
+    });
 
     expect(result.current.skus).toEqual({
       [mockSku.sku]: 1,
-      [mockSku2.sku]: 1
-    })
+      [mockSku2.sku]: 1,
+    });
 
     act(() => {
       result.current.deleteItem(mockSku.sku);
     });
 
     expect(result.current.skus).toEqual({
-      [mockSku2.sku]: 1
+      [mockSku2.sku]: 1,
     });
-  })
+  });
 
   it('storeLastClicked stores the correct value', () => {
     const wrapper = createWrapper();
@@ -156,36 +156,65 @@ describe('useStripeCart', () => {
     act(() => {
       result.current.addItem(mockSku);
       result.current.storeLastClicked(mockSku.sku);
-    })
+    });
 
-    expect(result.current.lastClicked).toBe(mockSku.sku)
-  })
+    expect(result.current.lastClicked).toBe(mockSku.sku);
+  });
 
   it('handleQuantityChange changes the quantity correctly', () => {
     const wrapper = createWrapper();
     const { result } = renderHook(() => useStripeCart(), { wrapper });
 
     act(() => {
-      result.current.addItem(mockSku)
-      result.current.handleQuantityChange(10, mockSku.sku)
-    })
+      result.current.addItem(mockSku);
+      result.current.handleQuantityChange(10, mockSku.sku);
+    });
 
     expect(result.current.skus).toEqual({
-      [mockSku.sku]: 10
-    })
-    expect(result.current.cartCount).toBe(10)
-  })
+      [mockSku.sku]: 10,
+    });
+    expect(result.current.cartCount).toBe(10);
+  });
 
   it('handleQuantityChange removes item from skus object when quantity reaches 0', () => {
     const wrapper = createWrapper();
     const { result } = renderHook(() => useStripeCart(), { wrapper });
 
     act(() => {
-      result.current.addItem(mockSku)
-      result.current.handleQuantityChange(0, mockSku.sku)
-    })
+      result.current.addItem(mockSku);
+      result.current.handleQuantityChange(0, mockSku.sku);
+    });
 
-    expect(result.current.skus).toEqual({})
-  })
+    expect(result.current.skus).toEqual({});
+  });
 
+  it('shouldDisplayCart should be false initially', () => {
+    const wrapper = createWrapper();
+    const { result } = renderHook(() => useStripeCart(), { wrapper });
+
+    expect(result.current.shouldDisplayCart).toBe(false);
+  });
+
+  it('shouldDisplayCart should be true after handleCartClick', () => {
+    const wrapper = createWrapper();
+    const { result } = renderHook(() => useStripeCart(), { wrapper });
+
+    act(() => {
+      result.current.handleCartClick();
+    });
+
+    expect(result.current.shouldDisplayCart).toBe(true);
+  });
+
+  it('shouldDisplayCart should be false after 2 handleCartClick', () => {
+    const wrapper = createWrapper();
+    const { result } = renderHook(() => useStripeCart(), { wrapper });
+
+    act(() => {
+      result.current.handleCartClick();
+      result.current.handleCartClick();
+    });
+
+    expect(result.current.shouldDisplayCart).toBe(false);
+  });
 });
