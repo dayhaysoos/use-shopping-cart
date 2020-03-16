@@ -25,6 +25,12 @@ const mockSku = {
   currency: 'usd',
 };
 
+const mockSku3 = {
+  sku: 'sku_abc234',
+  price: 100,
+  image: '',
+  currency: 'usd',
+};
 const mockSku2 = {
   sku: 'sku_xyz456',
   price: 300,
@@ -149,12 +155,34 @@ describe('useStripeCart', () => {
     });
   });
 
-  it('storeLastClicked stores the correct value', () => {
+  it('should update totalPrice', () => {
     const wrapper = createWrapper();
     const { result } = renderHook(() => useStripeCart(), { wrapper });
 
     act(() => {
       result.current.addItem(mockSku);
+    });
+
+    expect(result.current.totalPrice()).toBe('$2.00');
+  });
+
+  it('should update totalPrice when two items are added', () => {
+    const wrapper = createWrapper();
+    const { result } = renderHook(() => useStripeCart(), { wrapper });
+
+    act(() => {
+      result.current.addItem(mockSku);
+      result.current.addItem(mockSku3);
+    });
+
+    expect(result.current.totalPrice()).toBe('$3.00');
+  });
+
+  it('storeLastClicked stores the correct value', () => {
+    const wrapper = createWrapper();
+    const { result } = renderHook(() => useStripeCart(), { wrapper });
+
+    act(() => {
       result.current.storeLastClicked(mockSku.sku);
     });
 
