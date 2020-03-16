@@ -27,6 +27,7 @@ const formatDetailedCart = cartItems => {
   const details = cartItems.reduce((acc, current) => {
     if (acc.hasOwnProperty(current.sku)) {
       acc = {
+        ...acc,
         [current.sku]: {
           ...current,
           price: acc[current.sku].price + current.price,
@@ -39,6 +40,7 @@ const formatDetailedCart = cartItems => {
       };
     } else {
       acc = {
+        ...acc,
         [current.sku]: {
           ...current,
           quantity: 1,
