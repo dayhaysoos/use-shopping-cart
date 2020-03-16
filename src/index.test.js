@@ -215,4 +215,34 @@ describe('useStripeCart', () => {
 
     expect(result.current.skus).toEqual({});
   });
+
+  it('shouldDisplayCart should be false initially', () => {
+    const wrapper = createWrapper();
+    const { result } = renderHook(() => useStripeCart(), { wrapper });
+
+    expect(result.current.shouldDisplayCart).toBe(false);
+  });
+
+  it('shouldDisplayCart should be true after handleCartClick', () => {
+    const wrapper = createWrapper();
+    const { result } = renderHook(() => useStripeCart(), { wrapper });
+
+    act(() => {
+      result.current.handleCartClick();
+    });
+
+    expect(result.current.shouldDisplayCart).toBe(true);
+  });
+
+  it('shouldDisplayCart should be false after 2 handleCartClick', () => {
+    const wrapper = createWrapper();
+    const { result } = renderHook(() => useStripeCart(), { wrapper });
+
+    act(() => {
+      result.current.handleCartClick();
+      result.current.handleCartClick();
+    });
+
+    expect(result.current.shouldDisplayCart).toBe(false);
+  });
 });
