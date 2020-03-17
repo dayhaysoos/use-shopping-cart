@@ -21,14 +21,14 @@ const INITIAL_STATE = {
 const mockSku = {
   sku: 'sku_abc123',
   price: 200,
-  image: '',
+  image: 'https://www.fillmurray.com/300/300',
   currency: 'usd',
 };
 
 const mockSku3 = {
   sku: 'sku_abc234',
   price: 100,
-  image: '',
+  image: 'https://www.fillmurray.com/300/300',
   currency: 'usd',
 };
 const mockSku2 = {
@@ -36,6 +36,28 @@ const mockSku2 = {
   price: 300,
   image: 'https://www.fillmurray.com/300/300',
   currency: 'gbp',
+};
+
+const mockDetailedSku = {
+  [mockSku.sku]: {
+    sku: mockSku.sku,
+    quantity: 1,
+    currency: mockSku.currency,
+    price: mockSku.price,
+    formattedPrice: '$2.00',
+    image: mockSku.image,
+  },
+};
+
+const mockDetailedSku2 = {
+  [mockSku2.sku]: {
+    sku: mockSku2.sku,
+    quantity: 1,
+    currency: mockSku2.currency,
+    price: mockSku2.price,
+    formattedPrice: '£3.00',
+    image: mockSku2.image,
+  },
 };
 
 const createWrapper = () => ({ children }) => {
@@ -244,5 +266,57 @@ describe('useStripeCart', () => {
     });
 
     expect(result.current.shouldDisplayCart).toBe(false);
+  });
+
+  it('cartDetails should add give back a more detailed version of what skus gives back', () => {
+    const wrapper = createWrapper();
+    const { result } = renderHook(() => useStripeCart(), { wrapper });
+
+    act(() => {
+      result.current.addItem(mockSku);
+    });
+
+    expect(result.current.cartDetails).toEqual(mockDetailedSku);
+  });
+
+  it('cartDetails will increase quantitave values when same item is added to cart', () => {
+    const wrapper = createWrapper();
+    const { result } = renderHook(() => useStripeCart(), { wrapper });
+
+    act(() => {
+      result.current.addItem(mockSku);
+    });
+
+    expect(result.current.cartDetails).toEqual(mockDetailedSku);
+
+    act(() => {
+      result.current.addItem(mockSku);
+    });
+
+    expect(result.current.cartDetails).toEqual({
+      [mockSku.sku]: {
+        formattedPrice: '$4.00',
+        price: mockSku.price * 2,
+        image: 'https://www.fillmurray.com/300/300',
+        quantity: 2,
+        currency: mockSku.currency,
+        sku: mockSku.sku,
+      },
+    });
+  });
+
+  it('cartDetails can add 2 skus', () => {
+    const wrapper = createWrapper();
+    const { result } = renderHook(() => useStripeCart(), { wrapper });
+
+    act(() => {
+      result.current.addItem(mockSku);
+      result.current.addItem(mockSku2);
+    });
+
+    expect(result.current.cartDetails).toEqual({
+      ...mockDetailedSku,
+      ...mockDetailedSku2,
+    });
   });
 });
