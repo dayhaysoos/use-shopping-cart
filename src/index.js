@@ -80,7 +80,7 @@ const removeSku = (skuID, skus) => {
 };
 
 const reducer = (cart, action) => {
-  const { skus } = cart;
+  const { skus, cartItems } = cart;
 
   switch (action.type) {
     case 'addToCheckoutCart':
@@ -109,9 +109,16 @@ const reducer = (cart, action) => {
           'skus',
           JSON.stringify(removeSku(action.skuID, skus))
         );
+
+      const index = cartItems.findIndex(item => item.sku === action.skuID);
+
+      if (index !== -1) {
+        cartItems.splice(index, 1);
+      }
       return {
         ...cart,
         skus: removeSku(action.skuID, skus),
+        cartItems,
       };
 
     case 'storeLastClicked':
