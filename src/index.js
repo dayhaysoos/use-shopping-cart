@@ -27,6 +27,7 @@ const formatDetailedCart = cartItems => {
   const details = cartItems.reduce((acc, current) => {
     if (acc.hasOwnProperty(current.sku)) {
       acc = {
+        ...acc,
         [current.sku]: {
           ...current,
           price: acc[current.sku].price + current.price,
@@ -39,6 +40,7 @@ const formatDetailedCart = cartItems => {
       };
     } else {
       acc = {
+        ...acc,
         [current.sku]: {
           ...current,
           quantity: 1,
@@ -78,7 +80,7 @@ const removeSku = (skuID, skus) => {
 };
 
 const reducer = (cart, action) => {
-  const { skus } = cart;
+  const { skus, cartItems } = cart;
 
   switch (action.type) {
     case 'addToCheckoutCart':
@@ -107,9 +109,16 @@ const reducer = (cart, action) => {
           'skus',
           JSON.stringify(removeSku(action.skuID, skus))
         );
+
+      const index = cartItems.findIndex(item => item.sku === action.skuID);
+
+      if (index !== -1) {
+        cartItems.splice(index, 1);
+      }
       return {
         ...cart,
         skus: removeSku(action.skuID, skus),
+        cartItems,
       };
 
     case 'storeLastClicked':
