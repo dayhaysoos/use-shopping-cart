@@ -73,6 +73,11 @@ const updateQuantity = (quantity, skuID, skus) => {
   return updatedSkus;
 };
 
+const removeItem = (skuID, cartItems) => {
+  const index = cartItems.findIndex(item => item.sku);
+  return cartItems;
+};
+
 const removeSku = (skuID, skus) => {
   delete skus[skuID];
 
@@ -148,6 +153,11 @@ const reducer = (cart, action) => {
       return {
         ...cart,
         cartItems: [...cart.cartItems, action.sku],
+      };
+    case 'removeFromCartItems':
+      return {
+        ...cart,
+        cartItems: removeItem(action.sku, cart.cartItems),
       };
     default:
       console.error(`unknown action ${action.type}`);
@@ -238,6 +248,9 @@ export const useStripeCart = () => {
     dispatch({ type: 'addToCartItems', sku });
   };
 
+  const removeCartItem = sku => {
+    dispatch({ type: 'removeFromCartItems', sku });
+  };
   const handleQuantityChange = (quantity, skuID) => {
     dispatch({ type: 'handleQuantityChange', quantity, skuID });
   };
@@ -281,5 +294,6 @@ export const useStripeCart = () => {
     handleCartHover,
     handleCloseCart,
     totalPrice,
+    removeCartItem,
   };
 };

@@ -1,63 +1,33 @@
 /**@jsx jsx */
 import { jsx } from 'theme-ui';
-import { useStripeCart } from 'use-stripe-cart';
-import { Box, Flex, Button } from 'theme-ui';
+import { Flex } from 'theme-ui';
+import Products from './components/products';
+import CartDisplay from './components/cart-display';
+import { toCurrency } from './util';
+
+const fakeData = [
+  {
+    name: 'Bananas',
+    sku: 'sku_GBJ2Ep8246qeeT',
+    price: 400,
+    image: 'https://www.fillmurray.com/300/300',
+    currency: 'usd',
+  },
+  {
+    name: 'Oranges',
+    sku: 'sku_GBJ2WWfMaGNC2Z',
+    price: 200,
+    image: 'https://www.fillmurray.com/300/300',
+    currency: 'usd',
+  },
+];
 
 const App = () => {
-  const {
-    cartCount,
-    addItem,
-    deleteItem,
-    totalPrice,
-    redirectToCheckout,
-  } = useStripeCart();
-
   return (
-    <Box>
-      <Box>Total items in cart: {cartCount}</Box>
-      <Box>Total price: {totalPrice()}</Box>
-      <Flex>
-        <Flex sx={{ flexDirection: 'column' }}>
-          <Button
-            sx={{ backgroundColor: 'blue' }}
-            onClick={() =>
-              addItem({
-                sku: 'sku_GBJ2WWfMaGNC2Z',
-                price: 200,
-                image: '',
-                currency: 'usd',
-              })
-            }
-          >
-            Add Orange
-          </Button>
-          <Button
-            sx={{ backgroundColor: 'blue' }}
-            onClick={() => deleteItem('sku_GBJ2WWfMaGNC2Z')}
-          >
-            Remove Orange
-          </Button>
-        </Flex>
-        <Box>
-          <Button
-            sx={{ backgroundColor: 'blue' }}
-            onClick={() =>
-              addItem({
-                sku: 'sku_GBJ2Ep8246qeeT',
-                price: 400,
-                image: '',
-                currency: 'usd',
-              })
-            }
-          >
-            Bananas
-          </Button>
-        </Box>
-      </Flex>
-      <Button sx={{ backgroundColor: 'blue' }} onClick={redirectToCheckout}>
-        Checkout
-      </Button>
-    </Box>
+    <Flex sx={{ justifyContent: 'space-evenly' }}>
+      <Products products={fakeData} />
+      <CartDisplay />
+    </Flex>
   );
 };
 export default App;
