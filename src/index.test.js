@@ -319,4 +319,39 @@ describe('useStripeCart', () => {
       ...mockDetailedSku2,
     });
   });
+
+  it('cartItems gets items removed when deleteItem is ran', () => {
+    const wrapper = createWrapper();
+    const { result } = renderHook(() => useStripeCart(), { wrapper });
+
+    act(() => {
+      result.current.addItem(mockSku);
+    });
+
+    expect(result.current.cartItems).toEqual([mockSku]);
+
+    act(() => {
+      result.current.deleteItem(mockSku.sku);
+    });
+
+    expect(result.current.cartItems).toEqual([]);
+  });
+
+  it('cartItems gets one item removed when deleteItem is ran', () => {
+    const wrapper = createWrapper();
+    const { result } = renderHook(() => useStripeCart(), { wrapper });
+
+    act(() => {
+      result.current.addItem(mockSku);
+      result.current.addItem(mockSku2);
+    });
+
+    expect(result.current.cartItems).toEqual([mockSku, mockSku2]);
+
+    act(() => {
+      result.current.deleteItem(mockSku.sku);
+    });
+
+    expect(result.current.cartItems).toEqual([mockSku2]);
+  });
 });
