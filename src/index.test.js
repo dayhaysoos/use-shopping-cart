@@ -73,18 +73,19 @@ const createWrapper = () => ({ children }) => {
   );
 };
 
+
+let result;
+beforeEach(() => {
+  const wrapper = createWrapper();
+  result = renderHook(() => useStripeCart(), { wrapper }).result;
+});
+
 describe('useStripeCart', () => {
   it('renderps', () => {
-    const wrapper = createWrapper();
-    const { result } = renderHook(() => useStripeCart(), { wrapper });
-
     expect(result.current.cartItems).toEqual(INITIAL_STATE.cartItems);
   });
 
   it('addItems adds items to cart', () => {
-    const wrapper = createWrapper();
-    const { result } = renderHook(() => useStripeCart(), { wrapper });
-
     act(() => {
       result.current.addItem(mockSku);
     });
@@ -93,9 +94,6 @@ describe('useStripeCart', () => {
   });
 
   it('cartCount increments when addItem is executed', () => {
-    const wrapper = createWrapper();
-    const { result } = renderHook(() => useStripeCart(), { wrapper });
-
     expect(result.current.cartCount).toBe(0);
 
     act(() => {
@@ -106,9 +104,6 @@ describe('useStripeCart', () => {
   });
 
   it('skus object updates with sku id and quantity based on addItems', () => {
-    const wrapper = createWrapper();
-    const { result } = renderHook(() => useStripeCart(), { wrapper });
-
     expect(result.current.skus).toEqual({});
 
     act(() => {
@@ -121,9 +116,6 @@ describe('useStripeCart', () => {
   });
 
   it('checkoutData builds an array of objects to prepare for redirectToCheckout', () => {
-    const wrapper = createWrapper();
-    const { result } = renderHook(() => useStripeCart(), { wrapper });
-
     expect(result.current.checkoutData).toEqual([]);
 
     act(() => {
@@ -136,9 +128,6 @@ describe('useStripeCart', () => {
   });
 
   it('deleteItem removes item from sku object', () => {
-    const wrapper = createWrapper();
-    const { result } = renderHook(() => useStripeCart(), { wrapper });
-
     act(() => {
       result.current.addItem(mockSku);
     });
@@ -155,9 +144,6 @@ describe('useStripeCart', () => {
   });
 
   it('deleteItem remove the correct item from the cart', () => {
-    const wrapper = createWrapper();
-    const { result } = renderHook(() => useStripeCart(), { wrapper });
-
     act(() => {
       result.current.addItem(mockSku);
       result.current.addItem(mockSku2);
@@ -178,9 +164,6 @@ describe('useStripeCart', () => {
   });
 
   it('should update totalPrice', () => {
-    const wrapper = createWrapper();
-    const { result } = renderHook(() => useStripeCart(), { wrapper });
-
     act(() => {
       result.current.addItem(mockSku);
     });
@@ -189,9 +172,6 @@ describe('useStripeCart', () => {
   });
 
   it('should update totalPrice when two items are added', () => {
-    const wrapper = createWrapper();
-    const { result } = renderHook(() => useStripeCart(), { wrapper });
-
     act(() => {
       result.current.addItem(mockSku);
       result.current.addItem(mockSku3);
@@ -201,9 +181,6 @@ describe('useStripeCart', () => {
   });
 
   it('storeLastClicked stores the correct value', () => {
-    const wrapper = createWrapper();
-    const { result } = renderHook(() => useStripeCart(), { wrapper });
-
     act(() => {
       result.current.storeLastClicked(mockSku.sku);
     });
@@ -212,9 +189,6 @@ describe('useStripeCart', () => {
   });
 
   it('handleQuantityChange changes the quantity correctly', () => {
-    const wrapper = createWrapper();
-    const { result } = renderHook(() => useStripeCart(), { wrapper });
-
     act(() => {
       result.current.addItem(mockSku);
       result.current.handleQuantityChange(10, mockSku.sku);
@@ -227,9 +201,6 @@ describe('useStripeCart', () => {
   });
 
   it('handleQuantityChange removes item from skus object when quantity reaches 0', () => {
-    const wrapper = createWrapper();
-    const { result } = renderHook(() => useStripeCart(), { wrapper });
-
     act(() => {
       result.current.addItem(mockSku);
       result.current.handleQuantityChange(0, mockSku.sku);
@@ -239,16 +210,11 @@ describe('useStripeCart', () => {
   });
 
   it('shouldDisplayCart should be false initially', () => {
-    const wrapper = createWrapper();
-    const { result } = renderHook(() => useStripeCart(), { wrapper });
-
+        
     expect(result.current.shouldDisplayCart).toBe(false);
   });
 
   it('shouldDisplayCart should be true after handleCartClick', () => {
-    const wrapper = createWrapper();
-    const { result } = renderHook(() => useStripeCart(), { wrapper });
-
     act(() => {
       result.current.handleCartClick();
     });
@@ -257,9 +223,6 @@ describe('useStripeCart', () => {
   });
 
   it('shouldDisplayCart should be false after 2 handleCartClick', () => {
-    const wrapper = createWrapper();
-    const { result } = renderHook(() => useStripeCart(), { wrapper });
-
     act(() => {
       result.current.handleCartClick();
       result.current.handleCartClick();
@@ -269,9 +232,6 @@ describe('useStripeCart', () => {
   });
 
   it('cartDetails should add give back a more detailed version of what skus gives back', () => {
-    const wrapper = createWrapper();
-    const { result } = renderHook(() => useStripeCart(), { wrapper });
-
     act(() => {
       result.current.addItem(mockSku);
     });
@@ -280,9 +240,6 @@ describe('useStripeCart', () => {
   });
 
   it('cartDetails will increase quantitave values when same item is added to cart', () => {
-    const wrapper = createWrapper();
-    const { result } = renderHook(() => useStripeCart(), { wrapper });
-
     act(() => {
       result.current.addItem(mockSku);
     });
@@ -306,9 +263,6 @@ describe('useStripeCart', () => {
   });
 
   it('cartDetails can add 2 skus', () => {
-    const wrapper = createWrapper();
-    const { result } = renderHook(() => useStripeCart(), { wrapper });
-
     act(() => {
       result.current.addItem(mockSku);
       result.current.addItem(mockSku2);
@@ -321,9 +275,6 @@ describe('useStripeCart', () => {
   });
 
   it('cartItems gets items removed when deleteItem is ran', () => {
-    const wrapper = createWrapper();
-    const { result } = renderHook(() => useStripeCart(), { wrapper });
-
     act(() => {
       result.current.addItem(mockSku);
     });
@@ -338,9 +289,6 @@ describe('useStripeCart', () => {
   });
 
   it('cartItems gets one item removed when deleteItem is ran', () => {
-    const wrapper = createWrapper();
-    const { result } = renderHook(() => useStripeCart(), { wrapper });
-
     act(() => {
       result.current.addItem(mockSku);
       result.current.addItem(mockSku2);
