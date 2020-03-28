@@ -1,5 +1,5 @@
 import React, { createContext, useReducer, useContext } from 'react';
-import { toCurrency } from './util';
+import { toCurrency, calculateTotalPrice } from './util';
 
 /**
  * @function checkoutCart
@@ -219,19 +219,8 @@ export const useStripeCart = () => {
   }
 
   const checkoutData = formatCheckoutCart(skus);
-
-  const totalPrice = () => {
-    let total = 0;
-    let currency = 'usd';
-    const totalPrice = cartItems.reduce((acc, current) => {
-      currency = current.currency;
-      return acc + current.price;
-    }, 0);
-
-    total = totalPrice;
-
-    return toCurrency({ price: total, currency: currency });
-  };
+  
+  const totalPrice = () => calculateTotalPrice('usd', cartItems);
 
   typeof localStorage === 'object' &&
     localStorage.setItem('skus', JSON.stringify(storageReference));

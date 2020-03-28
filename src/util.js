@@ -6,3 +6,12 @@ export const toCurrency = ({ price, currency }) => {
 
   return formatted;
 };
+
+export const calculateTotalPrice = (currency, cartItems) => {
+  const price = cartItems.reduce((acc, cartItem) => {
+    currency = cartItem.currency;
+    return acc + cartItem.price;
+  }, 0);
+
+  return toCurrency({ price, currency });
+}
