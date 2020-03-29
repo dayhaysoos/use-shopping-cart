@@ -173,6 +173,7 @@ export const CartProvider = ({
   billingAddressCollection,
   successUrl,
   cancelUrl,
+  currency,
 }) => {
   const skuStorage =
     typeof window !== 'undefined'
@@ -189,6 +190,7 @@ export const CartProvider = ({
         billingAddressCollection,
         successUrl,
         cancelUrl,
+        currency,
       })}
     >
       {children}
@@ -208,6 +210,7 @@ export const useStripeCart = () => {
     billingAddressCollection,
     successUrl,
     cancelUrl,
+    currency,
   } = cart;
 
   let storageReference =
@@ -220,7 +223,7 @@ export const useStripeCart = () => {
 
   const checkoutData = formatCheckoutCart(skus);
   
-  const totalPrice = () => calculateTotalPrice('usd', cartItems);
+  const totalPrice = () => calculateTotalPrice(currency, cartItems);
 
   typeof localStorage === 'object' &&
     localStorage.setItem('skus', JSON.stringify(storageReference));

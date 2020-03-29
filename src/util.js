@@ -8,13 +8,6 @@ export const toCurrency = ({ price, currency }) => {
 };
 
 export const calculateTotalPrice = (currency, cartItems) => {
-  const price = cartItems.reduce((acc, cartItem) => {
-    if (cartItem.currency) {
-      currency = cartItem.currency;
-    }
-
-    return acc + cartItem.price;
-  }, 0);
-
+  const price = cartItems.reduce((acc, { price }) => acc + price, 0);
   return toCurrency({ price, currency });
-}
+};
