@@ -23,11 +23,11 @@ const checkoutCart = (skus, { sku }, quantity = 1) => {
   }
 };
 
-const formatDetailedCart = (currency, cartItems) => {
+const formatDetailedCart = (currency, cartItems, language) => {
   return cartItems.reduce((acc, current) => {
     const quantity = (acc[current.sku]?.quantity ?? 0) + 1;
     const price = (acc[current.sku]?.price ?? 0) + current.price;
-    const formattedPrice = toCurrency({ price, currency });
+    const formattedPrice = toCurrency({ price, currency, language });
 
     return {
       ...acc,
@@ -158,6 +158,7 @@ export const CartProvider = ({
   successUrl,
   cancelUrl,
   currency,
+  language=navigator.language,
 }) => {
   const skuStorage =
     typeof window !== 'undefined'
@@ -195,6 +196,7 @@ export const useStripeCart = () => {
     successUrl,
     cancelUrl,
     currency,
+    language
   } = cart;
 
   let storageReference =
@@ -212,7 +214,7 @@ export const useStripeCart = () => {
   typeof localStorage === 'object' &&
     localStorage.setItem('skus', JSON.stringify(storageReference));
 
-  const cartDetails = formatDetailedCart(currency, cartItems);
+  const cartDetails = formatDetailedCart(currency, cartItems, language);
 
   const cartCount = checkoutData.reduce(
     (acc, current) => acc + current.quantity,
