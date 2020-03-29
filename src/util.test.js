@@ -12,13 +12,13 @@ describe('calculateTotalPrice', () => {
   
   it('handles cents', () => {
     const cartItemsWithDollarsAndCents = [
-      { price: 23, currency: 'USD' },
-      { price: 345, currency: 'USD' }
+      { price: 23 },
+      { price: 345 }
     ];
     
     const cartItemsWithOnlyCents = [
-      { price: 1, currency: 'USD' },
-      { price: 2, currency: 'USD' }
+      { price: 1 },
+      { price: 2 }
     ];
     
     expect(calculateTotalPrice('USD', cartItemsWithDollarsAndCents)).toBe('$3.68');
@@ -27,25 +27,21 @@ describe('calculateTotalPrice', () => {
   
   it('handles different currencies', () => {
     const cartItems = [
-      { price: 100, currency: 'GBP' },
-      { price: 100, currency: 'GBP' }
-    ];
-    
-    // defaults to USD but finds GBP
-    expect(calculateTotalPrice('USD', cartItems)).toBe('£2.00');
-  });
-  
-  it('handles missing currencies', () => {
-    const cartItemsMissingAllCurrencies = [
       { price: 100 },
       { price: 100 }
     ];
-    const cartItemsMissingOneCurrency = [
+
+    expect(calculateTotalPrice('GBP', cartItems)).toBe('£2.00');
+    expect(calculateTotalPrice('EUR', cartItems)).toBe('€2.00');
+  });
+  
+  it('handles different item currencies', () => {
+    const cartItems = [
+      { price: 100, currency: 'EUR' },
       { price: 100, currency: 'GBP' },
       { price: 100 }
     ];
     
-    expect(calculateTotalPrice('USD', cartItemsMissingAllCurrencies)).toBe('$2.00');
-    expect(calculateTotalPrice('USD', cartItemsMissingOneCurrency)).toBe('£2.00');
+    expect(calculateTotalPrice('USD', cartItems)).toBe('$3.00');
   });
 });
