@@ -64,9 +64,10 @@ const createWrapper = () => ({ children }) => {
   return (
     <CartProvider
       billingAddressCollection={false}
-      successUrl={'https://egghead.io'}
-      cancelUrl={'https://egghead.io'}
+      successUrl="https://egghead.io"
+      cancelUrl="https://egghead.io"
       stripe={stripeMock}
+      currency="USD"
     >
       {children}
     </CartProvider>

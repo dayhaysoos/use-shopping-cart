@@ -23,38 +23,22 @@ const checkoutCart = (skus, { sku }, quantity = 1) => {
   }
 };
 
-const formatDetailedCart = cartItems => {
-  const details = cartItems.reduce((acc, current) => {
-    if (acc.hasOwnProperty(current.sku)) {
-      acc = {
-        ...acc,
-        [current.sku]: {
-          ...current,
-          price: acc[current.sku].price + current.price,
-          formattedPrice: toCurrency({
-            price: acc[current.sku].price + current.price,
-            currency: current.currency,
-          }),
-          quantity: acc[current.sku].quantity + 1,
-        },
-      };
-    } else {
-      acc = {
-        ...acc,
-        [current.sku]: {
-          ...current,
-          quantity: 1,
-          formattedPrice: toCurrency({
-            price: current.price,
-            currency: current.currency,
-          }),
-        },
-      };
-    }
-    return acc;
-  }, {});
+const formatDetailedCart = (currency, cartItems) => {
+  return cartItems.reduce((acc, current) => {
+    const quantity = (acc[current.sku]?.quantity ?? 0) + 1;
+    const price = (acc[current.sku]?.price ?? 0) + current.price;
+    const formattedPrice = toCurrency({ price, currency });
 
-  return details;
+    return {
+      ...acc,
+      [current.sku]: {
+        ...current,
+        quantity,
+        price,
+        formattedPrice,
+      },
+    };
+  }, {});
 };
 
 const formatCheckoutCart = checkoutData => {
@@ -228,7 +212,7 @@ export const useStripeCart = () => {
   typeof localStorage === 'object' &&
     localStorage.setItem('skus', JSON.stringify(storageReference));
 
-  const cartDetails = formatDetailedCart(cartItems);
+  const cartDetails = formatDetailedCart(currency, cartItems);
 
   const cartCount = checkoutData.reduce(
     (acc, current) => acc + current.quantity,
