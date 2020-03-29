@@ -29,13 +29,13 @@ const mockSku3 = {
   sku: 'sku_abc234',
   price: 100,
   image: 'https://www.fillmurray.com/300/300',
-  currency: 'usd',
+  currency: 'USD',
 };
 const mockSku2 = {
   sku: 'sku_xyz456',
   price: 300,
   image: 'https://www.fillmurray.com/300/300',
-  currency: 'gbp',
+  currency: 'USD',
 };
 
 const mockDetailedSku = {
@@ -55,7 +55,7 @@ const mockDetailedSku2 = {
     quantity: 1,
     currency: mockSku2.currency,
     price: mockSku2.price,
-    formattedPrice: '£3.00',
+    formattedPrice: '$3.00',
     image: mockSku2.image,
   },
 };
