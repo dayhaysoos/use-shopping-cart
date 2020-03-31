@@ -1,5 +1,5 @@
 import React, { createContext, useReducer, useContext } from 'react';
-import { toCurrency } from './util';
+import { toCurrency, calculateTotalPrice } from './util';
 
 /**
  * @function checkoutCart
@@ -23,38 +23,22 @@ const checkoutCart = (skus, { sku }, quantity = 1) => {
   }
 };
 
-const formatDetailedCart = cartItems => {
-  const details = cartItems.reduce((acc, current) => {
-    if (acc.hasOwnProperty(current.sku)) {
-      acc = {
-        ...acc,
-        [current.sku]: {
-          ...current,
-          price: acc[current.sku].price + current.price,
-          formattedPrice: toCurrency({
-            price: acc[current.sku].price + current.price,
-            currency: current.currency,
-          }),
-          quantity: acc[current.sku].quantity + 1,
-        },
-      };
-    } else {
-      acc = {
-        ...acc,
-        [current.sku]: {
-          ...current,
-          quantity: 1,
-          formattedPrice: toCurrency({
-            price: current.price,
-            currency: current.currency,
-          }),
-        },
-      };
-    }
-    return acc;
-  }, {});
+const formatDetailedCart = (currency, cartItems) => {
+  return cartItems.reduce((acc, current) => {
+    const quantity = (acc[current.sku]?.quantity ?? 0) + 1;
+    const price = (acc[current.sku]?.price ?? 0) + current.price;
+    const formattedPrice = toCurrency({ price, currency });
 
-  return details;
+    return {
+      ...acc,
+      [current.sku]: {
+        ...current,
+        quantity,
+        price,
+        formattedPrice,
+      },
+    };
+  }, {});
 };
 
 const formatCheckoutCart = checkoutData => {
@@ -173,6 +157,7 @@ export const CartProvider = ({
   billingAddressCollection,
   successUrl,
   cancelUrl,
+  currency,
 }) => {
   const skuStorage =
     typeof window !== 'undefined'
@@ -189,6 +174,7 @@ export const CartProvider = ({
         billingAddressCollection,
         successUrl,
         cancelUrl,
+        currency,
       })}
     >
       {children}
@@ -208,6 +194,7 @@ export const useStripeCart = () => {
     billingAddressCollection,
     successUrl,
     cancelUrl,
+    currency,
   } = cart;
 
   let storageReference =
@@ -219,24 +206,13 @@ export const useStripeCart = () => {
   }
 
   const checkoutData = formatCheckoutCart(skus);
-
-  const totalPrice = () => {
-    let total = 0;
-    let currency = 'usd';
-    const totalPrice = cartItems.reduce((acc, current) => {
-      currency = current.currency;
-      return acc + current.price;
-    }, 0);
-
-    total = totalPrice;
-
-    return toCurrency({ price: total, currency: currency });
-  };
+  
+  const totalPrice = () => calculateTotalPrice(currency, cartItems);
 
   typeof localStorage === 'object' &&
     localStorage.setItem('skus', JSON.stringify(storageReference));
 
-  const cartDetails = formatDetailedCart(cartItems);
+  const cartDetails = formatDetailedCart(currency, cartItems);
 
   const cartCount = checkoutData.reduce(
     (acc, current) => acc + current.quantity,
