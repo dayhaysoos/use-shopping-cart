@@ -267,8 +267,9 @@ export const useStripeCart = () => {
       successUrl,
       cancelUrl,
     });
+    
     if (error) {
-      console.warn('Error:', error);
+      return error;
     }
   };
 
