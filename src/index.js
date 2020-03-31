@@ -264,8 +264,8 @@ export const useStripeCart = () => {
   const redirectToCheckout = async (submitType = 'auto') => {
     const { error } = await stripe.redirectToCheckout({
       items: checkoutData,
-      successUrl: `http://localhost:8000/thank-you`,
-      cancelUrl: `http://localhost:8000/`,
+      successUrl,
+      cancelUrl,
     });
     if (error) {
       console.warn('Error:', error);
