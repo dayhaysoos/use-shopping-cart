@@ -14,8 +14,6 @@ const CartDisplay = () => {
     redirectToCheckout,
   } = useStripeCart();
 
-  console.log('cart Details', cartDetails);
-
   if (Object.keys(cartDetails).length === 0) {
     return (
       <Box sx={{ textAlign: 'center' }}>
