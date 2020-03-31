@@ -1,6 +1,9 @@
 # use-stripe-cart
+
 <!-- ALL-CONTRIBUTORS-BADGE:START - Do not remove or modify this section -->
+
 [![All Contributors](https://img.shields.io/badge/all_contributors-1-orange.svg?style=flat-square)](#contributors-)
+
 <!-- ALL-CONTRIBUTORS-BADGE:END -->
 
 > Shopping cart state and logic for Stripe
@@ -11,20 +14,110 @@
 
 ```bash
 npm install --save use-stripe-cart
+
+or
+
+yarn add use-stripe-cart
 ```
 
 ## Usage
 
+At the root level of your app, wrap your Root app in the `<CartProvider />`
+
 ```jsx
-import React, { Component } from 'react'
+/** @jsx jsx */
+import { CartProvider } from 'use-stripe-cart';
+import './index.css';
+import App from './App';
 
-import { useMyHook } from 'use-stripe-cart'
+const stripe = window.Stripe(process.env.REACT_APP_STRIPE_API_PUBLIC);
 
-const Example = () => {
-  const example = useMyHook()
+ReactDOM.render(
+  <CartProvider
+    stripe={stripe}
+    billingAddressCollection={false}
+    successUrl={'stripe.com'}
+    cancelUrl={'twitter.com/dayhaysoos'}
+    currency={'USD'}
+  >
+    <App />
+  </CartProvider>,
+  document.getElementById('root')
+);
+```
+
+To add an item to the cart, you could use `addItem()`
+
+```jsx
+/**@jsx jsx */
+import { jsx, Box, Image, Button, Flex } from 'theme-ui';
+import { useStripeCart } from 'use-stripe-cart';
+import { toCurrency } from '../util';
+
+/**
+ * PRODUCT DATA COMING FROM PROPS
+const fakeData = [
+  {
+    name: 'Bananas',
+    sku: 'sku_GBJ2Ep8246qeeT',
+    price: 400,
+    image: 'https://www.fillmurray.com/300/300',
+    currency: 'USD',
+  },
+  {
+    name: 'Tangerines',
+    sku: 'sku_GBJ2WWfMaGNC2Z',
+    price: 100,
+    image: 'https://www.fillmurray.com/300/300',
+    currency: 'USD',
+  },
+];
+*/
+
+const Product = product => {
+  const { addItem } = useStripeCart();
+  const { name, sku, price, image, currency } = product;
   return (
-    <div>{example}</div>
-  )
+    <Flex
+      sx={{
+        flexDirection: 'column',
+        justifyContent: 'center',
+        alignItems: 'center',
+      }}
+    >
+      <Image src={image} />
+      <Box>
+        <p>{name}</p>
+        <p>{toCurrency({ price: price, currency })}</p>
+      </Box>
+      <Button onClick={() => addItem({ ...product })} backgroundColor={'black'}>
+        Add To Cart
+      </Button>
+    </Flex>
+  );
+};
+```
+
+For displaying what's actually in the cart, refer to the CartDisplay component:
+https://github.com/dayhaysoos/use-stripe-cart/blob/master/example/src/components/cart-display.js
+
+## API
+
+`cartDetails: Object`
+
+Cart details is an object with skus of the items in the cart as keys and details of the items as the value, for example:
+
+```jsx
+{
+  sku_GBJ2Ep8246qeeT: {
+    name: 'Bananas';
+    sku: 'sku_GBJ2Ep8246qeeT';
+    price: 400;
+    image: 'https://www.fillmurray.com/300/300';
+    currency: 'USD';
+    quantity: 1;
+    formattedPrice: '$4.00';
+  }
 }
 ```
 
@@ -52,6 +145,7 @@ Thanks goes to these wonderful people ([emoji key](https://allcontributors.org/d
 
 <!-- markdownlint-enable -->
 <!-- prettier-ignore-end -->
+
 <!-- ALL-CONTRIBUTORS-LIST:END -->
 
 This project follows the [all-contributors](https://github.com/all-contributors/all-contributors) specification. Contributions of any kind welcome!

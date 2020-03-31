@@ -13,6 +13,7 @@ ReactDOM.render(
     billingAddressCollection={false}
     successUrl={'stripe.com'}
     cancelUrl={'twitter.com/dayhaysoos'}
+    currency={'USD'}
   >
     <App />
   </CartProvider>,

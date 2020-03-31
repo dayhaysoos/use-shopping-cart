@@ -11,14 +11,14 @@ const fakeData = [
     sku: 'sku_GBJ2Ep8246qeeT',
     price: 400,
     image: 'https://www.fillmurray.com/300/300',
-    currency: 'usd',
+    currency: 'USD',
   },
   {
-    name: 'Oranges',
+    name: 'Tangerines',
     sku: 'sku_GBJ2WWfMaGNC2Z',
-    price: 200,
+    price: 100,
     image: 'https://www.fillmurray.com/300/300',
-    currency: 'usd',
+    currency: 'USD',
   },
 ];
 
