@@ -1,5 +1,5 @@
-export const toCurrency = ({ price, currency }) => {
-  const formatted = new Intl.NumberFormat('en-US', {
+export const toCurrency = ({ price, currency, language }) => {
+  const formatted = new Intl.NumberFormat(language, {
     style: 'currency',
     currency,
   }).format(price / 100);
