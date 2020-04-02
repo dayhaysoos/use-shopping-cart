@@ -14,8 +14,11 @@ const INITIAL_STATE = {
   toggleRightMenu: false,
   cartItems: [],
   billingAddressCollection: false,
-  successUrl: 'https://egghead.io',
-  cancelUrl: 'https://egghead.io',
+  allowedCountries: null,
+  language: 'en-US',
+  currency: 'USD',
+  successUrl: 'https://egghead.io/success',
+  cancelUrl: 'https://egghead.io/cancel',
 };
 
 const mockSku = {
@@ -60,27 +63,27 @@ const mockDetailedSku2 = {
   },
 };
 
-const createWrapper = () => ({ children }) => {
+const createWrapper = (props={}) => ({ children }) => {
   return (
     <CartProvider
-      billingAddressCollection={false}
-      successUrl="https://egghead.io"
-      cancelUrl="https://egghead.io"
+      successUrl="https://egghead.io/success"
+      cancelUrl="https://egghead.io/cancel"
       stripe={stripeMock}
       currency="USD"
+      {...props}
     >
       {children}
     </CartProvider>
   );
 };
 
-let result;
-beforeEach(() => {
-  const wrapper = createWrapper();
-  result = renderHook(() => useStripeCart(), { wrapper }).result;
-});
-
 describe('useStripeCart', () => {
+  let result;
+  beforeEach(() => {
+    const wrapper = createWrapper();
+    result = renderHook(() => useStripeCart(), { wrapper }).result;
+  });
+
   it('renderps', () => {
     expect(result.current.cartItems).toEqual(INITIAL_STATE.cartItems);
   });
@@ -329,5 +332,25 @@ describe('useStripeCart', () => {
       result.current.reduceItemByOne(mockSku.sku);
     });
     expect(result.current.cartItems.length).toEqual(3);
+  });
+});
+
+describe('useStripeCart redirectToCheckout', () => {
+  it('should receive the correct default values', () => {
+    const wrapper = createWrapper();
+    const { result } = renderHook(() => useStripeCart(), { wrapper });
+
+    act(() => {
+      result.current.redirectToCheckout();
+    });
+    
+    expect(stripeMock.redirectToCheckout).toHaveBeenCalled();
+    expect(stripeMock.redirectToCheckout.mock.calls[0][0]).toEqual({
+      items: [],
+      successUrl: 'https://egghead.io/success',
+      cancelUrl: 'https://egghead.io/cancel',
+      billingAddressCollection: 'auto',
+      submitType: 'auto',
+    });
   });
 });
