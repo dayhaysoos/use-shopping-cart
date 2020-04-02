@@ -283,6 +283,7 @@ export const useStripeCart = () => {
       successUrl,
       cancelUrl,
       billingAddressCollection: billingAddressCollection ? 'required' : 'auto',
+      submitType,
     };
 
     if (Array.isArray(allowedCountries) && allowedCountries.length) {
