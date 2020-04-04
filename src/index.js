@@ -163,7 +163,6 @@ const reducer = (cart, action) => {
 
 export const CartContext = createContext();
 
-
 /**
  * @param {{
     children: JSX.Element,
@@ -277,20 +276,21 @@ export const useStripeCart = () => {
 
   const handleCloseCart = () => dispatch({ type: 'closeCart' });
 
-  const redirectToCheckout = async (submitType = 'auto') => {
+  const redirectToCheckout = async () => {
     const options = {
       items: checkoutData,
       successUrl,
       cancelUrl,
       billingAddressCollection: billingAddressCollection ? 'required' : 'auto',
-      submitType,
+      submitType: 'auto',
     };
 
     if (Array.isArray(allowedCountries) && allowedCountries.length) {
       options.shippingAddressCollection = {
-        allowedCountries
+        allowedCountries,
       };
     }
+    console.log('options', options, stripe);
 
     const { error } = await stripe.redirectToCheckout(options);
     if (error) {
