@@ -163,14 +163,28 @@ const reducer = (cart, action) => {
 
 export const CartContext = createContext();
 
+
+/**
+ * @param {{
+    children: JSX.Element,
+    stripe: any,
+    successUrl: string,
+    cancelUrl: string,
+    currency: string,
+    language: string,
+    billingAddressCollection: boolean,
+    allowedCountries: null | string[]
+ * }}
+ */
 export const CartProvider = ({
   children,
   stripe,
-  billingAddressCollection,
   successUrl,
   cancelUrl,
   currency,
   language = navigator.language,
+  billingAddressCollection = false,
+  allowedCountries = null,
 }) => {
   const skuStorage =
     typeof window !== 'undefined'
@@ -184,10 +198,11 @@ export const CartProvider = ({
         shouldDisplayCart: false,
         cartItems: [],
         stripe,
-        billingAddressCollection,
         successUrl,
         cancelUrl,
         currency,
+        billingAddressCollection,
+        allowedCountries,
       })}
     >
       {children}
@@ -204,11 +219,12 @@ export const useStripeCart = () => {
     lastClicked,
     shouldDisplayCart,
     cartItems,
-    billingAddressCollection,
     successUrl,
     cancelUrl,
     currency,
     language,
+    billingAddressCollection,
+    allowedCountries,
   } = cart;
 
   let storageReference =
@@ -262,13 +278,23 @@ export const useStripeCart = () => {
   const handleCloseCart = () => dispatch({ type: 'closeCart' });
 
   const redirectToCheckout = async (submitType = 'auto') => {
-    const { error } = await stripe.redirectToCheckout({
+    const options = {
       items: checkoutData,
-      successUrl: `http://localhost:8000/thank-you`,
-      cancelUrl: `http://localhost:8000/`,
-    });
+      successUrl,
+      cancelUrl,
+      billingAddressCollection: billingAddressCollection ? 'required' : 'auto',
+      submitType,
+    };
+
+    if (Array.isArray(allowedCountries) && allowedCountries.length) {
+      options.shippingAddressCollection = {
+        allowedCountries
+      };
+    }
+
+    const { error } = await stripe.redirectToCheckout(options);
     if (error) {
-      console.warn('Error:', error);
+      return error;
     }
   };
 
