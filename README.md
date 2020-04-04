@@ -138,7 +138,7 @@ Thanks goes to these wonderful people ([emoji key](https://allcontributors.org/d
   <tr>
     <td align="center"><a href="http://www.kevincunningham.co.uk"><img src="https://avatars3.githubusercontent.com/u/8320213?v=4" width="100px;" alt=""/><br /><sub><b>Kevin Cunningham</b></sub></a><br /><a href="https://github.com/dayhaysoos/use-stripe-cart/commits?author=doingandlearning" title="Tests">⚠️</a></td>
     <td align="center"><a href="https://ianjones.us/"><img src="https://avatars2.githubusercontent.com/u/4407263?v=4" width="100px;" alt=""/><br /><sub><b>Ian Jones</b></sub></a><br /><a href="https://github.com/dayhaysoos/use-stripe-cart/commits?author=theianjones" title="Tests">⚠️</a></td>
-    <td align="center"><a href="https://github.com/dayhaysoos"><img src="https://avatars3.githubusercontent.com/u/1852675?v=4" width="100px;" alt=""/><br /><sub><b>Nick DeJesus</b></sub></a><br /><a href="https://github.com/dayhaysoos/use-stripe-cart/commits?author=dayhaysoos" title="Tests">⚠️</a></td>
+    <td align="center"><a href="https://github.com/dayhaysoos"><img src="https://avatars3.githubusercontent.com/u/1852675?v=4" width="100px;" alt=""/><br /><sub><b>Nick DeJesus</b></sub></a><br /><a href="https://github.com/dayhaysoos/use-stripe-cart/commits?author=dayhaysoos" title="Tests">⚠️</a> <a href="https://github.com/dayhaysoos/use-stripe-cart/commits?author=dayhaysoos" title="Code">💻</a></td>
   </tr>
 </table>
 
