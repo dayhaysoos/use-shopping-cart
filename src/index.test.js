@@ -74,7 +74,6 @@ const createWrapper = () => ({ children }) => {
   );
 };
 
-
 let result;
 beforeEach(() => {
   const wrapper = createWrapper();
@@ -211,7 +210,6 @@ describe('useStripeCart', () => {
   });
 
   it('shouldDisplayCart should be false initially', () => {
-        
     expect(result.current.shouldDisplayCart).toBe(false);
   });
 
@@ -302,5 +300,34 @@ describe('useStripeCart', () => {
     });
 
     expect(result.current.cartItems).toEqual([mockSku2]);
+  });
+
+  it('reduceItemByOne reduces the cartItem amount of the target SKU by one', () => {
+    act(() => {
+      result.current.addItem(mockSku);
+      result.current.addItem(mockSku);
+      result.current.addItem(mockSku);
+    });
+    expect(result.current.cartItems.length).toEqual(3);
+
+    act(() => {
+      result.current.reduceItemByOne(mockSku.sku);
+    });
+    expect(result.current.cartItems.length).toEqual(2);
+  });
+
+  it('reduceItemByOne reduces the cartItems amount of the target SKU by one even when other SKUs are present', () => {
+    act(() => {
+      result.current.addItem(mockSku);
+      result.current.addItem(mockSku);
+      result.current.addItem(mockSku);
+      result.current.addItem(mockSku2);
+    });
+    expect(result.current.cartItems.length).toEqual(4);
+
+    act(() => {
+      result.current.reduceItemByOne(mockSku.sku);
+    });
+    expect(result.current.cartItems.length).toEqual(3);
   });
 });
