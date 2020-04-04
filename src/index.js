@@ -41,8 +41,8 @@ const formatDetailedCart = (currency, cartItems, language) => {
   }, {});
 };
 
-const formatCheckoutCart = checkoutData => {
-  return Object.keys(checkoutData).map(item => ({
+const formatCheckoutCart = (checkoutData) => {
+  return Object.keys(checkoutData).map((item) => ({
     sku: item,
     quantity: checkoutData[item],
   }));
@@ -58,8 +58,15 @@ const updateQuantity = (quantity, skuID, skus) => {
 };
 
 const removeItem = (skuID, cartItems) => {
-  const index = cartItems.findIndex(item => item.sku);
-  return cartItems;
+  const newCartItems = cartItems.filter((item) => item.sku !== skuID);
+  return newCartItems;
+};
+
+const reduceItemByOne = (skuID, cartItems) => {
+  const newCartItems = cartItems.filter((item) => item.sku !== skuID);
+  const itemsToReduce = cartItems.filter((item) => item.sku === skuID);
+  itemsToReduce.shift();
+  return [...newCartItems, ...itemsToReduce];
 };
 
 const removeSku = (skuID, skus) => {
@@ -99,7 +106,7 @@ const reducer = (cart, action) => {
           JSON.stringify(removeSku(action.skuID, skus))
         );
 
-      const index = cartItems.findIndex(item => item.sku === action.skuID);
+      const index = cartItems.findIndex((item) => item.sku === action.skuID);
 
       if (index !== -1) {
         cartItems.splice(index, 1);
@@ -143,6 +150,11 @@ const reducer = (cart, action) => {
         ...cart,
         cartItems: removeItem(action.sku, cart.cartItems),
       };
+    case 'reduceItemByOne':
+      return {
+        ...cart,
+        cartItems: reduceItemByOne(action.sku, cart.cartItems),
+      };
     default:
       console.error(`unknown action ${action.type}`);
       return cart;
@@ -158,7 +170,7 @@ export const CartProvider = ({
   successUrl,
   cancelUrl,
   currency,
-  language=navigator.language,
+  language = navigator.language,
 }) => {
   const skuStorage =
     typeof window !== 'undefined'
@@ -196,7 +208,7 @@ export const useStripeCart = () => {
     successUrl,
     cancelUrl,
     currency,
-    language
+    language,
   } = cart;
 
   let storageReference =
@@ -208,7 +220,7 @@ export const useStripeCart = () => {
   }
 
   const checkoutData = formatCheckoutCart(skus);
-  
+
   const totalPrice = () => calculateTotalPrice(currency, cartItems);
 
   typeof localStorage === 'object' &&
@@ -221,21 +233,26 @@ export const useStripeCart = () => {
     0
   );
 
-  const addItem = sku => {
+  const addItem = (sku) => {
     dispatch({ type: 'addToCheckoutCart', sku });
     dispatch({ type: 'addToCartItems', sku });
   };
 
-  const removeCartItem = sku => {
+  const removeCartItem = (sku) => {
     dispatch({ type: 'removeFromCartItems', sku });
   };
+
+  const reduceItemByOne = (sku) => {
+    dispatch({ type: 'reduceItemByOne', sku });
+  };
+
   const handleQuantityChange = (quantity, skuID) => {
     dispatch({ type: 'handleQuantityChange', quantity, skuID });
   };
 
-  const deleteItem = skuID => dispatch({ type: 'delete', skuID });
+  const deleteItem = (skuID) => dispatch({ type: 'delete', skuID });
 
-  const storeLastClicked = skuID =>
+  const storeLastClicked = (skuID) =>
     dispatch({ type: 'storeLastClicked', skuID });
 
   const handleCartClick = () => dispatch({ type: 'cartClick' });
@@ -273,5 +290,6 @@ export const useStripeCart = () => {
     handleCloseCart,
     totalPrice,
     removeCartItem,
+    reduceItemByOne,
   };
 };
