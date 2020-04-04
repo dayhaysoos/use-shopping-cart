@@ -1,32 +1,42 @@
 {
-	"files": [
-		"README.md"
-	],
-	"imageSize": 100,
-	"commit": false,
-	"contributors": [{
-			"login": "doingandlearning",
-			"name": "Kevin Cunningham",
-			"avatar_url": "https://avatars3.githubusercontent.com/u/8320213?v=4",
-			"profile": "http://www.kevincunningham.co.uk",
-			"contributions": [
-				"test"
-			]
-		},
-		{
-			"login": "theianjones",
-			"name": "Ian Jones",
-			"avatar_url": "https://avatars2.githubusercontent.com/u/4407263?v=4",
-			"profile": "https://ianjones.us/",
-			"contributions": [
-				"test"
-			]
-		}
-	],
-	"contributorsPerLine": 7,
-	"projectName": "use-stripe-cart",
-	"projectOwner": "dayhaysoos",
-	"repoType": "github",
-	"repoHost": "https://github.com",
-	"skipCi": true
+  "files": [
+    "README.md"
+  ],
+  "imageSize": 100,
+  "commit": false,
+  "contributors": [
+    {
+      "login": "doingandlearning",
+      "name": "Kevin Cunningham",
+      "avatar_url": "https://avatars3.githubusercontent.com/u/8320213?v=4",
+      "profile": "http://www.kevincunningham.co.uk",
+      "contributions": [
+        "test"
+      ]
+    },
+    {
+      "login": "theianjones",
+      "name": "Ian Jones",
+      "avatar_url": "https://avatars2.githubusercontent.com/u/4407263?v=4",
+      "profile": "https://ianjones.us/",
+      "contributions": [
+        "test"
+      ]
+    },
+    {
+      "login": "dayhaysoos",
+      "name": "Nick DeJesus",
+      "avatar_url": "https://avatars3.githubusercontent.com/u/1852675?v=4",
+      "profile": "https://github.com/dayhaysoos",
+      "contributions": [
+        "test"
+      ]
+    }
+  ],
+  "contributorsPerLine": 7,
+  "projectName": "use-stripe-cart",
+  "projectOwner": "dayhaysoos",
+  "repoType": "github",
+  "repoHost": "https://github.com",
+  "skipCi": true
 }
