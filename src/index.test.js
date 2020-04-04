@@ -336,7 +336,11 @@ describe('useStripeCart', () => {
 });
 
 describe('useStripeCart redirectToCheckout', () => {
-  it('should receive the correct default values', () => {
+  beforeEach(() => {
+    stripeMock.redirectToCheckout.mockClear();
+  });
+
+  it('should send the correct default values', () => {
     const wrapper = createWrapper();
     const { result } = renderHook(() => useStripeCart(), { wrapper });
 
@@ -352,5 +356,25 @@ describe('useStripeCart redirectToCheckout', () => {
       billingAddressCollection: 'auto',
       submitType: 'auto',
     });
+  });
+
+  it('should send all formatted items', () => {
+    const wrapper = createWrapper();
+    const { result } = renderHook(() => useStripeCart(), { wrapper });
+
+    act(() => {
+      result.current.addItem(mockSku);
+      result.current.addItem(mockSku);
+    });
+    result.current.redirectToCheckout();  
+
+    const expectedItems = [
+      { sku: mockSku.sku, quantity: 2 },
+    ];
+
+    expect(stripeMock.redirectToCheckout).toHaveBeenCalled();
+    expect(result.current.checkoutData).toEqual(expectedItems);
+    expect(stripeMock.redirectToCheckout.mock.calls[0][0].items)
+      .toEqual(expectedItems);
   });
 });
