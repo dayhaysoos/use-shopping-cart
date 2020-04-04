@@ -344,9 +344,7 @@ describe('useStripeCart redirectToCheckout', () => {
     const wrapper = createWrapper();
     const { result } = renderHook(() => useStripeCart(), { wrapper });
 
-    act(() => {
-      result.current.redirectToCheckout();
-    });
+    result.current.redirectToCheckout();
     
     expect(stripeMock.redirectToCheckout).toHaveBeenCalled();
     expect(stripeMock.redirectToCheckout.mock.calls[0][0]).toEqual({
@@ -376,5 +374,25 @@ describe('useStripeCart redirectToCheckout', () => {
     expect(result.current.checkoutData).toEqual(expectedItems);
     expect(stripeMock.redirectToCheckout.mock.calls[0][0].items)
       .toEqual(expectedItems);
+  });
+
+  it('should send correct billingAddressCollection', () => {
+    const wrapper = createWrapper({ billingAddressCollection: true });
+    const { result } = renderHook(() => useStripeCart(), { wrapper });
+
+    result.current.redirectToCheckout();
+
+    expect(stripeMock.redirectToCheckout).toHaveBeenCalled();
+    expect(stripeMock.redirectToCheckout.mock.calls[0][0].billingAddressCollection).toBe('required');
+  });
+
+  it('should send correct shippingAddressCollection', () => {
+    const wrapper = createWrapper({ allowedCountries: ['US', 'CA'] });
+    const { result } = renderHook(() => useStripeCart(), { wrapper });
+
+    result.current.redirectToCheckout();
+
+    expect(stripeMock.redirectToCheckout).toHaveBeenCalled();
+    expect(stripeMock.redirectToCheckout.mock.calls[0][0].shippingAddressCollection.allowedCountries).toEqual(['US', 'CA']);
   });
 });
