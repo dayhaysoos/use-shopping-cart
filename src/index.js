@@ -58,8 +58,15 @@ const updateQuantity = (quantity, skuID, skus) => {
 };
 
 const removeItem = (skuID, cartItems) => {
-  const index = cartItems.findIndex((item) => item.sku);
-  return cartItems;
+  const newCartItems = cartItems.filter((item) => item.sku !== skuID);
+  return newCartItems;
+};
+
+const reduceItemByOne = (skuID, cartItems) => {
+  const newCartItems = cartItems.filter((item) => item.sku !== skuID);
+  const itemsToReduce = cartItems.filter((item) => item.sku === skuID);
+  itemsToReduce.shift();
+  return [...newCartItems, ...itemsToReduce];
 };
 
 const removeSku = (skuID, skus) => {
@@ -142,6 +149,11 @@ const reducer = (cart, action) => {
       return {
         ...cart,
         cartItems: removeItem(action.sku, cart.cartItems),
+      };
+    case 'reduceItemByOne':
+      return {
+        ...cart,
+        cartItems: reduceItemByOne(action.sku, cart.cartItems),
       };
     default:
       console.error(`unknown action ${action.type}`);
@@ -229,6 +241,11 @@ export const useStripeCart = () => {
   const removeCartItem = (sku) => {
     dispatch({ type: 'removeFromCartItems', sku });
   };
+
+  const reduceItemByOne = (sku) => {
+    dispatch({ type: 'reduceItemByOne', sku });
+  };
+
   const handleQuantityChange = (quantity, skuID) => {
     dispatch({ type: 'handleQuantityChange', quantity, skuID });
   };
@@ -273,5 +290,6 @@ export const useStripeCart = () => {
     handleCloseCart,
     totalPrice,
     removeCartItem,
+    reduceItemByOne,
   };
 };

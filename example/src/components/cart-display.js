@@ -12,6 +12,7 @@ const CartDisplay = () => {
     removeCartItem,
     totalPrice,
     redirectToCheckout,
+    reduceItemByOne,
   } = useStripeCart();
 
   if (Object.keys(cartDetails).length === 0) {
@@ -31,7 +32,7 @@ const CartDisplay = () => {
         }}
       >
         <h2>Shopping Cart Display Panel</h2>
-        {Object.keys(cartDetails).map(item => {
+        {Object.keys(cartDetails).map((item) => {
           const cartItem = cartDetails[item];
           const { name, sku, formattedPrice, quantity } = cartItem;
           return (
@@ -58,7 +59,7 @@ const CartDisplay = () => {
                 </Button>
                 <Button
                   backgroundColor={'black'}
-                  onClick={() => removeCartItem(sku)}
+                  onClick={() => reduceItemByOne(sku)}
                 >
                   -
                 </Button>
