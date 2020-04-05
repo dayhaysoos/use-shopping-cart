@@ -1,5 +1,5 @@
 import React, { createContext, useReducer, useContext } from 'react';
-import { toCurrency, calculateTotalPrice } from './util';
+import { toCurrency, calculateTotalValue } from './util';
 
 /**
  * @function checkoutCart
@@ -26,8 +26,9 @@ const checkoutCart = (skus, { sku }, quantity = 1) => {
 const formatDetailedCart = (currency, cartItems, language) => {
   return cartItems.reduce((acc, current) => {
     const quantity = (acc[current.sku]?.quantity ?? 0) + 1;
-    const price = (acc[current.sku]?.price ?? 0) + current.price;
-    const formattedPrice = toCurrency({ price, currency, language });
+    const price = current.price;
+    const value = (acc[current.sku]?.value ?? 0) + current.price;
+    const formattedValue = toCurrency({ value, currency, language });
 
     return {
       ...acc,
@@ -35,14 +36,15 @@ const formatDetailedCart = (currency, cartItems, language) => {
         ...current,
         quantity,
         price,
-        formattedPrice,
+        formattedValue,
+        value,
       },
     };
   }, {});
 };
 
-const formatCheckoutCart = checkoutData => {
-  return Object.keys(checkoutData).map(item => ({
+const formatCheckoutCart = (checkoutData) => {
+  return Object.keys(checkoutData).map((item) => ({
     sku: item,
     quantity: checkoutData[item],
   }));
@@ -58,7 +60,7 @@ const updateQuantity = (quantity, skuID, skus) => {
 };
 
 const removeItem = (skuID, cartItems) => {
-  const index = cartItems.findIndex(item => item.sku);
+  const index = cartItems.findIndex((item) => item.sku);
   return cartItems;
 };
 
@@ -99,7 +101,7 @@ const reducer = (cart, action) => {
           JSON.stringify(removeSku(action.skuID, skus))
         );
 
-      const index = cartItems.findIndex(item => item.sku === action.skuID);
+      const index = cartItems.findIndex((item) => item.sku === action.skuID);
 
       if (index !== -1) {
         cartItems.splice(index, 1);
@@ -158,7 +160,7 @@ export const CartProvider = ({
   successUrl,
   cancelUrl,
   currency,
-  language=navigator.language,
+  language = navigator.language,
 }) => {
   const skuStorage =
     typeof window !== 'undefined'
@@ -196,7 +198,7 @@ export const useStripeCart = () => {
     successUrl,
     cancelUrl,
     currency,
-    language
+    language,
   } = cart;
 
   let storageReference =
@@ -208,8 +210,8 @@ export const useStripeCart = () => {
   }
 
   const checkoutData = formatCheckoutCart(skus);
-  
-  const totalPrice = () => calculateTotalPrice(currency, cartItems);
+
+  const totalPrice = () => calculateTotalValue(currency, cartItems);
 
   typeof localStorage === 'object' &&
     localStorage.setItem('skus', JSON.stringify(storageReference));
@@ -221,21 +223,21 @@ export const useStripeCart = () => {
     0
   );
 
-  const addItem = sku => {
+  const addItem = (sku) => {
     dispatch({ type: 'addToCheckoutCart', sku });
     dispatch({ type: 'addToCartItems', sku });
   };
 
-  const removeCartItem = sku => {
+  const removeCartItem = (sku) => {
     dispatch({ type: 'removeFromCartItems', sku });
   };
   const handleQuantityChange = (quantity, skuID) => {
     dispatch({ type: 'handleQuantityChange', quantity, skuID });
   };
 
-  const deleteItem = skuID => dispatch({ type: 'delete', skuID });
+  const deleteItem = (skuID) => dispatch({ type: 'delete', skuID });
 
-  const storeLastClicked = skuID =>
+  const storeLastClicked = (skuID) =>
     dispatch({ type: 'storeLastClicked', skuID });
 
   const handleCartClick = () => dispatch({ type: 'cartClick' });

@@ -44,8 +44,9 @@ const mockDetailedSku = {
     quantity: 1,
     currency: mockSku.currency,
     price: mockSku.price,
-    formattedPrice: '$2.00',
+    formattedValue: '$2.00',
     image: mockSku.image,
+    value: 200,
   },
 };
 
@@ -55,8 +56,9 @@ const mockDetailedSku2 = {
     quantity: 1,
     currency: mockSku2.currency,
     price: mockSku2.price,
-    formattedPrice: '$3.00',
+    formattedValue: '$3.00',
     image: mockSku2.image,
+    value: 300,
   },
 };
 
@@ -251,12 +253,13 @@ describe('useStripeCart', () => {
 
     expect(result.current.cartDetails).toEqual({
       [mockSku.sku]: {
-        formattedPrice: '$4.00',
-        price: mockSku.price * 2,
+        formattedValue: '$4.00',
+        price: mockSku.price,
         image: 'https://www.fillmurray.com/300/300',
         quantity: 2,
         currency: mockSku.currency,
         sku: mockSku.sku,
+        value: mockSku.price * 2,
       },
     });
   });
@@ -308,7 +311,5 @@ describe('useStripeCart', () => {
       result.current.addItem(mockSku);
       result.current.addItem(mockSku);
     });
-
-    console.log(result.current);
   });
 });
