@@ -74,7 +74,6 @@ const createWrapper = () => ({ children }) => {
   );
 };
 
-
 let result;
 beforeEach(() => {
   const wrapper = createWrapper();
@@ -211,7 +210,6 @@ describe('useStripeCart', () => {
   });
 
   it('shouldDisplayCart should be false initially', () => {
-        
     expect(result.current.shouldDisplayCart).toBe(false);
   });
 
@@ -302,5 +300,15 @@ describe('useStripeCart', () => {
     });
 
     expect(result.current.cartItems).toEqual([mockSku2]);
+  });
+
+  it('addItem should add one copy of the item and one unit of cost', () => {
+    act(() => {
+      result.current.addItem(mockSku);
+      result.current.addItem(mockSku);
+      result.current.addItem(mockSku);
+    });
+
+    console.log(result.current);
   });
 });
