@@ -63,10 +63,10 @@ const removeItem = (skuID, cartItems) => {
 };
 
 const reduceItemByOne = (skuID, cartItems) => {
-  const newCartItems = cartItems.filter((item) => item.sku !== skuID);
-  const itemsToReduce = cartItems.filter((item) => item.sku === skuID);
-  itemsToReduce.shift();
-  return [...newCartItems, ...itemsToReduce];
+  const newCartItems = cartItems;
+  const indexToRemove = newCartItems.map((item) => item.sku).indexOf(skuID);
+  newCartItems.splice(indexToRemove, 1);
+  return newCartItems;
 };
 
 const removeSku = (skuID, skus) => {
@@ -290,7 +290,6 @@ export const useStripeCart = () => {
         allowedCountries,
       };
     }
-    console.log('options', options, stripe);
 
     const { error } = await stripe.redirectToCheckout(options);
     if (error) {
