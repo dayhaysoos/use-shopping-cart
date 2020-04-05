@@ -31,9 +31,9 @@ const CartDisplay = () => {
         }}
       >
         <h2>Shopping Cart Display Panel</h2>
-        {Object.keys(cartDetails).map(item => {
+        {Object.keys(cartDetails).map((item) => {
           const cartItem = cartDetails[item];
-          const { name, sku, formattedPrice, quantity } = cartItem;
+          const { name, sku, formattedValue, quantity } = cartItem;
           return (
             <Flex
               key={cartItem.sku}
@@ -48,7 +48,7 @@ const CartDisplay = () => {
                 <p>{name}</p>
               </Flex>
               <Box>
-                <span sx={{ display: 'block' }}>Price: {formattedPrice}</span>
+                <span sx={{ display: 'block' }}>Price: {formattedValue}</span>
                 <span sx={{ display: 'block' }}>qty: {quantity}</span>
                 <Button
                   backgroundColor={'black'}
