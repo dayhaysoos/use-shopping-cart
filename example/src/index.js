@@ -11,8 +11,8 @@ ReactDOM.render(
   <CartProvider
     stripe={stripe}
     billingAddressCollection={false}
-    successUrl={'stripe.com'}
-    cancelUrl={'twitter.com/dayhaysoos'}
+    successUrl={'https://stripe.com'}
+    cancelUrl={'https://twitter.com/dayhaysoos'}
     currency={'USD'}
   >
     <App />

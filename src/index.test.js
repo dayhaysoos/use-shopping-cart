@@ -14,8 +14,11 @@ const INITIAL_STATE = {
   toggleRightMenu: false,
   cartItems: [],
   billingAddressCollection: false,
-  successUrl: 'https://egghead.io',
-  cancelUrl: 'https://egghead.io',
+  allowedCountries: null,
+  language: 'en-US',
+  currency: 'USD',
+  successUrl: 'https://egghead.io/success',
+  cancelUrl: 'https://egghead.io/cancel',
 };
 
 const mockSku = {
@@ -62,14 +65,14 @@ const mockDetailedSku2 = {
   },
 };
 
-const createWrapper = () => ({ children }) => {
+const createWrapper = (props = {}) => ({ children }) => {
   return (
     <CartProvider
-      billingAddressCollection={false}
-      successUrl="https://egghead.io"
-      cancelUrl="https://egghead.io"
+      successUrl="https://egghead.io/success"
+      cancelUrl="https://egghead.io/cancel"
       stripe={stripeMock}
       currency="USD"
+      {...props}
     >
       {children}
     </CartProvider>
@@ -83,6 +86,12 @@ beforeEach(() => {
 });
 
 describe('useStripeCart', () => {
+  let result;
+  beforeEach(() => {
+    const wrapper = createWrapper();
+    result = renderHook(() => useStripeCart(), { wrapper }).result;
+  });
+
   it('renderps', () => {
     expect(result.current.cartItems).toEqual(INITIAL_STATE.cartItems);
   });
@@ -305,11 +314,99 @@ describe('useStripeCart', () => {
     expect(result.current.cartItems).toEqual([mockSku2]);
   });
 
-  it('addItem should add one copy of the item and one unit of cost', () => {
+  it('reduceItemByOne reduces the cartItem amount of the target SKU by one', () => {
     act(() => {
       result.current.addItem(mockSku);
       result.current.addItem(mockSku);
       result.current.addItem(mockSku);
     });
+
+    expect(result.current.cartItems.length).toEqual(3);
+
+    act(() => {
+      result.current.reduceItemByOne(mockSku.sku);
+    });
+    expect(result.current.cartItems.length).toEqual(2);
+  });
+
+  it('reduceItemByOne reduces the cartItems amount of the target SKU by one even when other SKUs are present', () => {
+    act(() => {
+      result.current.addItem(mockSku);
+      result.current.addItem(mockSku);
+      result.current.addItem(mockSku);
+      result.current.addItem(mockSku2);
+    });
+    expect(result.current.cartItems.length).toEqual(4);
+
+    act(() => {
+      result.current.reduceItemByOne(mockSku.sku);
+    });
+    expect(result.current.cartItems.length).toEqual(3);
+  });
+});
+
+describe('useStripeCart redirectToCheckout', () => {
+  beforeEach(() => {
+    stripeMock.redirectToCheckout.mockClear();
+  });
+
+  it('should send the correct default values', () => {
+    const wrapper = createWrapper();
+    const { result } = renderHook(() => useStripeCart(), { wrapper });
+
+    result.current.redirectToCheckout();
+
+    expect(stripeMock.redirectToCheckout).toHaveBeenCalled();
+    expect(stripeMock.redirectToCheckout.mock.calls[0][0]).toEqual({
+      items: [],
+      successUrl: 'https://egghead.io/success',
+      cancelUrl: 'https://egghead.io/cancel',
+      billingAddressCollection: 'auto',
+      submitType: 'auto',
+    });
+  });
+
+  it('should send all formatted items', () => {
+    const wrapper = createWrapper();
+    const { result } = renderHook(() => useStripeCart(), { wrapper });
+
+    act(() => {
+      result.current.addItem(mockSku);
+      result.current.addItem(mockSku);
+    });
+    result.current.redirectToCheckout();
+
+    const expectedItems = [{ sku: mockSku.sku, quantity: 2 }];
+
+    expect(stripeMock.redirectToCheckout).toHaveBeenCalled();
+    expect(result.current.checkoutData).toEqual(expectedItems);
+    expect(stripeMock.redirectToCheckout.mock.calls[0][0].items).toEqual(
+      expectedItems
+    );
+  });
+
+  it('should send correct billingAddressCollection', () => {
+    const wrapper = createWrapper({ billingAddressCollection: true });
+    const { result } = renderHook(() => useStripeCart(), { wrapper });
+
+    result.current.redirectToCheckout();
+
+    expect(stripeMock.redirectToCheckout).toHaveBeenCalled();
+    expect(
+      stripeMock.redirectToCheckout.mock.calls[0][0].billingAddressCollection
+    ).toBe('required');
+  });
+
+  it('should send correct shippingAddressCollection', () => {
+    const wrapper = createWrapper({ allowedCountries: ['US', 'CA'] });
+    const { result } = renderHook(() => useStripeCart(), { wrapper });
+
+    result.current.redirectToCheckout();
+
+    expect(stripeMock.redirectToCheckout).toHaveBeenCalled();
+    expect(
+      stripeMock.redirectToCheckout.mock.calls[0][0].shippingAddressCollection
+        .allowedCountries
+    ).toEqual(['US', 'CA']);
   });
 });

@@ -12,6 +12,7 @@ const CartDisplay = () => {
     removeCartItem,
     totalPrice,
     redirectToCheckout,
+    reduceItemByOne,
   } = useStripeCart();
 
   if (Object.keys(cartDetails).length === 0) {
@@ -58,7 +59,7 @@ const CartDisplay = () => {
                 </Button>
                 <Button
                   backgroundColor={'black'}
-                  onClick={() => removeCartItem(sku)}
+                  onClick={() => reduceItemByOne(sku)}
                 >
                   -
                 </Button>

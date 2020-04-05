@@ -60,8 +60,15 @@ const updateQuantity = (quantity, skuID, skus) => {
 };
 
 const removeItem = (skuID, cartItems) => {
-  const index = cartItems.findIndex((item) => item.sku);
-  return cartItems;
+  const newCartItems = cartItems.filter((item) => item.sku !== skuID);
+  return newCartItems;
+};
+
+const reduceItemByOne = (skuID, cartItems) => {
+  const newCartItems = cartItems;
+  const indexToRemove = newCartItems.map((item) => item.sku).indexOf(skuID);
+  newCartItems.splice(indexToRemove, 1);
+  return newCartItems;
 };
 
 const removeSku = (skuID, skus) => {
@@ -145,6 +152,11 @@ const reducer = (cart, action) => {
         ...cart,
         cartItems: removeItem(action.sku, cart.cartItems),
       };
+    case 'reduceItemByOne':
+      return {
+        ...cart,
+        cartItems: reduceItemByOne(action.sku, cart.cartItems),
+      };
     default:
       console.error(`unknown action ${action.type}`);
       return cart;
@@ -153,14 +165,27 @@ const reducer = (cart, action) => {
 
 export const CartContext = createContext();
 
+/**
+ * @param {{
+    children: JSX.Element,
+    stripe: any,
+    successUrl: string,
+    cancelUrl: string,
+    currency: string,
+    language: string,
+    billingAddressCollection: boolean,
+    allowedCountries: null | string[]
+ * }}
+ */
 export const CartProvider = ({
   children,
   stripe,
-  billingAddressCollection,
   successUrl,
   cancelUrl,
   currency,
   language = navigator.language,
+  billingAddressCollection = false,
+  allowedCountries = null,
 }) => {
   const skuStorage =
     typeof window !== 'undefined'
@@ -174,10 +199,11 @@ export const CartProvider = ({
         shouldDisplayCart: false,
         cartItems: [],
         stripe,
-        billingAddressCollection,
         successUrl,
         cancelUrl,
         currency,
+        billingAddressCollection,
+        allowedCountries,
       })}
     >
       {children}
@@ -194,11 +220,12 @@ export const useStripeCart = () => {
     lastClicked,
     shouldDisplayCart,
     cartItems,
-    billingAddressCollection,
     successUrl,
     cancelUrl,
     currency,
     language,
+    billingAddressCollection,
+    allowedCountries,
   } = cart;
 
   let storageReference =
@@ -231,6 +258,11 @@ export const useStripeCart = () => {
   const removeCartItem = (sku) => {
     dispatch({ type: 'removeFromCartItems', sku });
   };
+
+  const reduceItemByOne = (sku) => {
+    dispatch({ type: 'reduceItemByOne', sku });
+  };
+
   const handleQuantityChange = (quantity, skuID) => {
     dispatch({ type: 'handleQuantityChange', quantity, skuID });
   };
@@ -246,14 +278,24 @@ export const useStripeCart = () => {
 
   const handleCloseCart = () => dispatch({ type: 'closeCart' });
 
-  const redirectToCheckout = async (submitType = 'auto') => {
-    const { error } = await stripe.redirectToCheckout({
+  const redirectToCheckout = async () => {
+    const options = {
       items: checkoutData,
-      successUrl: `http://localhost:8000/thank-you`,
-      cancelUrl: `http://localhost:8000/`,
-    });
+      successUrl,
+      cancelUrl,
+      billingAddressCollection: billingAddressCollection ? 'required' : 'auto',
+      submitType: 'auto',
+    };
+
+    if (Array.isArray(allowedCountries) && allowedCountries.length) {
+      options.shippingAddressCollection = {
+        allowedCountries,
+      };
+    }
+
+    const { error } = await stripe.redirectToCheckout(options);
     if (error) {
-      console.warn('Error:', error);
+      return error;
     }
   };
 
@@ -275,5 +317,6 @@ export const useStripeCart = () => {
     handleCloseCart,
     totalPrice,
     removeCartItem,
+    reduceItemByOne,
   };
 };
