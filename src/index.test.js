@@ -47,8 +47,9 @@ const mockDetailedSku = {
     quantity: 1,
     currency: mockSku.currency,
     price: mockSku.price,
-    formattedPrice: '$2.00',
+    formattedValue: '$2.00',
     image: mockSku.image,
+    value: 200,
   },
 };
 
@@ -58,12 +59,13 @@ const mockDetailedSku2 = {
     quantity: 1,
     currency: mockSku2.currency,
     price: mockSku2.price,
-    formattedPrice: '$3.00',
+    formattedValue: '$3.00',
     image: mockSku2.image,
+    value: 300,
   },
 };
 
-const createWrapper = (props={}) => ({ children }) => {
+const createWrapper = (props = {}) => ({ children }) => {
   return (
     <CartProvider
       successUrl="https://egghead.io/success"
@@ -76,6 +78,12 @@ const createWrapper = (props={}) => ({ children }) => {
     </CartProvider>
   );
 };
+
+let result;
+beforeEach(() => {
+  const wrapper = createWrapper();
+  result = renderHook(() => useStripeCart(), { wrapper }).result;
+});
 
 describe('useStripeCart', () => {
   let result;
@@ -254,12 +262,13 @@ describe('useStripeCart', () => {
 
     expect(result.current.cartDetails).toEqual({
       [mockSku.sku]: {
-        formattedPrice: '$4.00',
-        price: mockSku.price * 2,
+        formattedValue: '$4.00',
+        price: mockSku.price,
         image: 'https://www.fillmurray.com/300/300',
         quantity: 2,
         currency: mockSku.currency,
         sku: mockSku.sku,
+        value: mockSku.price * 2,
       },
     });
   });
@@ -311,6 +320,7 @@ describe('useStripeCart', () => {
       result.current.addItem(mockSku);
       result.current.addItem(mockSku);
     });
+
     expect(result.current.cartItems.length).toEqual(3);
 
     act(() => {
@@ -345,7 +355,7 @@ describe('useStripeCart redirectToCheckout', () => {
     const { result } = renderHook(() => useStripeCart(), { wrapper });
 
     result.current.redirectToCheckout();
-    
+
     expect(stripeMock.redirectToCheckout).toHaveBeenCalled();
     expect(stripeMock.redirectToCheckout.mock.calls[0][0]).toEqual({
       items: [],
@@ -364,16 +374,15 @@ describe('useStripeCart redirectToCheckout', () => {
       result.current.addItem(mockSku);
       result.current.addItem(mockSku);
     });
-    result.current.redirectToCheckout();  
+    result.current.redirectToCheckout();
 
-    const expectedItems = [
-      { sku: mockSku.sku, quantity: 2 },
-    ];
+    const expectedItems = [{ sku: mockSku.sku, quantity: 2 }];
 
     expect(stripeMock.redirectToCheckout).toHaveBeenCalled();
     expect(result.current.checkoutData).toEqual(expectedItems);
-    expect(stripeMock.redirectToCheckout.mock.calls[0][0].items)
-      .toEqual(expectedItems);
+    expect(stripeMock.redirectToCheckout.mock.calls[0][0].items).toEqual(
+      expectedItems
+    );
   });
 
   it('should send correct billingAddressCollection', () => {
@@ -383,7 +392,9 @@ describe('useStripeCart redirectToCheckout', () => {
     result.current.redirectToCheckout();
 
     expect(stripeMock.redirectToCheckout).toHaveBeenCalled();
-    expect(stripeMock.redirectToCheckout.mock.calls[0][0].billingAddressCollection).toBe('required');
+    expect(
+      stripeMock.redirectToCheckout.mock.calls[0][0].billingAddressCollection
+    ).toBe('required');
   });
 
   it('should send correct shippingAddressCollection', () => {
@@ -393,6 +404,9 @@ describe('useStripeCart redirectToCheckout', () => {
     result.current.redirectToCheckout();
 
     expect(stripeMock.redirectToCheckout).toHaveBeenCalled();
-    expect(stripeMock.redirectToCheckout.mock.calls[0][0].shippingAddressCollection.allowedCountries).toEqual(['US', 'CA']);
+    expect(
+      stripeMock.redirectToCheckout.mock.calls[0][0].shippingAddressCollection
+        .allowedCountries
+    ).toEqual(['US', 'CA']);
   });
 });

@@ -1,5 +1,5 @@
 import React, { createContext, useReducer, useContext } from 'react';
-import { toCurrency, calculateTotalPrice } from './util';
+import { toCurrency, calculateTotalValue } from './util';
 
 /**
  * @function checkoutCart
@@ -26,8 +26,9 @@ const checkoutCart = (skus, { sku }, quantity = 1) => {
 const formatDetailedCart = (currency, cartItems, language) => {
   return cartItems.reduce((acc, current) => {
     const quantity = (acc[current.sku]?.quantity ?? 0) + 1;
-    const price = (acc[current.sku]?.price ?? 0) + current.price;
-    const formattedPrice = toCurrency({ price, currency, language });
+    const price = current.price;
+    const value = (acc[current.sku]?.value ?? 0) + current.price;
+    const formattedValue = toCurrency({ value, currency, language });
 
     return {
       ...acc,
@@ -35,7 +36,8 @@ const formatDetailedCart = (currency, cartItems, language) => {
         ...current,
         quantity,
         price,
-        formattedPrice,
+        formattedValue,
+        value,
       },
     };
   }, {});
@@ -236,7 +238,7 @@ export const useStripeCart = () => {
 
   const checkoutData = formatCheckoutCart(skus);
 
-  const totalPrice = () => calculateTotalPrice(currency, cartItems);
+  const totalPrice = () => calculateTotalValue(currency, cartItems);
 
   typeof localStorage === 'object' &&
     localStorage.setItem('skus', JSON.stringify(storageReference));
