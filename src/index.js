@@ -73,11 +73,6 @@ const reducer = (cart, action) => {
         ...cart,
         skus: checkoutCart(skus, action.sku),
       };
-    case 'handleQuantityChange':
-      return {
-        ...cart,
-        skus: updateQuantity(action.quantity, action.skuID, skus),
-      };
     case 'delete':
       const index = cartItems.findIndex((item) => item.sku === action.skuID);
 
@@ -219,10 +214,6 @@ export const useStripeCart = () => {
     dispatch({ type: 'reduceItemByOne', sku });
   };
 
-  const handleQuantityChange = (quantity, skuID) => {
-    dispatch({ type: 'handleQuantityChange', quantity, skuID });
-  };
-
   const deleteItem = (skuID) => dispatch({ type: 'delete', skuID });
 
   const storeLastClicked = (skuID) =>
@@ -261,7 +252,6 @@ export const useStripeCart = () => {
     cartCount,
     checkoutData,
     redirectToCheckout,
-    handleQuantityChange,
     lastClicked,
     storeLastClicked,
     shouldDisplayCart,

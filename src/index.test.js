@@ -201,27 +201,6 @@ describe('useStripeCart', () => {
     expect(result.current.lastClicked).toBe(mockSku.sku);
   });
 
-  it('handleQuantityChange changes the quantity correctly', () => {
-    act(() => {
-      result.current.addItem(mockSku);
-      result.current.handleQuantityChange(10, mockSku.sku);
-    });
-
-    expect(result.current.cartDetails).toEqual({
-      [mockSku.sku]: 10,
-    });
-    expect(result.current.cartCount).toBe(10);
-  });
-
-  it('handleQuantityChange removes item from skus object when quantity reaches 0', () => {
-    act(() => {
-      result.current.addItem(mockSku);
-      result.current.handleQuantityChange(0, mockSku.sku);
-    });
-
-    expect(result.current.skus).toEqual({});
-  });
-
   it('shouldDisplayCart should be false initially', () => {
     expect(result.current.shouldDisplayCart).toBe(false);
   });

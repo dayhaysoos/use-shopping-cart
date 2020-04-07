@@ -6,7 +6,6 @@ const CartDisplay = () => {
   const {
     cartDetails,
     cartItems,
-    handleQuantityChange,
     cartCount,
     addItem,
     removeCartItem,
