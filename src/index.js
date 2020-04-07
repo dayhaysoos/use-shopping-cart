@@ -64,12 +64,6 @@ const reduceItemByOne = (skuID, cartItems) => {
   return newCartItems;
 };
 
-const removeSku = (skuID, skus) => {
-  delete skus[skuID];
-
-  return skus;
-};
-
 const reducer = (cart, action) => {
   const { skus, cartItems } = cart;
 
@@ -92,7 +86,6 @@ const reducer = (cart, action) => {
       }
       return {
         ...cart,
-        skus: removeSku(action.skuID, skus),
         cartItems,
       };
 
@@ -188,7 +181,6 @@ export const useStripeCart = () => {
   const [cart, dispatch] = useContext(CartContext);
 
   const {
-    skus,
     stripe,
     lastClicked,
     shouldDisplayCart,
@@ -264,7 +256,6 @@ export const useStripeCart = () => {
   };
 
   return {
-    skus,
     addItem,
     deleteItem,
     cartCount,
