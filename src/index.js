@@ -43,13 +43,6 @@ const formatDetailedCart = (currency, cartItems, language) => {
   }, {});
 };
 
-const formatCheckoutCart = (checkoutData) => {
-  return Object.keys(checkoutData).map((item) => ({
-    sku: item,
-    quantity: checkoutData[item],
-  }));
-};
-
 const updateQuantity = (quantity, skuID, skus) => {
   quantity = isNaN(quantity) ? 0 : quantity;
 
@@ -71,43 +64,16 @@ const reduceItemByOne = (skuID, cartItems) => {
   return newCartItems;
 };
 
-const removeSku = (skuID, skus) => {
-  delete skus[skuID];
-
-  return skus;
-};
-
 const reducer = (cart, action) => {
   const { skus, cartItems } = cart;
 
   switch (action.type) {
     case 'addToCheckoutCart':
-      typeof localStorage !== 'undefined' &&
-        localStorage.setItem(
-          'skus',
-          JSON.stringify(checkoutCart(skus, action.sku))
-        );
       return {
         ...cart,
         skus: checkoutCart(skus, action.sku),
       };
-    case 'handleQuantityChange':
-      typeof localStorage !== 'undefined' &&
-        localStorage.setItem(
-          'skus',
-          JSON.stringify(updateQuantity(action.quantity, action.skuID, skus))
-        );
-      return {
-        ...cart,
-        skus: updateQuantity(action.quantity, action.skuID, skus),
-      };
     case 'delete':
-      typeof localStorage !== 'undefined' &&
-        localStorage.setItem(
-          'skus',
-          JSON.stringify(removeSku(action.skuID, skus))
-        );
-
       const index = cartItems.findIndex((item) => item.sku === action.skuID);
 
       if (index !== -1) {
@@ -115,7 +81,6 @@ const reducer = (cart, action) => {
       }
       return {
         ...cart,
-        skus: removeSku(action.skuID, skus),
         cartItems,
       };
 
@@ -187,15 +152,10 @@ export const CartProvider = ({
   billingAddressCollection = false,
   allowedCountries = null,
 }) => {
-  const skuStorage =
-    typeof window !== 'undefined'
-      ? JSON.parse(localStorage.getItem('skus'))
-      : {};
   return (
     <CartContext.Provider
       value={useReducer(reducer, {
         lastClicked: '',
-        skus: skuStorage || {},
         shouldDisplayCart: false,
         cartItems: [],
         stripe,
@@ -204,6 +164,7 @@ export const CartProvider = ({
         currency,
         billingAddressCollection,
         allowedCountries,
+        skus: {},
       })}
     >
       {children}
@@ -215,7 +176,6 @@ export const useStripeCart = () => {
   const [cart, dispatch] = useContext(CartContext);
 
   const {
-    skus,
     stripe,
     lastClicked,
     shouldDisplayCart,
@@ -228,27 +188,18 @@ export const useStripeCart = () => {
     allowedCountries,
   } = cart;
 
-  let storageReference =
-    typeof localStorage === 'object' &&
-    JSON.parse(localStorage.getItem('skus'));
-
-  if (storageReference === null) {
-    storageReference = {};
-  }
-
-  const checkoutData = formatCheckoutCart(skus);
-
   const totalPrice = () => calculateTotalValue(currency, cartItems);
-
-  typeof localStorage === 'object' &&
-    localStorage.setItem('skus', JSON.stringify(storageReference));
 
   const cartDetails = formatDetailedCart(currency, cartItems, language);
 
-  const cartCount = checkoutData.reduce(
-    (acc, current) => acc + current.quantity,
-    0
-  );
+  const checkoutData = Object.keys(cartDetails).map((item) => {
+    return {
+      sku: cartDetails[item].sku,
+      quantity: cartDetails[item].quantity,
+    };
+  });
+
+  const cartCount = cartItems.length;
 
   const addItem = (sku) => {
     dispatch({ type: 'addToCheckoutCart', sku });
@@ -261,10 +212,6 @@ export const useStripeCart = () => {
 
   const reduceItemByOne = (sku) => {
     dispatch({ type: 'reduceItemByOne', sku });
-  };
-
-  const handleQuantityChange = (quantity, skuID) => {
-    dispatch({ type: 'handleQuantityChange', quantity, skuID });
   };
 
   const deleteItem = (skuID) => dispatch({ type: 'delete', skuID });
@@ -300,13 +247,11 @@ export const useStripeCart = () => {
   };
 
   return {
-    skus,
     addItem,
     deleteItem,
     cartCount,
     checkoutData,
     redirectToCheckout,
-    handleQuantityChange,
     lastClicked,
     storeLastClicked,
     shouldDisplayCart,

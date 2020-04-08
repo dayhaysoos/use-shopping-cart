@@ -10,7 +10,6 @@ const stripeMock = {
 
 const INITIAL_STATE = {
   lastClicked: '',
-  skus: {},
   toggleRightMenu: false,
   cartItems: [],
   billingAddressCollection: false,
@@ -114,16 +113,19 @@ describe('useStripeCart', () => {
     expect(result.current.cartCount).toBe(1);
   });
 
-  it('skus object updates with sku id and quantity based on addItems', () => {
-    expect(result.current.skus).toEqual({});
+  it('checkoutData array updates with sku id and quantity based on addItems', () => {
+    expect(result.current.checkoutData).toEqual([]);
 
     act(() => {
       result.current.addItem(mockSku);
     });
 
-    expect(result.current.skus).toEqual({
-      [mockSku.sku]: 1,
-    });
+    expect(result.current.checkoutData).toEqual([
+      {
+        sku: mockSku.sku,
+        quantity: 1,
+      },
+    ]);
   });
 
   it('checkoutData builds an array of objects to prepare for redirectToCheckout', () => {
@@ -138,20 +140,20 @@ describe('useStripeCart', () => {
     ]);
   });
 
-  it('deleteItem removes item from sku object', () => {
+  it('deleteItem removes item from checkoutData array', () => {
     act(() => {
       result.current.addItem(mockSku);
     });
 
-    expect(result.current.skus).toEqual({
-      [mockSku.sku]: 1,
-    });
+    expect(result.current.checkoutData).toEqual([
+      { sku: mockSku.sku, quantity: 1 },
+    ]);
 
     act(() => {
       result.current.deleteItem(mockSku.sku);
     });
 
-    expect(result.current.skus).toEqual({});
+    expect(result.current.checkoutData).toEqual([]);
   });
 
   it('deleteItem remove the correct item from the cart', () => {
@@ -160,18 +162,18 @@ describe('useStripeCart', () => {
       result.current.addItem(mockSku2);
     });
 
-    expect(result.current.skus).toEqual({
-      [mockSku.sku]: 1,
-      [mockSku2.sku]: 1,
-    });
+    expect(result.current.checkoutData).toEqual([
+      { sku: mockSku.sku, quantity: 1 },
+      { sku: mockSku2.sku, quantity: 1 },
+    ]);
 
     act(() => {
       result.current.deleteItem(mockSku.sku);
     });
 
-    expect(result.current.skus).toEqual({
-      [mockSku2.sku]: 1,
-    });
+    expect(result.current.checkoutData).toEqual([
+      { sku: mockSku2.sku, quantity: 1 },
+    ]);
   });
 
   it('should update totalPrice', () => {
@@ -197,27 +199,6 @@ describe('useStripeCart', () => {
     });
 
     expect(result.current.lastClicked).toBe(mockSku.sku);
-  });
-
-  it('handleQuantityChange changes the quantity correctly', () => {
-    act(() => {
-      result.current.addItem(mockSku);
-      result.current.handleQuantityChange(10, mockSku.sku);
-    });
-
-    expect(result.current.skus).toEqual({
-      [mockSku.sku]: 10,
-    });
-    expect(result.current.cartCount).toBe(10);
-  });
-
-  it('handleQuantityChange removes item from skus object when quantity reaches 0', () => {
-    act(() => {
-      result.current.addItem(mockSku);
-      result.current.handleQuantityChange(0, mockSku.sku);
-    });
-
-    expect(result.current.skus).toEqual({});
   });
 
   it('shouldDisplayCart should be false initially', () => {
