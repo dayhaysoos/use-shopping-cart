@@ -7,6 +7,7 @@ on:
   push:
     branches: 
       - release
+        
 
 jobs:
   build:
@@ -28,7 +29,7 @@ jobs:
           registry-url: https://registry.npmjs.org/
       - run: yarn install && npm publish
         env:
-          NODE_AUTH_TOKEN: ${{secrets.npm_token}}
+          NODE_AUTH_TOKEN: ${{secrets.NPM_AUTH_TOKEN}}
 
   publish-gpr:
     needs: build
