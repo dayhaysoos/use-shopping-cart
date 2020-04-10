@@ -140,7 +140,7 @@ export const CartContext = createContext();
     language: string,
     billingAddressCollection: boolean,
     allowedCountries: null | string[]
- * }}
+ * }} props
  */
 export const CartProvider = ({
   children,
