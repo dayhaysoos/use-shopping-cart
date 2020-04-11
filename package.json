@@ -69,6 +69,6 @@
     "rollup-plugin-url": "^3.0.1"
   },
   "dependencies": {
-    "react-use": "^14.1.0"
+    "react-storage-hooks": "^4.0.0"
   }
 }
