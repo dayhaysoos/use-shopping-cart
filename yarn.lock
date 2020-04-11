@@ -8733,6 +8733,11 @@ react-scripts@^3.4.0:
   optionalDependencies:
     fsevents "2.1.2"
 
+react-storage-hooks@^4.0.0:
+  version "4.0.0"
+  resolved "https://registry.yarnpkg.com/react-storage-hooks/-/react-storage-hooks-4.0.0.tgz#1ebe40367cbe7699bf7d7cd0e24041b9717c0048"
+  integrity sha512-b0iTTosRF7EbQMwi17kjIOkD+3po/AxEueObKm3fQoQXERWaMVYIt+iGN0Lhbwm5YkyJMb+hzEyK+IM8kYwT6w==
+
 react-test-renderer@^16.9.0:
   version "16.13.1"
   resolved "https://registry.yarnpkg.com/react-test-renderer/-/react-test-renderer-16.13.1.tgz#de25ea358d9012606de51e012d9742e7f0deabc1"
