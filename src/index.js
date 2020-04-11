@@ -165,16 +165,15 @@ export const CartProvider = ({
     cartItemsReducer,
     []
   );
-  // combine dispatches
-  function dispatch(action) {
-    cartDispatch(action);
-    cartItemsDispatch(action);
-  }
 
+  // combine dispatches and
   // memoize context value to avoid causing re-renders
   const contextValue = useMemo(() => (
-    [{ ...cart, cartItems }, dispatch]
-  ), [cart, cartItems, dispatch]);
+    [{ ...cart, cartItems }, action => {
+      cartDispatch(action);
+      cartItemsDispatch(action);
+    }]
+  ), [cart, cartItems, cartDispatch, cartItemsDispatch]);
 
   return (
     <CartContext.Provider value={contextValue}>
