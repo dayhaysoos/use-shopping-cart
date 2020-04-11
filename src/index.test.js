@@ -391,3 +391,34 @@ describe('useStripeCart redirectToCheckout', () => {
     ).toEqual(['US', 'CA']);
   });
 });
+
+describe('useStripeCart persistency', () => {
+  function cartItemsFromStorage() {
+    return JSON.parse(localStorage.getItem('cart-items'));
+  }
+
+  it('should save cartItems to localStorage', () => {
+    const wrapper = createWrapper();
+    const { result } = renderHook(() => useStripeCart(), { wrapper });
+
+    act(() => {
+      result.current.addItem(mockSku);
+    });
+
+    expect(cartItemsFromStorage()).toEqual(result.current.cartItems);
+  });
+
+  it('should load cartItems from localStorage', () => {
+    let wrapper = createWrapper();
+    let { result } = renderHook(() => useStripeCart(), { wrapper });
+
+    act(() => {
+      result.current.addItem(mockSku);
+    });
+
+    wrapper = createWrapper();
+    result = renderHook(() => useStripeCart(), { wrapper }).result;
+
+    expect(result.current.cartItems).toEqual(cartItemsFromStorage());
+  });
+});
