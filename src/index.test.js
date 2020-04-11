@@ -156,7 +156,7 @@ describe('useStripeCart', () => {
     expect(result.current.checkoutData).toEqual([]);
   });
 
-  it('deleteItem remove the correct item from the cart', () => {
+  it('deleteItem removes the correct item from the cart', () => {
     act(() => {
       result.current.addItem(mockSku);
       result.current.addItem(mockSku2);
