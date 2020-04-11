@@ -43,15 +43,6 @@ const formatDetailedCart = (currency, cartItems, language) => {
   }, {});
 };
 
-const updateQuantity = (quantity, skuID, skus) => {
-  quantity = isNaN(quantity) ? 0 : quantity;
-
-  const updatedSkus = skus;
-  quantity === 0 ? delete updatedSkus[skuID] : (updatedSkus[skuID] = quantity);
-
-  return updatedSkus;
-};
-
 const removeItem = (skuID, cartItems) => {
   const newCartItems = cartItems.filter((item) => item.sku !== skuID);
   return newCartItems;
