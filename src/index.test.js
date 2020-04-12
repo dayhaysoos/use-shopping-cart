@@ -156,7 +156,7 @@ describe('useStripeCart', () => {
     expect(result.current.checkoutData).toEqual([]);
   });
 
-  it('deleteItem remove the correct item from the cart', () => {
+  it('deleteItem removes the correct item from the cart', () => {
     act(() => {
       result.current.addItem(mockSku);
       result.current.addItem(mockSku2);
@@ -389,5 +389,36 @@ describe('useStripeCart redirectToCheckout', () => {
       stripeMock.redirectToCheckout.mock.calls[0][0].shippingAddressCollection
         .allowedCountries
     ).toEqual(['US', 'CA']);
+  });
+});
+
+describe('useStripeCart persistency', () => {
+  function cartItemsFromStorage() {
+    return JSON.parse(localStorage.getItem('cart-items'));
+  }
+
+  it('should save cartItems to localStorage', () => {
+    const wrapper = createWrapper();
+    const { result } = renderHook(() => useStripeCart(), { wrapper });
+
+    act(() => {
+      result.current.addItem(mockSku);
+    });
+
+    expect(cartItemsFromStorage()).toEqual(result.current.cartItems);
+  });
+
+  it('should load cartItems from localStorage', () => {
+    let wrapper = createWrapper();
+    let { result } = renderHook(() => useStripeCart(), { wrapper });
+
+    act(() => {
+      result.current.addItem(mockSku);
+    });
+
+    wrapper = createWrapper();
+    result = renderHook(() => useStripeCart(), { wrapper }).result;
+
+    expect(result.current.cartItems).toEqual(cartItemsFromStorage());
   });
 });
