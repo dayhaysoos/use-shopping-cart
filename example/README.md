@@ -6,6 +6,8 @@
 
 ## Get Started
 
+Clone the repo
+
 ```
 git clone git@github.com:dayhaysoos/use-stripe-cart.git
 ```
