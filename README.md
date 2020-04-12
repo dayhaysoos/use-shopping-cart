@@ -1,58 +1,150 @@
-<p align="center">
-  <img src="https://rocketseat-cdn.s3-sa-east-1.amazonaws.com/theme-docs.svg" alt="A illustration of file that is the @rocketseat/gatsby-theme-docs logo" width="100">
-</p>
+# use-stripe-cart
 
-<h2 align="center">
-  Gatsby Starter: Rocket Docs
-</h2>
+> A Shopping Cart State and Logic for Stripe in React
 
-<p align="center">
-  Out of the box Gatsby Starter for creating documentation websites easily and quickly. With support for MDX, code highlight, Analytics, SEO and more 🔥 Using the theme: <a href="https://github.com/Rocketseat/gatsby-themes/tree/master/%40rocketseat/gatsby-theme-docs">@rocketseat/gatsby-theme-docs</a>
-</p>
+[![NPM](https://img.shields.io/npm/v/use-stripe-cart.svg)](https://www.npmjs.com/package/use-stripe-cart) [![JavaScript Style Guide](https://img.shields.io/badge/code_style-standard-brightgreen.svg)](https://standardjs.com)
+<!-- ALL-CONTRIBUTORS-BADGE:START - Do not remove or modify this section -->
+[![All Contributors](https://img.shields.io/badge/all_contributors-5-orange.svg?style=flat-square)](#contributors-)
+<!-- ALL-CONTRIBUTORS-BADGE:END -->
 
-<p align="center">
-  <img src="https://img.shields.io/badge/PRs-welcome-%237159c1.svg" alt="PRs welcome!" />
+## Installation
 
-  <img alt="License" src="https://img.shields.io/badge/license-MIT-%237159c1">
+```bash
+npm install --save use-stripe-cart
 
-  <a href="https://twitter.com/intent/follow?screen_name=rocketseat">
-    <img src="https://img.shields.io/twitter/follow/rocketseat.svg?label=Follow%20@rocketseat" alt="Follow @rocketseat" />
-  </a>
-</p>
+or
 
-## 🚀 Features
+yarn add use-stripe-cart
+```
 
-- MDX for docs;
-- Fully customizable through the usage of Gatsby Themes (and Theme UI)
-- Sidebar customization with Yaml;
-- Code highlighting with [prism-react-renderer](https://github.com/FormidableLabs/prism-react-renderer) and [react-live](https://github.com/FormidableLabs/react-live) support. Copy code button and option to show line numbers.
-- SEO (Sitemap, schema.org data, Open Graph and Twitter tags).
-- Google Analytics support;
-- Offline Support & WebApp Manifest
+## Usage
 
-## ⚡️ Getting started
+At the root level of your app, wrap your Root app in the `<CartProvider />`
 
-1. Create the website.
+```jsx
+/** @jsx jsx */
+import { CartProvider } from 'use-stripe-cart';
+import './index.css';
+import App from './App';
 
-    ```sh
-    gatsby new rocket-docs https://github.com/rocketseat/gatsby-starter-rocket-docs
-    ```
+const stripe = window.Stripe(process.env.REACT_APP_STRIPE_API_PUBLIC);
 
-2. Start developing.
+ReactDOM.render(
+  <CartProvider
+    stripe={stripe}
+    billingAddressCollection={false}
+    successUrl={'stripe.com'}
+    cancelUrl={'twitter.com/dayhaysoos'}
+    currency={'USD'}
+  >
+    <App />
+  </CartProvider>,
+  document.getElementById('root')
+);
+```
 
-    ```sh
-    cd rocket-docs
-    gatsby develop
-    ```
+To add an item to the cart, use `addItem()`
 
-3. Are you ready for launch? 
+```jsx
+/**@jsx jsx */
+import { jsx, Box, Image, Button, Flex } from 'theme-ui';
+import { useStripeCart } from 'use-stripe-cart';
+import { toCurrency } from '../util';
 
-    Your site is now running at `http://localhost:8000`
+/**
+ * PRODUCT DATA COMING FROM PROPS
+const fakeData = [
+  {
+    name: 'Bananas',
+    sku: 'sku_GBJ2Ep8246qeeT',
+    price: 400,
+    image: 'https://www.fillmurray.com/300/300',
+    currency: 'USD',
+  },
+  {
+    name: 'Tangerines',
+    sku: 'sku_GBJ2WWfMaGNC2Z',
+    price: 100,
+    image: 'https://www.fillmurray.com/300/300',
+    currency: 'USD',
+  },
+];
+*/
 
-## 📄 Docs
+const Product = product => {
+  const { addItem } = useStripeCart();
+  const { name, sku, price, image, currency } = product;
+  return (
+    <Flex
+      sx={{
+        flexDirection: 'column',
+        justifyContent: 'center',
+        alignItems: 'center',
+      }}
+    >
+      <Image src={image} />
+      <Box>
+        <p>{name}</p>
+        <p>{toCurrency({ price: price, currency })}</p>
+      </Box>
+      <Button onClick={() => addItem({ ...product })} backgroundColor={'black'}>
+        Add To Cart
+      </Button>
+    </Flex>
+  );
+};
+```
 
-Looking for docs? Check our live demo and documentation [website](https://rocketdocs.netlify.com).
+For displaying what's actually in the cart, refer to the `CartDisplay` component:
+https://github.com/dayhaysoos/use-stripe-cart/blob/master/example/src/components/cart-display.js
+
+## API
+
+`cartDetails: Object`
+
+Cart details is an object with skus of the items in the cart as keys and details of the items as the value, for example:
+
+```jsx
+{
+  sku_GBJ2Ep8246qeeT: {
+    name: 'Bananas';
+    sku: 'sku_GBJ2Ep8246qeeT';
+    price: 400;
+    image: 'https://www.fillmurray.com/300/300';
+    currency: 'USD';
+    quantity: 1;
+    formattedPrice: '$4.00';
+  }
+}
+```
+
+## License
+
+MIT © [dayhaysoos](https://github.com/dayhaysoos)
 
 ---
 
-Made with 💜 by Rocketseat :wave: [check our community!](https://discordapp.com/invite/gCRAFhc)
+This hook is created using [create-react-hook](https://github.com/hermanya/create-react-hook).
+
+## Contributors ✨
+
+Thanks goes to these wonderful people ([emoji key](https://allcontributors.org/docs/en/emoji-key)):
+
+<!-- ALL-CONTRIBUTORS-LIST:START - Do not remove or modify this section -->
+<!-- prettier-ignore-start -->
+<!-- markdownlint-disable -->
+<table>
+  <tr>
+    <td align="center"><a href="http://www.kevincunningham.co.uk"><img src="https://avatars3.githubusercontent.com/u/8320213?v=4" width="100px;" alt=""/><br /><sub><b>Kevin Cunningham</b></sub></a><br /><a href="https://github.com/dayhaysoos/use-stripe-cart/commits?author=doingandlearning" title="Tests">⚠️</a> <a href="https://github.com/dayhaysoos/use-stripe-cart/commits?author=doingandlearning" title="Code">💻</a></td>
+    <td align="center"><a href="https://ianjones.us/"><img src="https://avatars2.githubusercontent.com/u/4407263?v=4" width="100px;" alt=""/><br /><sub><b>Ian Jones</b></sub></a><br /><a href="https://github.com/dayhaysoos/use-stripe-cart/commits?author=theianjones" title="Tests">⚠️</a></td>
+    <td align="center"><a href="https://chrisbrownie.dev/"><img src="https://avatars2.githubusercontent.com/u/19195374?v=4" width="100px;" alt=""/><br /><sub><b>Christopher Brown</b></sub></a><br /><a href="https://github.com/dayhaysoos/use-stripe-cart/commits?author=ChrisBrownie55" title="Tests">⚠️</a> <a href="https://github.com/dayhaysoos/use-stripe-cart/commits?author=ChrisBrownie55" title="Code">💻</a></td>
+    <td align="center"><a href="https://github.com/dayhaysoos"><img src="https://avatars3.githubusercontent.com/u/1852675?v=4" width="100px;" alt=""/><br /><sub><b>Nick DeJesus</b></sub></a><br /><a href="https://github.com/dayhaysoos/use-stripe-cart/commits?author=dayhaysoos" title="Code">💻</a> <a href="https://github.com/dayhaysoos/use-stripe-cart/commits?author=dayhaysoos" title="Tests">⚠️</a></td>
+    <td align="center"><a href="http://shodipoayomide.com"><img src="https://avatars2.githubusercontent.com/u/20538832?v=4" width="100px;" alt=""/><br /><sub><b>Shodipo Ayomide</b></sub></a><br /><a href="https://github.com/dayhaysoos/use-stripe-cart/commits?author=Developerayo" title="Documentation">📖</a></td>
+  </tr>
+</table>
+
+<!-- markdownlint-enable -->
+<!-- prettier-ignore-end -->
+<!-- ALL-CONTRIBUTORS-LIST:END -->
+
+This project follows the [all-contributors](https://github.com/all-contributors/all-contributors) specification. Contributions of any kind welcome!
