@@ -15,4 +15,7 @@
 - Pull requests should have a useful title.
 - The body of your commit message should contain a link to the repository.
 
-Submit PR and wait for approval
+## Updating your PR
+A lot of times, making a PR adhere to the standards above can be difficult. If the maintainers notice anything that we'd like changed, we'll ask you to edit your PR before we merge it. There's no need to open a new PR, just edit the existing one. If you're not sure how to do that.
+
+Submit a PR and wait for approval/comments from the maintainers
