@@ -8,7 +8,7 @@
   items:
     - label: 'CartProvider'
       link: '/usage/cartprovider'
-    - label: 'Navigation'
+    - label: 'addItem()'
       link: '/usage/navigation'
     - label: 'Shadowing'
       link: '/usage/shadowing'
