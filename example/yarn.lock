@@ -8774,7 +8774,12 @@ react-scripts@^3.0.1:
   optionalDependencies:
     fsevents "2.1.2"
 
-react@^16.13.1:
+react-storage-hooks@^4.0.0:
+  version "4.0.0"
+  resolved "https://registry.yarnpkg.com/react-storage-hooks/-/react-storage-hooks-4.0.0.tgz#1ebe40367cbe7699bf7d7cd0e24041b9717c0048"
+  integrity sha512-b0iTTosRF7EbQMwi17kjIOkD+3po/AxEueObKm3fQoQXERWaMVYIt+iGN0Lhbwm5YkyJMb+hzEyK+IM8kYwT6w==
+
+react@16.13.1:
   version "16.13.1"
   resolved "https://registry.yarnpkg.com/react/-/react-16.13.1.tgz#2e818822f1a9743122c063d6410d85c1e3afe48e"
   integrity sha512-YMZQQq32xHLX0bz5Mnibv1/LHb3Sqzngu7xstSM+vrkE5Kzr9xE0yMByK5kMoTK30YVJE61WfbxIFFvfeDKT1w==
@@ -10408,10 +10413,9 @@ url@^0.11.0:
     punycode "1.3.2"
     querystring "0.2.0"
 
-use-stripe-cart@1.0.0:
-  version "1.0.0"
-  resolved "https://registry.yarnpkg.com/use-stripe-cart/-/use-stripe-cart-1.0.0.tgz#e45539af8a169fcc90e097bf384e8e50514f6dc4"
-  integrity sha512-nLSng02EX0BOpq4gTx+NMsfZmJjgqo7xEwO0q3bGdwkQoz7qKBBO5Hx8gLydOFXbpKkcetM4nMWrxnCN2g2Gew==
+"use-stripe-cart@link:..":
+  version "0.0.0"
+  uid ""
 
 use@^3.1.0:
   version "3.1.1"
