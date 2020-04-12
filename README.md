@@ -1,6 +1,6 @@
 # use-stripe-cart
 
-> A Shopping cart state and logic for Stripe in React
+> A Shopping Cart State and Logic for Stripe in React
 
 [![NPM](https://img.shields.io/npm/v/use-stripe-cart.svg)](https://www.npmjs.com/package/use-stripe-cart) [![JavaScript Style Guide](https://img.shields.io/badge/code_style-standard-brightgreen.svg)](https://standardjs.com)
 <!-- ALL-CONTRIBUTORS-BADGE:START - Do not remove or modify this section -->
