@@ -7,7 +7,7 @@
 - label: Usage
   items:
     - label: 'CartProvider'
-      link: '/usage/creating-docs'
+      link: '/usage/cartprovider'
     - label: 'Navigation'
       link: '/usage/navigation'
     - label: 'Shadowing'
