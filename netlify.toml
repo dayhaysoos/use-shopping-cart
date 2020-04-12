@@ -1,0 +1,5 @@
+[build]
+  command="yarn deploy"
+  baseDirectory = "example"
+  publish="build"
+  functions="functions"
