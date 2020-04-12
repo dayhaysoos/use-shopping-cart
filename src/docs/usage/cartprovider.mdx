@@ -1,9 +1,32 @@
 ---
-title: Creating docs
+title: CartProvider
 ---
 
-By creating a MDX file inside your docs folder it will be created as a page, with the path defined by the filename.
-Inside all docs files, you can define the following options:
+
+At the root level of your app, wrap your Root app in the `<CartProvider />`
+
+
+```jsx
+/** @jsx jsx */
+import { CartProvider } from 'use-stripe-cart';
+import './index.css';
+import App from './App';
+
+const stripe = window.Stripe(process.env.REACT_APP_STRIPE_API_PUBLIC);
+
+ReactDOM.render(
+  <CartProvider
+    stripe={stripe}
+    billingAddressCollection={false}
+    successUrl={'stripe.com'}
+    cancelUrl={'twitter.com/dayhaysoos'}
+    currency={'USD'}
+  >
+    <App />
+  </CartProvider>,
+  document.getElementById('root')
+);
+```
 
 <div style="overflow-x:auto;">
   <table>

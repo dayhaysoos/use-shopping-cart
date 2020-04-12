@@ -6,7 +6,7 @@
   link: '/getting-started'
 - label: Usage
   items:
-    - label: 'Creating docs'
+    - label: 'CartProvider'
       link: '/usage/creating-docs'
     - label: 'Navigation'
       link: '/usage/navigation'
