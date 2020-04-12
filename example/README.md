@@ -7,8 +7,15 @@
 ## Get Started
 
 ```
-git clone git@github.com:Developerayo/react-notify.git
+git clone git@github.com:dayhaysoos/use-stripe-cart.git
 ```
+
+Navigate into the example directory
+
+```
+cd example
+```
+
 
 ## Install the dependencies:
 
