@@ -12,4 +12,5 @@
       link: '/usage/addItem()'
     - label: 'API'
       link: '/usage/api'
-- label: Contributors
+- label: 'Contributors'
+  link: '/contributors'

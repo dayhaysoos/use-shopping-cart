@@ -1,16 +1,16 @@
 module.exports = {
   siteMetadata: {
-    siteTitle: `@rocketseat/gatsby-theme-docs`,
-    defaultTitle: `@rocketseat/gatsby-theme-docs`,
-    siteTitleShort: `gatsby-theme-docs`,
+    siteTitle: `use-stripe-cart`,
+    defaultTitle: `use-stripe-cart`,
+    siteTitleShort: `use-stripe-cart`,
     siteDescription: `Out of the box Gatsby Theme for creating documentation websites easily and quickly`,
     siteUrl: `https://rocketdocs.netlify.com`,
-    siteAuthor: `@rocketseat`,
+    siteAuthor: `use-stripe-cart`,
     siteImage: `/banner.png`,
     siteLanguage: `en`,
     themeColor: `#7159c1`,
     basePath: `/`,
-    footer: `Theme by Rocketseat`,
+    footer: `use-stripe-cart`,
   },
   plugins: [
     {
