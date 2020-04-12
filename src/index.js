@@ -1,5 +1,5 @@
-import React, { createContext, useReducer, useContext } from 'react';
-import { toCurrency, calculateTotalValue } from './util';
+import React, {createContext, useReducer, useContext, useMemo} from 'react';
+import { toCurrency, calculateTotalValue, useLocalStorageReducer } from './util';
 
 /**
  * @function checkoutCart
@@ -43,15 +43,6 @@ const formatDetailedCart = (currency, cartItems, language) => {
   }, {});
 };
 
-const updateQuantity = (quantity, skuID, skus) => {
-  quantity = isNaN(quantity) ? 0 : quantity;
-
-  const updatedSkus = skus;
-  quantity === 0 ? delete updatedSkus[skuID] : (updatedSkus[skuID] = quantity);
-
-  return updatedSkus;
-};
-
 const removeItem = (skuID, cartItems) => {
   const newCartItems = cartItems.filter((item) => item.sku !== skuID);
   return newCartItems;
@@ -64,24 +55,14 @@ const reduceItemByOne = (skuID, cartItems) => {
   return newCartItems;
 };
 
-const reducer = (cart, action) => {
+function cartReducer (cart, action) {
   const { skus, cartItems } = cart;
 
   switch (action.type) {
-    case 'addToCheckoutCart':
+    case 'addToCart':
       return {
         ...cart,
         skus: checkoutCart(skus, action.sku),
-      };
-    case 'delete':
-      const index = cartItems.findIndex((item) => item.sku === action.skuID);
-
-      if (index !== -1) {
-        cartItems.splice(index, 1);
-      }
-      return {
-        ...cart,
-        cartItems,
       };
 
     case 'storeLastClicked':
@@ -107,26 +88,31 @@ const reducer = (cart, action) => {
         ...cart,
         shouldDisplayCart: false,
       };
-    case 'addToCartItems':
-      return {
-        ...cart,
-        cartItems: [...cart.cartItems, action.sku],
-      };
-    case 'removeFromCartItems':
-      return {
-        ...cart,
-        cartItems: removeItem(action.sku, cart.cartItems),
-      };
-    case 'reduceItemByOne':
-      return {
-        ...cart,
-        cartItems: reduceItemByOne(action.sku, cart.cartItems),
-      };
     default:
-      console.error(`unknown action ${action.type}`);
       return cart;
   }
-};
+}
+
+function cartItemsReducer(cartItems, action) {
+  switch (action.type) {
+    case 'delete':
+      const index = cartItems.findIndex((item) => item.sku === action.skuID);
+
+      if (index === -1) {
+        return cartItems;
+      }
+
+      return cartItems.slice(0, index).concat(cartItems.slice(index + 1));
+    case 'addToCart':
+      return [...cartItems, action.sku];
+    case 'removeFromCart':
+      return removeItem(action.sku, cartItems);
+    case 'reduceItemByOne':
+      return reduceItemByOne(action.sku, cartItems);
+    default:
+      return cartItems;
+  }
+}
 
 export const CartContext = createContext();
 
@@ -140,7 +126,7 @@ export const CartContext = createContext();
     language: string,
     billingAddressCollection: boolean,
     allowedCountries: null | string[]
- * }}
+ * }} props
  */
 export const CartProvider = ({
   children,
@@ -152,21 +138,36 @@ export const CartProvider = ({
   billingAddressCollection = false,
   allowedCountries = null,
 }) => {
+  const [cart, cartDispatch] = useReducer(cartReducer, {
+    lastClicked: '',
+    shouldDisplayCart: false,
+    stripe,
+    successUrl,
+    cancelUrl,
+    currency,
+    billingAddressCollection,
+    allowedCountries,
+    skus: {},
+  });
+
+  // keep cartItems in LocalStorage
+  const [cartItems, cartItemsDispatch] = useLocalStorageReducer(
+    'cart-items',
+    cartItemsReducer,
+    []
+  );
+
+  // combine dispatches and
+  // memoize context value to avoid causing re-renders
+  const contextValue = useMemo(() => (
+    [{ ...cart, cartItems }, action => {
+      cartDispatch(action);
+      cartItemsDispatch(action);
+    }]
+  ), [cart, cartItems, cartDispatch, cartItemsDispatch]);
+
   return (
-    <CartContext.Provider
-      value={useReducer(reducer, {
-        lastClicked: '',
-        shouldDisplayCart: false,
-        cartItems: [],
-        stripe,
-        successUrl,
-        cancelUrl,
-        currency,
-        billingAddressCollection,
-        allowedCountries,
-        skus: {},
-      })}
-    >
+    <CartContext.Provider value={contextValue}>
       {children}
     </CartContext.Provider>
   );
@@ -202,12 +203,11 @@ export const useStripeCart = () => {
   const cartCount = cartItems.length;
 
   const addItem = (sku) => {
-    dispatch({ type: 'addToCheckoutCart', sku });
-    dispatch({ type: 'addToCartItems', sku });
+    dispatch({ type: 'addToCart', sku });
   };
 
   const removeCartItem = (sku) => {
-    dispatch({ type: 'removeFromCartItems', sku });
+    dispatch({ type: 'removeFromCart', sku });
   };
 
   const reduceItemByOne = (sku) => {

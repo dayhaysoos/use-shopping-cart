@@ -58,7 +58,7 @@
     "eslint-plugin-react": "^7.10.0",
     "eslint-plugin-standard": "^4.0.1",
     "gh-pages": "^2.0.1",
-    "react": "^16.9.0",
+    "react": "16.13.1",
     "react-scripts": "^3.4.0",
     "react-test-renderer": "^16.9.0",
     "rollup": "^2.3.3",
@@ -67,5 +67,8 @@
     "rollup-plugin-node-resolve": "^5.2.0",
     "rollup-plugin-peer-deps-external": "^2.2.0",
     "rollup-plugin-url": "^3.0.1"
+  },
+  "dependencies": {
+    "react-storage-hooks": "^4.0.0"
   }
 }
