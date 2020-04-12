@@ -4,7 +4,7 @@
  *
  * @see https://stripe.com/docs/payments/checkout/one-time
  */
-const stripe = require('stripe')(process.env.STRIPE_API_SECRET);
+const stripe = window.Stripe(process.env.REACT_APP_STRIPE_API_PUBLIC);
 
 /*
  * Product data can be loaded from anywhere. In this case, we’re loading it from
@@ -18,6 +18,7 @@ const inventory = require('./data/products.json');
 
 exports.handler = async (event) => {
   const { sku, quantity } = JSON.parse(event.body);
+  console.log('body', event.body);
   const product = inventory.find((p) => p.sku === sku);
 
   // ensure that the quantity is within the allowed range
@@ -49,6 +50,8 @@ exports.handler = async (event) => {
       },
     ],
   });
+
+  console.log('test', JSON.stringify({ sessionId: session.id }));
 
   return {
     statusCode: 200,
