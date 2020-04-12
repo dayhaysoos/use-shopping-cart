@@ -1,13 +1,13 @@
 # use-stripe-cart
 
-> Shopping cart state and logic for Stripe
+> A Shopping cart state and logic for Stripe in React
 
 [![NPM](https://img.shields.io/npm/v/use-stripe-cart.svg)](https://www.npmjs.com/package/use-stripe-cart) [![JavaScript Style Guide](https://img.shields.io/badge/code_style-standard-brightgreen.svg)](https://standardjs.com)
 <!-- ALL-CONTRIBUTORS-BADGE:START - Do not remove or modify this section -->
 [![All Contributors](https://img.shields.io/badge/all_contributors-4-orange.svg?style=flat-square)](#contributors-)
 <!-- ALL-CONTRIBUTORS-BADGE:END -->
 
-## Install
+## Installation
 
 ```bash
 npm install --save use-stripe-cart
@@ -43,7 +43,7 @@ ReactDOM.render(
 );
 ```
 
-To add an item to the cart, you could use `addItem()`
+To add an item to the cart, use `addItem()`
 
 ```jsx
 /**@jsx jsx */
@@ -95,7 +95,7 @@ const Product = product => {
 };
 ```
 
-For displaying what's actually in the cart, refer to the CartDisplay component:
+For displaying what's actually in the cart, refer to the `CartDisplay` component:
 https://github.com/dayhaysoos/use-stripe-cart/blob/master/example/src/components/cart-display.js
 
 ## API
