@@ -2,4 +2,3 @@
   command="yarn deploy"
   baseDirectory = "example"
   publish="build"
-  functions="example/functions"
