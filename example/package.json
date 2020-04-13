@@ -19,7 +19,7 @@
     "build": "react-scripts build",
     "test": "react-scripts test --env=jsdom",
     "eject": "react-scripts eject",
-    "deploy": "yarn link use-stripe-cart && yarn install && yarn run build"
+    "deploy": "yarn install && yarn run build"
   },
   "browserslist": [
     ">0.2%",
