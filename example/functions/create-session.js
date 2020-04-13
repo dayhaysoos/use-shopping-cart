@@ -4,7 +4,8 @@
  *
  * @see https://stripe.com/docs/payments/checkout/one-time
  */
-const stripe = window.Stripe(process.env.REACT_APP_STRIPE_API_PUBLIC);
+
+const stripe = require('stripe')(process.env.REACT_APP_STRIPE_API_PUBLIC);
 
 /*
  * Product data can be loaded from anywhere. In this case, we’re loading it from
