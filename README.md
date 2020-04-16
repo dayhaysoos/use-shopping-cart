@@ -54,7 +54,7 @@ The hook `useStripeCart()` provides several utilities and pieces of data for you
 
 ```jsx
 import { useStripeCart } from 'use-stripe-cart'
-import { Products } from './Product'
+import { Product } from './Product'
 import { CartItems } from './CartItems';
 
 const productData = [
