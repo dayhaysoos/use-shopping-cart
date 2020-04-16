@@ -5,7 +5,7 @@
  * @see https://stripe.com/docs/payments/checkout/one-time
  */
 
-const stripe = require('stripe')(process.env.REACT_APP_STRIPE_API_PUBLIC);
+const stripe = require('stripe')(process.env.REACT_APP_STRIPE_API_SECRET);
 
 /*
  * Product data can be loaded from anywhere. In this case, we’re loading it from
@@ -16,14 +16,29 @@ const stripe = require('stripe')(process.env.REACT_APP_STRIPE_API_PUBLIC);
  * so you know the pricing information is accurate.
  */
 const inventory = require('./data/products.json');
+// const { validateCartItems } = useStripeCart;
+
+const validateCartItems = (inventorySrc, cartItems) => {
+  const validatedItems = Object.keys(cartItems).map((item) => {
+    const product = cartItems[item];
+    const validatedItem = inventorySrc.find(
+      (p) => p.name === cartItems[item].name
+    );
+    return {
+      name: validatedItem.name,
+      amount: validatedItem.price * product.quantity,
+      currency: validatedItem.currency,
+      quantity: product.quantity,
+    };
+  });
+
+  return validatedItems;
+};
 
 exports.handler = async (event) => {
-  const { sku, quantity } = JSON.parse(event.body);
-  console.log('body', event.body);
-  const product = inventory.find((p) => p.sku === sku);
+  const productJSON = JSON.parse(event.body);
 
-  // ensure that the quantity is within the allowed range
-  const validatedQuantity = quantity > 0 && quantity < 11 ? quantity : 1;
+  const line_items = validateCartItems(inventory, productJSON);
 
   const session = await stripe.checkout.sessions.create({
     payment_method_types: ['card'],
@@ -40,19 +55,10 @@ exports.handler = async (event) => {
      */
     success_url: `${process.env.URL}/success.html`,
     cancel_url: process.env.URL,
-    line_items: [
-      {
-        name: product.name,
-        description: product.description,
-        images: [product.image],
-        amount: product.amount,
-        currency: product.currency,
-        quantity: validatedQuantity,
-      },
-    ],
+    line_items,
   });
 
-  console.log('test', JSON.stringify({ sessionId: session.id }));
+  console.log(JSON.stringify({ sessionId: session.id }));
 
   return {
     statusCode: 200,
