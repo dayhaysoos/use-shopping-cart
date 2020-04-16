@@ -17,15 +17,20 @@ const CartDisplay = () => {
   const handleSubmit = async (event) => {
     event.preventDefault();
 
-    const response = await fetch('./netlify/functions/create-checkout', {
-      method: 'POST',
+    const response = await fetch('/.netlify/functions/create-session', {
+      method: 'post',
       headers: {
         'Content-Type': 'application/json',
       },
-      body: JSON.stringify(cartItems),
-    }).then((res) => res.json());
+      body: JSON.stringify(cartDetails),
+    })
+      .then((res) => {
+        console.log('yo', res);
+        return res.json();
+      })
+      .catch((error) => console.log(error));
 
-    console.log('response', response);
+    redirectToCheckout({ sessionId: response.sessionId });
   };
 
   if (Object.keys(cartDetails).length === 0) {
