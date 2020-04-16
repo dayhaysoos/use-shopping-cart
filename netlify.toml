@@ -1,5 +1,7 @@
 [build]
-  command="yarn deploy"
-  baseDirectory = "example"
-  publish="build"
-  functions="functions"
+  command="yarn exampledev"
+  publish="example/build"
+  functions="example/functions"
+
+  [dev]
+  command="yarn start & (cd example && yarn start)"
