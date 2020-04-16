@@ -1,5 +1,9 @@
-import React, {createContext, useReducer, useContext, useMemo} from 'react';
-import { toCurrency, calculateTotalValue, useLocalStorageReducer } from './util';
+import React, { createContext, useReducer, useContext, useMemo } from 'react';
+import {
+  toCurrency,
+  calculateTotalValue,
+  useLocalStorageReducer,
+} from './util';
 
 /**
  * @function checkoutCart
@@ -55,7 +59,7 @@ const reduceItemByOne = (skuID, cartItems) => {
   return newCartItems;
 };
 
-function cartReducer (cart, action) {
+function cartReducer(cart, action) {
   const { skus, cartItems } = cart;
 
   switch (action.type) {
@@ -159,17 +163,19 @@ export const CartProvider = ({
 
   // combine dispatches and
   // memoize context value to avoid causing re-renders
-  const contextValue = useMemo(() => (
-    [{ ...cart, cartItems }, action => {
-      cartDispatch(action);
-      cartItemsDispatch(action);
-    }]
-  ), [cart, cartItems, cartDispatch, cartItemsDispatch]);
+  const contextValue = useMemo(
+    () => [
+      { ...cart, cartItems },
+      (action) => {
+        cartDispatch(action);
+        cartItemsDispatch(action);
+      },
+    ],
+    [cart, cartItems, cartDispatch, cartItemsDispatch]
+  );
 
   return (
-    <CartContext.Provider value={contextValue}>
-      {children}
-    </CartContext.Provider>
+    <CartContext.Provider value={contextValue}>{children}</CartContext.Provider>
   );
 };
 
