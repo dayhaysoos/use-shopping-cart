@@ -1,6 +1,6 @@
 # use-stripe-cart
 
-> A Shopping Cart State and Logic for Stripe in React
+> A React Hook that handles shopping cart state and logic for Stripe.
 
 [![NPM](https://img.shields.io/npm/v/use-stripe-cart.svg)](https://www.npmjs.com/package/use-stripe-cart) [![JavaScript Style Guide](https://img.shields.io/badge/code_style-standard-brightgreen.svg)](https://standardjs.com)
 <!-- ALL-CONTRIBUTORS-BADGE:START - Do not remove or modify this section -->
@@ -12,30 +12,35 @@
 ```bash
 npm install --save use-stripe-cart
 
-or
+# or
 
 yarn add use-stripe-cart
 ```
 
 ## Usage
 
-At the root level of your app, wrap your Root app in the `<CartProvider />`
+### Initialization
+
+At the root level of your application (or the highest point you'll be using Stripe from), wrap your components in a `<CartProvider>`.
+
+`<CartProvider>` comes with several props that allow you to interact with the Stripe API and customize the Stripe experience.
 
 ```jsx
-/** @jsx jsx */
 import { CartProvider } from 'use-stripe-cart';
-import './index.css';
 import App from './App';
 
-const stripe = window.Stripe(process.env.REACT_APP_STRIPE_API_PUBLIC);
+const stripe = window.Stripe(
+  process.env.REACT_APP_STRIPE_API_PUBLIC
+);
 
 ReactDOM.render(
   <CartProvider
     stripe={stripe}
-    billingAddressCollection={false}
-    successUrl={'stripe.com'}
-    cancelUrl={'twitter.com/dayhaysoos'}
-    currency={'USD'}
+    successUrl="stripe.com"
+    cancelUrl="twitter.com/dayhaysoos"
+    currency="USD"
+    allowedCountries={['US', 'UK', 'CA']}
+    billingAddressCollection={true}
   >
     <App />
   </CartProvider>,
@@ -43,16 +48,14 @@ ReactDOM.render(
 );
 ```
 
-To add an item to the cart, use `addItem()`
+### Using the hook
+
+The hook `useStripeCart()` provides several utilities and pieces of data for you to use in your application. The examples below won't cover every part of the `useStripeCart()` API but you can [look at the API](#API) below.
 
 ```jsx
-/**@jsx jsx */
-import { jsx, Box, Image, Button, Flex } from 'theme-ui';
 import { useStripeCart } from 'use-stripe-cart';
-import { toCurrency } from '../util';
+import { Products } from './Product';
 
-/**
- * PRODUCT DATA COMING FROM PROPS
 const fakeData = [
   {
     name: 'Bananas',
@@ -69,7 +72,36 @@ const fakeData = [
     currency: 'USD',
   },
 ];
-*/
+
+export function App() {
+  const { totalPrice, redirectToCheckout } = useStripeCart();
+
+  return (
+    <div>
+      <p>Total: ${totalPrice()}</p>
+      <Products />
+      <button onClick={redirectToCheckout}>Checkout</button>
+    </div>
+  );
+}
+```
+
+```jsx
+import { useStripeCart } from 'use-stripe-cart';
+
+export function Product() {
+
+}
+```
+
+To add an item to the cart, use `addItem()`
+
+```jsx
+/**@jsx jsx */
+import { jsx, Box, Image, Button, Flex } from 'theme-ui';
+import { useStripeCart } from 'use-stripe-cart';
+import { toCurrency } from '../util';
+
 
 const Product = product => {
   const { addItem } = useStripeCart();
