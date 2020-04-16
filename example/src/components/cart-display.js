@@ -25,7 +25,6 @@ const CartDisplay = () => {
       body: JSON.stringify(cartDetails),
     })
       .then((res) => {
-        console.log('yo', res);
         return res.json();
       })
       .catch((error) => console.log(error));
