@@ -58,8 +58,6 @@ exports.handler = async (event) => {
     line_items,
   });
 
-  console.log(JSON.stringify({ sessionId: session.id }));
-
   return {
     statusCode: 200,
     body: JSON.stringify({ sessionId: session.id }),
