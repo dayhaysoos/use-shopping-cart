@@ -4,4 +4,4 @@
   functions="example/functions"
 
   [dev]
-  command="yarn start & (cd example && yarn start)"
+  command="yarn start"

@@ -16,10 +16,11 @@
     "test": "cross-env CI=1 react-scripts test --env=jsdom",
     "test:watch": "react-scripts test --env=jsdom",
     "build": "rollup -c",
-    "start": "rollup -c -w",
+    "start": "rollup -c -w & (cd example && yarn start)",
     "prepare": "yarn run build",
     "predeploy": "cd example && yarn install && yarn run build",
-    "deploy": "gh-pages -d example/build"
+    "deploy": "gh-pages -d example/build",
+    "dev": "ntl dev"
   },
   "peerDependencies": {
     "react": "^16.9.0",
@@ -58,6 +59,7 @@
     "eslint-plugin-react": "^7.10.0",
     "eslint-plugin-standard": "^4.0.1",
     "gh-pages": "^2.0.1",
+    "netlify-cli": "^2.46.0",
     "react-scripts": "^3.4.0",
     "react-test-renderer": "^16.9.0",
     "rollup": "^2.3.3",
