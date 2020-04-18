@@ -53,8 +53,8 @@ ReactDOM.render(
 The hook `useStripeCart()` provides several utilities and pieces of data for you to use in your application. The examples below won't cover every part of the `useStripeCart()` API but you can [look at the API](#API) below.
 
 ```jsx
-import { useStripeCart } from 'use-stripe-cart';
-import { Products } from './Product';
+import { useStripeCart } from 'use-stripe-cart'
+import { Products } from './Product'
 
 const fakeData = [
   {
@@ -71,26 +71,42 @@ const fakeData = [
     image: 'https://www.fillmurray.com/300/300',
     currency: 'USD',
   },
-];
+]
 
 export function App() {
   const { totalPrice, redirectToCheckout } = useStripeCart();
 
   return (
     <div>
-      <p>Total: ${totalPrice()}</p>
-      <Products />
+      <p>Total: {totalPrice()}</p>
+      {fakeData.map(product => (
+        <Product product={product} />
+      ))}
       <button onClick={redirectToCheckout}>Checkout</button>
     </div>
-  );
+  )
 }
 ```
 
 ```jsx
-import { useStripeCart } from 'use-stripe-cart';
+import { useStripeCart, toCurrency } from 'use-stripe-cart';
 
-export function Product() {
+export function Product({ product }) {
+  const { addItem } = useStripeCart()
 
+  return (
+    <article>
+      <figure>
+        <img src={product.image} alt="" />
+        <figcaption>{product.name}</figcaption>
+      </figure>
+      <p>${toCurrency(product.price)}</p>
+      <button
+        onClick={() => addItem(product.sku)}
+        aria-label={`Add ${product.name} to your cart`}
+      >Add to cart</button>
+    </article>
+  )
 }
 ```
 
