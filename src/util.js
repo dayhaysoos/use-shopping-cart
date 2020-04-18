@@ -30,21 +30,3 @@ export function useLocalStorageReducer(key, reducer, initialState) {
     initialState
   );
 }
-
-export const validateCartItems = (inventorySrc, cartItems) => {
-  const validatedItems = Object.keys(cartItems).map((item) => {
-    const product = cartItems[item];
-    const validatedItem = inventorySrc.find(
-      (p) => p.name === cartItems[item].name
-    );
-    return {
-      ...validatedItem,
-      name: validatedItem.name,
-      amount: validatedItem.price * product.quantity,
-      currency: validatedItem.currency,
-      quantity: product.quantity,
-    };
-  });
-
-  return validatedItems;
-};
