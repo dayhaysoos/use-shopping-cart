@@ -19,7 +19,6 @@
     "start": "rollup -c -w & (cd example && yarn start)",
     "prepare": "yarn run build",
     "predeploy": "cd example && yarn install && yarn run build",
-    "deploy": "gh-pages -d example/build",
     "dev": "ntl dev"
   },
   "peerDependencies": {

@@ -1,5 +1,5 @@
 [build]
-  command="yarn exampledev"
+  command="yarn predeploy"
   publish="example/build"
   functions="example/functions"
 
