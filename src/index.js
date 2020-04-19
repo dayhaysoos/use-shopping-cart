@@ -1,5 +1,9 @@
-import React, {createContext, useReducer, useContext, useMemo} from 'react';
-import { toCurrency, calculateTotalValue, useLocalStorageReducer } from './util';
+import React, { createContext, useReducer, useContext, useMemo } from 'react';
+import {
+  toCurrency,
+  calculateTotalValue,
+  useLocalStorageReducer,
+} from './util';
 
 /**
  * @function checkoutCart
@@ -44,13 +48,22 @@ const formatDetailedCart = (currency, cartItems, language) => {
 };
 
 const reduceItemByOne = (skuID, cartItems) => {
-  const newCartItems = cartItems;
-  const indexToRemove = newCartItems.map((item) => item.sku).indexOf(skuID);
-  newCartItems.splice(indexToRemove, 1);
+  const newCartItems = [];
+  let removedItem = false;
+
+  for (const item of cartItems) {
+    if (!removedItem && item.sku === skuID) {
+      removedItem = true;
+      continue;
+    }
+
+    newCartItems.push(item);
+  }
+
   return newCartItems;
 };
 
-function cartReducer (cart, action) {
+function cartReducer(cart, action) {
   switch (action.type) {
     case 'addToCart':
       return {
@@ -144,17 +157,19 @@ export const CartProvider = ({
 
   // combine dispatches and
   // memoize context value to avoid causing re-renders
-  const contextValue = useMemo(() => (
-    [{ ...cart, cartItems }, action => {
-      cartDispatch(action);
-      cartItemsDispatch(action);
-    }]
-  ), [cart, cartItems, cartDispatch, cartItemsDispatch]);
+  const contextValue = useMemo(
+    () => [
+      { ...cart, cartItems },
+      (action) => {
+        cartDispatch(action);
+        cartItemsDispatch(action);
+      },
+    ],
+    [cart, cartItems, cartDispatch, cartItemsDispatch]
+  );
 
   return (
-    <CartContext.Provider value={contextValue}>
-      {children}
-    </CartContext.Provider>
+    <CartContext.Provider value={contextValue}>{children}</CartContext.Provider>
   );
 };
 
