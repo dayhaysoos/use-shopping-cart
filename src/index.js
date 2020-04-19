@@ -43,11 +43,6 @@ const formatDetailedCart = (currency, cartItems, language) => {
   }, {});
 };
 
-const removeItem = (skuID, cartItems) => {
-  const newCartItems = cartItems.filter((item) => item.sku !== skuID);
-  return newCartItems;
-};
-
 const reduceItemByOne = (skuID, cartItems) => {
   const newCartItems = cartItems;
   const indexToRemove = newCartItems.map((item) => item.sku).indexOf(skuID);
@@ -56,13 +51,11 @@ const reduceItemByOne = (skuID, cartItems) => {
 };
 
 function cartReducer (cart, action) {
-  const { skus, cartItems } = cart;
-
   switch (action.type) {
     case 'addToCart':
       return {
         ...cart,
-        skus: checkoutCart(skus, action.sku),
+        skus: checkoutCart(cart.skus, action.product.sku),
       };
 
     case 'storeLastClicked':
@@ -95,18 +88,10 @@ function cartReducer (cart, action) {
 
 function cartItemsReducer(cartItems, action) {
   switch (action.type) {
-    case 'delete':
-      const index = cartItems.findIndex((item) => item.sku === action.skuID);
-
-      if (index === -1) {
-        return cartItems;
-      }
-
-      return cartItems.slice(0, index).concat(cartItems.slice(index + 1));
     case 'addToCart':
-      return [...cartItems, action.sku];
-    case 'removeFromCart':
-      return removeItem(action.sku, cartItems);
+      return [...cartItems, action.product];
+    case 'removeCartItem':
+      return cartItems.filter((item) => item.sku !== action.sku);
     case 'reduceItemByOne':
       return reduceItemByOne(action.sku, cartItems);
     default:
@@ -202,19 +187,17 @@ export const useStripeCart = () => {
 
   const cartCount = cartItems.length;
 
-  const addItem = (sku) => {
-    dispatch({ type: 'addToCart', sku });
+  const addItem = (product) => {
+    dispatch({ type: 'addToCart', product });
   };
 
   const removeCartItem = (sku) => {
-    dispatch({ type: 'removeFromCart', sku });
+    dispatch({ type: 'removeCartItem', sku });
   };
 
   const reduceItemByOne = (sku) => {
     dispatch({ type: 'reduceItemByOne', sku });
   };
-
-  const deleteItem = (skuID) => dispatch({ type: 'delete', skuID });
 
   const storeLastClicked = (skuID) =>
     dispatch({ type: 'storeLastClicked', skuID });
@@ -248,7 +231,6 @@ export const useStripeCart = () => {
 
   return {
     addItem,
-    deleteItem,
     cartCount,
     checkoutData,
     redirectToCheckout,
