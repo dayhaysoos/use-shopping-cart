@@ -98,7 +98,7 @@ export function App() {
 
 #### How do I add an item to the user's cart?
 
-
+To add a product to the cart, use `useStripeCart()`'s `addItem(product)` method. It takes in your product object, which must have a `sku` and a `price`, and adds it to the cart.
 
 ```jsx
 import { useStripeCart, toCurrency } from 'use-stripe-cart';
@@ -106,53 +106,29 @@ import { useStripeCart, toCurrency } from 'use-stripe-cart';
 export function Product({ product }) {
   const { addItem } = useStripeCart()
 
+  /* A helper function that turns the price into a readable format */
+  const price = toCurrency({
+    price: product.price,
+    currency: product.currency,
+    language: navigator.language,
+  })
+
   return (
     <article>
       <figure>
         <img src={product.image} alt="" />
         <figcaption>{product.name}</figcaption>
       </figure>
-      <p>${toCurrency(product.price)}</p>
+      <p>{price}</p>
+
+      {/* Adds the item to the cart */}
       <button
-        onClick={() => addItem(product.sku)}
+        onClick={() => addItem(product)}
         aria-label={`Add ${product.name} to your cart`}
       >Add to cart</button>
     </article>
   )
 }
-```
-
-To add an item to the cart, use `addItem()`
-
-```jsx
-/**@jsx jsx */
-import { jsx, Box, Image, Button, Flex } from 'theme-ui';
-import { useStripeCart } from 'use-stripe-cart';
-import { toCurrency } from '../util';
-
-
-const Product = product => {
-  const { addItem } = useStripeCart();
-  const { name, sku, price, image, currency } = product;
-  return (
-    <Flex
-      sx={{
-        flexDirection: 'column',
-        justifyContent: 'center',
-        alignItems: 'center',
-      }}
-    >
-      <Image src={image} />
-      <Box>
-        <p>{name}</p>
-        <p>{toCurrency({ price: price, currency })}</p>
-      </Box>
-      <Button onClick={() => addItem({ ...product })} backgroundColor={'black'}>
-        Add To Cart
-      </Button>
-    </Flex>
-  );
-};
 ```
 
 For displaying what's actually in the cart, refer to the `CartDisplay` component:
