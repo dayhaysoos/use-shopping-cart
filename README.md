@@ -131,6 +131,16 @@ export function Product({ product }) {
 }
 ```
 
+#### Now how do I display the cart to the user?
+
+```jsx
+import { useStripeCart } from 'use-stripe-cart'
+
+export function CartItems() {
+
+}
+```
+
 For displaying what's actually in the cart, refer to the `CartDisplay` component:
 https://github.com/dayhaysoos/use-stripe-cart/blob/master/example/src/components/cart-display.js
 
