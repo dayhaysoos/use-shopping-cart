@@ -55,8 +55,9 @@ The hook `useStripeCart()` provides several utilities and pieces of data for you
 ```jsx
 import { useStripeCart } from 'use-stripe-cart'
 import { Products } from './Product'
+import { CartItems } from './CartItems';
 
-const fakeData = [
+const productData = [
   {
     name: 'Bananas',
     sku: 'sku_GBJ2Ep8246qeeT',
@@ -74,19 +75,30 @@ const fakeData = [
 ]
 
 export function App() {
+  /* Gets the totalPrice and a method for redirecting to stripe */
   const { totalPrice, redirectToCheckout } = useStripeCart();
 
   return (
     <div>
-      <p>Total: {totalPrice()}</p>
-      {fakeData.map(product => (
+      {/* Renders the products */}
+      {productData.map(product => (
         <Product product={product} />
       ))}
+
+      {/* This is where we'll render our cart */}
+      <p>Total: {totalPrice()}</p>
+      <CartItems />
+
+      {/* Redirects the user to Stripe */}
       <button onClick={redirectToCheckout}>Checkout</button>
     </div>
   )
 }
 ```
+
+#### How do I add an item to the user's cart?
+
+
 
 ```jsx
 import { useStripeCart, toCurrency } from 'use-stripe-cart';
