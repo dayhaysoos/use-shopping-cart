@@ -140,7 +140,7 @@ describe('useStripeCart', () => {
     ]);
   });
 
-  it('deleteItem removes item from checkoutData array', () => {
+  it('removeCartItem removes item from checkoutData array', () => {
     act(() => {
       result.current.addItem(mockSku);
     });
@@ -150,13 +150,13 @@ describe('useStripeCart', () => {
     ]);
 
     act(() => {
-      result.current.deleteItem(mockSku.sku);
+      result.current.removeCartItem(mockSku.sku);
     });
 
     expect(result.current.checkoutData).toEqual([]);
   });
 
-  it('deleteItem removes the correct item from the cart', () => {
+  it('removeCartItem removes the correct item from the cart', () => {
     act(() => {
       result.current.addItem(mockSku);
       result.current.addItem(mockSku2);
@@ -168,7 +168,7 @@ describe('useStripeCart', () => {
     ]);
 
     act(() => {
-      result.current.deleteItem(mockSku.sku);
+      result.current.removeCartItem(mockSku.sku);
     });
 
     expect(result.current.checkoutData).toEqual([
@@ -266,7 +266,7 @@ describe('useStripeCart', () => {
     });
   });
 
-  it('cartItems gets items removed when deleteItem is ran', () => {
+  it('cartItems gets items removed when removeCartItem is ran', () => {
     act(() => {
       result.current.addItem(mockSku);
     });
@@ -274,13 +274,13 @@ describe('useStripeCart', () => {
     expect(result.current.cartItems).toEqual([mockSku]);
 
     act(() => {
-      result.current.deleteItem(mockSku.sku);
+      result.current.removeCartItem(mockSku.sku);
     });
 
     expect(result.current.cartItems).toEqual([]);
   });
 
-  it('cartItems gets one item removed when deleteItem is ran', () => {
+  it('cartItems gets one item removed when removeCartItem is ran', () => {
     act(() => {
       result.current.addItem(mockSku);
       result.current.addItem(mockSku2);
@@ -289,7 +289,7 @@ describe('useStripeCart', () => {
     expect(result.current.cartItems).toEqual([mockSku, mockSku2]);
 
     act(() => {
-      result.current.deleteItem(mockSku.sku);
+      result.current.removeCartItem(mockSku.sku);
     });
 
     expect(result.current.cartItems).toEqual([mockSku2]);
