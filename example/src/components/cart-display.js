@@ -14,6 +14,24 @@ const CartDisplay = () => {
     reduceItemByOne,
   } = useStripeCart();
 
+  const handleSubmit = async (event) => {
+    event.preventDefault();
+
+    const response = await fetch('/.netlify/functions/create-session', {
+      method: 'post',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(cartDetails),
+    })
+      .then((res) => {
+        return res.json();
+      })
+      .catch((error) => console.log(error));
+
+    redirectToCheckout({ sessionId: response.sessionId });
+  };
+
   if (Object.keys(cartDetails).length === 0) {
     return (
       <Box sx={{ textAlign: 'center' }}>
@@ -68,9 +86,15 @@ const CartDisplay = () => {
         })}
         <h3>Total Items in Cart: {cartCount}</h3>
         <h3>Total Price: {totalPrice()}</h3>
-        <Button sx={{ backgroundColor: 'black' }} onClick={redirectToCheckout}>
-          Checkout
-        </Button>
+        <Box
+          as={'form'}
+          action={'/.netlify/functions/create-session'}
+          method="POST"
+        >
+          <Button sx={{ backgroundColor: 'black' }} onClick={handleSubmit}>
+            Checkout
+          </Button>
+        </Box>
       </Flex>
     );
   }

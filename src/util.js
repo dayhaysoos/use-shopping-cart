@@ -17,7 +17,9 @@ export const calculateTotalValue = (currency, cartItems) => {
 
 export function useLocalStorageReducer(key, reducer, initialState) {
   const dummyStorage = {
-    getItem() { return null; },
+    getItem() {
+      return null;
+    },
     setItem() {},
     removeItem() {},
   };
@@ -25,6 +27,6 @@ export function useLocalStorageReducer(key, reducer, initialState) {
     isClient ? window.localStorage : dummyStorage,
     key,
     reducer,
-    initialState,
+    initialState
   );
 }

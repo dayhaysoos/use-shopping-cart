@@ -1,0 +1,7 @@
+[build]
+  command="yarn predeploy"
+  publish="example/build"
+  functions="example/functions"
+
+  [dev]
+  command="yarn start"
