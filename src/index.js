@@ -48,10 +48,25 @@ const removeItem = (skuID, cartItems) => {
   return newCartItems;
 };
 
+/**
+ * Reduces the quantity
+ * @param skuID
+ * @param cartItems
+ * @returns {*}
+ */
 const reduceItemByOne = (skuID, cartItems) => {
-  const newCartItems = cartItems;
-  const indexToRemove = newCartItems.map((item) => item.sku).indexOf(skuID);
-  newCartItems.splice(indexToRemove, 1);
+  const newCartItems = [];
+  let removedItem = false;
+
+  for (const item of cartItems) {
+    if (!removedItem && item.sku === skuID) {
+      removedItem = true;
+      continue;
+    }
+
+    newCartItems.push(item);
+  }
+
   return newCartItems;
 };
 
