@@ -28,7 +28,7 @@ const checkoutCart = (skus, { sku }, quantity = 1) => {
 };
 
 const formatDetailedCart = (currency, cartItems, language) => {
-  return cartItems.reduce((acc, current) => {
+  return cartItems ? cartItems.reduce((acc, current) => {
     const quantity = (acc[current.sku]?.quantity ?? 0) + 1;
     const price = current.price;
     const value = (acc[current.sku]?.value ?? 0) + current.price;
@@ -44,7 +44,7 @@ const formatDetailedCart = (currency, cartItems, language) => {
         value,
       },
     };
-  }, {});
+  }, {}) : {};
 };
 
 const reduceItemByOne = (skuID, cartItems) => {
@@ -112,7 +112,7 @@ function cartItemsReducer(cartItems, action) {
   }
 }
 
-export const CartContext = createContext();
+export const CartContext = createContext([{}, () => {}]);
 
 /**
  * @param {{
@@ -200,7 +200,7 @@ export const useStripeCart = () => {
     };
   });
 
-  const cartCount = cartItems.length;
+  const cartCount = cartItems ? cartItems.length : 0;
 
   const addItem = (product) => {
     dispatch({ type: 'addToCart', product });
