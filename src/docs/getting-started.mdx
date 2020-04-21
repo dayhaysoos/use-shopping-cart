@@ -5,11 +5,36 @@ title: 'Getting started'
 ## Installation
 
 ```bash
-npm install --save use-stripe-cart
+npm install --save stripe use-stripe-cart
 
 or
 
-yarn add use-stripe-cart
+yarn add stripe use-stripe-cart
 ```
 
-Once you have successfully installed the `use-stripe-cart` package in your project, you are ready 🚀
+The package needs to be configured with your account's secret key, which is available in the [Stripe Dashboard](https://dashboard.stripe.com/apikeys). Require it with the key's value.
+
+At the root level of your app, wrap your root component in the `<CartProvider />`
+
+```jsx
+import { CartProvider } from 'use-stripe-cart';
+import './index.css';
+import App from './App';
+
+const stripe = require('stripe')('sk_test_...');
+
+ReactDOM.render(
+  <CartProvider
+    stripe={stripe}
+    billingAddressCollection={false}
+    successUrl={'stripe.com'}
+    cancelUrl={'twitter.com/dayhaysoos'}
+    currency={'USD'}
+  >
+    <App />
+  </CartProvider>,
+  document.getElementById('root')
+);
+```
+
+Once you have successfully installed `stripe` and `use-stripe-cart` and wrap your root component with CartProvider, you are ready to go! 🚀

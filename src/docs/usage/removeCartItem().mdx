@@ -1,8 +1,8 @@
 ---
-title: addItem()
+title: removeCartItem()
 ---
 
-To add an item to the cart, use `addItem()`
+Completely removes a product and quantity that comes with it from the removeCartItem
 
 ```jsx
 /**@jsx jsx */
@@ -31,7 +31,7 @@ const fakeData = [
 */
 
 const Product = (product) => {
-  const { addItem } = useStripeCart();
+  const { removeCartItem } = useStripeCart();
   const { name, sku, price, image, currency } = product;
   return (
     <Flex
@@ -46,13 +46,13 @@ const Product = (product) => {
         <p>{name}</p>
         <p>{toCurrency({ price: price, currency })}</p>
       </Box>
-      <Button onClick={() => addItem({ ...product })} backgroundColor={'black'}>
-        Add To Cart
+      <Button
+        onClick={() => removeCartItem({ ...product })}
+        backgroundColor={'black'}
+      >
+        Remove from Cart
       </Button>
     </Flex>
   );
 };
 ```
-
-For displaying what's actually in the cart, refer to the `CartDisplay` component in the example:
-https://github.com/dayhaysoos/use-stripe-cart/blob/master/example/src/components/cart-display.js

@@ -1,8 +1,8 @@
 ---
-title: addItem()
+title: reduceItemByOne()
 ---
 
-To add an item to the cart, use `addItem()`
+To remove an item from the cart, use `reduceItemByOne()`
 
 ```jsx
 /**@jsx jsx */
@@ -31,7 +31,7 @@ const fakeData = [
 */
 
 const Product = (product) => {
-  const { addItem } = useStripeCart();
+  const { reduceItemByOne } = useStripeCart();
   const { name, sku, price, image, currency } = product;
   return (
     <Flex
@@ -46,8 +46,11 @@ const Product = (product) => {
         <p>{name}</p>
         <p>{toCurrency({ price: price, currency })}</p>
       </Box>
-      <Button onClick={() => addItem({ ...product })} backgroundColor={'black'}>
-        Add To Cart
+      <Button
+        onClick={() => reduceItemByOne({ ...product })}
+        backgroundColor={'black'}
+      >
+        Remove One
       </Button>
     </Flex>
   );
