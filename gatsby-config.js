@@ -3,8 +3,9 @@ module.exports = {
     siteTitle: `use-stripe-cart`,
     defaultTitle: `use-stripe-cart`,
     siteTitleShort: `use-stripe-cart`,
-    siteDescription: `Out of the box Gatsby Theme for creating documentation websites easily and quickly`,
-    siteUrl: `https://rocketdocs.netlify.com`,
+    siteDescription:
+      'React Hooks library for your Stripe powered shopping cart needs!',
+    siteUrl: `https://use-stripe-cart.netlify.app/`,
     siteAuthor: `use-stripe-cart`,
     siteImage: `/banner.png`,
     siteLanguage: `en`,

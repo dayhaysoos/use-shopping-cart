@@ -2,8 +2,8 @@
   "name": "gatsby-starter-rocket-docs",
   "private": true,
   "version": "1.0.0",
-  "description": "Out of the box Gatsby Starter for creating documentation websites easily and quickly. With support for MDX, code highlight, Analytics, SEO and more",
-  "author": "João Pedro Schmitz <oi@joaopedro.cc> (@joaopedro_cc)",
+  "description": "React Hooks library for your Stripe powered shopping cart needs!",
+  "author": "Nick DeJesus <ndejesus1227@gmail.com> (@dayhaysoos)",
   "license": "MIT",
   "starter-name": "gatsby-starter-rocket-docs",
   "dependencies": {
