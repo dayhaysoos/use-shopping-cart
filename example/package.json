@@ -4,15 +4,14 @@
   "license": "MIT",
   "private": true,
   "dependencies": {
-    "@stripe/react-stripe-js": "^1.0.3",
-    "@stripe/stripe-js": "^1.3.2",
-    "prop-types": "^15.6.2",
+    "@stripe/react-stripe-js": "1.1.2",
+    "@stripe/stripe-js": "1.4.0",
+    "prop-types": "15.7.2",
     "react": "16.13.1",
-    "react-dom": "^16.9.0",
-    "react-scripts": "^3.0.1",
-    "stripe": "^8.39.1",
-    "theme-ui": "^0.3.1",
-    "use-stripe-cart": "1.1.0"
+    "react-dom": "16.13.1",
+    "react-scripts": "3.4.1",
+    "theme-ui": "0.3.1",
+    "use-stripe-cart": "1.2.1"
   },
   "scripts": {
     "start": "react-scripts start",
