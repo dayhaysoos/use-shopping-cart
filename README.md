@@ -3,8 +3,11 @@
 > A Shopping Cart State and Logic for Stripe in React
 
 [![NPM](https://img.shields.io/npm/v/use-stripe-cart.svg)](https://www.npmjs.com/package/use-stripe-cart) [![JavaScript Style Guide](https://img.shields.io/badge/code_style-standard-brightgreen.svg)](https://standardjs.com)
+
 <!-- ALL-CONTRIBUTORS-BADGE:START - Do not remove or modify this section -->
+
 [![All Contributors](https://img.shields.io/badge/all_contributors-5-orange.svg?style=flat-square)](#contributors-)
+
 <!-- ALL-CONTRIBUTORS-BADGE:END -->
 
 ## Installation
@@ -19,26 +22,38 @@ yarn add use-stripe-cart
 
 ## Usage
 
-At the root level of your app, wrap your Root app in the `<CartProvider />`
+At the root level of your app, wrap your Root app in the `<CartProvider />`.
+
+Remember to add your public Stripe key, in this example it's added in in the environment `process.env.REACT_APP_STRIPE_API_PUBLIC`.
 
 ```jsx
 /** @jsx jsx */
+import { jsx } from 'theme-ui';
+import ReactDOM from 'react-dom';
+import { Elements, ElementsConsumer } from '@stripe/react-stripe-js';
+import { loadStripe } from '@stripe/stripe-js';
 import { CartProvider } from 'use-stripe-cart';
 import './index.css';
 import App from './App';
 
-const stripe = window.Stripe(process.env.REACT_APP_STRIPE_API_PUBLIC);
+const stripePromise = loadStripe(process.env.REACT_APP_STRIPE_API_PUBLIC);
 
 ReactDOM.render(
-  <CartProvider
-    stripe={stripe}
-    billingAddressCollection={false}
-    successUrl={'stripe.com'}
-    cancelUrl={'twitter.com/dayhaysoos'}
-    currency={'USD'}
-  >
-    <App />
-  </CartProvider>,
+  <Elements stripe={stripePromise}>
+    <ElementsConsumer>
+      {({ stripe }) => (
+        <CartProvider
+          stripe={stripe}
+          billingAddressCollection={false}
+          successUrl={'https://stripe.com'}
+          cancelUrl={'https://twitter.com/dayhaysoos'}
+          currency={'USD'}
+        >
+          <App />
+        </CartProvider>
+      )}
+    </ElementsConsumer>
+  </Elements>,
   document.getElementById('root')
 );
 ```
@@ -71,7 +86,7 @@ const fakeData = [
 ];
 */
 
-const Product = product => {
+const Product = (product) => {
   const { addItem } = useStripeCart();
   const { name, sku, price, image, currency } = product;
   return (
@@ -145,6 +160,7 @@ Thanks goes to these wonderful people ([emoji key](https://allcontributors.org/d
 
 <!-- markdownlint-enable -->
 <!-- prettier-ignore-end -->
+
 <!-- ALL-CONTRIBUTORS-LIST:END -->
 
 This project follows the [all-contributors](https://github.com/all-contributors/all-contributors) specification. Contributions of any kind welcome!
