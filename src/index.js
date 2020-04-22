@@ -112,7 +112,18 @@ function cartItemsReducer(cartItems, action) {
   }
 }
 
-export const CartContext = createContext([{ cartItems: [] }, () => {}]);
+export const CartContext = createContext([{
+  lastClicked: '',
+  shouldDisplayCart: false,
+  stripe,
+  successUrl,
+  cancelUrl,
+  currency,
+  billingAddressCollection,
+  allowedCountries,
+  skus: {},
+  cartItems: [],
+}, () => {}]);
 
 /**
  * @param {{
