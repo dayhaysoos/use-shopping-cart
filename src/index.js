@@ -94,6 +94,13 @@ function cartReducer(cart, action) {
         ...cart,
         shouldDisplayCart: false,
       };
+
+    case 'initStripe':
+      return {
+        ...cart,
+        stripe: action.stripe,
+      };
+
     default:
       return cart;
   }
@@ -152,6 +159,10 @@ export const CartProvider = ({
     allowedCountries,
     skus: {},
   });
+
+  // Init Stripe if it comes in and we didn't already have it
+  if (cart.stripe === null && stripe !== null)
+    cartDispatch({ type: 'initStripe', stripe });
 
   // keep cartItems in LocalStorage
   const [cartItems, cartItemsDispatch] = useLocalStorageReducer(
