@@ -64,21 +64,17 @@ const mockDetailedSku2 = {
   },
 };
 
-const createWrapper = (props = {}) => ({ children }) => {
-  const stripe = 'stripe' in props ? props.stripe : stripeMock;
-
-  return (
-    <CartProvider
-      successUrl="https://egghead.io/success"
-      cancelUrl="https://egghead.io/cancel"
-      stripe={stripe}
-      currency="USD"
-      {...props}
-    >
-      {children}
-    </CartProvider>
-  );
-};
+const createWrapper = (props = {}) => ({ children }) => (
+  <CartProvider
+    successUrl="https://egghead.io/success"
+    cancelUrl="https://egghead.io/cancel"
+    stripe={stripeMock}
+    currency="USD"
+    {...props}
+  >
+    {children}
+  </CartProvider>
+);
 
 describe('useStripeCart', () => {
   let result;
