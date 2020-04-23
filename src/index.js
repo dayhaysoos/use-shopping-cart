@@ -1,4 +1,4 @@
-import React, { createContext, useReducer, useContext, useMemo } from 'react';
+import React, { createContext, useReducer, useContext, useMemo, useEffect } from 'react'
 import {
   toCurrency,
   calculateTotalValue,
@@ -95,7 +95,7 @@ function cartReducer(cart, action) {
         shouldDisplayCart: false,
       };
 
-    case 'initStripe':
+    case 'stripe changed':
       return {
         ...cart,
         stripe: action.stripe,
@@ -160,9 +160,9 @@ export const CartProvider = ({
     skus: {},
   });
 
-  // Init Stripe if it comes in and we didn't already have it
-  if (cart.stripe === null && stripe !== null)
-    cartDispatch({ type: 'initStripe', stripe });
+  useEffect(() => {
+    cartDispatch({ type: 'stripe changed', stripe })
+  }, [stripe])
 
   // keep cartItems in LocalStorage
   const [cartItems, cartItemsDispatch] = useLocalStorageReducer(
