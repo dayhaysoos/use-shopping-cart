@@ -1,4 +1,10 @@
-import React, { createContext, useReducer, useContext, useMemo, useEffect } from 'react'
+import React, {
+  createContext,
+  useReducer,
+  useContext,
+  useMemo,
+  useEffect,
+} from 'react';
 import {
   toCurrency,
   calculateTotalValue,
@@ -119,12 +125,15 @@ function cartItemsReducer(cartItems, action) {
   }
 }
 
-export const CartContext = createContext([{
-  lastClicked: '',
-  shouldDisplayCart: false,
-  skus: {},
-  cartItems: [],
-}, () => {}]);
+export const CartContext = createContext([
+  {
+    lastClicked: '',
+    shouldDisplayCart: false,
+    skus: {},
+    cartItems: [],
+  },
+  () => {},
+]);
 
 /**
  * @param {{
@@ -161,8 +170,8 @@ export const CartProvider = ({
   });
 
   useEffect(() => {
-    cartDispatch({ type: 'stripe changed', stripe })
-  }, [stripe])
+    cartDispatch({ type: 'stripe changed', stripe });
+  }, [stripe]);
 
   // keep cartItems in LocalStorage
   const [cartItems, cartItemsDispatch] = useLocalStorageReducer(
