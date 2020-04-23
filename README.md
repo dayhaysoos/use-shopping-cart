@@ -133,11 +133,43 @@ export function Product({ product }) {
 
 #### Now how do I display the cart to the user?
 
+Once the user has added their items to the cart, you can use the `cartDetails` object to display the different data about each product in their cart.
+
+Each product in `cartDetails` contains the same data you provided when you called `addItem(product)`. In addition, `cartDetails` also provides the following properties:
+
+```js
+/**
+ *       quantity => Number of that item added to the cart
+ *          value => price * quantity
+ * formattedValue => A currency formatted version of value
+ */
+```
+
 ```jsx
 import { useStripeCart } from 'use-stripe-cart'
 
 export function CartItems() {
+  const { cartDetails, reduceItemByOne, addItem } = useStripeCart()
 
+  const cart = [];
+  // Note: Object.keys().map() takes 2x as long as a for-in loop
+  for (const sku in cartDetails) {
+    const cartEntry = cartDetails[sku]
+
+    // all of your basic product data still exists (i.e. name, image, price)
+    cart.push(
+      <article>
+        {/* image */}
+        {/* name */}
+        <p>Line total: {cartEntry.formattedValue}</p>
+
+        {/* What if we want to remove one of the item... or add one */}
+        <button onClick={reduceItemByOne(cartEntry.sku)}>-</button>
+        <p>Quantity: {cartEntry.quantity}</p>
+        <button onClick={addItem(cartEntry)}>+</button>
+      </article>
+    )
+  }
 }
 ```
 
