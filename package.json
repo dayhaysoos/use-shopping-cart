@@ -22,8 +22,8 @@
     "dev": "ntl dev"
   },
   "peerDependencies": {
-    "react": "^16.9.0",
-    "stripe": "^8.29.0"
+    "react": "16.13.1",
+    "stripe": "8.46.0"
   },
   "devDependencies": {
     "@babel/core": "^7.0.0",
@@ -59,14 +59,16 @@
     "eslint-plugin-standard": "^4.0.1",
     "gh-pages": "^2.0.1",
     "netlify-cli": "^2.46.0",
-    "react-scripts": "^3.4.0",
-    "react-test-renderer": "^16.9.0",
+    "react": "16.13.1",
+    "react-scripts": "3.4.1",
+    "react-test-renderer": "16.13.1",
     "rollup": "^2.3.3",
     "rollup-plugin-babel": "^4.3.2",
     "rollup-plugin-commonjs": "^10.1.0",
     "rollup-plugin-node-resolve": "^5.2.0",
     "rollup-plugin-peer-deps-external": "^2.2.0",
-    "rollup-plugin-url": "^3.0.1"
+    "rollup-plugin-url": "^3.0.1",
+    "prettier": "2.0.5"
   },
   "dependencies": {
     "react-storage-hooks": "^4.0.0"

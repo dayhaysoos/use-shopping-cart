@@ -65,11 +65,13 @@ const mockDetailedSku2 = {
 };
 
 const createWrapper = (props = {}) => ({ children }) => {
+  const stripe = 'stripe' in props ? props.stripe : stripeMock;
+
   return (
     <CartProvider
       successUrl="https://egghead.io/success"
       cancelUrl="https://egghead.io/cancel"
-      stripe={stripeMock}
+      stripe={stripe}
       currency="USD"
       {...props}
     >
@@ -78,12 +80,6 @@ const createWrapper = (props = {}) => ({ children }) => {
   );
 };
 
-let result;
-beforeEach(() => {
-  const wrapper = createWrapper();
-  result = renderHook(() => useStripeCart(), { wrapper }).result;
-});
-
 describe('useStripeCart', () => {
   let result;
   beforeEach(() => {
@@ -91,7 +87,7 @@ describe('useStripeCart', () => {
     result = renderHook(() => useStripeCart(), { wrapper }).result;
   });
 
-  it('renderps', () => {
+  it('renders', () => {
     expect(result.current.cartItems).toEqual(INITIAL_STATE.cartItems);
   });
 
@@ -420,5 +416,25 @@ describe('useStripeCart persistency', () => {
     result = renderHook(() => useStripeCart(), { wrapper }).result;
 
     expect(result.current.cartItems).toEqual(cartItemsFromStorage());
+  });
+});
+
+describe('useStripeCart stripe handling', () => {
+  it('if stripe is defined, redirectToCheckout can be called', () => {
+    const wrapper = createWrapper();
+    const { result } = renderHook(() => useStripeCart(), { wrapper });
+    result.current.redirectToCheckout();
+    expect(stripeMock.redirectToCheckout).toHaveBeenCalled();
+  });
+
+  it('if stripe is undefined, redirectToCheckout throws an error', async () => {
+    const wrapper = createWrapper({ stripe: null });
+    const { result } = renderHook(() => useStripeCart(), { wrapper });
+    expect.assertions(1);
+    try {
+      await result.current.redirectToCheckout();
+    } catch (e) {
+      expect(e).toEqual(new Error('Stripe is not defined'));
+    }
   });
 });

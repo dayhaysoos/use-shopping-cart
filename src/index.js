@@ -263,6 +263,10 @@ export const useStripeCart = () => {
       };
     }
 
+    if (stripe === null) {
+      throw new Error('Stripe is not defined');
+    }
+
     const { error } = await stripe.redirectToCheckout(options);
     if (error) {
       return error;
