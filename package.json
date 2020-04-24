@@ -1,10 +1,10 @@
 {
-  "name": "use-stripe-cart",
-  "version": "1.2.1",
+  "name": "use-shopping-cart",
+  "version": "0.0.2",
   "description": "Shopping cart state and logic for Stripe",
   "author": "dayhaysoos",
   "license": "MIT",
-  "repository": "dayhaysoos/use-stripe-cart",
+  "repository": "dayhaysoos/use-shopping-cart",
   "main": "dist/index.js",
   "module": "dist/index.es.js",
   "jsnext:main": "dist/index.es.js",

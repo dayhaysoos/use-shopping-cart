@@ -1,6 +1,6 @@
 /**@jsx jsx */
 import { jsx, Box, Flex, Image, Button } from 'theme-ui';
-import { useStripeCart } from 'use-stripe-cart';
+import { useShoppingCart } from 'use-shopping-cart';
 
 const CartDisplay = () => {
   const {
@@ -12,7 +12,7 @@ const CartDisplay = () => {
     totalPrice,
     redirectToCheckout,
     reduceItemByOne,
-  } = useStripeCart();
+  } = useShoppingCart();
 
   const handleSubmit = async (event) => {
     event.preventDefault();

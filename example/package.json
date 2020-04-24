@@ -1,5 +1,5 @@
 {
-  "name": "use-stripe-cart-example",
+  "name": "use-shopping-cart-example",
   "version": "0.0.0",
   "license": "MIT",
   "private": true,
@@ -12,7 +12,7 @@
     "react-dom": "16.13.1",
     "react-scripts": "3.4.1",
     "theme-ui": "0.3.1",
-    "use-stripe-cart": "1.2.1"
+    "use-shopping-cart": "0.0.2"
   },
   "scripts": {
     "start": "react-scripts start",

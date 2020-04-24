@@ -198,7 +198,7 @@ export const CartProvider = ({
   );
 };
 
-export const useStripeCart = () => {
+export const useShoppingCart = () => {
   const [cart, dispatch] = useContext(CartContext);
 
   const {

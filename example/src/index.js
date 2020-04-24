@@ -3,7 +3,7 @@ import { jsx } from 'theme-ui';
 import ReactDOM from 'react-dom';
 import { Elements, ElementsConsumer } from '@stripe/react-stripe-js';
 import { loadStripe } from '@stripe/stripe-js';
-import { CartProvider } from 'use-stripe-cart';
+import { CartProvider } from 'use-shopping-cart';
 import './index.css';
 import App from './App';
 

@@ -1,6 +1,6 @@
 {
-  "short_name": "use-stripe-cart",
-  "name": "use-stripe-cart",
+  "short_name": "use-shopping-cart",
+  "name": "use-shopping-cart",
   "start_url": "./index.html",
   "display": "standalone",
   "theme_color": "#000000",
