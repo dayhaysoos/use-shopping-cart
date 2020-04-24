@@ -7,7 +7,7 @@ Completely removes a product and quantity that comes with it from the removeCart
 ```jsx
 /**@jsx jsx */
 import { jsx, Box, Image, Button, Flex } from 'theme-ui';
-import { useStripeCart } from 'use-stripe-cart';
+import { useShoppingCart } from 'use-shopping-cart';
 import { toCurrency } from '../util';
 
 /**
@@ -31,7 +31,7 @@ const fakeData = [
 */
 
 const Product = (product) => {
-  const { removeCartItem } = useStripeCart();
+  const { removeCartItem } = useShoppingCart();
   const { name, sku, price, image, currency } = product;
   return (
     <Flex

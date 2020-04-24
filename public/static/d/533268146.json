@@ -1,1 +1,7 @@
-{"data":{"site":{"siteMetadata":{"footer":"use-stripe-cart","basePath":"/"}}}}
+{
+  "data": {
+    "site": {
+      "siteMetadata": { "footer": "use-shopping-cart", "basePath": "/" }
+    }
+  }
+}

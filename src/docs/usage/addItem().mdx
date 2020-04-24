@@ -7,7 +7,7 @@ To add an item to the cart, use `addItem()`
 ```jsx
 /**@jsx jsx */
 import { jsx, Box, Image, Button, Flex } from 'theme-ui';
-import { useStripeCart } from 'use-stripe-cart';
+import { useShoppingCart } from 'use-shopping-cart';
 import { toCurrency } from '../util';
 
 /**
@@ -31,7 +31,7 @@ const fakeData = [
 */
 
 const Product = (product) => {
-  const { addItem } = useStripeCart();
+  const { addItem } = useShoppingCart();
   const { name, sku, price, image, currency } = product;
   return (
     <Flex
@@ -55,4 +55,4 @@ const Product = (product) => {
 ```
 
 For displaying what's actually in the cart, refer to the `CartDisplay` component in the example:
-https://github.com/dayhaysoos/use-stripe-cart/blob/master/example/src/components/cart-display.js
+https://github.com/dayhaysoos/use-shopping-cart/blob/master/example/src/components/cart-display.js

@@ -1,17 +1,17 @@
 module.exports = {
   siteMetadata: {
-    siteTitle: `use-stripe-cart`,
-    defaultTitle: `use-stripe-cart`,
-    siteTitleShort: `use-stripe-cart`,
+    siteTitle: `use-shopping-cart`,
+    defaultTitle: `use-shopping-cart`,
+    siteTitleShort: `use-shopping-cart`,
     siteDescription:
       'React Hooks library for your Stripe powered shopping cart needs!',
-    siteUrl: `https://use-stripe-cart.netlify.app/`,
-    siteAuthor: `use-stripe-cart`,
+    siteUrl: `https://use-shopping-cart.netlify.app/`,
+    siteAuthor: `use-shopping-cart`,
     siteImage: `/banner.png`,
     siteLanguage: `en`,
     themeColor: `#7159c1`,
     basePath: `/`,
-    footer: `use-stripe-cart`,
+    footer: `use-shopping-cart`,
   },
   plugins: [
     {

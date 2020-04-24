@@ -1,1 +1,16 @@
-{"data":{"site":{"siteMetadata":{"defaultTitle":"use-stripe-cart","siteTitleShort":"use-stripe-cart","siteTitle":"use-stripe-cart","siteImage":"/banner.png","siteDescription":"React Hooks library for your Stripe powered shopping cart needs!","siteLanguage":"en","siteUrl":"https://use-stripe-cart.netlify.app","siteAuthor":"use-stripe-cart"}}}}
+{
+  "data": {
+    "site": {
+      "siteMetadata": {
+        "defaultTitle": "use-shopping-cart",
+        "siteTitleShort": "use-shopping-cart",
+        "siteTitle": "use-shopping-cart",
+        "siteImage": "/banner.png",
+        "siteDescription": "React Hooks library for your Stripe powered shopping cart needs!",
+        "siteLanguage": "en",
+        "siteUrl": "https://use-shopping-cart.netlify.app",
+        "siteAuthor": "use-shopping-cart"
+      }
+    }
+  }
+}
