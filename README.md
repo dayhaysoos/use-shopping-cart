@@ -4,7 +4,7 @@
 
 [![NPM](https://img.shields.io/npm/v/use-stripe-cart.svg)](https://www.npmjs.com/package/use-stripe-cart) [![JavaScript Style Guide](https://img.shields.io/badge/code_style-standard-brightgreen.svg)](https://standardjs.com)
 <!-- ALL-CONTRIBUTORS-BADGE:START - Do not remove or modify this section -->
-[![All Contributors](https://img.shields.io/badge/all_contributors-5-orange.svg?style=flat-square)](#contributors-)
+[![All Contributors](https://img.shields.io/badge/all_contributors-6-orange.svg?style=flat-square)](#contributors-)
 <!-- ALL-CONTRIBUTORS-BADGE:END -->
 
 ## Installation
@@ -26,26 +26,36 @@ At the root level of your application (or the highest point you'll be using Stri
 `<CartProvider>` comes with several props that allow you to interact with the Stripe API and customize the Stripe experience.
 
 ```jsx
-import { CartProvider } from 'use-stripe-cart';
-import App from './App';
+import ReactDOM from 'react-dom';
 
-const stripe = window.Stripe(
-  process.env.REACT_APP_STRIPE_API_PUBLIC
-);
+import { loadStripe } from '@stripe/stripe-js';
+import { Elements, ElementsConsumer } from '@stripe/react-stripe-js';
+import { CartProvider } from 'use-stripe-cart'
+
+import App from './App'
+
+// Remember to add your public Stripe key
+const stripePromise = loadStripe(process.env.REACT_APP_STRIPE_API_PUBLIC)
 
 ReactDOM.render(
-  <CartProvider
-    stripe={stripe}
-    successUrl="stripe.com"
-    cancelUrl="twitter.com/dayhaysoos"
-    currency="USD"
-    allowedCountries={['US', 'UK', 'CA']}
-    billingAddressCollection={true}
-  >
-    <App />
-  </CartProvider>,
+  <Elements stripe={stripePromise}>
+    <ElementsConsumer>
+      {({ stripe }) => (
+        <CartProvider
+          stripe={stripe}
+          successUrl="stripe.com"
+          cancelUrl="twitter.com/dayhaysoos"
+          currency="USD"
+          allowedCountries={['US', 'UK', 'CA']}
+          billingAddressCollection={true}
+        >
+          <App />
+        </CartProvider>
+      )}
+    </ElementsConsumer>
+  </Elements>,
   document.getElementById('root')
-);
+)
 ```
 
 ### Using the hook
@@ -218,6 +228,7 @@ Thanks goes to these wonderful people ([emoji key](https://allcontributors.org/d
     <td align="center"><a href="https://chrisbrownie.dev/"><img src="https://avatars2.githubusercontent.com/u/19195374?v=4" width="100px;" alt=""/><br /><sub><b>Christopher Brown</b></sub></a><br /><a href="https://github.com/dayhaysoos/use-stripe-cart/commits?author=ChrisBrownie55" title="Tests">⚠️</a> <a href="https://github.com/dayhaysoos/use-stripe-cart/commits?author=ChrisBrownie55" title="Code">💻</a></td>
     <td align="center"><a href="https://github.com/dayhaysoos"><img src="https://avatars3.githubusercontent.com/u/1852675?v=4" width="100px;" alt=""/><br /><sub><b>Nick DeJesus</b></sub></a><br /><a href="https://github.com/dayhaysoos/use-stripe-cart/commits?author=dayhaysoos" title="Code">💻</a> <a href="https://github.com/dayhaysoos/use-stripe-cart/commits?author=dayhaysoos" title="Tests">⚠️</a></td>
     <td align="center"><a href="http://shodipoayomide.com"><img src="https://avatars2.githubusercontent.com/u/20538832?v=4" width="100px;" alt=""/><br /><sub><b>Shodipo Ayomide</b></sub></a><br /><a href="https://github.com/dayhaysoos/use-stripe-cart/commits?author=Developerayo" title="Documentation">📖</a></td>
+    <td align="center"><a href="http://appbureauet.dk"><img src="https://avatars1.githubusercontent.com/u/167574?v=4" width="100px;" alt=""/><br /><sub><b>Anders Bech Mellson</b></sub></a><br /><a href="https://github.com/dayhaysoos/use-stripe-cart/commits?author=mellson" title="Code">💻</a></td>
   </tr>
 </table>
 

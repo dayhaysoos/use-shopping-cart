@@ -52,6 +52,15 @@
       "contributions": [
         "doc"
       ]
+    },
+    {
+      "login": "mellson",
+      "name": "Anders Bech Mellson",
+      "avatar_url": "https://avatars1.githubusercontent.com/u/167574?v=4",
+      "profile": "http://appbureauet.dk",
+      "contributions": [
+        "code"
+      ]
     }
   ],
   "contributorsPerLine": 7,

@@ -1,4 +1,10 @@
-import React, { createContext, useReducer, useContext, useMemo } from 'react';
+import React, {
+  createContext,
+  useReducer,
+  useContext,
+  useMemo,
+  useEffect,
+} from 'react';
 import {
   toCurrency,
   calculateTotalValue,
@@ -28,7 +34,7 @@ const checkoutCart = (skus, { sku }, quantity = 1) => {
 };
 
 const formatDetailedCart = (currency, cartItems, language) => {
-  return cartItems ? cartItems.reduce((acc, current) => {
+  return cartItems.reduce((acc, current) => {
     const quantity = (acc[current.sku]?.quantity ?? 0) + 1;
     const value = (acc[current.sku]?.value ?? 0) + current.price;
     const formattedValue = toCurrency({ value, currency, language });
@@ -42,7 +48,7 @@ const formatDetailedCart = (currency, cartItems, language) => {
         value,
       },
     };
-  }, {}) : {};
+  }, {});
 };
 
 const reduceItemByOne = (skuID, cartItems) => {
@@ -92,6 +98,13 @@ function cartReducer(cart, action) {
         ...cart,
         shouldDisplayCart: false,
       };
+
+    case 'stripe changed':
+      return {
+        ...cart,
+        stripe: action.stripe,
+      };
+
     default:
       return cart;
   }
@@ -110,7 +123,15 @@ function cartItemsReducer(cartItems, action) {
   }
 }
 
-export const CartContext = createContext([{}, () => {}]);
+export const CartContext = createContext([
+  {
+    lastClicked: '',
+    shouldDisplayCart: false,
+    skus: {},
+    cartItems: [],
+  },
+  () => {},
+]);
 
 /**
  * @param {{
@@ -145,6 +166,10 @@ export const CartProvider = ({
     allowedCountries,
     skus: {},
   });
+
+  useEffect(() => {
+    cartDispatch({ type: 'stripe changed', stripe });
+  }, [stripe]);
 
   // keep cartItems in LocalStorage
   const [cartItems, cartItemsDispatch] = useLocalStorageReducer(
@@ -198,7 +223,7 @@ export const useStripeCart = () => {
     };
   });
 
-  const cartCount = cartItems ? cartItems.length : 0;
+  const cartCount = cartItems.length;
 
   const addItem = (product) => {
     dispatch({ type: 'addToCart', product });
@@ -234,6 +259,10 @@ export const useStripeCart = () => {
       options.shippingAddressCollection = {
         allowedCountries,
       };
+    }
+
+    if (stripe === null) {
+      throw new Error('Stripe is not defined');
     }
 
     const { error } = await stripe.redirectToCheckout(options);
