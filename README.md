@@ -26,10 +26,10 @@ At the root level of your application (or the highest point you'll be using Stri
 `<CartProvider>` comes with several props that allow you to interact with the Stripe API and customize the Stripe experience.
 
 ```jsx
-import ReactDOM from 'react-dom';
+import ReactDOM from 'react-dom'
 
-import { loadStripe } from '@stripe/stripe-js';
-import { Elements, ElementsConsumer } from '@stripe/react-stripe-js';
+import { loadStripe } from '@stripe/stripe-js'
+import { Elements, ElementsConsumer } from '@stripe/react-stripe-js'
 import { CartProvider } from 'use-stripe-cart'
 
 import App from './App'
@@ -65,7 +65,7 @@ The hook `useStripeCart()` provides several utilities and pieces of data for you
 ```jsx
 import { useStripeCart } from 'use-stripe-cart'
 import { Product } from './Product'
-import { CartItems } from './CartItems';
+import { CartItems } from './CartItems'
 
 const productData = [
   {
@@ -86,7 +86,7 @@ const productData = [
 
 export function App() {
   /* Gets the totalPrice and a method for redirecting to stripe */
-  const { totalPrice, redirectToCheckout } = useStripeCart();
+  const { totalPrice, redirectToCheckout } = useStripeCart()
 
   return (
     <div>
@@ -111,7 +111,7 @@ export function App() {
 To add a product to the cart, use `useStripeCart()`'s `addItem(product)` method. It takes in your product object, which must have a `sku` and a `price`, and adds it to the cart.
 
 ```jsx
-import { useStripeCart, toCurrency } from 'use-stripe-cart';
+import { useStripeCart, toCurrency } from 'use-stripe-cart'
 
 export function Product({ product }) {
   const { addItem } = useStripeCart()
@@ -161,7 +161,7 @@ import { useStripeCart } from 'use-stripe-cart'
 export function CartItems() {
   const { cartDetails, reduceItemByOne, addItem } = useStripeCart()
 
-  const cart = [];
+  const cart = []
   // Note: Object.keys().map() takes 2x as long as a for-in loop
   for (const sku in cartDetails) {
     const cartEntry = cartDetails[sku]
@@ -192,16 +192,16 @@ https://github.com/dayhaysoos/use-stripe-cart/blob/master/example/src/components
 
 Cart details is an object with skus of the items in the cart as keys and details of the items as the value, for example:
 
-```jsx
+```json5
 {
   sku_GBJ2Ep8246qeeT: {
-    name: 'Bananas';
-    sku: 'sku_GBJ2Ep8246qeeT';
-    price: 400;
-    image: 'https://www.fillmurray.com/300/300';
-    currency: 'USD';
-    quantity: 1;
-    formattedPrice: '$4.00';
+    name: 'Bananas',
+    sku: 'sku_GBJ2Ep8246qeeT',
+    price: 400,
+    image: 'https://www.fillmurray.com/300/300',
+    currency: 'USD',
+    quantity: 1,
+    formattedPrice: '$4.00',
   }
 }
 ```
