@@ -22,7 +22,7 @@ You can add anything you'd like to the product object.
 ```jsx
 import { useShoppingCart, toCurrency } from 'use-shopping-cart';
 
-const Product = (product) => {
+function Product(product) {
   const { addItem } = useShoppingCart();
   const { name, sku, price, image, currency } = product;
   return (
@@ -42,7 +42,7 @@ const Product = (product) => {
       <button onClick={() => addItem({ ...product })}>Add To Cart</button>
     </div>
   );
-};
+}
 ```
 
 For displaying what's actually in the cart, refer to the `CartDisplay` component in the example:

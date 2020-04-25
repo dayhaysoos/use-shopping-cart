@@ -9,12 +9,12 @@ title: reduceItemByOne()
 ```jsx
 import { useShoppingCart, toCurrency } from 'use-shopping-cart';
 
-const Product = (product) => {
+function Product(product) {
   const { reduceItemByOne } = useShoppingCart();
   const { name, sku, price, image, currency } = product;
   return (
     <div
-      sx={{
+      style={{
         display: 'flex',
         flexDirection: 'column',
         justifyContent: 'center',
@@ -29,7 +29,7 @@ const Product = (product) => {
       <button onClick={() => reduceItemByOne(sku)}>Remove One</button>
     </div>
   );
-};
+}
 ```
 
 For displaying what's actually in the cart, refer to the `CartDisplay` component in the example:
