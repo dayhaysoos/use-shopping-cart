@@ -28,7 +28,7 @@ const Product = (product) => {
         <p>{toCurrency({ price: price, currency })}</p>
       </Box>
       <Button
-        onClick={() => reduceItemByOne(product)}
+        onClick={() => reduceItemByOne(sku)}
         backgroundColor={'black'}
       >
         Remove One
