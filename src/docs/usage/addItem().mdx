@@ -2,33 +2,29 @@
 title: addItem()
 ---
 
-To add an item to the cart, use `addItem()`
+<div>
+
+`addItem()` adds product objects to the [cartItems](api) array. Product objects require a
+name, sku, price and currency values as shown below.
+
+```json
+{
+  "name": "Bananas",
+  "sku": "sku_GBJ2Ep8246qeeT",
+  "price": 400,
+  "image": "https://www.fillmurray.com/300/300",
+  "currency": "USD"
+}
+```
+
+Notice that we spread the product object when we pass it to addItem(). This is so that you are free to
+add other values for your own needs.
 
 ```jsx
 /**@jsx jsx */
 import { jsx, Box, Image, Button, Flex } from 'theme-ui';
 import { useShoppingCart } from 'use-shopping-cart';
 import { toCurrency } from '../util';
-
-/**
- * PRODUCT DATA COMING FROM PROPS
-const fakeData = [
-  {
-    name: 'Bananas',
-    sku: 'sku_GBJ2Ep8246qeeT',
-    price: 400,
-    image: 'https://www.fillmurray.com/300/300',
-    currency: 'USD',
-  },
-  {
-    name: 'Tangerines',
-    sku: 'sku_GBJ2WWfMaGNC2Z',
-    price: 100,
-    image: 'https://www.fillmurray.com/300/300',
-    currency: 'USD',
-  },
-];
-*/
 
 const Product = (product) => {
   const { addItem } = useShoppingCart();
@@ -56,3 +52,5 @@ const Product = (product) => {
 
 For displaying what's actually in the cart, refer to the `CartDisplay` component in the example:
 https://github.com/dayhaysoos/use-shopping-cart/blob/master/example/src/components/cart-display.js
+
+</div>

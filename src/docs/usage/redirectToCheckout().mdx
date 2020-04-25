@@ -5,6 +5,10 @@ title: redirectToCheckout()
 To send the buyer to Stripe's Checkout experience, use `redirectToCheckout`
 
 Please refer to [Stripe's official documentation](https://stripe.com/docs/js/checkout/redirect_to_checkout)
+to learn more about redirectToCheckout.
+
+With use-shopping-cart's `redirectToCheckout`, you don't need to pass anything more than the sessionId you get
+from Stripe because all of the config is handled in the CartProvider props
 
 Our `redirectToCheckout` is configured for you by the props passed to CartProvider. You can pass it a sessionId
 or refer to products in your Stripe dashboard to fulfill purchases.
