@@ -26,7 +26,7 @@ const Product = (product) => {
         <p>{name}</p>
         <p>{toCurrency({ price: price, currency })}</p>
       </Box>
-      <Button onClick={() => removeCartItem(product)} backgroundColor={'black'}>
+      <Button onClick={() => removeCartItem(sku)} backgroundColor={'black'}>
         Remove from Cart
       </Button>
     </Flex>
