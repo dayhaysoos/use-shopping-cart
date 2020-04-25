@@ -7,11 +7,11 @@ title: reduceItemByOne()
 `reduceItemByOne(sku)` reduces the number of a product, by its sku, in the user's cart by one. This allows the user to reduce the quantity of an item in the cart by one at a time if they added too many.
 
 ```jsx
-import { useShoppingCart, toCurrency } from 'use-shopping-cart';
+import { useShoppingCart, toCurrency } from 'use-shopping-cart'
 
 function Product(product) {
-  const { reduceItemByOne } = useShoppingCart();
-  const { name, sku, price, image, currency } = product;
+  const { reduceItemByOne } = useShoppingCart()
+  const { name, sku, price, image, currency } = product
   return (
     <div
       style={{
@@ -28,7 +28,7 @@ function Product(product) {
       </div>
       <button onClick={() => reduceItemByOne(sku)}>Remove One</button>
     </div>
-  );
+  )
 }
 ```
 

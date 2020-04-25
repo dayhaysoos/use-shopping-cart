@@ -20,11 +20,11 @@ name, sku, price, and currency values as shown below.
 You can add anything you'd like to the product object.
 
 ```jsx
-import { useShoppingCart, toCurrency } from 'use-shopping-cart';
+import { useShoppingCart, toCurrency } from 'use-shopping-cart'
 
 function Product(product) {
-  const { addItem } = useShoppingCart();
-  const { name, sku, price, image, currency } = product;
+  const { addItem } = useShoppingCart()
+  const { name, sku, price, image, currency } = product
   return (
     <div
       style={{
@@ -41,7 +41,7 @@ function Product(product) {
       </div>
       <button onClick={() => addItem({ ...product })}>Add To Cart</button>
     </div>
-  );
+  )
 }
 ```
 

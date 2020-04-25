@@ -13,12 +13,12 @@ from Stripe because all of the config is handled in the [CartProvider](cartprovi
 This is how you'd use `redirectToCheckout()` with a serverless function:
 
 ```jsx
-import { useShoppingCart } from 'use-shopping-cart';
+import { useShoppingCart } from 'use-shopping-cart'
 
-const { cartDetails, redirectToCheckout } = useShoppingCart();
+const { cartDetails, redirectToCheckout } = useShoppingCart()
 
 const handleSubmit = async (event) => {
-  event.preventDefault();
+  event.preventDefault()
 
   const response = await fetch('/.netlify/functions/create-session', {
     method: 'post',
@@ -28,12 +28,12 @@ const handleSubmit = async (event) => {
     body: JSON.stringify(cartDetails),
   })
     .then((res) => {
-      return res.json();
+      return res.json()
     })
-    .catch((error) => console.log(error));
+    .catch((error) => console.log(error))
 
-  redirectToCheckout({ sessionId: response.sessionId });
-};
+  redirectToCheckout({ sessionId: response.sessionId })
+}
 ```
 
 Please refer to [Stripe's official documentation](https://stripe.com/docs/js/checkout/redirect_to_checkout)

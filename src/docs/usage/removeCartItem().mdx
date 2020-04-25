@@ -5,12 +5,12 @@ title: removeCartItem()
 Completely removes a product and quantity that comes with it from the removeCartItem
 
 ```jsx
-import { useShoppingCart } from 'use-shopping-cart';
-import { toCurrency } from '../util';
+import { useShoppingCart } from 'use-shopping-cart'
+import { toCurrency } from '../util'
 
 function Product(product) {
-  const { removeCartItem } = useShoppingCart();
-  const { name, sku, price, image, currency } = product;
+  const { removeCartItem } = useShoppingCart()
+  const { name, sku, price, image, currency } = product
   return (
     <div
       style={{
@@ -29,6 +29,6 @@ function Product(product) {
         Remove from Cart
       </button>
     </div>
-  );
+  )
 }
 ```
