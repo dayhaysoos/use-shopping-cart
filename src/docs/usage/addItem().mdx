@@ -23,8 +23,7 @@ add other values for your own needs.
 ```jsx
 /**@jsx jsx */
 import { jsx, Box, Image, Button, Flex } from 'theme-ui';
-import { useShoppingCart } from 'use-shopping-cart';
-import { toCurrency } from '../util';
+import { useShoppingCart, toCurrency } from 'use-shopping-cart';
 
 const Product = (product) => {
   const { addItem } = useShoppingCart();
