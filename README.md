@@ -148,14 +148,24 @@ Once the user has added their items to the cart, you can use the `cartDetails` o
 Each product in `cartDetails` contains the same data you provided when you called `addItem(product)`. In addition, `cartDetails` also provides the following properties:
 
 
-
-```js
-/**
- *       quantity => Number of that item added to the cart
- *          value => price * quantity
- * formattedValue => A currency formatted version of value
- */
-```
+<table>
+  <tr>
+    <th>Name</th>
+    <th>Value</th>
+  </tr>
+  <tr>
+    <td><code>quantity</code></td>
+    <td>Number of that product added to the cart</td>
+  </tr>
+  <tr>
+    <td><code>value</code></td>
+    <td>The <code>price * quantity</code></td>
+  </tr>
+  <tr>
+    <td><code>formattedValue</code></td>
+    <td>A currency formatted version of <code>value</code></td>
+  </tr>
+</table>
 
 ```jsx
 import { useShoppingCart } from 'use-shopping-cart'
@@ -171,8 +181,8 @@ export function CartItems() {
     // all of your basic product data still exists (i.e. name, image, price)
     cart.push(
       <article>
-        {/* image */}
-        {/* name */}
+        {/* image here */}
+        {/* name here */}
         <p>Line total: {cartEntry.formattedValue}</p>
 
         {/* What if we want to remove one of the item... or add one */}
