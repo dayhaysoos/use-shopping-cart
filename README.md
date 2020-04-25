@@ -239,7 +239,7 @@ MIT © [dayhaysoos](https://github.com/dayhaysoos)
 
 ---
 
-This hook is created using [create-react-hook](https://github.com/hermanya/create-react-hook).
+We created this hook with [create-react-hook](https://github.com/hermanya/create-react-hook).
 
 ## Contributors ✨
 
