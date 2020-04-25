@@ -186,17 +186,32 @@ export function CartItems() {
         <p>Line total: {cartEntry.formattedValue}</p>
 
         {/* What if we want to remove one of the item... or add one */}
-        <button onClick={reduceItemByOne(cartEntry.sku)}>-</button>
+        <button
+          onClick={reduceItemByOne(cartEntry.sku)}
+          aria-label={`Remove one ${cartEntry.name} from your cart`}
+        >-</button>
         <p>Quantity: {cartEntry.quantity}</p>
-        <button onClick={addItem(cartEntry)}>+</button>
+        <button
+          onClick={addItem(cartEntry)}
+          aria-label={`Add one ${cartEntry.name} to your cart`}
+        >+</button>
       </article>
     )
   }
 }
 ```
 
-For displaying what's actually in the cart, refer to the `CartDisplay` component:
-https://github.com/dayhaysoos/use-shopping-cart/blob/master/example/src/components/cart-display.js
+Note that in the above code, to reduce the quantity of a product in the user's cart, you must pass an SKU to `reduceItemByOne()` like so:
+
+```js
+reduceItemByOne(cartEntry.sku)
+```
+
+This differs from the way that you can increase the quantity of a product in the user's cart. Currently, to do this, you must pass the entire `cartEntry` to `addItem()`:
+
+```js
+addItem(cartEntry)
+```
 
 ## API
 
