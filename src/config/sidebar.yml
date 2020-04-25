@@ -16,6 +16,8 @@
       link: '/usage/removeCartItem()'
     - label: 'redirectToCheckout()'
       link: '/usage/redirectToCheckout()'
+    - label: 'validateCartItems()'
+      link: '/usage/validateCartItems()'
     - label: 'API'
       link: '/usage/api'
 - label: 'Contributors'
