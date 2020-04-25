@@ -5,8 +5,6 @@ title: removeCartItem()
 Completely removes a product and quantity that comes with it from the removeCartItem
 
 ```jsx
-/**@jsx jsx */
-import { jsx, Box, Image, Button, Flex } from 'theme-ui';
 import { useShoppingCart } from 'use-shopping-cart';
 import { toCurrency } from '../util';
 
@@ -14,22 +12,23 @@ const Product = (product) => {
   const { removeCartItem } = useShoppingCart();
   const { name, sku, price, image, currency } = product;
   return (
-    <Flex
+    <div
       sx={{
+        display: 'flex',
         flexDirection: 'column',
         justifyContent: 'center',
         alignItems: 'center',
       }}
     >
-      <Image src={image} />
-      <Box>
+      <img alt={'Alt Tet'} src={image} />
+      <div>
         <p>{name}</p>
         <p>{toCurrency({ price: price, currency })}</p>
-      </Box>
-      <Button onClick={() => removeCartItem(sku)} backgroundColor={'black'}>
+      </div>
+      <button onClick={() => removeCartItem(sku)} backgroundColor={'black'}>
         Remove from Cart
-      </Button>
-    </Flex>
+      </button>
+    </div>
   );
 };
 ```

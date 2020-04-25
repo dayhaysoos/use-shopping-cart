@@ -17,34 +17,30 @@ name, sku, price, and currency values as shown below.
 }
 ```
 
-Notice that we spread the product object when we pass it to addItem(). This is so that you are free to
-add other values for your own needs.
+You can add anything you'd like to the product object.
 
 ```jsx
-/**@jsx jsx */
-import { jsx, Box, Image, Button, Flex } from 'theme-ui';
 import { useShoppingCart, toCurrency } from 'use-shopping-cart';
 
 const Product = (product) => {
   const { addItem } = useShoppingCart();
   const { name, sku, price, image, currency } = product;
   return (
-    <Flex
-      sx={{
+    <div
+      style={{
+        display: 'flex',
         flexDirection: 'column',
         justifyContent: 'center',
         alignItems: 'center',
       }}
     >
-      <Image src={image} />
-      <Box>
+      <img alt={'Alt Text'} src={image} />
+      <div>
         <p>{name}</p>
         <p>{toCurrency({ price: price, currency })}</p>
-      </Box>
-      <Button onClick={() => addItem({ ...product })} backgroundColor={'black'}>
-        Add To Cart
-      </Button>
-    </Flex>
+      </div>
+      <button onClick={() => addItem({ ...product })}>Add To Cart</button>
+    </div>
   );
 };
 ```

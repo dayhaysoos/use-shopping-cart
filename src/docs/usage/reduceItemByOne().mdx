@@ -7,33 +7,32 @@ title: reduceItemByOne()
 `reduceItemByOne()` removes a product from the [cartItems](cartItems) array.
 
 ```jsx
-/**@jsx jsx */
-import { jsx, Box, Image, Button, Flex } from 'theme-ui';
 import { useShoppingCart, toCurrency } from 'use-shopping-cart';
 
 const Product = (product) => {
   const { reduceItemByOne } = useShoppingCart();
   const { name, sku, price, image, currency } = product;
   return (
-    <Flex
+    <div
       sx={{
+        display: 'flex',
         flexDirection: 'column',
         justifyContent: 'center',
         alignItems: 'center',
       }}
     >
-      <Image src={image} />
-      <Box>
+      <img alt={'Alt Text'} src={image} />
+      <div>
         <p>{name}</p>
         <p>{toCurrency({ price: price, currency })}</p>
-      </Box>
-      <Button
+      </div>
+      <button
         onClick={() => reduceItemByOne(product)}
         backgroundColor={'black'}
       >
         Remove One
-      </Button>
-    </Flex>
+      </button>
+    </div>
   );
 };
 ```
