@@ -413,6 +413,23 @@ describe('useShoppingCart persistency', () => {
 
     expect(result.current.cartItems).toEqual(cartItemsFromStorage());
   });
+
+  it('clearCart removes everything from cartItems array', () => {
+    const wrapper = createWrapper();
+    const { result } = renderHook(() => useShoppingCart(), { wrapper });
+
+    act(() => {
+      result.current.addItem(mockSku);
+    });
+
+    expect(result.current.cartItems).toEqual([mockSku]);
+
+    act(() => {
+      result.current.clearCart();
+    });
+
+    expect(result.current.cartItems).toEqual([]);
+  });
 });
 
 describe('useShoppingCart stripe handling', () => {
