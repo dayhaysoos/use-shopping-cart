@@ -236,25 +236,57 @@ You can [view the full API](https://use-shopping-cart.netlify.app/) on our docum
 
 ### `<CartProvider>`
 
+<table>
+  <tr>
+    <th>Name</th>
+    <th>Type</th>
+  </tr>
+</table>
+
 ### `useShoppingCart()`
 
-#### `cartDetails: Object`
-
-Cart details is an object with skus of the items in the cart as keys and details of the items as the value, for example:
-
-```json5
-{
-  sku_GBJ2Ep8246qeeT: {
-    name: 'Bananas',
-    sku: 'sku_GBJ2Ep8246qeeT',
-    price: 400,
-    image: 'https://www.fillmurray.com/300/300',
-    currency: 'USD',
-    quantity: 1,
-    formattedPrice: '$4.00',
-  }
-}
-```
+<table>
+  <tr>
+    <th>Name</th>
+    <th>Type/Args</th>
+    <th>Return Type</th>
+  </tr>
+  <tr>
+    <td><a href="https://use-shopping-cart.netlify.app/usage/addItem()"><code>addItem()</code></a></td>
+    <td>product: Object</td>
+    <td>N/A</td>
+  </tr>
+  <tr>
+    <td><a href="https://use-shopping-cart.netlify.app/usage/reduceItemByOne()"><code>reduceItemByOne()</code></a></td>
+    <td>sku: string</td>
+    <td>N/A</td>
+  </tr>
+  <tr>
+    <td><a href="https://use-shopping-cart.netlify.app/usage/removeCartItem()"><code>removeCartItem()</code></a></td>
+    <td>sku: string</td>
+    <td>N/A</td>
+  </tr>
+  <tr>
+    <td><a href="https://use-shopping-cart.netlify.app/usage/api#totalPrice"><code>totalPrice()</code></a></td>
+    <td>N/A</td>
+    <td>string</td>
+  </tr>
+  <tr>
+    <td><a href="https://use-shopping-cart.netlify.app/usage/api#cartCount"><code>cartCount</code></a></td>
+    <td>number</td>
+    <td>N/A</td>
+  </tr>
+  <tr>
+    <td><a href="https://use-shopping-cart.netlify.app/usage/api#cartDetails"><code>cartDetails</code></a></td>
+    <td>Object of cart entries</td>
+    <td>N/A</td>
+  </tr>
+  <tr>
+    <td><a href="https://use-shopping-cart.netlify.app/usage/redirectToCheckout()"><code>redirectToCheckout()</code></a></td>
+    <td>N/A</td>
+    <td>Error (if one occurrs)</td>
+  </tr>
+</table>
 
 ## License
 
