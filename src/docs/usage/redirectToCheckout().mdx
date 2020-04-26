@@ -4,7 +4,37 @@ title: redirectToCheckout()
 
 To send the buyer to Stripe's Checkout experience, use `redirectToCheckout`
 
-Please refer to [Stripe's official documentation](https://stripe.com/docs/js/checkout/redirect_to_checkout)
+`redirectToCheckout` is configured for you by the props passed to CartProvider. You can pass it a sessionId
+(the preferred way) or refer to products in your Stripe dashboard to fulfill purchases.
 
-Our `redirectToCheckout` is configured for you by the props passed to CartProvider. You can pass it a sessionId
-or refer to products in your Stripe dashboard to fulfill purchases.
+With use-shopping-cart's `redirectToCheckout`, you don't need to pass anything more than the sessionId you get
+from Stripe because all of the config is handled in the [CartProvider](cartprovider) props.
+
+This is how you'd use `redirectToCheckout()` with a serverless function:
+
+```jsx
+import { useShoppingCart } from 'use-shopping-cart'
+
+const { cartDetails, redirectToCheckout } = useShoppingCart()
+
+const handleSubmit = async (event) => {
+  event.preventDefault()
+
+  const response = await fetch('/.netlify/functions/create-session', {
+    method: 'post',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify(cartDetails),
+  })
+    .then((res) => {
+      return res.json()
+    })
+    .catch((error) => console.log(error))
+
+  redirectToCheckout({ sessionId: response.sessionId })
+}
+```
+
+Please refer to [Stripe's official documentation](https://stripe.com/docs/js/checkout/redirect_to_checkout)
+to learn more about redirectToCheckout.

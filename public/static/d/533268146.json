@@ -1,7 +1,1 @@
-{
-  "data": {
-    "site": {
-      "siteMetadata": { "footer": "use-shopping-cart", "basePath": "/" }
-    }
-  }
-}
+{"data":{"site":{"siteMetadata":{"footer":"use-shopping-cart","basePath":"/"}}}}
