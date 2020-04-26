@@ -241,6 +241,34 @@ You can [view the full API](https://use-shopping-cart.netlify.app/) on our docum
     <th>Name</th>
     <th>Type</th>
   </tr>
+    <tr>
+      <td><a href="https://use-stripe-cart.netlify.app/usage/cartprovider#stripe"><code>stripe</code></a></td>
+      <td>Stripe | undefined</td>
+    </tr>
+    <tr>
+      <td><a href="https://use-stripe-cart.netlify.app/usage/cartprovider#successUrl"><code>successUrl</code></a></td>
+      <td>string</td>
+    </tr>
+    <tr>
+      <td><a href="https://use-stripe-cart.netlify.app/usage/cartprovider#cancelUrl"><code>cancelUrl</code></a></td>
+      <td>string</td>
+    </tr>
+    <tr>
+      <td><a href="https://use-stripe-cart.netlify.app/usage/cartprovider#currency"><code>currency</code></a></td>
+      <td>string</td>
+    </tr>
+    <tr>
+      <td><a href="https://use-stripe-cart.netlify.app/usage/cartprovider#language"><code>language</code></a></td>
+      <td>string</td>
+    </tr>
+    <tr>
+      <td><a href="https://use-stripe-cart.netlify.app/usage/cartprovider#billingAddressCollection"><code>billingAddressCollection</code></a></td>
+      <td>boolean</td>
+    </tr>
+    <tr>
+      <td><a href="https://use-stripe-cart.netlify.app/usage/cartprovider#allowedCountries"><code>allowedCountries</code></a></td>
+      <td>null | string[]</td>
+    </tr>
 </table>
 
 ### `useShoppingCart()`
