@@ -171,7 +171,12 @@ Each product in `cartDetails` contains the same data you provided when you calle
 import { useShoppingCart } from 'use-shopping-cart'
 
 export function CartItems() {
-  const { cartDetails, reduceItemByOne, addItem } = useShoppingCart()
+  const {
+    cartDetails,
+    reduceItemByOne,
+    addItem,
+    removeCartItem
+  } = useShoppingCart()
 
   const cart = []
   // Note: Object.keys().map() takes 2x as long as a for-in loop
@@ -187,14 +192,20 @@ export function CartItems() {
 
         {/* What if we want to remove one of the item... or add one */}
         <button
-          onClick={reduceItemByOne(cartEntry.sku)}
+          onClick={() => reduceItemByOne(cartEntry.sku)}
           aria-label={`Remove one ${cartEntry.name} from your cart`}
         >-</button>
         <p>Quantity: {cartEntry.quantity}</p>
         <button
-          onClick={addItem(cartEntry)}
+          onClick={() => addItem(cartEntry)}
           aria-label={`Add one ${cartEntry.name} to your cart`}
         >+</button>
+
+        {/* What if we don't want this product at all */}
+        <button
+          onClick={() => removeCartItem(cartEntry.sku)}
+          aria-label={`Remove all ${cartEntry.name} from your cart`}
+        >Remove</button>
       </article>
     )
   }
@@ -207,7 +218,13 @@ Note that in the above code, to reduce the quantity of a product in the user's c
 reduceItemByOne(cartEntry.sku)
 ```
 
-This differs from the way that you can increase the quantity of a product in the user's cart. Currently, to do this, you must pass the entire `cartEntry` to `addItem()`:
+Just like you can reduce the quantity of a product you can remove the product entirely with `removeCartItem()`:
+
+```js
+removeCartItem(cartEntry.sku)
+```
+
+However, those two examples differ from the way that you increase the quantity of a product in the user's cart. Currently, to do this, you must pass the entire `cartEntry` to `addItem()`:
 
 ```js
 addItem(cartEntry)
@@ -215,7 +232,13 @@ addItem(cartEntry)
 
 ## API
 
-`cartDetails: Object`
+You can [view the full API](https://use-shopping-cart.netlify.app/) on our documentation page.
+
+### `<CartProvider>`
+
+### `useShoppingCart()`
+
+#### `cartDetails: Object`
 
 Cart details is an object with skus of the items in the cart as keys and details of the items as the value, for example:
 
