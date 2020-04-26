@@ -12,10 +12,14 @@ const CartDisplay = () => {
     totalPrice,
     redirectToCheckout,
     reduceItemByOne,
+    clearCart,
   } = useShoppingCart();
 
+    console.log(clearCart)
+    
   const handleSubmit = async (event) => {
     event.preventDefault();
+
 
     const response = await fetch('/.netlify/functions/create-session', {
       method: 'post',
@@ -94,7 +98,9 @@ const CartDisplay = () => {
           <Button sx={{ backgroundColor: 'black' }} onClick={handleSubmit}>
             Checkout
           </Button>
+          
         </Box>
+        <Button sx={{backgroundColor: 'black'}} onClick={() => clearCart()}>Clear Cart Items</Button>
       </Flex>
     );
   }

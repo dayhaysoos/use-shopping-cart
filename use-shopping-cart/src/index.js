@@ -120,6 +120,8 @@ function cartItemsReducer(cartItems, action) {
       return cartItems.filter((item) => item.sku !== action.sku);
     case 'reduceItemByOne':
       return reduceItemByOne(action.sku, cartItems);
+    case 'clearCart':
+    return []
     default:
       return cartItems;
   }
@@ -248,6 +250,8 @@ export const useShoppingCart = () => {
 
   const handleCloseCart = () => dispatch({ type: 'closeCart' });
 
+  const clearCart = () => dispatch({type: 'clearCart'})
+
   const redirectToCheckout = async () => {
     const options = {
       items: checkoutData,
@@ -289,5 +293,6 @@ export const useShoppingCart = () => {
     totalPrice,
     removeCartItem,
     reduceItemByOne,
+    clearCart
   };
 };
