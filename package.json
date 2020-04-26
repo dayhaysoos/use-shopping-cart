@@ -5,6 +5,7 @@
     "use-shopping-cart"
   ],
   "scripts": {
-    "dev": "yarn workspace use-shopping-cart dev"
+    "dev": "yarn workspace use-shopping-cart dev",
+    "test": "yarn workspace use-shopping-cart test:watch"
   }
 }

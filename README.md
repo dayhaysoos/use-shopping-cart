@@ -20,6 +20,16 @@ or
 yarn add use-shopping-cart
 ```
 
+## Development
+
+To run this package for development run:
+
+`yarn dev`
+
+To run tests:
+
+`yarn test`
+
 ## Usage
 
 At the root level of your app, wrap your Root app in the `<CartProvider />`.
