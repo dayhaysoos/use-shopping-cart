@@ -1,6 +1,6 @@
 /**@jsx jsx */
 import { jsx, Box, Flex, Image, Button } from 'theme-ui';
-import { useStripeCart } from 'use-stripe-cart';
+import { useShoppingCart } from 'use-shopping-cart';
 
 const CartDisplay = () => {
   const {
@@ -12,7 +12,8 @@ const CartDisplay = () => {
     totalPrice,
     redirectToCheckout,
     reduceItemByOne,
-  } = useStripeCart();
+    clearCart,
+  } = useShoppingCart();
 
   const handleSubmit = async (event) => {
     event.preventDefault();
@@ -95,6 +96,9 @@ const CartDisplay = () => {
             Checkout
           </Button>
         </Box>
+        <Button sx={{ backgroundColor: 'black' }} onClick={() => clearCart()}>
+          Clear Cart Items
+        </Button>
       </Flex>
     );
   }

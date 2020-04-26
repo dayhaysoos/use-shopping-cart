@@ -1,10 +1,10 @@
 /**@jsx jsx */
 import { jsx, Box, Image, Button, Flex } from 'theme-ui';
-import { useStripeCart } from 'use-stripe-cart';
+import { useShoppingCart } from 'use-shopping-cart';
 import { toCurrency } from '../util';
 
-const Product = products => {
-  const { addItem } = useStripeCart();
+const Product = (products) => {
+  const { addItem } = useShoppingCart();
   const { name, sku, price, image, currency } = products;
   return (
     <Flex

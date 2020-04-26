@@ -1,6 +1,6 @@
 import React from 'react';
 import { renderHook, act } from '@testing-library/react-hooks';
-import { useStripeCart, CartProvider } from './index';
+import { useShoppingCart, CartProvider } from './index';
 
 afterEach(() => window.localStorage.clear());
 
@@ -76,11 +76,11 @@ const createWrapper = (props = {}) => ({ children }) => (
   </CartProvider>
 );
 
-describe('useStripeCart', () => {
+describe('useShoppingCart', () => {
   let result;
   beforeEach(() => {
     const wrapper = createWrapper();
-    result = renderHook(() => useStripeCart(), { wrapper }).result;
+    result = renderHook(() => useShoppingCart(), { wrapper }).result;
   });
 
   it('renders', () => {
@@ -318,14 +318,14 @@ describe('useStripeCart', () => {
   });
 });
 
-describe('useStripeCart redirectToCheckout', () => {
+describe('useShoppingCart redirectToCheckout', () => {
   beforeEach(() => {
     stripeMock.redirectToCheckout.mockClear();
   });
 
   it('should send the correct default values', () => {
     const wrapper = createWrapper();
-    const { result } = renderHook(() => useStripeCart(), { wrapper });
+    const { result } = renderHook(() => useShoppingCart(), { wrapper });
 
     result.current.redirectToCheckout();
 
@@ -341,7 +341,7 @@ describe('useStripeCart redirectToCheckout', () => {
 
   it('should send all formatted items', () => {
     const wrapper = createWrapper();
-    const { result } = renderHook(() => useStripeCart(), { wrapper });
+    const { result } = renderHook(() => useShoppingCart(), { wrapper });
 
     act(() => {
       result.current.addItem(mockSku);
@@ -360,7 +360,7 @@ describe('useStripeCart redirectToCheckout', () => {
 
   it('should send correct billingAddressCollection', () => {
     const wrapper = createWrapper({ billingAddressCollection: true });
-    const { result } = renderHook(() => useStripeCart(), { wrapper });
+    const { result } = renderHook(() => useShoppingCart(), { wrapper });
 
     result.current.redirectToCheckout();
 
@@ -372,7 +372,7 @@ describe('useStripeCart redirectToCheckout', () => {
 
   it('should send correct shippingAddressCollection', () => {
     const wrapper = createWrapper({ allowedCountries: ['US', 'CA'] });
-    const { result } = renderHook(() => useStripeCart(), { wrapper });
+    const { result } = renderHook(() => useShoppingCart(), { wrapper });
 
     result.current.redirectToCheckout();
 
@@ -384,14 +384,14 @@ describe('useStripeCart redirectToCheckout', () => {
   });
 });
 
-describe('useStripeCart persistency', () => {
+describe('useShoppingCart persistency', () => {
   function cartItemsFromStorage() {
     return JSON.parse(localStorage.getItem('cart-items'));
   }
 
   it('should save cartItems to localStorage', () => {
     const wrapper = createWrapper();
-    const { result } = renderHook(() => useStripeCart(), { wrapper });
+    const { result } = renderHook(() => useShoppingCart(), { wrapper });
 
     act(() => {
       result.current.addItem(mockSku);
@@ -402,30 +402,47 @@ describe('useStripeCart persistency', () => {
 
   it('should load cartItems from localStorage', () => {
     let wrapper = createWrapper();
-    let { result } = renderHook(() => useStripeCart(), { wrapper });
+    let { result } = renderHook(() => useShoppingCart(), { wrapper });
 
     act(() => {
       result.current.addItem(mockSku);
     });
 
     wrapper = createWrapper();
-    result = renderHook(() => useStripeCart(), { wrapper }).result;
+    result = renderHook(() => useShoppingCart(), { wrapper }).result;
 
     expect(result.current.cartItems).toEqual(cartItemsFromStorage());
   });
+
+  it('clearCart removes everything from cartItems array', () => {
+    const wrapper = createWrapper();
+    const { result } = renderHook(() => useShoppingCart(), { wrapper });
+
+    act(() => {
+      result.current.addItem(mockSku);
+    });
+
+    expect(result.current.cartItems).toEqual([mockSku]);
+
+    act(() => {
+      result.current.clearCart();
+    });
+
+    expect(result.current.cartItems).toEqual([]);
+  });
 });
 
-describe('useStripeCart stripe handling', () => {
+describe('useShoppingCart stripe handling', () => {
   it('if stripe is defined, redirectToCheckout can be called', () => {
     const wrapper = createWrapper();
-    const { result } = renderHook(() => useStripeCart(), { wrapper });
+    const { result } = renderHook(() => useShoppingCart(), { wrapper });
     result.current.redirectToCheckout();
     expect(stripeMock.redirectToCheckout).toHaveBeenCalled();
   });
 
   it('if stripe is undefined, redirectToCheckout throws an error', async () => {
     const wrapper = createWrapper({ stripe: null });
-    const { result } = renderHook(() => useStripeCart(), { wrapper });
+    const { result } = renderHook(() => useShoppingCart(), { wrapper });
     expect.assertions(1);
     try {
       await result.current.redirectToCheckout();

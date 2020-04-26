@@ -1,7 +1,7 @@
 [build]
-  command="yarn predeploy"
-  publish="example/build"
-  functions="example/functions"
+  command="yarn workspace use-shopping-cart predeploy"
+  publish="examples/cra/build"
+  functions="examples/cra/functions"
 
   [dev]
-  command="yarn start"
+  command="yarn workspace use-shopping-cart start"

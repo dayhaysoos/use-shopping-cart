@@ -118,6 +118,8 @@ function cartItemsReducer(cartItems, action) {
       return cartItems.filter((item) => item.sku !== action.sku);
     case 'reduceItemByOne':
       return reduceItemByOne(action.sku, cartItems);
+    case 'clearCart':
+    return []
     default:
       return cartItems;
   }
@@ -196,7 +198,7 @@ export const CartProvider = ({
   );
 };
 
-export const useStripeCart = () => {
+export const useShoppingCart = () => {
   const [cart, dispatch] = useContext(CartContext);
 
   const {
@@ -246,6 +248,8 @@ export const useStripeCart = () => {
 
   const handleCloseCart = () => dispatch({ type: 'closeCart' });
 
+  const clearCart = () => dispatch({type: 'clearCart'})
+
   const redirectToCheckout = async () => {
     const options = {
       items: checkoutData,
@@ -287,5 +291,6 @@ export const useStripeCart = () => {
     totalPrice,
     removeCartItem,
     reduceItemByOne,
+    clearCart
   };
 };

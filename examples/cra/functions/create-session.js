@@ -6,7 +6,7 @@
  */
 
 const stripe = require('stripe')(process.env.REACT_APP_STRIPE_API_SECRET);
-const validateCartItems = require('use-stripe-cart/src/serverUtil')
+const validateCartItems = require('use-shopping-cart/src/serverUtil')
   .validateCartItems;
 
 /*

@@ -10418,10 +10418,10 @@ url@^0.11.0:
     punycode "1.3.2"
     querystring "0.2.0"
 
-use-stripe-cart@1.2.1:
-  version "1.2.1"
-  resolved "https://registry.yarnpkg.com/use-stripe-cart/-/use-stripe-cart-1.2.1.tgz#f67a611dde533ad96903b56f1d83b2303d86fc08"
-  integrity sha512-fPLozTlgXJ5CyC7IQgn3xQlKR9glftlpqOCozyu11nVvlbRVs8FKgrhs7jgsVAxPMbE4HeD2Rps/uxqlb/Ty+A==
+use-shopping-cart@0.0.2:
+  version "0.0.2"
+  resolved "https://registry.yarnpkg.com/use-shopping-cart/-/use-shopping-cart-0.0.2.tgz#4f08ce36d8fddfd7c454a6a2a66348854f5c744c"
+  integrity sha512-PNOLmyoJfKjQKg5+Pz9GNyDwaA7Uwj4ID7zpZQ8nuB+7Q4aLqSlqr2eKCeQK3luLOWxVE9Pumnp78lnARM4LPg==
   dependencies:
     react-storage-hooks "^4.0.0"
 
