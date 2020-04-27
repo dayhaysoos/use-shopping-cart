@@ -11,6 +11,8 @@ import {
   useLocalStorageReducer,
 } from './util';
 
+export { toCurrency };
+
 /**
  * @function checkoutCart
  * @param skus {Object}
