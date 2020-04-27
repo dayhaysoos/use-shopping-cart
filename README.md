@@ -335,6 +335,11 @@ Returns an object with all the following properties and methods:
     <td>sessionId?: string</td>
     <td>Error (if one occurrs)</td>
   </tr>
+  <tr>
+    <td><a href="https://use-shopping-cart.netlify.app/usage/clearCart()"><code>clearCart()</code></a></td>
+    <td>N/A</td>
+    <td>N/A</td>
+  </tr>
 </table>
 
 ### `toCurrency(options)`
