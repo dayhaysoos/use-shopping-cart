@@ -37,6 +37,8 @@ At the root level of your application (or the highest point you'll be using Stri
 
 `<CartProvider>` comes with several props that allow you to interact with the Stripe API and customize the Stripe experience.
 
+When loading up Stripe, don't forget to use your public Stripe API key with it. If you need help setting up your environment variables for this, [view a list of environment variable tutorials.](#Environment-Variable-Tutorials)
+
 ```jsx
 import ReactDOM from 'react-dom'
 
@@ -327,6 +329,15 @@ You can [view the full API](https://use-shopping-cart.netlify.app/) on our docum
     <td>Error (if one occurrs)</td>
   </tr>
 </table>
+
+## Environment Variable Tutorials
+
+The following tutorials teach how to set up your custom environment variables for your project.
+
+- [create-react-app](https://create-react-app.dev/docs/adding-custom-environment-variables/)
+- [gatsby.js](https://www.gatsbyjs.org/docs/environment-variables/)
+- [next.js](https://nextjs.org/docs/api-reference/next.config.js/environment-variables)
+- [react-static](https://github.com/react-static/react-static/blob/master/docs/concepts.md#environment-variables)
 
 ## License
 
