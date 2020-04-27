@@ -224,6 +224,8 @@ export function CartItems() {
       </article>
     )
   }
+
+  return cart;
 }
 ```
 
