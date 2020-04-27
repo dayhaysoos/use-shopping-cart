@@ -141,7 +141,7 @@ export function Product({ product }) {
   return (
     <article>
       <figure>
-        <img src={product.image} alt="" />
+        <img src={product.image} alt={`Image of ${product.name}`} />
         <figcaption>{product.name}</figcaption>
       </figure>
       <p>{price}</p>
