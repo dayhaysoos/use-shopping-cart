@@ -100,7 +100,7 @@ const productData = [
 
 export function App() {
   /* Gets the totalPrice and a method for redirecting to stripe */
-  const { totalPrice, redirectToCheckout } = useShoppingCart()
+  const { totalPrice, redirectToCheckout, cartCount } = useShoppingCart()
 
   return (
     <div>
@@ -110,6 +110,7 @@ export function App() {
       ))}
 
       {/* This is where we'll render our cart */}
+      <p>Number of Items: {cartCount}</p>
       <p>Total: {totalPrice()}</p>
       <CartItems />
 
@@ -250,6 +251,8 @@ You can [view the full API](https://use-shopping-cart.netlify.app/) on our docum
 
 ### `<CartProvider>`
 
+Props for this component:
+
 <table>
   <tr>
     <th>Name</th>
@@ -286,6 +289,8 @@ You can [view the full API](https://use-shopping-cart.netlify.app/) on our docum
 </table>
 
 ### `useShoppingCart()`
+
+Returns an object with all the following properties and methods:
 
 <table>
   <tr>
@@ -325,8 +330,31 @@ You can [view the full API](https://use-shopping-cart.netlify.app/) on our docum
   </tr>
   <tr>
     <td><a href="https://use-shopping-cart.netlify.app/usage/redirectToCheckout()"><code>redirectToCheckout()</code></a></td>
-    <td>N/A</td>
+    <td>sessionId?: string</td>
     <td>Error (if one occurrs)</td>
+  </tr>
+</table>
+
+### `toCurrency(options)`
+
+This function takes one options argument, these are the options for this function:
+
+<table>
+  <tr>
+    <th>Name</th>
+    <th>Type</th>
+  </tr>
+  <tr>
+    <td>value</td>
+    <td>number</td>
+  </tr>
+  <tr>
+    <td>currency</td>
+    <td>string</td>
+  </tr>
+  <tr>
+    <td>language</td>
+    <td>string</td>
   </tr>
 </table>
 
