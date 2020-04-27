@@ -4,48 +4,39 @@ title: addItem()
 
 <div>
 
-`addItem()` adds product objects to the [cartItems](api) array. Product objects require a
-name, sku, price, and currency values as shown below.
-
-```json
-{
-  "name": "Bananas",
-  "sku": "sku_GBJ2Ep8246qeeT",
-  "price": 400,
-  "image": "https://www.fillmurray.com/300/300",
-  "currency": "USD"
-}
-```
-
-You can add anything you'd like to the product object.
+To add a product to the cart, use `useShoppingCart()`'s `addItem(product)` method. It takes in your product object, which must have a `sku` and a `price`, and adds it to the cart.
 
 ```jsx
 import { useShoppingCart, toCurrency } from 'use-shopping-cart'
 
-function Product(product) {
+export function Product({ product }) {
   const { addItem } = useShoppingCart()
-  const { name, sku, price, image, currency } = product
+
+  /* A helper function that turns the price into a readable format */
+  const price = toCurrency({
+    price: product.price,
+    currency: product.currency,
+    language: navigator.language,
+  })
+
   return (
-    <div
-      style={{
-        display: 'flex',
-        flexDirection: 'column',
-        justifyContent: 'center',
-        alignItems: 'center',
-      }}
-    >
-      <img alt={'Alt Text'} src={image} />
-      <div>
-        <p>{name}</p>
-        <p>{toCurrency({ price: price, currency })}</p>
-      </div>
-      <button onClick={() => addItem({ ...product })}>Add To Cart</button>
-    </div>
+    <article>
+      <figure>
+        <img src={product.image} alt={`Image of ${product.name}`} />
+        <figcaption>{product.name}</figcaption>
+      </figure>
+      <p>{price}</p>
+
+      {/* Adds the item to the cart */}
+      <button
+        onClick={() => addItem(product)}
+        aria-label={`Add ${product.name} to your cart`}
+      >
+        Add to cart
+      </button>
+    </article>
   )
 }
 ```
-
-For displaying what's actually in the cart, refer to the `CartDisplay` component in the example:
-https://github.com/dayhaysoos/use-shopping-cart/blob/master/example/src/components/cart-display.js
 
 </div>

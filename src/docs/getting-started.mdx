@@ -17,24 +17,85 @@ The package needs to be configured with your account's secret key, which is avai
 At the root level of your app, wrap your root component in the `<CartProvider />`
 
 ```jsx
+import ReactDOM from 'react-dom'
+
+import { loadStripe } from '@stripe/stripe-js'
+import { Elements, ElementsConsumer } from '@stripe/react-stripe-js'
 import { CartProvider } from 'use-shopping-cart'
-import './index.css'
+
 import App from './App'
 
-const stripe = require('stripe')('sk_test_...')
+// Remember to add your public Stripe key
+const stripePromise = loadStripe(process.env.REACT_APP_STRIPE_API_PUBLIC)
 
 ReactDOM.render(
-  <CartProvider
-    stripe={stripe}
-    billingAddressCollection={false}
-    successUrl={'stripe.com'}
-    cancelUrl={'twitter.com/dayhaysoos'}
-    currency={'USD'}
-  >
-    <App />
-  </CartProvider>,
+  <Elements stripe={stripePromise}>
+    <ElementsConsumer>
+      {({ stripe }) => (
+        <CartProvider
+          stripe={stripe}
+          successUrl="stripe.com"
+          cancelUrl="twitter.com/dayhaysoos"
+          currency="USD"
+          allowedCountries={['US', 'UK', 'CA']}
+          billingAddressCollection={true}
+        >
+          <App />
+        </CartProvider>
+      )}
+    </ElementsConsumer>
+  </Elements>,
   document.getElementById('root')
 )
+```
+
+### Using the hook
+
+The hook `useShoppingCart()` provides several utilities and pieces of data for you to use in your application. The examples below won't cover every part of the `useShoppingCart()` API but you can [look at the API](#API) below.
+
+```jsx
+import { useShoppingCart } from 'use-shopping-cart'
+import { Product } from './Product'
+import { CartItems } from './CartItems'
+
+const productData = [
+  {
+    name: 'Bananas',
+    sku: 'sku_GBJ2Ep8246qeeT',
+    price: 400,
+    image: 'https://www.fillmurray.com/300/300',
+    currency: 'USD',
+  },
+  {
+    name: 'Tangerines',
+    sku: 'sku_GBJ2WWfMaGNC2Z',
+    price: 100,
+    image: 'https://www.fillmurray.com/300/300',
+    currency: 'USD',
+  },
+]
+
+export function App() {
+  /* Gets the totalPrice and a method for redirecting to stripe */
+  const { totalPrice, redirectToCheckout, cartCount } = useShoppingCart()
+
+  return (
+    <div>
+      {/* Renders the products */}
+      {productData.map((product) => (
+        <Product product={product} />
+      ))}
+
+      {/* This is where we'll render our cart */}
+      <p>Number of Items: {cartCount}</p>
+      <p>Total: {totalPrice()}</p>
+      <CartItems />
+
+      {/* Redirects the user to Stripe */}
+      <button onClick={redirectToCheckout}>Checkout</button>
+    </div>
+  )
+}
 ```
 
 Once you have successfully installed `stripe` and `use-shopping-cart` and wrap your root component with CartProvider, you are ready to go! 🚀

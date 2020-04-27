@@ -4,6 +4,25 @@ title: toCurrency()
 
 toCurrency formats the prices of the products. It takes an object shaped like this:
 
+<table>
+  <tr>
+    <th>Name</th>
+    <th>Type</th>
+  </tr>
+  <tr>
+    <td>value</td>
+    <td>number</td>
+  </tr>
+  <tr>
+    <td>currency</td>
+    <td>string</td>
+  </tr>
+  <tr>
+    <td>language</td>
+    <td>string</td>
+  </tr>
+</table>
+
 ```json5
 {
   value: 400,
@@ -22,9 +41,4 @@ toCurrency({ value, currency })
 // returns $4.00
 
 ```jsx
-
-
 ````
-
-For displaying what's actually in the cart, refer to the `CartDisplay` component in the example:
-https://github.com/dayhaysoos/use-shopping-cart/blob/master/example/src/components/cart-display.js
