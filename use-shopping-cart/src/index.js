@@ -140,7 +140,7 @@ export const CartContext = createContext([
 /**
  * @param {{
     children: JSX.Element,
-    stripe: any,
+    stripe: stripe.Stripe,
     successUrl: string,
     cancelUrl: string,
     currency: string,
