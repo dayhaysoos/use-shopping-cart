@@ -11,6 +11,8 @@ import {
   useLocalStorageReducer,
 } from './util';
 
+export { toCurrency };
+
 /**
  * @function checkoutCart
  * @param skus {Object}
@@ -36,7 +38,6 @@ const checkoutCart = (skus, { sku }, quantity = 1) => {
 const formatDetailedCart = (currency, cartItems, language) => {
   return cartItems.reduce((acc, current) => {
     const quantity = (acc[current.sku]?.quantity ?? 0) + 1;
-    const price = current.price;
     const value = (acc[current.sku]?.value ?? 0) + current.price;
     const formattedValue = toCurrency({ value, currency, language });
 
@@ -45,7 +46,6 @@ const formatDetailedCart = (currency, cartItems, language) => {
       [current.sku]: {
         ...current,
         quantity,
-        price,
         formattedValue,
         value,
       },
@@ -140,7 +140,7 @@ export const CartContext = createContext([
 /**
  * @param {{
     children: JSX.Element,
-    stripe: any,
+    stripe: stripe.Stripe,
     successUrl: string,
     cancelUrl: string,
     currency: string,

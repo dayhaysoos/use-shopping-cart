@@ -72,6 +72,7 @@
     "rollup-plugin-url": "^3.0.1"
   },
   "dependencies": {
+    "@types/stripe-v3": "^3.1.17",
     "react-storage-hooks": "^4.0.0"
   }
 }
