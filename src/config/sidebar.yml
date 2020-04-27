@@ -22,3 +22,7 @@
       link: '/usage/api'
 - label: 'Contributors'
   link: '/contributors'
+- label: 'Util'
+  items:
+    - label: toCurrency()
+      link: '/util/toCurrency()'
