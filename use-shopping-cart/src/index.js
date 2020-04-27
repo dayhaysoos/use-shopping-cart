@@ -121,7 +121,7 @@ function cartItemsReducer(cartItems, action) {
     case 'reduceItemByOne':
       return reduceItemByOne(action.sku, cartItems);
     case 'clearCart':
-    return []
+      return [];
     default:
       return cartItems;
   }
@@ -250,9 +250,9 @@ export const useShoppingCart = () => {
 
   const handleCloseCart = () => dispatch({ type: 'closeCart' });
 
-  const clearCart = () => dispatch({type: 'clearCart'})
+  const clearCart = () => dispatch({ type: 'clearCart' });
 
-  const redirectToCheckout = async () => {
+  const redirectToCheckout = async (sessionId) => {
     const options = {
       items: checkoutData,
       successUrl,
@@ -271,7 +271,9 @@ export const useShoppingCart = () => {
       throw new Error('Stripe is not defined');
     }
 
-    const { error } = await stripe.redirectToCheckout(options);
+    const { error } = await stripe.redirectToCheckout(
+      sessionId ? sessionId : options
+    );
     if (error) {
       return error;
     }
@@ -293,6 +295,6 @@ export const useShoppingCart = () => {
     totalPrice,
     removeCartItem,
     reduceItemByOne,
-    clearCart
+    clearCart,
   };
 };
