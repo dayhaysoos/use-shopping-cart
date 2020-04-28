@@ -271,7 +271,9 @@ export const useShoppingCart = () => {
       throw new Error('Stripe is not defined');
     }
 
-    const { error } = await stripe.redirectToCheckout(
+    const resolvedStripe = await Promise.resolve(stripe);
+
+    const { error } = await resolvedStripe.redirectToCheckout(
       sessionId ? sessionId : options
     );
     if (error) {
