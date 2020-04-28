@@ -11,7 +11,9 @@
       "avatar_url": "https://avatars0.githubusercontent.com/u/23213994?v=4",
       "profile": "https://thorweb.dev",
       "contributions": [
-        "doc"
+        "doc",
+        "code",
+        "test"
       ]
     }
   ],
