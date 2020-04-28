@@ -6,6 +6,7 @@
   "license": "MIT",
   "repository": "dayhaysoos/use-shopping-cart",
   "main": "dist/index.js",
+  "types": "./src/@types/use-shopping-cart/index.d.ts",
   "module": "dist/index.es.js",
   "jsnext:main": "dist/index.es.js",
   "engines": {
