@@ -1,0 +1,24 @@
+{
+  "files": [
+    "README.md"
+  ],
+  "imageSize": 100,
+  "commit": false,
+  "contributors": [
+    {
+      "login": "thorsten-stripe",
+      "name": "Thor 雷神",
+      "avatar_url": "https://avatars0.githubusercontent.com/u/23213994?v=4",
+      "profile": "https://thorweb.dev",
+      "contributions": [
+        "doc"
+      ]
+    }
+  ],
+  "contributorsPerLine": 7,
+  "projectName": "use-shopping-cart",
+  "projectOwner": "dayhaysoos",
+  "repoType": "github",
+  "repoHost": "https://github.com",
+  "skipCi": true
+}
