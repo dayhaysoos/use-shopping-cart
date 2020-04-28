@@ -13,11 +13,11 @@
 ## Installation
 
 ```bash
-npm install --save use-shopping-cart
+npm install --save @stripe/stripe-js use-shopping-cart
 
 # or
 
-yarn add use-shopping-cart
+yarn add @stripe/stripe-js use-shopping-cart
 ```
 
 ## Development
