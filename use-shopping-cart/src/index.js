@@ -6,19 +6,20 @@ import React, {
   useEffect
 } from 'react'
 import { toCurrency, calculateTotalValue, useLocalStorageReducer } from './util'
+import PropTypes from 'prop-types'
 
 export { toCurrency }
 
 /**
  * @function checkoutCart
- * @param skus {Object}
- * @param sku {String}
- * @quantity {Number}
+ * @param skus {object}
+ * @param sku {string}
+ * @param quantity {number}
  * @description Adds skuID to skus object, if no quantity argument is passed, it increments by 1
- * @returns {Object} skus
+ * @returns {object} skus
  */
 const checkoutCart = (skus, { sku }, quantity = 1) => {
-  if (skus.hasOwnProperty(sku)) {
+  if (sku in skus) {
     return {
       ...skus,
       [sku]: skus[sku] + quantity
@@ -162,6 +163,7 @@ export const CartProvider = ({
     successUrl,
     cancelUrl,
     currency,
+    language,
     billingAddressCollection,
     allowedCountries,
     skus: {}
@@ -194,6 +196,20 @@ export const CartProvider = ({
   return (
     <CartContext.Provider value={contextValue}>{children}</CartContext.Provider>
   )
+}
+
+CartProvider.propTypes = {
+  children: PropTypes.oneOfType([
+    PropTypes.arrayOf(PropTypes.element),
+    PropTypes.element
+  ]).isRequired,
+  stripe: PropTypes.any,
+  successUrl: PropTypes.string.isRequired,
+  cancelUrl: PropTypes.string.isRequired,
+  currency: PropTypes.string.isRequired,
+  language: PropTypes.string,
+  billingAddressCollection: PropTypes.bool,
+  allowedCountries: PropTypes.string
 }
 
 export const useShoppingCart = () => {
@@ -270,7 +286,7 @@ export const useShoppingCart = () => {
     const resolvedStripe = await Promise.resolve(stripe)
 
     const { error } = await resolvedStripe.redirectToCheckout(
-      sessionId ? sessionId : options
+      sessionId || options
     )
     if (error) {
       return error

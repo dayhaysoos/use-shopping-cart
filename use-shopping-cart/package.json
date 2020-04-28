@@ -73,6 +73,7 @@
   },
   "dependencies": {
     "@types/stripe-v3": "^3.1.17",
+    "prop-types": "^15.7.2",
     "react-storage-hooks": "^4.0.0"
   }
 }
