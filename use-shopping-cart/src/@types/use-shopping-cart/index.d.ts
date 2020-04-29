@@ -2,7 +2,7 @@ declare module 'use-shopping-cart' {
 
     export interface ProviderProps {
         children: JSX.Element,
-        stripe: any,
+        stripe: stripe.Stripe,
         successUrl: string,
         cancelUrl: string,
         currency: string,
@@ -45,10 +45,14 @@ declare module 'use-shopping-cart' {
          * The currency of the product
          */
         currency?: string;
+        /**
+         * Any additional properties
+         */
+        [propName: string]: any;
     }
 
     export type CartDetails = {
-        [key: string]: any
+        [sku: string]: Product
     };
 
     export interface ShoppingCartUtilities {
@@ -74,16 +78,16 @@ declare module 'use-shopping-cart' {
         /**
          * The number of items in the cart
          */
-        cartCount: (items: number) => void;
+        cartCount: number;
         /**
          * Cart details is an object with skus of the items in the cart as keys and details of the items as the value,
          */
-        cartDetails: (cartEntries: CartDetails) => void;
+        cartDetails: CartDetails;
         /**
          * Redirects customers to the Stripe checkout
          * @returns result object || error message
          */
-        redirectToCheckout: (sessionId?: string) => Promise<any>;
+        redirectToCheckout: (sessionId?: string) => Promise<undefined | Error>;
         /**
          * Totally clears the cart of all items
          */
@@ -102,4 +106,27 @@ declare module 'use-shopping-cart' {
      * @returns clearCart - Totally clears the cart of all items
      */
     export declare function useShoppingCart (): ShoppingCartUtilities;
+
+    interface ToCurrencyProps {
+        /**
+         * The value to convert
+         */
+        value: number;
+        /**
+         * The currency format. For example US
+         */
+        currency: string;
+        /**
+         * The language
+         */
+        language: string;
+    }
+
+    /**
+     * Formats the the currency to a string value
+     * @param value The value to convert
+     * @param currency The currency format. For example US
+     * @param language The language
+     */
+    export declare function toCurrency(props: ToCurrencyProps): string;
 }
