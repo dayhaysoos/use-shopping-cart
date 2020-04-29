@@ -7,5 +7,17 @@
   "scripts": {
     "dev": "yarn workspace use-shopping-cart dev",
     "test": "yarn workspace use-shopping-cart test:watch"
+  },
+  "dependencies": {
+    "husky": "^4.2.5",
+    "lint-staged": "^10.2.0"
+  },
+  "husky": {
+    "hooks": {
+      "pre-commit": "lint-staged"
+    }
+  },
+  "lint-staged": {
+    "*.{js,jsx}": "prettier --write"
   }
 }

@@ -1,7 +1,7 @@
 /**@jsx jsx */
-import { jsx, Box, Image, Button, Flex } from 'theme-ui';
-import { useShoppingCart } from 'use-shopping-cart';
-import { formatCurrencyString } from '../util';
+import { jsx, Box, Image, Button, Flex } from "theme-ui";
+import { useShoppingCart } from "use-shopping-cart";
+import { formatCurrencyString } from "../util";
 
 const Product = (products) => {
   const { addItem } = useShoppingCart();
@@ -9,9 +9,9 @@ const Product = (products) => {
   return (
     <Flex
       sx={{
-        flexDirection: 'column',
-        justifyContent: 'center',
-        alignItems: 'center',
+        flexDirection: "column",
+        justifyContent: "center",
+        alignItems: "center",
       }}
     >
       <Image src={image} />
@@ -21,7 +21,7 @@ const Product = (products) => {
       </Box>
       <Button
         onClick={() => addItem({ ...products })}
-        backgroundColor={'black'}
+        backgroundColor={"black"}
       >
         Add To Cart
       </Button>
