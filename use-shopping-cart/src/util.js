@@ -2,7 +2,7 @@ import { useStorageReducer } from 'react-storage-hooks';
 
 export const isClient = typeof window === 'object';
 
-export const toCurrency = ({ value, currency, language }) => {
+export const formatCurrencyString = ({ value, currency, language }) => {
   value = parseInt(value);
   const numberFormat = new Intl.NumberFormat(
     language ?? window?.navigator.language ?? 'en-US',
@@ -25,7 +25,7 @@ export const toCurrency = ({ value, currency, language }) => {
 
 export const calculateTotalValue = (currency, cartItems) => {
   const value = cartItems.reduce((acc, { price }) => acc + price, 0);
-  return toCurrency({ value, currency });
+  return formatCurrencyString({ value, currency });
 };
 
 export function useLocalStorageReducer(key, reducer, initialState) {

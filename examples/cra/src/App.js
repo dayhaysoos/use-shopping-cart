@@ -3,7 +3,7 @@ import { jsx } from 'theme-ui';
 import { Flex } from 'theme-ui';
 import Products from './components/products';
 import CartDisplay from './components/cart-display';
-import { toCurrency } from './util';
+import { formatCurrencyString } from './util';
 
 const fakeData = [
   {

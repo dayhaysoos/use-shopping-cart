@@ -3,6 +3,7 @@
 > A React Hook that handles shopping cart state and logic for Stripe.
 
 [![NPM](https://img.shields.io/npm/v/use-shopping-cart.svg)](https://www.npmjs.com/package/use-shopping-cart) [![JavaScript Style Guide](https://img.shields.io/badge/code_style-standard-brightgreen.svg)](https://standardjs.com)
+
 <!-- ALL-CONTRIBUTORS-BADGE:START - Do not remove or modify this section -->
 
 [![All Contributors](https://img.shields.io/badge/all_contributors-6-orange.svg?style=flat-square)](#contributors-)
@@ -40,16 +41,16 @@ At the root level of your application (or the highest point you'll be using Stri
 When loading up Stripe, don't forget to use your public Stripe API key with it. If you need help setting up your environment variables for this, [view a list of environment variable tutorials.](#Environment-Variable-Tutorials)
 
 ```jsx
-import ReactDOM from 'react-dom'
+import ReactDOM from 'react-dom';
 
-import { loadStripe } from '@stripe/stripe-js'
-import { Elements, ElementsConsumer } from '@stripe/react-stripe-js'
-import { CartProvider } from 'use-shopping-cart'
+import { loadStripe } from '@stripe/stripe-js';
+import { Elements, ElementsConsumer } from '@stripe/react-stripe-js';
+import { CartProvider } from 'use-shopping-cart';
 
-import App from './App'
+import App from './App';
 
 // Remember to add your public Stripe key
-const stripePromise = loadStripe(process.env.REACT_APP_STRIPE_API_PUBLIC)
+const stripePromise = loadStripe(process.env.REACT_APP_STRIPE_API_PUBLIC);
 
 ReactDOM.render(
   <Elements stripe={stripePromise}>
@@ -69,7 +70,7 @@ ReactDOM.render(
     </ElementsConsumer>
   </Elements>,
   document.getElementById('root')
-)
+);
 ```
 
 ### Using the hook
@@ -77,9 +78,9 @@ ReactDOM.render(
 The hook `useShoppingCart()` provides several utilities and pieces of data for you to use in your application. The examples below won't cover every part of the `useShoppingCart()` API but you can [look at the API](#API) below.
 
 ```jsx
-import { useShoppingCart } from 'use-shopping-cart'
-import { Product } from './Product'
-import { CartItems } from './CartItems'
+import { useShoppingCart } from 'use-shopping-cart';
+import { Product } from './Product';
+import { CartItems } from './CartItems';
 
 const productData = [
   {
@@ -96,16 +97,16 @@ const productData = [
     image: 'https://www.fillmurray.com/300/300',
     currency: 'USD',
   },
-]
+];
 
 export function App() {
   /* Gets the totalPrice and a method for redirecting to stripe */
-  const { totalPrice, redirectToCheckout, cartCount } = useShoppingCart()
+  const { totalPrice, redirectToCheckout, cartCount } = useShoppingCart();
 
   return (
     <div>
       {/* Renders the products */}
-      {productData.map(product => (
+      {productData.map((product) => (
         <Product product={product} />
       ))}
 
@@ -117,7 +118,7 @@ export function App() {
       {/* Redirects the user to Stripe */}
       <button onClick={redirectToCheckout}>Checkout</button>
     </div>
-  )
+  );
 }
 ```
 
@@ -126,17 +127,17 @@ export function App() {
 To add a product to the cart, use `useShoppingCart()`'s `addItem(product)` method. It takes in your product object, which must have a `sku` and a `price`, and adds it to the cart.
 
 ```jsx
-import { useShoppingCart, toCurrency } from 'use-shopping-cart'
+import { useShoppingCart, formatCurrencyString } from 'use-shopping-cart';
 
 export function Product({ product }) {
-  const { addItem } = useShoppingCart()
+  const { addItem } = useShoppingCart();
 
   /* A helper function that turns the price into a readable format */
-  const price = toCurrency({
+  const price = formatCurrencyString({
     price: product.price,
     currency: product.currency,
     language: navigator.language,
-  })
+  });
 
   return (
     <article>
@@ -150,9 +151,11 @@ export function Product({ product }) {
       <button
         onClick={() => addItem(product)}
         aria-label={`Add ${product.name} to your cart`}
-      >Add to cart</button>
+      >
+        Add to cart
+      </button>
     </article>
-  )
+  );
 }
 ```
 
@@ -161,7 +164,6 @@ export function Product({ product }) {
 Once the user has added their items to the cart, you can use the `cartDetails` object to display the different data about each product in their cart.
 
 Each product in `cartDetails` contains the same data you provided when you called `addItem(product)`. In addition, `cartDetails` also provides the following properties:
-
 
 <table>
   <tr>
@@ -183,20 +185,20 @@ Each product in `cartDetails` contains the same data you provided when you calle
 </table>
 
 ```jsx
-import { useShoppingCart } from 'use-shopping-cart'
+import { useShoppingCart } from 'use-shopping-cart';
 
 export function CartItems() {
   const {
     cartDetails,
     reduceItemByOne,
     addItem,
-    removeCartItem
-  } = useShoppingCart()
+    removeCartItem,
+  } = useShoppingCart();
 
-  const cart = []
+  const cart = [];
   // Note: Object.keys().map() takes 2x as long as a for-in loop
   for (const sku in cartDetails) {
-    const cartEntry = cartDetails[sku]
+    const cartEntry = cartDetails[sku];
 
     // all of your basic product data still exists (i.e. name, image, price)
     cart.push(
@@ -209,20 +211,26 @@ export function CartItems() {
         <button
           onClick={() => reduceItemByOne(cartEntry.sku)}
           aria-label={`Remove one ${cartEntry.name} from your cart`}
-        >-</button>
+        >
+          -
+        </button>
         <p>Quantity: {cartEntry.quantity}</p>
         <button
           onClick={() => addItem(cartEntry)}
           aria-label={`Add one ${cartEntry.name} to your cart`}
-        >+</button>
+        >
+          +
+        </button>
 
         {/* What if we don't want this product at all */}
         <button
           onClick={() => removeCartItem(cartEntry.sku)}
           aria-label={`Remove all ${cartEntry.name} from your cart`}
-        >Remove</button>
+        >
+          Remove
+        </button>
       </article>
-    )
+    );
   }
 
   return cart;
@@ -232,19 +240,19 @@ export function CartItems() {
 Note that in the above code, to reduce the quantity of a product in the user's cart, you must pass an SKU to `reduceItemByOne()` like so:
 
 ```js
-reduceItemByOne(cartEntry.sku)
+reduceItemByOne(cartEntry.sku);
 ```
 
 Just like you can reduce the quantity of a product you can remove the product entirely with `removeCartItem()`:
 
 ```js
-removeCartItem(cartEntry.sku)
+removeCartItem(cartEntry.sku);
 ```
 
 However, those two examples differ from the way that you increase the quantity of a product in the user's cart. Currently, to do this, you must pass the entire `cartEntry` to `addItem()`:
 
 ```js
-addItem(cartEntry)
+addItem(cartEntry);
 ```
 
 ## API
@@ -342,7 +350,7 @@ Returns an object with all the following properties and methods:
   </tr>
 </table>
 
-### `toCurrency(options)`
+### `formatCurrencyString(options)`
 
 This function takes one options argument, these are the options for this function:
 

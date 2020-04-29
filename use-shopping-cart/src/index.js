@@ -6,12 +6,12 @@ import React, {
   useEffect,
 } from 'react';
 import {
-  toCurrency,
+  formatCurrencyString,
   calculateTotalValue,
   useLocalStorageReducer,
 } from './util';
 
-export { toCurrency };
+export { formatCurrencyString };
 
 /**
  * @function checkoutCart
@@ -39,7 +39,7 @@ const formatDetailedCart = (currency, cartItems, language) => {
   return cartItems.reduce((acc, current) => {
     const quantity = (acc[current.sku]?.quantity ?? 0) + 1;
     const value = (acc[current.sku]?.value ?? 0) + current.price;
-    const formattedValue = toCurrency({ value, currency, language });
+    const formattedValue = formatCurrencyString({ value, currency, language });
 
     return {
       ...acc,
