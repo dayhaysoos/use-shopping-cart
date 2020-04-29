@@ -1,7 +1,7 @@
 /**@jsx jsx */
 import { jsx, Box, Image, Button, Flex } from 'theme-ui';
 import { useShoppingCart } from 'use-shopping-cart';
-import { toCurrency } from '../util';
+import { formatCurrencyString } from '../util';
 
 const Product = (products) => {
   const { addItem } = useShoppingCart();
@@ -17,7 +17,7 @@ const Product = (products) => {
       <Image src={image} />
       <Box>
         <p>{name}</p>
-        <p>{toCurrency({ price: price, currency })}</p>
+        <p>{formatCurrencyString({ price: price, currency })}</p>
       </Box>
       <Button
         onClick={() => addItem({ ...products })}
