@@ -5,10 +5,14 @@ import React, {
   useMemo,
   useEffect
 } from 'react'
-import { toCurrency, calculateTotalValue, useLocalStorageReducer } from './util'
+import {
+  formatCurrencyString,
+  calculateTotalValue,
+  useLocalStorageReducer
+} from './util'
 import PropTypes from 'prop-types'
 
-export { toCurrency }
+export { formatCurrencyString }
 
 /**
  * @function checkoutCart
@@ -36,7 +40,7 @@ const formatDetailedCart = (currency, cartItems, language) => {
   return cartItems.reduce((acc, current) => {
     const quantity = (acc[current.sku]?.quantity ?? 0) + 1
     const value = (acc[current.sku]?.value ?? 0) + current.price
-    const formattedValue = toCurrency({ value, currency, language })
+    const formattedValue = formatCurrencyString({ value, currency, language })
 
     return {
       ...acc,

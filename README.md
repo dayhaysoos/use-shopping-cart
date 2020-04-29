@@ -1,6 +1,9 @@
 # use-shopping-cart
+
 <!-- ALL-CONTRIBUTORS-BADGE:START - Do not remove or modify this section -->
+
 [![All Contributors](https://img.shields.io/badge/all_contributors-2-orange.svg?style=flat-square)](#contributors-)
+
 <!-- ALL-CONTRIBUTORS-BADGE:END -->
 
 > A React Hook that handles shopping cart state and logic for Stripe.
@@ -123,14 +126,14 @@ export function App() {
 To add a product to the cart, use `useShoppingCart()`'s `addItem(product)` method. It takes in your product object, which must have a `sku` and a `price`, and adds it to the cart.
 
 ```jsx
-import { useShoppingCart, toCurrency } from 'use-shopping-cart';
+import { useShoppingCart, formatCurrencyString } from 'use-shopping-cart';
 
 export function Product({ product }) {
   const { addItem } = useShoppingCart();
 
   /* A helper function that turns the price into a readable format */
-  const price = toCurrency({
-    value: product.price,
+  const price = formatCurrencyString({
+    price: product.price,
     currency: product.currency,
     language: navigator.language,
   });
@@ -346,7 +349,7 @@ Returns an object with all the following properties and methods:
   </tr>
 </table>
 
-### `toCurrency(options)`
+### `formatCurrencyString(options)`
 
 This function takes one options argument, these are the options for this function:
 
@@ -389,6 +392,7 @@ We created this hook with [create-react-hook](https://github.com/hermanya/create
 ## Contributors ✨
 
 Thanks goes to these wonderful people ([emoji key](https://allcontributors.org/docs/en/emoji-key)):
+
 <!-- ALL-CONTRIBUTORS-LIST:START - Do not remove or modify this section -->
 <!-- prettier-ignore-start -->
 <!-- markdownlint-disable -->
