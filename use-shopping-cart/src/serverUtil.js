@@ -1,6 +1,8 @@
 const validateCartItems = (inventorySrc, cartItems) => {
   const validatedItems = []
-  for (const product of cartItems) {
+  for (const product in cartItems) {
+    if (!Object.prototype.hasOwnProperty.call(cartItems, product)) continue
+
     const validatedItem = inventorySrc.find(
       (currentProduct) => currentProduct.name === product.name
     )
