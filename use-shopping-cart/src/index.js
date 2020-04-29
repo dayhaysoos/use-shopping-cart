@@ -213,7 +213,7 @@ CartProvider.propTypes = {
   currency: PropTypes.string.isRequired,
   language: PropTypes.string,
   billingAddressCollection: PropTypes.bool,
-  allowedCountries: PropTypes.string
+  allowedCountries: PropTypes.arrayOf(PropTypes.string)
 }
 
 export const useShoppingCart = () => {
