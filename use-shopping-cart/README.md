@@ -63,7 +63,7 @@ ReactDOM.render(
     successUrl="stripe.com"
     cancelUrl="twitter.com/dayhaysoos"
     currency="USD"
-    allowedCountries={['US', 'UK', 'CA']}
+    allowedCountries={['US', 'GB', 'CA']}
     billingAddressCollection={true}
   >
     <App />
@@ -115,7 +115,7 @@ export function App() {
       <CartItems />
 
       {/* Redirects the user to Stripe */}
-      <button onClick={redirectToCheckout}>Checkout</button>
+      <button onClick={() => redirectToCheckout()}>Checkout</button>
     </div>
   )
 }
