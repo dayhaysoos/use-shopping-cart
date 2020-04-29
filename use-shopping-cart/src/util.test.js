@@ -37,4 +37,11 @@ describe('calculateTotalValue', () => {
 
     expect(calculateTotalValue('USD', cartItems)).toBe('$3.00');
   });
+
+  it('handles non-decimal currencies', () => {
+    const cartItems = [{ price: 100 }, { price: 100 }];
+
+    expect(calculateTotalValue('JPY', cartItems)).toBe('¥200');
+    expect(calculateTotalValue('MGA', cartItems)).toBe('MGA 200');
+  });
 });
