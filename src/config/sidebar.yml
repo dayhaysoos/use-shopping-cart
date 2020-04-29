@@ -2,6 +2,8 @@
 
 - label: 'Introduction'
   link: '/'
+- label: 'Github'
+  link: 'https://github.com/dayhaysoos/use-shopping-cart'
 - label: 'Discord'
   link: '/discord'
 - label: 'Getting started'
@@ -30,5 +32,5 @@
   link: '/contributors'
 - label: 'Util'
   items:
-    - label: toCurrency()
-      link: '/util/toCurrency()'
+    - label: formatCurrencyString()
+      link: '/util/formatCurrencyString()'

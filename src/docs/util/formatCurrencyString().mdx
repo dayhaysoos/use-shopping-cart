@@ -1,8 +1,8 @@
 ---
-title: toCurrency()
+title: formatCurrencyString()
 ---
 
-toCurrency formats the prices of the products. It takes an object shaped like this:
+formatCurrencyString formats the prices of the products. It takes an object shaped like this:
 
 <table>
   <tr>
@@ -34,9 +34,9 @@ toCurrency formats the prices of the products. It takes an object shaped like th
 If you don't pass a value to language, it will choose language based on the browsers settings
 
 ````jsx
-import { toCurrency } from "use-shopping-cart/src/util"
+import { formatCurrencyString } from "use-shopping-cart/src/util"
 
-toCurrency({ value, currency })
+formatCurrencyString({ value, currency })
 
 // returns $4.00
 

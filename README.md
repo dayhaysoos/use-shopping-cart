@@ -28,11 +28,11 @@ At the root level of your app, wrap your Root app in the `<CartProvider />`
 
 ```jsx
 /** @jsx jsx */
-import { CartProvider } from 'use-shopping-cart';
-import './index.css';
-import App from './App';
+import { CartProvider } from 'use-shopping-cart'
+import './index.css'
+import App from './App'
 
-const stripe = window.Stripe(process.env.REACT_APP_STRIPE_API_PUBLIC);
+const stripe = window.Stripe(process.env.REACT_APP_STRIPE_API_PUBLIC)
 
 ReactDOM.render(
   <CartProvider
@@ -45,16 +45,16 @@ ReactDOM.render(
     <App />
   </CartProvider>,
   document.getElementById('root')
-);
+)
 ```
 
 To add an item to the cart, use `addItem()`
 
 ```jsx
 /**@jsx jsx */
-import { jsx, Box, Image, Button, Flex } from 'theme-ui';
-import { useShoppingCart } from 'use-shopping-cart';
-import { toCurrency } from '../util';
+import { jsx, Box, Image, Button, Flex } from 'theme-ui'
+import { useShoppingCart } from 'use-shopping-cart'
+import { formatCurrencyString } from '../util'
 
 /**
  * PRODUCT DATA COMING FROM PROPS
@@ -77,8 +77,8 @@ const fakeData = [
 */
 
 const Product = (product) => {
-  const { addItem } = useShoppingCart();
-  const { name, sku, price, image, currency } = product;
+  const { addItem } = useShoppingCart()
+  const { name, sku, price, image, currency } = product
   return (
     <Flex
       sx={{
@@ -90,14 +90,14 @@ const Product = (product) => {
       <Image src={image} />
       <Box>
         <p>{name}</p>
-        <p>{toCurrency({ price: price, currency })}</p>
+        <p>{formatCurrencyString({ price: price, currency })}</p>
       </Box>
       <Button onClick={() => addItem({ ...product })} backgroundColor={'black'}>
         Add To Cart
       </Button>
     </Flex>
-  );
-};
+  )
+}
 ```
 
 For displaying what's actually in the cart, refer to the `CartDisplay` component:
@@ -112,13 +112,13 @@ Cart details is an object with skus of the items in the cart as keys and details
 ```jsx
 {
   sku_GBJ2Ep8246qeeT: {
-    name: 'Bananas';
-    sku: 'sku_GBJ2Ep8246qeeT';
-    price: 400;
-    image: 'https://www.fillmurray.com/300/300';
-    currency: 'USD';
-    quantity: 1;
-    formattedPrice: '$4.00';
+    name: 'Bananas'
+    sku: 'sku_GBJ2Ep8246qeeT'
+    price: 400
+    image: 'https://www.fillmurray.com/300/300'
+    currency: 'USD'
+    quantity: 1
+    formattedPrice: '$4.00'
   }
 }
 ```

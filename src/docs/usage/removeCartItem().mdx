@@ -6,7 +6,7 @@ Completely removes a product and quantity that comes with it from the removeCart
 
 ```jsx
 import { useShoppingCart } from 'use-shopping-cart'
-import { toCurrency } from '../util'
+import { formatCurrencyString } from '../util'
 
 function Product(product) {
   const { removeCartItem } = useShoppingCart()
@@ -23,7 +23,7 @@ function Product(product) {
       <img alt={'Alt Tet'} src={image} />
       <div>
         <p>{name}</p>
-        <p>{toCurrency({ price: price, currency })}</p>
+        <p>{formatCurrencyString({ price: price, currency })}</p>
       </div>
       <button onClick={() => removeCartItem(sku)} backgroundColor={'black'}>
         Remove from Cart
