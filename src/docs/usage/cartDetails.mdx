@@ -2,6 +2,9 @@
 title: cartDetails
 ---
 
+import CartDisplayWrapper from 'components/cart-display-wrapper'
+import AddItem from 'components/add-item'
+
 Once the user has added their items to the cart, you can use the `cartDetails` object to display the different data about each product in their cart.
 
 Each product in `cartDetails` contains the same data you provided when you called `addItem(product)`. In addition, `cartDetails` also provides the following properties:
@@ -34,6 +37,20 @@ Each product in `cartDetails` contains the same data you provided when you calle
     </td>
   </tr>
 </table>
+
+<CartDisplayWrapper>
+  <AddItem
+  product={{
+    name: 'Bananas',
+    sku: 'sku_GBJ2Ep8246qeeT',
+    price: 400,
+    image:
+      'https://images.unsplash.com/photo-1574226516831-e1dff420e562?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=1050&q=80',
+    currency: 'USD',
+  }}
+/>
+
+</CartDisplayWrapper>
 
 ```jsx
 import { useShoppingCart } from 'use-shopping-cart'
