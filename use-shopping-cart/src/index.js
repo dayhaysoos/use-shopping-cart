@@ -217,7 +217,10 @@ export const useShoppingCart = () => {
     currency,
     language,
     billingAddressCollection,
-    allowedCountries
+    allowedCountries,
+    cartCount,
+    cartDetails,
+    totalPrice
   } = cart
 
   const totalPrice = () => calculateTotalValue(currency, cartItems)
@@ -288,13 +291,11 @@ export const useShoppingCart = () => {
   return {
     addItem,
     cartCount,
-    checkoutData,
     redirectToCheckout,
     lastClicked,
     storeLastClicked,
     shouldDisplayCart,
     handleCartClick,
-    cartItems,
     cartDetails,
     handleCartHover,
     handleCloseCart,
