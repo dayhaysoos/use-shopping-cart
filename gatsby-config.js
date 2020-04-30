@@ -26,8 +26,8 @@ module.exports = {
     {
       resolve: `gatsby-plugin-manifest`,
       options: {
-        name: `Rocketseat Gatsby Themes`,
-        short_name: `RS Gatsby Themes`,
+        name: `use-shopping-cart`,
+        short_name: `use-shopping-cart`,
         start_url: `/`,
         background_color: `#ffffff`,
         display: `standalone`,
@@ -38,7 +38,7 @@ module.exports = {
     {
       resolve: `gatsby-plugin-google-analytics`,
       options: {
-        // trackingId: ``,
+        trackingId: `UA-165110403-1`,
       },
     },
     {
@@ -49,4 +49,4 @@ module.exports = {
     },
     `gatsby-plugin-offline`,
   ],
-};
+}
