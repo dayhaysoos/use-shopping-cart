@@ -51,8 +51,23 @@ declare module 'use-shopping-cart' {
         [propName: string]: any;
     }
 
+    export interface CartEntry extends Product {
+        /**
+         * Amount of this product in the cart
+         */
+        quantity: number;
+        /**
+         * The total line item value, the price multiplied by the quantity
+         */
+        value: number;
+        /**
+         * Currency formatted version of value
+         */
+        formattedValue: string;
+    }
+
     export type CartDetails = {
-        [sku: string]: Product
+        [sku: string]: CartEntry
     };
 
     export interface ShoppingCartUtilities {
@@ -107,7 +122,7 @@ declare module 'use-shopping-cart' {
      */
     export declare function useShoppingCart (): ShoppingCartUtilities;
 
-    interface ToCurrencyProps {
+    interface FormatCurrencyStringProps {
         /**
          * The value to convert
          */
@@ -128,5 +143,5 @@ declare module 'use-shopping-cart' {
      * @param currency The currency format. For example US
      * @param language The language
      */
-    export declare function toCurrency(props: ToCurrencyProps): string;
+    export declare function formatCurrencyString(props: FormatCurrencyStringProps): string;
 }
