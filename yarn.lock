@@ -1527,6 +1527,11 @@
   resolved "https://registry.yarnpkg.com/@sindresorhus/is/-/is-0.7.0.tgz#9a06f4f137ee84d7df0460c1fdb1135ffa6c50fd"
   integrity sha512-ONhaKPIufzzrlNbqtWFFd+jlnemX6lJAgq9ZeiZtS7I1PIf/la7CW4m83rTXRnVnsMbW2k56pGYu7AUFJD9Pow==
 
+"@stripe/stripe-js@^1.5.0":
+  version "1.5.0"
+  resolved "https://registry.yarnpkg.com/@stripe/stripe-js/-/stripe-js-1.5.0.tgz#95540ebadd40875fb5c36c64df366ca370fb987e"
+  integrity sha512-KCctMhOYCKtyXf0lnO7D+1aHRC566LQf2I490GqvLHhgjGfzf4O44eUXZsOi5IxJkJTtcCBtxKYXXlwuDif/KA==
+
 "@szmarczak/http-timer@^1.1.2":
   version "1.1.2"
   resolved "https://registry.yarnpkg.com/@szmarczak/http-timer/-/http-timer-1.1.2.tgz#b1665e2c461a2cd92f4c1bbf50d5454de0d4b421"
@@ -1657,6 +1662,11 @@
   dependencies:
     "@types/glob" "*"
     "@types/node" "*"
+
+"@types/stripe-v3@^3.1.17":
+  version "3.1.17"
+  resolved "https://registry.yarnpkg.com/@types/stripe-v3/-/stripe-v3-3.1.17.tgz#0fd3c4b134daa1cd61631f58eeb6d756e0377668"
+  integrity sha512-ZnADc7cgvrnRpz9lkENMgMhBWYR6ybz/745WYPlKZZXzU05ZaADRRtafPfZDTpQhALLpX/KYKmWN/j9GmbIg4g==
 
 "@types/tmp@^0.0.33":
   version "0.0.33"
@@ -11108,6 +11118,11 @@ react-simple-code-editor@^0.10.0:
   resolved "https://registry.yarnpkg.com/react-simple-code-editor/-/react-simple-code-editor-0.10.0.tgz#73e7ac550a928069715482aeb33ccba36efe2373"
   integrity sha512-bL5W5mAxSW6+cLwqqVWY47Silqgy2DKDTR4hDBrLrUqC5BXc29YVx17l2IZk5v36VcDEq1Bszu2oHm1qBwKqBA==
 
+react-storage-hooks@^4.0.0:
+  version "4.0.1"
+  resolved "https://registry.yarnpkg.com/react-storage-hooks/-/react-storage-hooks-4.0.1.tgz#e30ed5cda48c77c431ecc02ec3824bd615f5b7fb"
+  integrity sha512-fetDkT5RDHGruc2NrdD1iqqoLuXgbx6AUpQSQLLkrCiJf8i97EtwJNXNTy3+GRfsATLG8TZgNc9lGRZOaU5yQA==
+
 react@^16.12.0, react@^16.8.0:
   version "16.13.1"
   resolved "https://registry.yarnpkg.com/react/-/react-16.13.1.tgz#2e818822f1a9743122c063d6410d85c1e3afe48e"
@@ -13553,6 +13568,14 @@ url@^0.11.0:
   dependencies:
     punycode "1.3.2"
     querystring "0.2.0"
+
+use-shopping-cart@^1.1.1:
+  version "1.1.1"
+  resolved "https://registry.yarnpkg.com/use-shopping-cart/-/use-shopping-cart-1.1.1.tgz#e5735a3062c08f2b19d104c223361ab60551ddec"
+  integrity sha512-skvrEyQFDiDdPvJjz9epp4RJKgrqL2rWdEG85FozW/pSMMOzwWSY0+hUdZDnnje3k8RadnNwq1U1Cc8QxwTt+w==
+  dependencies:
+    "@types/stripe-v3" "^3.1.17"
+    react-storage-hooks "^4.0.0"
 
 use@^3.1.0:
   version "3.1.1"
