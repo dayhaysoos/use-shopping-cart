@@ -5,9 +5,9 @@ declare module 'use-shopping-cart' {
     successUrl: string
     cancelUrl: string
     currency: string
-    language: string
-    billingAddressCollection: boolean
-    allowedCountries: null | string[]
+    language?: string
+    billingAddressCollection?: boolean
+    allowedCountries?: null | string[]
   }
 
   /**

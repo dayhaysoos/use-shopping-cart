@@ -138,18 +138,6 @@ export const CartContext = createContext([
   () => {}
 ])
 
-/**
- * @param {{
-    children: JSX.Element,
-    stripe: stripe.Stripe,
-    successUrl: string,
-    cancelUrl: string,
-    currency: string,
-    language: string,
-    billingAddressCollection: boolean,
-    allowedCountries: null | string[]
- * }} props
- */
 export const CartProvider = ({
   children,
   stripe,
