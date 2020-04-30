@@ -12,6 +12,22 @@ from Stripe because all of the config is handled in the [CartProvider](cartprovi
 
 This is how you'd use `redirectToCheckout()` with a serverless function:
 
+import CartDisplayWrapper from 'components/cart-display-wrapper'
+import RedirectToCheckout from 'components/redirect-to-checkout'
+
+<CartDisplayWrapper>
+  <RedirectToCheckout
+    product={{
+      name: 'Bananas',
+      sku: 'sku_GBJ2Ep8246qeeT',
+      price: 400,
+      image:
+        'https://images.unsplash.com/photo-1574226516831-e1dff420e562?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=1050&q=80',
+      currency: 'USD',
+    }}
+  />
+</CartDisplayWrapper>
+
 ```jsx
 import { useShoppingCart } from 'use-shopping-cart'
 
