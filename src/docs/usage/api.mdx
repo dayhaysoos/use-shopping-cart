@@ -6,19 +6,10 @@ title: API
 
 Cart details is an object with skus of the items in the cart as keys and details of the items as the value, for example:
 
-```json5
-{
-  sku_GBJ2Ep8246qeeT: {
-    name: 'Bananas',
-    sku: 'sku_GBJ2Ep8246qeeT',
-    price: 400,
-    image: 'https://www.fillmurray.com/300/300',
-    currency: 'USD',
-    quantity: 1,
-    formattedPrice: '$4.00',
-  },
-}
-```
+import CartDisplayWrapper from 'components/cart-display-wrapper'
+import API from 'components/api'
+
+<CartDisplayWrapper />
 
 As you add more items to the cartItem array, cart details will update with quantity and total amount of
 that particular item.
@@ -34,3 +25,5 @@ Total number of items in the cart
 ## `totalPrice`
 
 Total price of all products in cart
+
+<API />
