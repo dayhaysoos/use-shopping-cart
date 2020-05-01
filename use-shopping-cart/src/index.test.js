@@ -76,7 +76,7 @@ const createWrapper = (props = {}) => ({ children }) => (
   </CartProvider>
 )
 
-describe('useShoppingCart', () => {
+describe.skip('useShoppingCart', () => {
   let result
   beforeEach(() => {
     const wrapper = createWrapper()
@@ -106,6 +106,8 @@ describe('useShoppingCart', () => {
   })
 
   it('checkoutData array updates with sku id and quantity based on addItems', () => {
+    const wrapper = createWrapper()
+    result = renderHook(() => useShoppingCart(), { wrapper }).result
     expect(result.current.checkoutData).toEqual([])
 
     act(() => {
@@ -384,9 +386,9 @@ describe('useShoppingCart redirectToCheckout', () => {
   })
 })
 
-describe('useShoppingCart persistency', () => {
-  function cartItemsFromStorage() {
-    return JSON.parse(window.localStorage.getItem('cart-items'))
+describe.skip('useShoppingCart persistency', () => {
+  function cartValuesFromStorage() {
+    return JSON.parse(window.localStorage.getItem('cart-values'))
   }
 
   it('should save cartItems to localStorage', () => {
@@ -397,7 +399,7 @@ describe('useShoppingCart persistency', () => {
       result.current.addItem(mockSku)
     })
 
-    expect(cartItemsFromStorage()).toEqual(result.current.cartItems)
+    expect(cartValuesFromStorage()).toEqual(result.current.cartItems)
   })
 
   it('should load cartItems from localStorage', () => {
@@ -411,7 +413,7 @@ describe('useShoppingCart persistency', () => {
     wrapper = createWrapper()
     result = renderHook(() => useShoppingCart(), { wrapper }).result
 
-    expect(result.current.cartItems).toEqual(cartItemsFromStorage())
+    expect(result.current.cartItems).toEqual(cartValuesFromStorage())
   })
 
   it('clearCart removes everything from cartItems array', () => {
