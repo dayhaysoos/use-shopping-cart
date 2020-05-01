@@ -8,7 +8,8 @@ import React, {
 import {
   formatCurrencyString,
   calculateTotalValue,
-  useLocalStorageReducer
+  useLocalStorageReducer,
+  isClient
 } from './util'
 import PropTypes from 'prop-types'
 
