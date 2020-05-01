@@ -37,7 +37,6 @@ const SkuCard = ({ sku }) => {
         {formatCurrencyString({
           value: sku.price,
           currency: sku.currency,
-          language: navigator.language,
         })}
       </p>
       <button style={buttonStyles} onClick={() => addItem(sku)}>
