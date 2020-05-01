@@ -8,8 +8,8 @@ export const wrapRootElement = ({ element }) => {
   return (
     <CartProvider
       stripe={stripePromise}
-      successUrl={`${window.location.origin}/`}
-      cancelUrl={`${window.location.origin}/`}
+      successUrl={`https://use-shopping-cart.netlify.app/`}
+      cancelUrl={`https://use-shopping-cart.netlify.app/`}
       currency="USD"
       allowedCountries={['US', 'GB', 'CA']}
       billingAddressCollection={true}
