@@ -13574,10 +13574,10 @@ url@^0.11.0:
     punycode "1.3.2"
     querystring "0.2.0"
 
-use-shopping-cart@^1.1.3:
-  version "1.1.3"
-  resolved "https://registry.yarnpkg.com/use-shopping-cart/-/use-shopping-cart-1.1.3.tgz#ff5002929fb25acc71bf0cc3d638c87ad8d795ff"
-  integrity sha512-cKqjiz5tmyiyxsKZgSDjHy5v5mMYzJ9e1in3bqbedbyiGylcWoeYNPLkCo6dU9MdIg3Tk+vL/qO8eXWyTZBmFg==
+use-shopping-cart@^1.1.4:
+  version "1.1.4"
+  resolved "https://registry.yarnpkg.com/use-shopping-cart/-/use-shopping-cart-1.1.4.tgz#5fc60952f3a528f6e9415e4fa986fd5d6137b17b"
+  integrity sha512-Oxq7WRuczD84AtbXfE26g/BjaSRf5V1cNRQyb5HXwLEYcSaJjWfrwu0OhMpUrp6MW95v7mA/e9f5lCFmgoHqEA==
   dependencies:
     "@types/stripe-v3" "^3.1.17"
     prop-types "^15.7.2"
