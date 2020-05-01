@@ -14,6 +14,8 @@ import PropTypes from 'prop-types'
 
 export { formatCurrencyString }
 
+export const isClient = typeof window === 'object'
+
 /**
  * @function checkoutCart
  * @param skus {object}
@@ -144,7 +146,7 @@ export const CartProvider = ({
   successUrl,
   cancelUrl,
   currency,
-  language = navigator.language,
+  language = isClient ? navigator.language : 'en-US',
   billingAddressCollection = false,
   allowedCountries = null
 }) => {

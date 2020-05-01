@@ -6,7 +6,9 @@
   ],
   "scripts": {
     "dev": "yarn workspace use-shopping-cart dev",
-    "test": "yarn workspace use-shopping-cart test:watch"
+    "test": "yarn workspace use-shopping-cart test:watch",
+    "dev:gatsby": "yarn workspace ecommerce-gatsby-tutorial start",
+    "build:gatsby": "yarn workspace use-shopping-cart build && yarn workspace ecommerce-gatsby-tutorial build"
   },
   "dependencies": {
     "husky": "^4.2.5",
