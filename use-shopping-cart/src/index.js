@@ -12,9 +12,7 @@ import {
 } from './util'
 import PropTypes from 'prop-types'
 
-export { formatCurrencyString }
-
-export const isClient = typeof window === 'object'
+export { formatCurrencyString, isClient } from './util'
 
 /**
  * @function checkoutCart
