@@ -4,8 +4,6 @@ import { useShoppingCart } from 'use-shopping-cart'
 export function CartDisplayWrapper({ children }) {
   const { cartDetails, clearCart } = useShoppingCart()
 
-  console.log(cartDetails)
-
   return (
     <section
       style={{
@@ -24,6 +22,7 @@ export function CartDisplayWrapper({ children }) {
             fontSize: 12,
             padding: 10,
             height: 200,
+            overflow: 'scroll',
           }}
         >
           {JSON.stringify(cartDetails, null, 2)}

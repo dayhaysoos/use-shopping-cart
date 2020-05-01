@@ -1,30 +1,7 @@
----
-title: reduceItemByOne()
----
+import React from 'react'
+import { useShoppingCart, formatCurrencyString } from 'use-shopping-cart'
 
-`reduceItemByOne(sku)` reduces the number of a product, by its sku, in the user's cart by one. This allows the user to reduce the quantity of an item in the cart by one at a time if they added too many.
-
-import CartDisplayWrapper from 'components/cart-display-wrapper'
-import ReduceItemByOne from 'components/reduce-item-by-one'
-
-<CartDisplayWrapper>
-  <ReduceItemByOne
-    product={{
-      name: 'Bananas',
-      sku: 'sku_GBJ2Ep8246qeeT',
-      price: 400,
-      image:
-        'https://images.unsplash.com/photo-1574226516831-e1dff420e562?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=1050&q=80',
-      currency: 'USD',
-    }}
-  />
-</CartDisplayWrapper>
-
-```jsx
-import { useShoppingCart } from 'use-shopping-cart'
-import { formatCurrencyString } from '../util'
-
-function Product(product) {
+export function ReduceItemByOne({ product }) {
   const { reduceItemByOne } = useShoppingCart()
 
   /* A helper function that turns the price into a readable format */
@@ -47,7 +24,7 @@ function Product(product) {
         <img
           style={{ height: 200, width: 250 }}
           src={product.image}
-          alt={` ${product.name}`}
+          alt={product.name}
         />
         <figcaption>{product.name}</figcaption>
       </figure>
@@ -58,9 +35,10 @@ function Product(product) {
         aria-label={`Remove ${product.name} from your cart`}
         style={{ height: 50, width: 100, marginBottom: 30 }}
       >
-        Add to cart
+        Remove from cart
       </button>
     </article>
   )
 }
-```
+
+export default ReduceItemByOne

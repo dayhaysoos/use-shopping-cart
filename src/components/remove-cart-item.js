@@ -1,30 +1,7 @@
----
-title: removeCartItem()
----
+import React from 'react'
+import { useShoppingCart, formatCurrencyString } from 'use-shopping-cart'
 
-Completely removes a product and quantity that comes with it from the removeCartItem
-
-import CartDisplayWrapper from 'components/cart-display-wrapper'
-import RemoveCartItem from 'components/remove-cart-item'
-
-<CartDisplayWrapper>
-  <RemoveCartItem
-    product={{
-      name: 'Bananas',
-      sku: 'sku_GBJ2Ep8246qeeT',
-      price: 400,
-      image:
-        'https://images.unsplash.com/photo-1574226516831-e1dff420e562?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=1050&q=80',
-      currency: 'USD',
-    }}
-  />
-</CartDisplayWrapper>
-
-```jsx
-import { useShoppingCart } from 'use-shopping-cart'
-import { formatCurrencyString } from '../util'
-
-function Product(product) {
+export function RemoveCartItem({ product }) {
   const { removeCartItem } = useShoppingCart()
 
   /* A helper function that turns the price into a readable format */
@@ -47,7 +24,7 @@ function Product(product) {
         <img
           style={{ height: 200, width: 250 }}
           src={product.image}
-          alt={` ${product.name}`}
+          alt={product.name}
         />
         <figcaption>{product.name}</figcaption>
       </figure>
@@ -63,4 +40,5 @@ function Product(product) {
     </article>
   )
 }
-```
+
+export default RemoveCartItem
