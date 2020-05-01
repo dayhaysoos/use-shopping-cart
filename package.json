@@ -20,7 +20,7 @@
     "react": "^16.12.0",
     "react-dom": "^16.12.0",
     "typeface-bungee": "^0.0.72",
-    "use-shopping-cart": "^1.1.1"
+    "use-shopping-cart": "^1.1.2"
   },
   "devDependencies": {},
   "keywords": [
