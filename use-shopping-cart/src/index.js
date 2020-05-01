@@ -8,11 +8,12 @@ import React, {
 import {
   formatCurrencyString,
   calculateTotalValue,
-  useLocalStorageReducer
+  useLocalStorageReducer,
+  isClient
 } from './util'
 import PropTypes from 'prop-types'
 
-export { formatCurrencyString }
+export { formatCurrencyString, isClient } from './util'
 
 /**
  * @function checkoutCart
@@ -144,7 +145,7 @@ export const CartProvider = ({
   successUrl,
   cancelUrl,
   currency,
-  language = navigator.language,
+  language = isClient ? navigator.language : 'en-US',
   billingAddressCollection = false,
   allowedCountries = null
 }) => {

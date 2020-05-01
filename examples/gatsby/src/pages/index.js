@@ -21,8 +21,8 @@ const CartExample = () => (
     </h2>
     <CartProvider
       stripe={stripePromise}
-      successUrl={`${window.location.origin}/page-2/`}
-      cancelUrl={`${window.location.origin}/`}
+      successUrl={`http://localhost:8000/page-2/`}
+      cancelUrl={`http://localhost:8000/`}
       currency="USD"
       allowedCountries={['US', 'GB', 'CA']}
       billingAddressCollection={true}

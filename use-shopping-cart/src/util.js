@@ -2,9 +2,13 @@ import { useStorageReducer } from 'react-storage-hooks'
 
 export const isClient = typeof window === 'object'
 
-export const formatCurrencyString = ({ value, currency, language }) => {
+export const formatCurrencyString = ({
+  value,
+  currency,
+  language = isClient ? navigator.language : 'en-US'
+}) => {
   value = parseInt(value)
-  const numberFormat = new Intl.NumberFormat('en-US', {
+  const numberFormat = new Intl.NumberFormat(language, {
     style: 'currency',
     currency,
     currencyDisplay: 'symbol'
