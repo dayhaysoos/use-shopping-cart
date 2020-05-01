@@ -10,7 +10,7 @@
 
 <!-- ALL-CONTRIBUTORS-BADGE:END -->
 
-Demo: [https://rocketdocs.netlify.com/](https://rocketdocs.netlify.com/)
+Demo: [https://use-shopping-cart.netlify.app/](https://use-shopping-cart.netlify.app/)
 
 ## Installation
 
