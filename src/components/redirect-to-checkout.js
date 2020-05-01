@@ -1,10 +1,21 @@
 import React from 'react'
+import { Link } from 'gatsby'
 import { useShoppingCart, formatCurrencyString } from 'use-shopping-cart'
 
 export function RedirectToCheckout({ product }) {
-  const { redirectToCheckout, cartDetails } = useShoppingCart()
+  const { redirectToCheckout, cartCount } = useShoppingCart()
 
-  const hasItems = !Object.keys(cartDetails).length > 0
+  const hasItems = cartCount > 0
+
+  const handleClick = (e) => {
+    e.preventDefault()
+
+    if (hasItems) {
+      redirectToCheckout()
+    } else {
+      alert('Please head to addItem() and add an item to the cart')
+    }
+  }
 
   /* A helper function that turns the price into a readable format */
   const price = formatCurrencyString({
@@ -32,15 +43,15 @@ export function RedirectToCheckout({ product }) {
       </figure>
       <p>{price}</p>
 
-      {hasItems && (
-        <p style={{ color: 'red' }}>
-          Please go to addItem() and add an item to the cart
+      {!hasItems && (
+        <p style={{ color: 'black' }}>
+          Please go to <Link to={'/usage/addItem()'}>addItem()</Link> and add an
+          item to the cart
         </p>
       )}
 
       <button
-        disabled={hasItems}
-        onClick={() => redirectToCheckout()}
+        onClick={handleClick}
         aria-label={`Add ${product.name} to your cart`}
         style={{ height: 50, width: 100, marginBottom: 30 }}
       >
