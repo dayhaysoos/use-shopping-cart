@@ -24,7 +24,7 @@ export function ReduceItemByOne({ product }) {
         <img
           style={{ height: 200, width: 250 }}
           src={product.image}
-          alt={` ${product.name}`}
+          alt={product.name}
         />
         <figcaption>{product.name}</figcaption>
       </figure>
@@ -35,7 +35,7 @@ export function ReduceItemByOne({ product }) {
         aria-label={`Remove ${product.name} from your cart`}
         style={{ height: 50, width: 100, marginBottom: 30 }}
       >
-        {`Remove from cart`}
+        Remove from cart
       </button>
     </article>
   )
