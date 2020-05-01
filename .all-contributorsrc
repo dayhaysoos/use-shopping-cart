@@ -73,6 +73,15 @@
         "code",
         "test"
       ]
+    },
+    {
+      "login": "RyanWarner",
+      "name": "Ryan Warner",
+      "avatar_url": "https://avatars2.githubusercontent.com/u/1595979?v=4",
+      "profile": "https://ryan.warner.codes",
+      "contributions": [
+        "doc"
+      ]
     }
   ],
   "contributorsPerLine": 7,
