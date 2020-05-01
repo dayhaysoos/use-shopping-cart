@@ -5,7 +5,7 @@ export const isClient = typeof window === 'object'
 export const formatCurrencyString = ({ value, currency, language }) => {
   value = parseInt(value)
   const numberFormat = new Intl.NumberFormat(
-    language ?? window?.navigator.language ?? 'en-US',
+    language ?? 'en-US',
     {
       style: 'currency',
       currency,
