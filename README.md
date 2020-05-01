@@ -61,7 +61,7 @@ ReactDOM.render(
     successUrl="stripe.com"
     cancelUrl="twitter.com/dayhaysoos"
     currency="USD"
-    allowedCountries={['US', 'UK', 'CA']}
+    allowedCountries={['US', 'GB', 'CA']}
     billingAddressCollection={true}
   >
     <App />

@@ -1,0 +1,17 @@
+import React from 'react'
+import { Link } from 'gatsby'
+
+import Layout from '../components/layout'
+import SEO from '../components/seo'
+
+const SuccessPage = () => {
+  return (
+    <Layout>
+      <SEO title="Payment Success" />
+      <h1>Sucess!</h1>
+      <Link to="/">Shop again</Link>
+    </Layout>
+  )
+}
+
+export default SuccessPage
