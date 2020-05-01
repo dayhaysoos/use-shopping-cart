@@ -104,7 +104,7 @@ export function App() {
     <div>
       {/* Renders the products */}
       {productData.map((product) => (
-        <Product product={product} />
+        <Product key={product.sku} product={product} />
       ))}
 
       {/* This is where we'll render our cart */}
@@ -131,7 +131,7 @@ export function Product({ product }) {
 
   /* A helper function that turns the price into a readable format */
   const price = formatCurrencyString({
-    price: product.price,
+    value: product.price,
     currency: product.currency,
     language: navigator.language,
   });
@@ -202,6 +202,7 @@ export function CartItems() {
       <article>
         {/* image here */}
         {/* name here */}
+        {/* formatted total price of that item */}
         <p>Line total: {cartEntry.formattedValue}</p>
 
         {/* What if we want to remove one of the item... or add one */}
