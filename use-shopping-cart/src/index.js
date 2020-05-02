@@ -91,11 +91,7 @@ CartProvider.propTypes = {
 }
 
 export const useShoppingCart = () => {
-  const [cart, oldDispatch] = useContext(CartContext)
-
-  const dispatch = (...args) => {
-    oldDispatch(...args)
-  }
+  const [cart, dispatch] = useContext(CartContext)
 
   const {
     stripe,

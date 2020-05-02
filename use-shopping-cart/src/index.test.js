@@ -469,50 +469,78 @@ function mockProduct(overrides) {
 }
 
 describe.only('useShoppingCart()', () => {
-  let result
+  let cart
   beforeEach(() => {
     const wrapper = createWrapper()
-    result = renderHook(() => useShoppingCart(), { wrapper }).result
+    cart = renderHook(() => useShoppingCart(), { wrapper }).result
   })
 
   describe('addItem()', () => {
-    it('adds an items properties to the cart', () => {
+    it('adds an item to the cart', () => {
       const product = mockProduct({ price: 200 })
-      const productWithoutPrice = product
+      const productWithoutPrice = { ...product }
       delete productWithoutPrice.price
 
       act(() => {
-        result.current.addItem(product)
+        cart.current.addItem(product)
       })
 
-      const entry = result.current.cartDetails[product.sku]
+      expect(cart.current.cartDetails).toHaveProperty(product.sku)
+      const entry = cart.current.cartDetails[product.sku]
 
       expect(entry.quantity).toBe(1)
       expect(entry.value).toBe(product.price)
       expect(entry.formattedValue).toBe('$2.00')
       expect(entry).toMatchObject(productWithoutPrice)
+
+      expect(cart.current.cartCount).toBe(1)
+      expect(cart.current.totalPrice).toBe('$2.00')
     })
 
     it('adds multiple different items to the cart', () => {
-      const product1 = mockProduct()
-      const product2 = mockProduct()
+      const product1 = mockProduct({ price: 400 })
+      const product2 = mockProduct({ price: 100 })
 
       act(() => {
-        result.current.addItem(product1)
-        result.current.addItem(product2)
+        cart.current.addItem(product1)
+        cart.current.addItem(product2)
       })
 
-      const entry1 = result.current.cartDetails[product1.sku]
+      expect(cart.current.cartDetails).toHaveProperty(product1.sku)
+      const entry1 = cart.current.cartDetails[product1.sku]
+
       expect(entry1.quantity).toBe(1)
       expect(entry1.value).toBe(product1.price)
 
-      const entry2 = result.current.cartDetails[product2.sku]
+      expect(cart.current.cartDetails).toHaveProperty(product2.sku)
+      const entry2 = cart.current.cartDetails[product2.sku]
+
       expect(entry2.quantity).toBe(1)
       expect(entry2.value).toBe(product2.price)
+
+      expect(cart.current.cartCount).toBe(2)
+      expect(cart.current.totalPrice).toBe('$5.00')
     })
 
     it('adds multiple of the same item to the cart', () => {
-      //
+      const product = mockProduct({ price: 325 })
+
+      act(() => {
+        cart.current.addItem(product)
+        cart.current.addItem(product)
+      })
+
+      expect(cart.current.cartDetails).toHaveProperty(product.sku)
+      const entry = cart.current.cartDetails[product.sku]
+
+      expect(entry.quantity).toBe(2)
+      expect(entry.value).toBe(650)
+      expect(entry.formattedValue).toBe('$6.50')
+
+      expect(cart.current.cartCount).toBe(2)
+      expect(cart.current.totalPrice).toBe('$6.50')
     })
   })
+
+  describe.skip('incrementItem()', () => {})
 })
