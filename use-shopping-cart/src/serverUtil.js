@@ -4,13 +4,13 @@ const validateCartItems = (inventorySrc, cartDetails) => {
     if (!Object.prototype.hasOwnProperty.call(cartDetails, sku)) continue
 
     const product = cartDetails[sku]
-    const validatedItem = inventorySrc.find(
-      (currentProduct) => currentProduct.name === product.name
+    const inventoryItem = inventorySrc.find(
+      (currentProduct) => currentProduct.sku === sku
     )
     validatedItems.push({
-      name: validatedItem.name,
-      amount: validatedItem.price,
-      currency: validatedItem.currency,
+      name: inventoryItem.name,
+      amount: inventoryItem.price,
+      currency: inventoryItem.currency,
       quantity: product.quantity
     })
   }
