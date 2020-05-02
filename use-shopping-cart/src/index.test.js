@@ -455,6 +455,19 @@ describe('useShoppingCart stripe handling', () => {
   })
 })
 
+let counter = 0
+function mockProduct(overrides) {
+  return {
+    sku: `sku_abc${counter++}`,
+    name: 'blah bleh bloo',
+    price: Math.floor(Math.random() * 1000),
+    image: 'https://blah.com/bleh',
+    alt: 'a bleh glowing under a soft sunrise',
+    currency: 'usd',
+    ...overrides
+  }
+}
+
 describe.only('useShoppingCart()', () => {
   let result
   beforeEach(() => {
@@ -462,10 +475,44 @@ describe.only('useShoppingCart()', () => {
     result = renderHook(() => useShoppingCart(), { wrapper }).result
   })
 
-  it('add item to the cart', () => {
-    act(() => {
-      result.current.addItem(mockSku)
+  describe('addItem()', () => {
+    it('adds an items properties to the cart', () => {
+      const product = mockProduct({ price: 200 })
+      const productWithoutPrice = product
+      delete productWithoutPrice.price
+
+      act(() => {
+        result.current.addItem(product)
+      })
+
+      const entry = result.current.cartDetails[product.sku]
+
+      expect(entry.quantity).toBe(1)
+      expect(entry.value).toBe(product.price)
+      expect(entry.formattedValue).toBe('$2.00')
+      expect(entry).toMatchObject(productWithoutPrice)
     })
-    expect(result.current.cartDetails[mockSku.sku].quantity).toBe(1)
+
+    it('adds multiple different items to the cart', () => {
+      const product1 = mockProduct()
+      const product2 = mockProduct()
+
+      act(() => {
+        result.current.addItem(product1)
+        result.current.addItem(product2)
+      })
+
+      const entry1 = result.current.cartDetails[product1.sku]
+      expect(entry1.quantity).toBe(1)
+      expect(entry1.value).toBe(product1.price)
+
+      const entry2 = result.current.cartDetails[product2.sku]
+      expect(entry2.quantity).toBe(1)
+      expect(entry2.value).toBe(product2.price)
+    })
+
+    it('adds multiple of the same item to the cart', () => {
+      //
+    })
   })
 })
