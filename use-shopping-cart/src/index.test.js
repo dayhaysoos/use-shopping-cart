@@ -460,7 +460,7 @@ function mockProduct(overrides) {
   return {
     sku: `sku_abc${counter++}`,
     name: 'blah bleh bloo',
-    price: Math.floor(Math.random() * 1000),
+    price: Math.floor(Math.random() * 1000 + 1),
     image: 'https://blah.com/bleh',
     alt: 'a bleh glowing under a soft sunrise',
     currency: 'usd',
@@ -478,8 +478,6 @@ describe.only('useShoppingCart()', () => {
   describe('addItem()', () => {
     it('adds an item to the cart', () => {
       const product = mockProduct({ price: 200 })
-      const productWithoutPrice = { ...product }
-      delete productWithoutPrice.price
 
       act(() => {
         cart.current.addItem(product)
@@ -491,7 +489,7 @@ describe.only('useShoppingCart()', () => {
       expect(entry.quantity).toBe(1)
       expect(entry.value).toBe(product.price)
       expect(entry.formattedValue).toBe('$2.00')
-      expect(entry).toMatchObject(productWithoutPrice)
+      expect(entry).toMatchObject(product)
 
       expect(cart.current.cartCount).toBe(1)
       expect(cart.current.totalPrice).toBe('$2.00')
@@ -542,5 +540,40 @@ describe.only('useShoppingCart()', () => {
     })
   })
 
-  describe.skip('incrementItem()', () => {})
+  describe('incrementItem()', () => {
+    it('increments the quantity of a product in the cart by 1', () => {
+      const product = mockProduct()
+
+      act(() => {
+        cart.current.addItem(product)
+        cart.current.incrementItem(product.sku)
+      })
+
+      expect(cart.current.cartDetails).toHaveProperty(product.sku)
+      const entry = cart.current.cartDetails[product.sku]
+
+      expect(entry.quantity).toBe(2)
+      expect(entry.value).toBe(product.price * 2)
+    })
+
+    it('increments the quantity of a product by provided count', () => {
+      for (let count = 0; count <= 100; ++count) {
+        // tests 0 -> 101 for count
+        const product = mockProduct()
+
+        act(() => {
+          cart.current.addItem(product)
+          cart.current.incrementItem(product.sku, count)
+        })
+
+        expect(cart.current.cartDetails).toHaveProperty(product.sku)
+        const entry = cart.current.cartDetails[product.sku]
+
+        expect(entry.quantity).toBe(count + 1)
+        expect(entry.value).toBe(product.price * (count + 1))
+
+        console.log(entry.quantity, entry.value)
+      }
+    })
+  })
 })
