@@ -1,3 +1,4 @@
+import PropTypes from 'prop-types'
 import React, {
   createContext,
   useReducer,
@@ -5,198 +6,21 @@ import React, {
   useMemo,
   useEffect
 } from 'react'
+
 import {
-  formatCurrencyString,
-  calculateTotalValue,
   useLocalStorageReducer,
-  isClient
+  isClient,
+  getCheckoutData,
+  formatCurrencyString
 } from './util'
-import PropTypes from 'prop-types'
+import { cartReducer, cartValuesReducer } from './reducers'
 
 export { formatCurrencyString, isClient } from './util'
-
-/**
- * @function checkoutCart
- * @param skus {object}
- * @param sku {string}
- * @param quantity {number}
- * @description Adds skuID to skus object, if no quantity argument is passed, it increments by 1
- * @returns {object} skus
- */
-const checkoutCart = (skus, { sku }, quantity = 1) => {
-  if (sku in skus) {
-    return {
-      ...skus,
-      [sku]: skus[sku] + quantity
-    }
-  } else {
-    return {
-      ...skus,
-      [sku]: quantity
-    }
-  }
-}
-
-const formatDetailedCart = (currency, cartItems, language) => {
-  return cartItems.reduce((acc, current) => {
-    const quantity = (acc[current.sku]?.quantity ?? 0) + 1
-    const value = (acc[current.sku]?.value ?? 0) + current.price
-    const formattedValue = formatCurrencyString({ value, currency, language })
-
-    return {
-      ...acc,
-      [current.sku]: {
-        ...current,
-        quantity,
-        formattedValue,
-        value
-      }
-    }
-  }, {})
-}
-
-const reduceItemByOne = (skuID, cartItems) => {
-  const newCartItems = []
-  let removedItem = false
-
-  for (const item of cartItems) {
-    if (!removedItem && item.sku === skuID) {
-      removedItem = true
-      continue
-    }
-
-    newCartItems.push(item)
-  }
-
-  return newCartItems
-}
-
-function cartReducer(cart, action) {
-  switch (action.type) {
-    case 'addToCart':
-      return {
-        ...cart,
-        skus: checkoutCart(cart.skus, action.product.sku)
-      }
-
-    case 'storeLastClicked':
-      return {
-        ...cart,
-        lastClicked: action.skuID
-      }
-
-    case 'cartClick':
-      return {
-        ...cart,
-        shouldDisplayCart: !cart.shouldDisplayCart
-      }
-
-    case 'cartHover':
-      return {
-        ...cart,
-        shouldDisplayCart: true
-      }
-
-    case 'closeCart':
-      return {
-        ...cart,
-        shouldDisplayCart: false
-      }
-
-    case 'stripe changed':
-      return {
-        ...cart,
-        stripe: action.stripe
-      }
-
-    default:
-      return cart
-  }
-}
-
-function cartValuesReducer(state, action) {
-  function createEntry(product) {
-    const entry = {
-      ...product,
-      quantity: 1,
-      get value() {
-        return this.price * this.quantity
-      },
-      get formattedValue() {
-        return formatCurrencyString({
-          value: this.value,
-          currency: action.currency,
-          language: action.language
-        })
-      }
-    }
-
-    return {
-      cartDetails: {
-        ...state.cartDetails,
-        [product.sku]: entry
-      },
-      totalPrice: state.totalPrice + product.price,
-      cartCount: state.cartCount + 1
-    }
-  }
-  function updateEntry(sku, count) {
-    const cartDetails = { ...state.cartDetails }
-    const entry = cartDetails[sku]
-    entry.quantity += count
-
-    return {
-      cartDetails,
-      totalPrice: state.totalPrice + entry.price * count,
-      cartCount: state.cartCount + count
-    }
-  }
-  function removeEntry(sku) {
-    const cartDetails = { ...state.cartDetails }
-    const totalPrice = state.totalPrice - cartDetails[sku].value
-    const cartCount = state.cartCount - cartDetails[sku].quantity
-    delete cartDetails[sku]
-
-    return { cartDetails, totalPrice, cartCount }
-  }
-
-  switch (action.type) {
-    case 'add-item-to-cart':
-      if (action.product.sku in state.cartDetails) {
-        return updateEntry(action.product.sku, 1)
-      }
-
-      return createEntry(action.product)
-    case 'increment-item':
-      if (action.sku in state.cartDetails) {
-        return updateEntry(action.sku, action.count)
-      }
-      break
-
-    case 'decrement-item':
-      if (action.sku in state.cartDetails) {
-        return updateEntry(action.sku, -action.count)
-      }
-      break
-
-    case 'remove-item-from-cart':
-      if (action.sku in state.cartDetails) {
-        return removeEntry(action.sku)
-      }
-      break
-
-    default:
-      return state
-  }
-
-  return state
-}
 
 export const CartContext = createContext([
   {
     lastClicked: '',
     shouldDisplayCart: false,
-    skus: {},
     cartItems: []
   },
   () => {}
@@ -221,32 +45,30 @@ export const CartProvider = ({
     currency,
     language,
     billingAddressCollection,
-    allowedCountries,
-    skus: {}
+    allowedCountries
   })
 
   useEffect(() => {
     cartDispatch({ type: 'stripe changed', stripe })
   }, [stripe])
 
-  // keep cartItems in LocalStorage
-  const [cartItems, cartItemsDispatch] = useLocalStorageReducer(
+  const [cartValues, cartValuesDispatch] = useLocalStorageReducer(
     'cart-items',
-    cartItemsReducer,
-    []
+    cartValuesReducer,
+    { cartDetails: {}, totalPrice: 0, cartCount: 0 }
   )
 
   // combine dispatches and
   // memoize context value to avoid causing re-renders
   const contextValue = useMemo(
     () => [
-      { ...cart, cartItems },
+      { ...cart, ...cartValues },
       (action) => {
         cartDispatch(action)
-        cartItemsDispatch(action)
+        cartValuesDispatch({ ...action, currency, language })
       }
     ],
-    [cart, cartItems, cartDispatch, cartItemsDispatch]
+    [cart, cartDispatch, cartValues, cartValuesDispatch]
   )
 
   return (
@@ -269,47 +91,43 @@ CartProvider.propTypes = {
 }
 
 export const useShoppingCart = () => {
-  const [cart, dispatch] = useContext(CartContext)
+  const [cart, oldDispatch] = useContext(CartContext)
+
+  const dispatch = (...args) => {
+    oldDispatch(...args)
+  }
 
   const {
     stripe,
     lastClicked,
     shouldDisplayCart,
-    cartItems,
     successUrl,
     cancelUrl,
-    currency,
-    language,
     billingAddressCollection,
     allowedCountries,
     cartCount,
     cartDetails,
-    totalPrice
+    totalPrice,
+    currency,
+    language
   } = cart
 
   const addItem = (product) => dispatch({ type: 'add-item-to-cart', product })
-  const removeCartItem = (sku) =>
-    dispatch({ type: 'remove-item-from-cart', sku })
-  const decrementItem = (sku, count = 1) =>
-    dispatch({ type: 'decrement-item', sku, count })
+  const removeItem = (sku) => dispatch({ type: 'remove-item-from-cart', sku })
   const incrementItem = (sku, count = 1) =>
     dispatch({ type: 'increment-item', sku, count })
-
-  const storeLastClicked = (skuID) =>
-    dispatch({ type: 'storeLastClicked', skuID })
-
-  const handleCartClick = () => dispatch({ type: 'cartClick' })
-
-  const handleCartHover = () => dispatch({ type: 'cartHover' })
-
-  const handleCloseCart = () => dispatch({ type: 'closeCart' })
-
+  const decrementItem = (sku, count = 1) =>
+    dispatch({ type: 'decrement-item', sku, count })
   const clearCart = () => dispatch({ type: 'clearCart' })
 
+  const storeLastClicked = (sku) => dispatch({ type: 'storeLastClicked', sku })
+  const handleCartClick = () => dispatch({ type: 'cartClick' })
+  const handleCartHover = () => dispatch({ type: 'cartHover' })
+  const handleCloseCart = () => dispatch({ type: 'closeCart' })
+
   const redirectToCheckout = async (sessionId) => {
-    console.log('firing redirectToCheckout')
     const options = {
-      items: checkoutData,
+      items: getCheckoutData.stripe(cart),
       successUrl,
       cancelUrl,
       billingAddressCollection: billingAddressCollection ? 'required' : 'auto',
@@ -322,7 +140,6 @@ export const useShoppingCart = () => {
       }
     }
 
-    console.log('stripe:', stripe)
     if (stripe === null) {
       throw new Error('Stripe is not defined')
     }
@@ -338,19 +155,23 @@ export const useShoppingCart = () => {
   }
 
   return {
-    addItem,
+    cartDetails,
     cartCount,
-    redirectToCheckout,
+    totalPrice: formatCurrencyString({ value: totalPrice, currency, language }),
+
+    addItem,
+    removeItem,
+    incrementItem,
+    decrementItem,
+    clearCart,
+
     lastClicked,
     storeLastClicked,
     shouldDisplayCart,
     handleCartClick,
-    cartDetails,
     handleCartHover,
     handleCloseCart,
-    totalPrice,
-    removeCartItem,
-    reduceItemByOne,
-    clearCart
+
+    redirectToCheckout
   }
 }

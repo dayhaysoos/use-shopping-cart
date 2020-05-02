@@ -76,7 +76,7 @@ const createWrapper = (props = {}) => ({ children }) => (
   </CartProvider>
 )
 
-describe.skip('useShoppingCart', () => {
+describe('useShoppingCart', () => {
   let result
   beforeEach(() => {
     const wrapper = createWrapper()
@@ -386,7 +386,7 @@ describe('useShoppingCart redirectToCheckout', () => {
   })
 })
 
-describe.skip('useShoppingCart persistency', () => {
+describe('useShoppingCart persistency', () => {
   function cartValuesFromStorage() {
     return JSON.parse(window.localStorage.getItem('cart-values'))
   }
@@ -430,7 +430,8 @@ describe.skip('useShoppingCart persistency', () => {
       result.current.clearCart()
     })
 
-    expect(result.current.cartItems).toEqual([])
+    expect(result.current.cartDetails).toEqual({})
+    expect(result.current.totalPrice).toEqual('$0.00')
   })
 })
 
@@ -451,5 +452,20 @@ describe('useShoppingCart stripe handling', () => {
     } catch (e) {
       expect(e).toEqual(new Error('Stripe is not defined'))
     }
+  })
+})
+
+describe.only('useShoppingCart()', () => {
+  let result
+  beforeEach(() => {
+    const wrapper = createWrapper()
+    result = renderHook(() => useShoppingCart(), { wrapper }).result
+  })
+
+  it('add item to the cart', () => {
+    act(() => {
+      result.current.addItem(mockSku)
+    })
+    expect(result.current.cartDetails[mockSku.sku].quantity).toBe(1)
   })
 })
