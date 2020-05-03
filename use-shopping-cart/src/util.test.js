@@ -10,6 +10,7 @@ describe('getCheckoutData', () => {
     totalPrice: 550, // 100 * 1 + 150 * 2 + 50 * 3
     cartCount: 6
   }
+
   it('stripe()', () => {
     expect(getCheckoutData.stripe(cart)).toBe([
       { sku: 'sku1', quantity: 1 },
