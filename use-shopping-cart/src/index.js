@@ -157,15 +157,20 @@ export const useShoppingCart = () => {
   return {
     cartDetails,
     cartCount,
-    totalPrice: formatCurrencyString({ value: totalPrice, currency, language }),
-
+    totalPrice,
+    get formattedTotalPrice() {
+      return formatCurrencyString({
+        value: totalPrice,
+        currency,
+        language
+      })
+    },
     addItem,
     removeItem,
     setItemQuantity,
     incrementItem,
     decrementItem,
     clearCart,
-
     lastClicked,
     storeLastClicked,
     shouldDisplayCart,
