@@ -66,7 +66,7 @@ describe('validateCartItems', () => {
     ).toStrictEqual([
       {
         name: inventory[0].name,
-        amount: 1200,
+        amount: 400,
         currency: inventory[0].currency,
         quantity: mockDetailedSku[inventory[0].sku].quantity
       },

@@ -9,7 +9,7 @@ const validateCartItems = (inventorySrc, cartDetails) => {
     )
     validatedItems.push({
       name: validatedItem.name,
-      amount: validatedItem.price * product.quantity,
+      amount: validatedItem.price,
       currency: validatedItem.currency,
       quantity: product.quantity
     })
