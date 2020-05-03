@@ -5,7 +5,29 @@ title: addItem()
 import CartDisplayWrapper from 'components/cart-display-wrapper'
 import AddItem from 'components/add-item'
 
-To add a product to the cart, use `useShoppingCart()`'s `addItem(product)` method. It takes in your product object, which must have a `sku` and a `price`, and adds it to the cart.
+To add a product to the cart, use `useShoppingCart()`'s `addItem(product)` method. It takes in your product object which must be in the following shape:
+
+| Key           | Value (type)                                                    | Required                    |
+| :------------ | :-------------------------------------------------------------- | :-------------------------- |
+| `name`        | Name of the product to be shown on the Checkout page (string)   | Yes in CheckoutSession mode |
+| `description` | description to be shown on the Stripe Checkout page (string)    | No                          |
+| `sku`         | A unique identifier (stock keeping unit) for this item (string) | Yes                         |
+| `price`       | Price in smallest currency unit (number)                        | Yes                         |
+| `currency`    | ISO currency code (string)                                      | No                          |
+| `image`       | Image to be shown on the Stripe Checkout page (string)          | No                          |
+
+```js
+const products = [
+  {
+    name: 'Bananas',
+    description: 'Yummy yellow fruit',
+    sku: 'sku_banana001',
+    price: 400,
+    currency: 'USD',
+    image: 'https://my-image.com/banana.jpg',
+  },
+]
+```
 
 <CartDisplayWrapper>
   <AddItem
