@@ -44,7 +44,7 @@ export const CartProvider = ({
   const [cart, cartDispatch] = useReducer(cartReducer, cartInitialState)
 
   useEffect(() => {
-    cartDispatch({ type: 'stripe changed', stripe })
+    cartDispatch({ type: 'stripe-changed', stripe })
   }, [stripe])
 
   const [cartValues, cartValuesDispatch] = useLocalStorageReducer(

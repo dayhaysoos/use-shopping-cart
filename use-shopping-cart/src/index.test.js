@@ -369,9 +369,9 @@ describe('useShoppingCart()', () => {
       })
 
       const snapshot = {
-        cartDetails: cart.cartDetails,
-        cartCount: cart.cartCount,
-        totalPrice: cart.totalPrice
+        cartDetails: cart.current.cartDetails,
+        cartCount: cart.current.cartCount,
+        totalPrice: cart.current.totalPrice
       }
 
       reload()
@@ -389,7 +389,7 @@ describe('useShoppingCart()', () => {
       const emptyCart = {
         cartDetails: {},
         cartCount: 0,
-        totalPrice: '$0.00'
+        totalPrice: 0
       }
 
       expect(cart.current).toMatchObject(emptyCart)
@@ -404,13 +404,15 @@ describe('redirectToCheckout()', () => {
     stripeMock.redirectToCheckout.mockClear()
   })
 
-  it('should send the correct default values', () => {
+  it('should send the correct default values', async () => {
     const wrapper = createWrapper()
     const cart = renderHook(() => useShoppingCart(), { wrapper }).result
 
     const product = mockProduct()
-    act(() => cart.current.addItem(product))
-    cart.current.redirectToCheckout()
+    act(() => {
+      cart.current.addItem(product)
+    })
+    await cart.current.redirectToCheckout()
 
     expect(stripeMock.redirectToCheckout).toHaveBeenCalled()
     expect(stripeMock.redirectToCheckout.mock.calls[0][0]).toEqual({
@@ -422,7 +424,7 @@ describe('redirectToCheckout()', () => {
     })
   })
 
-  it('should send all formatted items', () => {
+  it('should send all formatted items', async () => {
     const wrapper = createWrapper()
     const cart = renderHook(() => useShoppingCart(), { wrapper }).result
 
@@ -433,7 +435,7 @@ describe('redirectToCheckout()', () => {
       cart.current.addItem(product1, 2)
       cart.current.addItem(product2, 9)
     })
-    cart.current.redirectToCheckout()
+    await cart.current.redirectToCheckout()
 
     const expectedItems = [
       { sku: product1.sku, quantity: 2 },
@@ -446,11 +448,11 @@ describe('redirectToCheckout()', () => {
     )
   })
 
-  it('should send correct billingAddressCollection', () => {
+  it('should send correct billingAddressCollection', async () => {
     const wrapper = createWrapper({ billingAddressCollection: true })
     const cart = renderHook(() => useShoppingCart(), { wrapper }).result
 
-    cart.current.redirectToCheckout()
+    await cart.current.redirectToCheckout()
 
     expect(stripeMock.redirectToCheckout).toHaveBeenCalled()
     expect(
@@ -458,11 +460,11 @@ describe('redirectToCheckout()', () => {
     ).toBe('required')
   })
 
-  it('should send correct shippingAddressCollection', () => {
+  it('should send correct shippingAddressCollection', async () => {
     const wrapper = createWrapper({ allowedCountries: ['US', 'CA'] })
     const cart = renderHook(() => useShoppingCart(), { wrapper }).result
 
-    cart.current.redirectToCheckout()
+    await cart.current.redirectToCheckout()
 
     expect(stripeMock.redirectToCheckout).toHaveBeenCalled()
     expect(
@@ -473,10 +475,10 @@ describe('redirectToCheckout()', () => {
 })
 
 describe('stripe handling', () => {
-  it('if stripe is defined, redirectToCheckout can be called', () => {
+  it('if stripe is defined, redirectToCheckout can be called', async () => {
     const wrapper = createWrapper()
     const cart = renderHook(() => useShoppingCart(), { wrapper }).result
-    cart.current.redirectToCheckout()
+    await cart.current.redirectToCheckout()
     expect(stripeMock.redirectToCheckout).toHaveBeenCalled()
   })
 
