@@ -111,16 +111,19 @@ export const useShoppingCart = () => {
   const addItem = (product, count = 1) =>
     dispatch({ type: 'add-item-to-cart', product, count })
   const removeItem = (sku) => dispatch({ type: 'remove-item-from-cart', sku })
+  const setItemQuantity = (sku, quantity) =>
+    dispatch({ type: 'set-item-quantity', sku, quantity })
   const incrementItem = (sku, count = 1) =>
     dispatch({ type: 'increment-item', sku, count })
   const decrementItem = (sku, count = 1) =>
     dispatch({ type: 'decrement-item', sku, count })
   const clearCart = () => dispatch({ type: 'clear-cart' })
 
-  const storeLastClicked = (sku) => dispatch({ type: 'storeLastClicked', sku })
-  const handleCartClick = () => dispatch({ type: 'cartClick' })
-  const handleCartHover = () => dispatch({ type: 'cartHover' })
-  const handleCloseCart = () => dispatch({ type: 'closeCart' })
+  const storeLastClicked = (sku) =>
+    dispatch({ type: 'store-last-clicked', sku })
+  const handleCartClick = () => dispatch({ type: 'cart-click' })
+  const handleCartHover = () => dispatch({ type: 'cart-hover' })
+  const handleCloseCart = () => dispatch({ type: 'close-cart' })
 
   const redirectToCheckout = async (sessionId) => {
     const options = {
@@ -158,6 +161,7 @@ export const useShoppingCart = () => {
 
     addItem,
     removeItem,
+    setItemQuantity,
     incrementItem,
     decrementItem,
     clearCart,

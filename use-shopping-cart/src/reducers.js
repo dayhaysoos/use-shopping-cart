@@ -2,31 +2,31 @@ import { formatCurrencyString } from './util'
 
 export function cartReducer(cart, action) {
   switch (action.type) {
-    case 'storeLastClicked':
+    case 'store-last-clicked':
       return {
         ...cart,
         lastClicked: action.skuID
       }
 
-    case 'cartClick':
+    case 'cart-click':
       return {
         ...cart,
         shouldDisplayCart: !cart.shouldDisplayCart
       }
 
-    case 'cartHover':
+    case 'cart-hover':
       return {
         ...cart,
         shouldDisplayCart: true
       }
 
-    case 'closeCart':
+    case 'close-cart':
       return {
         ...cart,
         shouldDisplayCart: false
       }
 
-    case 'stripe changed':
+    case 'stripe-changed':
       return {
         ...cart,
         stripe: action.stripe
@@ -86,6 +86,10 @@ export function cartValuesReducer(state, action) {
 
     return { cartDetails, totalPrice, cartCount }
   }
+  function updateQuantity(sku, quantity) {
+    const entry = state.cartDetails[sku]
+    return updateEntry(sku, quantity - entry.quantity)
+  }
 
   switch (action.type) {
     case 'add-item-to-cart':
@@ -97,22 +101,25 @@ export function cartValuesReducer(state, action) {
 
     case 'increment-item':
       if (action.count <= 0) break
-      if (action.sku in state.cartDetails) {
+      if (action.sku in state.cartDetails)
         return updateEntry(action.sku, action.count)
-      }
       break
 
     case 'decrement-item':
       if (action.count <= 0) break
-      if (action.sku in state.cartDetails) {
+      if (action.sku in state.cartDetails)
         return updateEntry(action.sku, -action.count)
+      break
+
+    case 'set-item-quantity':
+      if (action.count < 0) break
+      if (action.sku in state.cartDetails) {
+        return updateQuantity(action.sku, action.quantity)
       }
       break
 
     case 'remove-item-from-cart':
-      if (action.sku in state.cartDetails) {
-        return removeEntry(action.sku)
-      }
+      if (action.sku in state.cartDetails) return removeEntry(action.sku)
       break
 
     default:
