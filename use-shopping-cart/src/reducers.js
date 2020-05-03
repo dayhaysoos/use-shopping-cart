@@ -1,11 +1,16 @@
 import { formatCurrencyString } from './util'
 
+export const cartInitialState = {
+  lastClicked: '',
+  shouldDisplayCart: false,
+  stripe: null
+}
 export function cartReducer(cart, action) {
   switch (action.type) {
     case 'store-last-clicked':
       return {
         ...cart,
-        lastClicked: action.skuID
+        lastClicked: action.sku
       }
 
     case 'cart-click':
@@ -37,6 +42,11 @@ export function cartReducer(cart, action) {
   }
 }
 
+export const cartValuesInitialState = {
+  cartDetails: {},
+  totalPrice: 0,
+  cartCount: 0
+}
 export function cartValuesReducer(state, action) {
   function createEntry(product, count) {
     const entry = {
@@ -121,6 +131,9 @@ export function cartValuesReducer(state, action) {
     case 'remove-item-from-cart':
       if (action.sku in state.cartDetails) return removeEntry(action.sku)
       break
+
+    case 'clear-cart':
+      return cartValuesInitialState
 
     default:
       return state

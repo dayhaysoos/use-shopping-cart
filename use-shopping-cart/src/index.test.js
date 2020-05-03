@@ -44,12 +44,13 @@ describe('useShoppingCart()', () => {
   it('initial state', () => {
     expect(cart.current).toMatchObject({
       cartDetails: {},
-      totalPrice: '$0.00',
-      cartCount: 0
+      totalPrice: 0,
+      formattedTotalPrice: '$0.00',
+      cartCount: 0,
+      shouldDisplayCart: false
     })
   })
-  it.todo('removeItem() should remove correct item')
-  it.todo('decrementItem() should decrement correct item')
+
   it('storeLastClicked() updates lastClicked', () => {
     const product = mockProduct()
     act(() => {
@@ -57,10 +58,33 @@ describe('useShoppingCart()', () => {
     })
     expect(cart.current.lastClicked).toBe(product.sku)
   })
-  describe.todo('shouldDisplayCart', () => {
-    it.todo('initial value')
-    it.todo('handleCartClick() toggles value')
-    it.todo('')
+
+  describe('shouldDisplayCart', () => {
+    it('handleCartClick() toggles value', () => {
+      act(() => {
+        cart.current.handleCartClick()
+      })
+      expect(cart.current.shouldDisplayCart).toBe(true)
+
+      act(() => {
+        cart.current.handleCartClick()
+      })
+      expect(cart.current.shouldDisplayCart).toBe(false)
+    })
+
+    it('handleCartHover() opens cart', () => {
+      act(() => {
+        cart.current.handleCartHover()
+      })
+      expect(cart.current.shouldDisplayCart).toBe(true)
+    })
+
+    it('handleCloseCart() closes cart', () => {
+      act(() => {
+        cart.current.handleCloseCart()
+      })
+      expect(cart.current.shouldDisplayCart).toBe(false)
+    })
   })
 
   describe('addItem()', () => {
@@ -80,7 +104,7 @@ describe('useShoppingCart()', () => {
       expect(entry).toMatchObject(product)
 
       expect(cart.current.cartCount).toBe(1)
-      expect(cart.current.totalPrice).toBe('$2.00')
+      expect(cart.current.totalPrice).toBe(200)
     })
 
     it('adds `count` amount of items to the cart', () => {
@@ -125,7 +149,7 @@ describe('useShoppingCart()', () => {
       expect(entry2.value).toBe(product2.price)
 
       expect(cart.current.cartCount).toBe(2)
-      expect(cart.current.totalPrice).toBe('$5.00')
+      expect(cart.current.totalPrice).toBe(500)
     })
 
     it('adds multiple of the same item to the cart', () => {
@@ -144,19 +168,35 @@ describe('useShoppingCart()', () => {
       expect(entry.formattedValue).toBe('$6.50')
 
       expect(cart.current.cartCount).toBe(2)
-      expect(cart.current.totalPrice).toBe('$6.50')
+      expect(cart.current.totalPrice).toBe(650)
     })
   })
 
-  it('removeItem()', () => {
-    const product = mockProduct()
+  describe('removeItem()', () => {
+    it('removes the item from the cart', () => {
+      const product = mockProduct()
 
-    act(() => {
-      cart.current.addItem(product)
-      cart.current.removeItem(product.sku)
+      act(() => {
+        cart.current.addItem(product)
+        cart.current.removeItem(product.sku)
+      })
+
+      expect(cart.current.cartDetails).not.toHaveProperty(product.sku)
     })
 
-    expect(cart.current.cartDetails).not.toHaveProperty(product.sku)
+    it('should remove correct item', () => {
+      const product1 = mockProduct()
+      const product2 = mockProduct()
+
+      act(() => {
+        cart.current.addItem(product1, 2)
+        cart.current.addItem(product2, 4)
+        cart.current.removeItem(product1.sku)
+      })
+
+      expect(cart.current.cartDetails).not.toHaveProperty(product1.sku)
+      expect(cart.current.cartDetails).toHaveProperty(product2.sku)
+    })
   })
 
   describe('incrementItem()', () => {
@@ -216,7 +256,7 @@ describe('useShoppingCart()', () => {
       expect(entry.formattedValue).toBe('$5.12')
 
       expect(cart.current.cartCount).toBe(2)
-      expect(cart.current.totalPrice).toBe('$5.12')
+      expect(cart.current.totalPrice).toBe(512)
     })
 
     it('removes `count` amount of that item from the cart', () => {
@@ -254,7 +294,7 @@ describe('useShoppingCart()', () => {
       })
 
       expect(cart.current.cartDetails).not.toHaveProperty(product.sku)
-      expect(cart.current.totalPrice).toBe('$0.00')
+      expect(cart.current.totalPrice).toBe(0)
       expect(cart.current.cartCount).toBe(0)
     })
 
@@ -267,8 +307,22 @@ describe('useShoppingCart()', () => {
       })
 
       expect(cart.current.cartDetails).not.toHaveProperty(product.sku)
-      expect(cart.current.totalPrice).toBe('$0.00')
+      expect(cart.current.totalPrice).toBe(0)
       expect(cart.current.cartCount).toBe(0)
+    })
+
+    it('should decrement correct item', () => {
+      const product1 = mockProduct()
+      const product2 = mockProduct()
+
+      act(() => {
+        cart.current.addItem(product1, 2)
+        cart.current.addItem(product2, 4)
+        cart.current.decrementItem(product2.sku)
+      })
+
+      expect(cart.current.cartDetails[product1.sku].quantity).toBe(2)
+      expect(cart.current.cartDetails[product2.sku].quantity).toBe(3)
     })
   })
 

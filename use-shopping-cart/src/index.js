@@ -13,7 +13,12 @@ import {
   getCheckoutData,
   formatCurrencyString
 } from './util'
-import { cartReducer, cartValuesReducer } from './reducers'
+import {
+  cartInitialState,
+  cartReducer,
+  cartValuesInitialState,
+  cartValuesReducer
+} from './reducers'
 
 export { formatCurrencyString, isClient } from './util'
 
@@ -21,7 +26,7 @@ export const CartContext = createContext([
   {
     lastClicked: '',
     shouldDisplayCart: false,
-    cartItems: []
+    ...cartValuesInitialState
   },
   () => {}
 ])
@@ -36,17 +41,7 @@ export const CartProvider = ({
   billingAddressCollection = false,
   allowedCountries = null
 }) => {
-  const [cart, cartDispatch] = useReducer(cartReducer, {
-    lastClicked: '',
-    shouldDisplayCart: false,
-    stripe,
-    successUrl,
-    cancelUrl,
-    currency,
-    language,
-    billingAddressCollection,
-    allowedCountries
-  })
+  const [cart, cartDispatch] = useReducer(cartReducer, cartInitialState)
 
   useEffect(() => {
     cartDispatch({ type: 'stripe changed', stripe })
@@ -55,20 +50,40 @@ export const CartProvider = ({
   const [cartValues, cartValuesDispatch] = useLocalStorageReducer(
     'cart-items',
     cartValuesReducer,
-    { cartDetails: {}, totalPrice: 0, cartCount: 0 }
+    cartValuesInitialState
   )
 
   // combine dispatches and
   // memoize context value to avoid causing re-renders
   const contextValue = useMemo(
     () => [
-      { ...cart, ...cartValues },
+      {
+        ...cart,
+        ...cartValues,
+        successUrl,
+        cancelUrl,
+        currency,
+        language,
+        billingAddressCollection,
+        allowedCountries
+      },
       (action) => {
         cartDispatch(action)
         cartValuesDispatch({ ...action, currency, language })
       }
     ],
-    [cart, cartDispatch, cartValues, cartValuesDispatch]
+    [
+      cart,
+      cartDispatch,
+      cartValues,
+      cartValuesDispatch,
+      successUrl,
+      cancelUrl,
+      currency,
+      language,
+      billingAddressCollection,
+      allowedCountries
+    ]
   )
 
   return (
