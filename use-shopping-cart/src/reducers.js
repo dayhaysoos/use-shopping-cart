@@ -38,10 +38,10 @@ export function cartReducer(cart, action) {
 }
 
 export function cartValuesReducer(state, action) {
-  function createEntry(product) {
+  function createEntry(product, count) {
     const entry = {
       ...product,
-      quantity: 1,
+      quantity: count,
       get value() {
         return this.price * this.quantity
       },
@@ -59,13 +59,17 @@ export function cartValuesReducer(state, action) {
         ...state.cartDetails,
         [product.sku]: entry
       },
-      totalPrice: state.totalPrice + product.price,
-      cartCount: state.cartCount + 1
+      totalPrice: state.totalPrice + product.price * count,
+      cartCount: state.cartCount + count
     }
   }
   function updateEntry(sku, count) {
     const cartDetails = { ...state.cartDetails }
     const entry = cartDetails[sku]
+    if (entry.quantity + count <= 0) {
+      return removeEntry(sku)
+    }
+
     entry.quantity += count
 
     return {
@@ -85,18 +89,21 @@ export function cartValuesReducer(state, action) {
 
   switch (action.type) {
     case 'add-item-to-cart':
+      if (action.count <= 0) break
       if (action.product.sku in state.cartDetails) {
-        return updateEntry(action.product.sku, 1)
+        return updateEntry(action.product.sku, action.count)
       }
+      return createEntry(action.product, action.count)
 
-      return createEntry(action.product)
     case 'increment-item':
+      if (action.count <= 0) break
       if (action.sku in state.cartDetails) {
         return updateEntry(action.sku, action.count)
       }
       break
 
     case 'decrement-item':
+      if (action.count <= 0) break
       if (action.sku in state.cartDetails) {
         return updateEntry(action.sku, -action.count)
       }
@@ -112,5 +119,6 @@ export function cartValuesReducer(state, action) {
       return state
   }
 
+  console.warn('Invalid action arguments', action)
   return state
 }

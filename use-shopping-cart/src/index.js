@@ -108,13 +108,14 @@ export const useShoppingCart = () => {
     language
   } = cart
 
-  const addItem = (product) => dispatch({ type: 'add-item-to-cart', product })
+  const addItem = (product, count = 1) =>
+    dispatch({ type: 'add-item-to-cart', product, count })
   const removeItem = (sku) => dispatch({ type: 'remove-item-from-cart', sku })
   const incrementItem = (sku, count = 1) =>
     dispatch({ type: 'increment-item', sku, count })
   const decrementItem = (sku, count = 1) =>
     dispatch({ type: 'decrement-item', sku, count })
-  const clearCart = () => dispatch({ type: 'clearCart' })
+  const clearCart = () => dispatch({ type: 'clear-cart' })
 
   const storeLastClicked = (sku) => dispatch({ type: 'storeLastClicked', sku })
   const handleCartClick = () => dispatch({ type: 'cartClick' })
