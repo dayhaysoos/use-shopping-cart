@@ -2,7 +2,8 @@
   "private": true,
   "workspaces": [
     "examples/*",
-    "use-shopping-cart"
+    "use-shopping-cart",
+    "documentation"
   ],
   "scripts": {
     "dev": "yarn workspace use-shopping-cart dev",

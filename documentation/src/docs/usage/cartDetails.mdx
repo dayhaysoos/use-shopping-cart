@@ -1,0 +1,106 @@
+---
+title: cartDetails
+---
+
+import CartDisplayWrapper from 'components/cart-display-wrapper'
+import AddItem from 'components/add-item'
+
+Once the user has added their items to the cart, you can use the `cartDetails` object to display the different data about each product in their cart.
+
+Each product in `cartDetails` contains the same data you provided when you called `addItem(product)`. In addition, `cartDetails` also provides the following properties:
+
+<table>
+  <tr>
+    <th>Name</th>
+    <th>Value</th>
+  </tr>
+  <tr>
+    <td>
+      <p>quantity</p>
+    </td>
+    <td>Number of that product added to the cart</td>
+  </tr>
+  <tr>
+    <td>
+      <p>value</p>
+    </td>
+    <td>
+      The <p>price * quantity</p>
+    </td>
+  </tr>
+  <tr>
+    <td>
+      <p>formattedValue</p>
+    </td>
+    <td>
+      A currency formatted version of <p>value</p>
+    </td>
+  </tr>
+</table>
+
+<CartDisplayWrapper>
+  <AddItem
+  product={{
+    name: 'Bananas',
+    sku: 'sku_GBJ2Ep8246qeeT',
+    price: 400,
+    image:
+      'https://images.unsplash.com/photo-1574226516831-e1dff420e562?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=1050&q=80',
+    currency: 'USD',
+  }}
+/>
+
+</CartDisplayWrapper>
+
+```jsx
+import { useShoppingCart } from 'use-shopping-cart'
+
+export function CartItems() {
+  const {
+    cartDetails,
+    reduceItemByOne,
+    addItem,
+    removeCartItem,
+  } = useShoppingCart()
+
+  const cart = []
+  // Note: Object.keys().map() takes 2x as long as a for-in loop
+  for (const sku in cartDetails) {
+    const cartEntry = cartDetails[sku]
+
+    // all of your basic product data still exists (i.e. name, image, price)
+    cart.push(
+      <article>
+        {/* image here */}
+        {/* name here */}
+        <p>Line total: {cartEntry.formattedValue}</p>
+
+        {/* What if we want to remove one of the item... or add one */}
+        <button
+          onClick={() => reduceItemByOne(cartEntry.sku)}
+          aria-label={`Remove one ${cartEntry.name} from your cart`}
+        >
+          -
+        </button>
+        <p>Quantity: {cartEntry.quantity}</p>
+        <button
+          onClick={() => addItem(cartEntry)}
+          aria-label={`Add one ${cartEntry.name} to your cart`}
+        >
+          +
+        </button>
+
+        {/* What if we don't want this product at all */}
+        <button
+          onClick={() => removeCartItem(cartEntry.sku)}
+          aria-label={`Remove all ${cartEntry.name} from your cart`}
+        >
+          Remove
+        </button>
+      </article>
+    )
+  }
+
+  return cart
+}
+```
