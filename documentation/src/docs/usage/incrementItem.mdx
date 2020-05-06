@@ -1,14 +1,14 @@
 ---
-title: addItem()
+title: incrementItem()
 ---
 
 import CartDisplayWrapper from 'components/cart-display-wrapper'
-import AddItem from 'components/add-item'
+import IncrementItem from 'components/increment-item'
 
-To add a product to the cart, use `useShoppingCart()`'s `addItem(product)` method. It takes in your product object, which must have a `sku` and a `price`, and adds it to the cart.
+To add a product to the cart, use `useShoppingCart()`'s `incrementItem(product)` method. It takes in your product object, which must have a `sku` and a `price`, and adds it to the cart.
 
 <CartDisplayWrapper>
-  <AddItem
+  <IncrementItem
   product={{
     name: 'Bananas',
     sku: 'sku_GBJ2Ep8246qeeT',
@@ -23,7 +23,7 @@ To add a product to the cart, use `useShoppingCart()`'s `addItem(product)` metho
 
 ```jsx
 export function Product({ product }) {
-  const { addItem } = useShoppingCart()
+  const { incrementItem } = useShoppingCart()
 
   /* A helper function that turns the price into a readable format */
   const price = formatCurrencyString({
@@ -52,7 +52,7 @@ export function Product({ product }) {
       <p>{price}</p>
       {/* Adds the item to the cart */}
       <button
-        onClick={() => addItem(product)}
+        onClick={() => incrementItem(product)}
         aria-label={`Add ${product.name} to your cart`}
         style={{ height: 50, width: 100, marginBottom: 30 }}
       >

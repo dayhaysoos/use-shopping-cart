@@ -41,7 +41,7 @@ const handleClick = (e) => {
   if (hasItems) {
     redirectToCheckout()
   } else {
-    alert('Please head to addItem() and add an item to the cart')
+    alert('Please head to incrementItem() and add an item to the cart')
   }
 }
 
@@ -73,7 +73,7 @@ return (
 
     {!hasItems && (
       <p style={{ color: 'black' }}>
-        Please go to <Link to={'/usage/addItem()'}>addItem()</Link> and add an
+        Please go to <Link to={'/usage/incrementItem()'}>incrementItem()</Link> and add an
         item to the cart
       </p>
     )}

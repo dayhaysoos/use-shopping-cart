@@ -7,11 +7,11 @@ const CartDisplay = () => {
     cartDetails,
     cartItems,
     cartCount,
-    addItem,
+    incrementItem,
     removeCartItem,
     totalPrice,
     redirectToCheckout,
-    reduceItemByOne,
+    decrementItem,
     clearCart,
   } = useShoppingCart();
 
@@ -71,13 +71,13 @@ const CartDisplay = () => {
                 <span sx={{ display: 'block' }}>qty: {quantity}</span>
                 <Button
                   backgroundColor={'black'}
-                  onClick={() => addItem(cartItem)}
+                  onClick={() => incrementItem(cartItem)}
                 >
                   +
                 </Button>
                 <Button
                   backgroundColor={'black'}
-                  onClick={() => reduceItemByOne(sku)}
+                  onClick={() => decrementItem(sku)}
                 >
                   -
                 </Button>

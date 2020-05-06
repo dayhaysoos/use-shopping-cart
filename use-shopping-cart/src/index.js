@@ -55,7 +55,7 @@ const formatDetailedCart = (currency, cartItems, language) => {
   }, {})
 }
 
-const reduceItemByOne = (skuID, cartItems) => {
+const decrementItem = (skuID, cartItems) => {
   const newCartItems = []
   let removedItem = false
 
@@ -120,8 +120,8 @@ function cartItemsReducer(cartItems, action) {
       return [...cartItems, action.product]
     case 'removeCartItem':
       return cartItems.filter((item) => item.sku !== action.sku)
-    case 'reduceItemByOne':
-      return reduceItemByOne(action.sku, cartItems)
+    case 'decrementItem':
+      return decrementItem(action.sku, cartItems)
     case 'clearCart':
       return []
     default:
@@ -234,7 +234,7 @@ export const useShoppingCart = () => {
 
   const cartCount = cartItems.length
 
-  const addItem = (product) => {
+  const incrementItem = (product) => {
     dispatch({ type: 'addToCart', product })
   }
 
@@ -242,8 +242,8 @@ export const useShoppingCart = () => {
     dispatch({ type: 'removeCartItem', sku })
   }
 
-  const reduceItemByOne = (sku) => {
-    dispatch({ type: 'reduceItemByOne', sku })
+  const decrementItem = (sku) => {
+    dispatch({ type: 'decrementItem', sku })
   }
 
   const storeLastClicked = (skuID) =>
@@ -287,7 +287,7 @@ export const useShoppingCart = () => {
   }
 
   return {
-    addItem,
+    incrementItem,
     cartCount,
     checkoutData,
     redirectToCheckout,
@@ -301,7 +301,7 @@ export const useShoppingCart = () => {
     handleCloseCart,
     totalPrice,
     removeCartItem,
-    reduceItemByOne,
+    decrementItem,
     clearCart
   }
 }

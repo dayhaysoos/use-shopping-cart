@@ -121,13 +121,13 @@ export function App() {
 
 #### How do I add an item to the user's cart?
 
-To add a product to the cart, use `useShoppingCart()`'s `addItem(product)` method. It takes in your product object, which must have a `sku` and a `price`, and adds it to the cart.
+To add a product to the cart, use `useShoppingCart()`'s `incrementItem(product)` method. It takes in your product object, which must have a `sku` and a `price`, and adds it to the cart.
 
 ```jsx
 import { useShoppingCart, formatCurrencyString } from 'use-shopping-cart';
 
 export function Product({ product }) {
-  const { addItem } = useShoppingCart();
+  const { incrementItem } = useShoppingCart();
 
   /* A helper function that turns the price into a readable format */
   const price = formatCurrencyString({
@@ -146,7 +146,7 @@ export function Product({ product }) {
 
       {/* Adds the item to the cart */}
       <button
-        onClick={() => addItem(product)}
+        onClick={() => incrementItem(product)}
         aria-label={`Add ${product.name} to your cart`}
       >
         Add to cart
@@ -160,7 +160,7 @@ export function Product({ product }) {
 
 Once the user has added their items to the cart, you can use the `cartDetails` object to display the different data about each product in their cart.
 
-Each product in `cartDetails` contains the same data you provided when you called `addItem(product)`. In addition, `cartDetails` also provides the following properties:
+Each product in `cartDetails` contains the same data you provided when you called `incrementItem(product)`. In addition, `cartDetails` also provides the following properties:
 
 <table>
   <tr>
@@ -187,8 +187,8 @@ import { useShoppingCart } from 'use-shopping-cart';
 export function CartItems() {
   const {
     cartDetails,
-    reduceItemByOne,
-    addItem,
+    decrementItem,
+    incrementItem,
     removeCartItem,
   } = useShoppingCart();
 
@@ -207,14 +207,14 @@ export function CartItems() {
 
         {/* What if we want to remove one of the item... or add one */}
         <button
-          onClick={() => reduceItemByOne(cartEntry.sku)}
+          onClick={() => decrementItem(cartEntry.sku)}
           aria-label={`Remove one ${cartEntry.name} from your cart`}
         >
           -
         </button>
         <p>Quantity: {cartEntry.quantity}</p>
         <button
-          onClick={() => addItem(cartEntry)}
+          onClick={() => incrementItem(cartEntry)}
           aria-label={`Add one ${cartEntry.name} to your cart`}
         >
           +
@@ -235,10 +235,10 @@ export function CartItems() {
 }
 ```
 
-Note that in the above code, to reduce the quantity of a product in the user's cart, you must pass an SKU to `reduceItemByOne()` like so:
+Note that in the above code, to reduce the quantity of a product in the user's cart, you must pass an SKU to `decrementItem()` like so:
 
 ```js
-reduceItemByOne(cartEntry.sku);
+decrementItem(cartEntry.sku);
 ```
 
 Just like you can reduce the quantity of a product you can remove the product entirely with `removeCartItem()`:
@@ -247,10 +247,10 @@ Just like you can reduce the quantity of a product you can remove the product en
 removeCartItem(cartEntry.sku);
 ```
 
-However, those two examples differ from the way that you increase the quantity of a product in the user's cart. Currently, to do this, you must pass the entire `cartEntry` to `addItem()`:
+However, those two examples differ from the way that you increase the quantity of a product in the user's cart. Currently, to do this, you must pass the entire `cartEntry` to `incrementItem()`:
 
 ```js
-addItem(cartEntry);
+incrementItem(cartEntry);
 ```
 
 ## API
@@ -307,12 +307,12 @@ Returns an object with all the following properties and methods:
     <th>Return Type</th>
   </tr>
   <tr>
-    <td><a href="https://use-shopping-cart.netlify.app/usage/addItem()"><code>addItem()</code></a></td>
+    <td><a href="https://use-shopping-cart.netlify.app/usage/incrementItem()"><code>incrementItem()</code></a></td>
     <td>product: Object</td>
     <td>N/A</td>
   </tr>
   <tr>
-    <td><a href="https://use-shopping-cart.netlify.app/usage/reduceItemByOne()"><code>reduceItemByOne()</code></a></td>
+    <td><a href="https://use-shopping-cart.netlify.app/usage/decrementItem()"><code>decrementItem()</code></a></td>
     <td>sku: string</td>
     <td>N/A</td>
   </tr>

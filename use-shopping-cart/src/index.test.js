@@ -89,17 +89,17 @@ describe('useShoppingCart', () => {
 
   it('addItems adds items to cart', () => {
     act(() => {
-      result.current.addItem(mockSku)
+      result.current.incrementItem(mockSku)
     })
 
     expect(result.current.cartItems).toEqual([mockSku])
   })
 
-  it('cartCount increments when addItem is executed', () => {
+  it('cartCount increments when incrementItem is executed', () => {
     expect(result.current.cartCount).toBe(0)
 
     act(() => {
-      result.current.addItem(mockSku)
+      result.current.incrementItem(mockSku)
     })
 
     expect(result.current.cartCount).toBe(1)
@@ -109,7 +109,7 @@ describe('useShoppingCart', () => {
     expect(result.current.checkoutData).toEqual([])
 
     act(() => {
-      result.current.addItem(mockSku)
+      result.current.incrementItem(mockSku)
     })
 
     expect(result.current.checkoutData).toEqual([
@@ -124,7 +124,7 @@ describe('useShoppingCart', () => {
     expect(result.current.checkoutData).toEqual([])
 
     act(() => {
-      result.current.addItem(mockSku)
+      result.current.incrementItem(mockSku)
     })
 
     expect(result.current.checkoutData).toEqual([
@@ -134,7 +134,7 @@ describe('useShoppingCart', () => {
 
   it('removeCartItem removes item from checkoutData array', () => {
     act(() => {
-      result.current.addItem(mockSku)
+      result.current.incrementItem(mockSku)
     })
 
     expect(result.current.checkoutData).toEqual([
@@ -150,8 +150,8 @@ describe('useShoppingCart', () => {
 
   it('removeCartItem removes the correct item from the cart', () => {
     act(() => {
-      result.current.addItem(mockSku)
-      result.current.addItem(mockSku2)
+      result.current.incrementItem(mockSku)
+      result.current.incrementItem(mockSku2)
     })
 
     expect(result.current.checkoutData).toEqual([
@@ -170,7 +170,7 @@ describe('useShoppingCart', () => {
 
   it('should update totalPrice', () => {
     act(() => {
-      result.current.addItem(mockSku)
+      result.current.incrementItem(mockSku)
     })
 
     expect(result.current.totalPrice()).toBe('$2.00')
@@ -178,8 +178,8 @@ describe('useShoppingCart', () => {
 
   it('should update totalPrice when two items are added', () => {
     act(() => {
-      result.current.addItem(mockSku)
-      result.current.addItem(mockSku3)
+      result.current.incrementItem(mockSku)
+      result.current.incrementItem(mockSku3)
     })
 
     expect(result.current.totalPrice()).toBe('$3.00')
@@ -216,7 +216,7 @@ describe('useShoppingCart', () => {
 
   it('cartDetails should add give back a more detailed version of what skus gives back', () => {
     act(() => {
-      result.current.addItem(mockSku)
+      result.current.incrementItem(mockSku)
     })
 
     expect(result.current.cartDetails).toEqual(mockDetailedSku)
@@ -224,13 +224,13 @@ describe('useShoppingCart', () => {
 
   it('cartDetails will increase quantitave values when same item is added to cart', () => {
     act(() => {
-      result.current.addItem(mockSku)
+      result.current.incrementItem(mockSku)
     })
 
     expect(result.current.cartDetails).toEqual(mockDetailedSku)
 
     act(() => {
-      result.current.addItem(mockSku)
+      result.current.incrementItem(mockSku)
     })
 
     expect(result.current.cartDetails).toEqual({
@@ -248,8 +248,8 @@ describe('useShoppingCart', () => {
 
   it('cartDetails can add 2 skus', () => {
     act(() => {
-      result.current.addItem(mockSku)
-      result.current.addItem(mockSku2)
+      result.current.incrementItem(mockSku)
+      result.current.incrementItem(mockSku2)
     })
 
     expect(result.current.cartDetails).toEqual({
@@ -260,7 +260,7 @@ describe('useShoppingCart', () => {
 
   it('cartItems gets items removed when removeCartItem is ran', () => {
     act(() => {
-      result.current.addItem(mockSku)
+      result.current.incrementItem(mockSku)
     })
 
     expect(result.current.cartItems).toEqual([mockSku])
@@ -274,8 +274,8 @@ describe('useShoppingCart', () => {
 
   it('cartItems gets one item removed when removeCartItem is ran', () => {
     act(() => {
-      result.current.addItem(mockSku)
-      result.current.addItem(mockSku2)
+      result.current.incrementItem(mockSku)
+      result.current.incrementItem(mockSku2)
     })
 
     expect(result.current.cartItems).toEqual([mockSku, mockSku2])
@@ -287,32 +287,32 @@ describe('useShoppingCart', () => {
     expect(result.current.cartItems).toEqual([mockSku2])
   })
 
-  it('reduceItemByOne reduces the cartItem amount of the target SKU by one', () => {
+  it('decrementItem reduces the cartItem amount of the target SKU by one', () => {
     act(() => {
-      result.current.addItem(mockSku)
-      result.current.addItem(mockSku)
-      result.current.addItem(mockSku)
+      result.current.incrementItem(mockSku)
+      result.current.incrementItem(mockSku)
+      result.current.incrementItem(mockSku)
     })
 
     expect(result.current.cartItems.length).toEqual(3)
 
     act(() => {
-      result.current.reduceItemByOne(mockSku.sku)
+      result.current.decrementItem(mockSku.sku)
     })
     expect(result.current.cartItems.length).toEqual(2)
   })
 
-  it('reduceItemByOne reduces the cartItems amount of the target SKU by one even when other SKUs are present', () => {
+  it('decrementItem reduces the cartItems amount of the target SKU by one even when other SKUs are present', () => {
     act(() => {
-      result.current.addItem(mockSku)
-      result.current.addItem(mockSku)
-      result.current.addItem(mockSku)
-      result.current.addItem(mockSku2)
+      result.current.incrementItem(mockSku)
+      result.current.incrementItem(mockSku)
+      result.current.incrementItem(mockSku)
+      result.current.incrementItem(mockSku2)
     })
     expect(result.current.cartItems.length).toEqual(4)
 
     act(() => {
-      result.current.reduceItemByOne(mockSku.sku)
+      result.current.decrementItem(mockSku.sku)
     })
     expect(result.current.cartItems.length).toEqual(3)
   })
@@ -344,8 +344,8 @@ describe('useShoppingCart redirectToCheckout', () => {
     const { result } = renderHook(() => useShoppingCart(), { wrapper })
 
     act(() => {
-      result.current.addItem(mockSku)
-      result.current.addItem(mockSku)
+      result.current.incrementItem(mockSku)
+      result.current.incrementItem(mockSku)
     })
     result.current.redirectToCheckout()
 
@@ -394,7 +394,7 @@ describe('useShoppingCart persistency', () => {
     const { result } = renderHook(() => useShoppingCart(), { wrapper })
 
     act(() => {
-      result.current.addItem(mockSku)
+      result.current.incrementItem(mockSku)
     })
 
     expect(cartItemsFromStorage()).toEqual(result.current.cartItems)
@@ -405,7 +405,7 @@ describe('useShoppingCart persistency', () => {
     let { result } = renderHook(() => useShoppingCart(), { wrapper })
 
     act(() => {
-      result.current.addItem(mockSku)
+      result.current.incrementItem(mockSku)
     })
 
     wrapper = createWrapper()
@@ -419,7 +419,7 @@ describe('useShoppingCart persistency', () => {
     const { result } = renderHook(() => useShoppingCart(), { wrapper })
 
     act(() => {
-      result.current.addItem(mockSku)
+      result.current.incrementItem(mockSku)
     })
 
     expect(result.current.cartItems).toEqual([mockSku])

@@ -1,14 +1,14 @@
 ---
-title: reduceItemByOne()
+title: decrementItem()
 ---
 
-`reduceItemByOne(sku)` reduces the number of a product, by its sku, in the user's cart by one. This allows the user to reduce the quantity of an item in the cart by one at a time if they added too many.
+`decrementItem(sku)` reduces the number of a product, by its sku, in the user's cart by one. This allows the user to reduce the quantity of an item in the cart by one at a time if they added too many.
 
-import CartDisplayWrapper from 'components/cart-display-wrapper'
-import ReduceItemByOne from 'components/reduce-item-by-one'
+import CartDisplayWrapper from 'components/cart-display-wrapper';
+import DecrementItem from 'components/decrement-item';
 
 <CartDisplayWrapper>
-  <ReduceItemByOne
+  <DecrementItem
     product={{
       name: 'Bananas',
       sku: 'sku_GBJ2Ep8246qeeT',
@@ -21,18 +21,18 @@ import ReduceItemByOne from 'components/reduce-item-by-one'
 </CartDisplayWrapper>
 
 ```jsx
-import { useShoppingCart } from 'use-shopping-cart'
-import { formatCurrencyString } from '../util'
+import { useShoppingCart } from 'use-shopping-cart';
+import { formatCurrencyString } from '../util';
 
 function Product(product) {
-  const { reduceItemByOne } = useShoppingCart()
+  const { decrementItem } = useShoppingCart();
 
   /* A helper function that turns the price into a readable format */
   const price = formatCurrencyString({
     value: product.price,
     currency: product.currency,
     language: 'en-US',
-  })
+  });
   return (
     <article
       style={{
@@ -54,13 +54,13 @@ function Product(product) {
       <p>{price}</p>
       {/* Adds the item to the cart */}
       <button
-        onClick={() => reduceItemByOne(product.sku)}
+        onClick={() => decrementItem(product.sku)}
         aria-label={`Remove ${product.name} from your cart`}
         style={{ height: 50, width: 100, marginBottom: 30 }}
       >
         Add to cart
       </button>
     </article>
-  )
+  );
 }
 ```

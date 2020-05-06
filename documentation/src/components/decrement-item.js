@@ -1,15 +1,15 @@
-import React from 'react'
-import { useShoppingCart, formatCurrencyString } from 'use-shopping-cart'
+import React from 'react';
+import { useShoppingCart, formatCurrencyString } from 'use-shopping-cart';
 
-export function AddItem({ product }) {
-  const { addItem } = useShoppingCart()
+export function ReduceItemByOne({ product }) {
+  const { decrementItem } = useShoppingCart();
 
   /* A helper function that turns the price into a readable format */
   const price = formatCurrencyString({
     value: product.price,
     currency: product.currency,
     language: 'en-US',
-  })
+  });
   return (
     <article
       style={{
@@ -24,21 +24,21 @@ export function AddItem({ product }) {
         <img
           style={{ height: 200, width: 250 }}
           src={product.image}
-          alt={` ${product.name}`}
+          alt={product.name}
         />
         <figcaption>{product.name}</figcaption>
       </figure>
       <p>{price}</p>
       {/* Adds the item to the cart */}
       <button
-        onClick={() => addItem(product)}
-        aria-label={`Add ${product.name} to your cart`}
+        onClick={() => decrementItem(product.sku)}
+        aria-label={`Remove ${product.name} from your cart`}
         style={{ height: 50, width: 100, marginBottom: 30 }}
       >
-        Add to cart
+        Remove from cart
       </button>
     </article>
-  )
+  );
 }
 
-export default AddItem
+export default ReduceItemByOne;

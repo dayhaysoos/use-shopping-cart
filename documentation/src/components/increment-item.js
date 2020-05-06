@@ -1,15 +1,15 @@
-import React from 'react'
-import { useShoppingCart, formatCurrencyString } from 'use-shopping-cart'
+import React from 'react';
+import { useShoppingCart, formatCurrencyString } from 'use-shopping-cart';
 
-export function ReduceItemByOne({ product }) {
-  const { reduceItemByOne } = useShoppingCart()
+export function AddItem({ product }) {
+  const { incrementItem } = useShoppingCart();
 
   /* A helper function that turns the price into a readable format */
   const price = formatCurrencyString({
     value: product.price,
     currency: product.currency,
     language: 'en-US',
-  })
+  });
   return (
     <article
       style={{
@@ -24,21 +24,21 @@ export function ReduceItemByOne({ product }) {
         <img
           style={{ height: 200, width: 250 }}
           src={product.image}
-          alt={product.name}
+          alt={` ${product.name}`}
         />
         <figcaption>{product.name}</figcaption>
       </figure>
       <p>{price}</p>
       {/* Adds the item to the cart */}
       <button
-        onClick={() => reduceItemByOne(product.sku)}
-        aria-label={`Remove ${product.name} from your cart`}
+        onClick={() => incrementItem(product)}
+        aria-label={`Add ${product.name} to your cart`}
         style={{ height: 50, width: 100, marginBottom: 30 }}
       >
-        Remove from cart
+        Add to cart
       </button>
     </article>
-  )
+  );
 }
 
-export default ReduceItemByOne
+export default IncrementItem;
