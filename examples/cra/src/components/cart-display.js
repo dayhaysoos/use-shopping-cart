@@ -8,14 +8,15 @@ const CartDisplay = () => {
     cartItems,
     cartCount,
     addItem,
-    removeCartItem,
-    totalPrice,
+    decrementItem,
+    incrementItem,
+    formattedTotalPrice,
     redirectToCheckout,
     reduceItemByOne,
     clearCart,
   } = useShoppingCart();
 
-  const handleSubmit = async (event) => {
+  const handleSubmit = async event => {
     event.preventDefault();
 
     const response = await fetch('/.netlify/functions/create-session', {
@@ -25,10 +26,10 @@ const CartDisplay = () => {
       },
       body: JSON.stringify(cartDetails),
     })
-      .then((res) => {
+      .then(res => {
         return res.json();
       })
-      .catch((error) => console.log(error));
+      .catch(error => console.log(error));
 
     redirectToCheckout({ sessionId: response.sessionId });
   };
@@ -50,7 +51,7 @@ const CartDisplay = () => {
         }}
       >
         <h2>Shopping Cart Display Panel</h2>
-        {Object.keys(cartDetails).map((item) => {
+        {Object.keys(cartDetails).map(item => {
           const cartItem = cartDetails[item];
           const { name, sku, formattedValue, quantity } = cartItem;
           return (
@@ -71,13 +72,13 @@ const CartDisplay = () => {
                 <span sx={{ display: 'block' }}>qty: {quantity}</span>
                 <Button
                   backgroundColor={'black'}
-                  onClick={() => addItem(cartItem)}
+                  onClick={() => incrementItem(sku)}
                 >
                   +
                 </Button>
                 <Button
                   backgroundColor={'black'}
-                  onClick={() => reduceItemByOne(sku)}
+                  onClick={() => decrementItem(sku)}
                 >
                   -
                 </Button>
@@ -86,7 +87,7 @@ const CartDisplay = () => {
           );
         })}
         <h3>Total Items in Cart: {cartCount}</h3>
-        <h3>Total Price: {totalPrice()}</h3>
+        <h3>Total Price: {formattedTotalPrice}</h3>
         <Box
           as={'form'}
           action={'/.netlify/functions/create-session'}
