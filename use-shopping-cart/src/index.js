@@ -48,7 +48,7 @@ export const CartProvider = ({
   }, [stripe])
 
   const [cartValues, cartValuesDispatch] = useLocalStorageReducer(
-    'cart-items',
+    'cart-values',
     cartValuesReducer,
     cartValuesInitialState
   )
