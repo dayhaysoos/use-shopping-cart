@@ -1,18 +1,17 @@
 /**@jsx jsx */
-import { jsx, Box, Flex, Image, Button } from 'theme-ui';
+import { jsx, Box, Flex, Image, Button, Input } from 'theme-ui';
 import { useShoppingCart } from 'use-shopping-cart';
 
 const CartDisplay = () => {
   const {
     cartDetails,
-    cartItems,
     cartCount,
-    incrementItem,
-    removeCartItem,
-    totalPrice,
-    redirectToCheckout,
     decrementItem,
+    incrementItem,
+    formattedTotalPrice,
+    redirectToCheckout,
     clearCart,
+    setItemQuantity,
   } = useShoppingCart();
 
   const handleSubmit = async (event) => {
@@ -52,12 +51,12 @@ const CartDisplay = () => {
         <h2>Shopping Cart Display Panel</h2>
         {Object.keys(cartDetails).map((item) => {
           const cartItem = cartDetails[item];
-          const { name, sku, formattedValue, quantity } = cartItem;
+          const { name, sku, quantity } = cartItem;
           return (
             <Flex
               key={cartItem.sku}
               sx={{
-                justifyContent: 'space-between',
+                justifyContent: 'space-around',
                 alignItems: 'center',
                 width: '100%',
               }}
@@ -66,27 +65,21 @@ const CartDisplay = () => {
                 <Image sx={{ width: 100 }} src={cartItem.image} />
                 <p>{name}</p>
               </Flex>
-              <Box>
-                <span sx={{ display: 'block' }}>Price: {formattedValue}</span>
-                <span sx={{ display: 'block' }}>qty: {quantity}</span>
-                <Button
-                  backgroundColor={'black'}
-                  onClick={() => incrementItem(cartItem)}
-                >
-                  +
-                </Button>
-                <Button
-                  backgroundColor={'black'}
-                  onClick={() => decrementItem(sku)}
-                >
-                  -
-                </Button>
-              </Box>
+              <Input
+                type={'number'}
+                max={99}
+                sx={{ width: 60 }}
+                defaultValue={quantity}
+                onChange={(e) => {
+                  const { value } = e.target;
+                  setItemQuantity(sku, value);
+                }}
+              />
             </Flex>
           );
         })}
         <h3>Total Items in Cart: {cartCount}</h3>
-        <h3>Total Price: {totalPrice()}</h3>
+        <h3>Total Price: {formattedTotalPrice}</h3>
         <Box
           as={'form'}
           action={'/.netlify/functions/create-session'}

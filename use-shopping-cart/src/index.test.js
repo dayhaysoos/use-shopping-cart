@@ -8,330 +8,415 @@ const stripeMock = {
   redirectToCheckout: jest.fn().mockReturnValue(() => Promise.resolve())
 }
 
-const INITIAL_STATE = {
-  lastClicked: '',
-  toggleRightMenu: false,
-  cartItems: [],
-  billingAddressCollection: false,
-  allowedCountries: null,
-  language: 'en-US',
-  currency: 'USD',
-  successUrl: 'https://egghead.io/success',
-  cancelUrl: 'https://egghead.io/cancel'
-}
-
-const mockSku = {
-  sku: 'sku_abc123',
-  price: 200,
-  image: 'https://www.fillmurray.com/300/300',
-  currency: 'usd'
-}
-
-const mockSku3 = {
-  sku: 'sku_abc234',
-  price: 100,
-  image: 'https://www.fillmurray.com/300/300',
-  currency: 'USD'
-}
-const mockSku2 = {
-  sku: 'sku_xyz456',
-  price: 300,
-  image: 'https://www.fillmurray.com/300/300',
-  currency: 'USD'
-}
-
-const mockDetailedSku = {
-  [mockSku.sku]: {
-    sku: mockSku.sku,
-    quantity: 1,
-    currency: mockSku.currency,
-    price: mockSku.price,
-    formattedValue: '$2.00',
-    image: mockSku.image,
-    value: 200
-  }
-}
-
-const mockDetailedSku2 = {
-  [mockSku2.sku]: {
-    sku: mockSku2.sku,
-    quantity: 1,
-    currency: mockSku2.currency,
-    price: mockSku2.price,
-    formattedValue: '$3.00',
-    image: mockSku2.image,
-    value: 300
-  }
-}
-
-const createWrapper = (props = {}) => ({ children }) => (
+const createWrapper = (overrides = {}) => ({ children }) => (
   <CartProvider
     successUrl="https://egghead.io/success"
     cancelUrl="https://egghead.io/cancel"
     stripe={stripeMock}
     currency="USD"
-    {...props}
+    {...overrides}
   >
     {children}
   </CartProvider>
 )
 
-describe('useShoppingCart', () => {
-  let result
-  beforeEach(() => {
-    const wrapper = createWrapper()
-    result = renderHook(() => useShoppingCart(), { wrapper }).result
+let counter = 0
+function mockProduct(overrides) {
+  return {
+    sku: `sku_abc${counter++}`,
+    name: 'blah bleh bloo',
+    price: Math.floor(Math.random() * 1000 + 1),
+    image: 'https://blah.com/bleh',
+    alt: 'a bleh glowing under a soft sunrise',
+    currency: 'usd',
+    ...overrides
+  }
+}
+
+describe('useShoppingCart()', () => {
+  const wrapper = createWrapper()
+  let cart
+  function reload() {
+    cart = renderHook(() => useShoppingCart(), { wrapper }).result
+  }
+  beforeEach(() => reload())
+
+  it('initial state', () => {
+    expect(cart.current).toMatchObject({
+      cartDetails: {},
+      totalPrice: 0,
+      formattedTotalPrice: '$0.00',
+      cartCount: 0,
+      shouldDisplayCart: false
+    })
   })
 
-  it('renders', () => {
-    expect(result.current.cartItems).toEqual(INITIAL_STATE.cartItems)
+  it('storeLastClicked() updates lastClicked', () => {
+    const product = mockProduct()
+    act(() => {
+      cart.current.storeLastClicked(product.sku)
+    })
+    expect(cart.current.lastClicked).toBe(product.sku)
   })
 
-  it('addItems adds items to cart', () => {
-    act(() => {
-      result.current.incrementItem(mockSku)
+  describe('shouldDisplayCart', () => {
+    it('handleCartClick() toggles value', () => {
+      act(() => {
+        cart.current.handleCartClick()
+      })
+      expect(cart.current.shouldDisplayCart).toBe(true)
+
+      act(() => {
+        cart.current.handleCartClick()
+      })
+      expect(cart.current.shouldDisplayCart).toBe(false)
     })
 
-    expect(result.current.cartItems).toEqual([mockSku])
+    it('handleCartHover() opens cart', () => {
+      act(() => {
+        cart.current.handleCartHover()
+      })
+      expect(cart.current.shouldDisplayCart).toBe(true)
+    })
+
+    it('handleCloseCart() closes cart', () => {
+      act(() => {
+        cart.current.handleCloseCart()
+      })
+      expect(cart.current.shouldDisplayCart).toBe(false)
+    })
   })
 
-  it('cartCount increments when incrementItem is executed', () => {
-    expect(result.current.cartCount).toBe(0)
+  describe('addItem()', () => {
+    it('adds an item to the cart', () => {
+      const product = mockProduct({ price: 200 })
 
-    act(() => {
-      result.current.incrementItem(mockSku)
+      act(() => {
+        cart.current.addItem(product)
+      })
+
+      expect(cart.current.cartDetails).toHaveProperty(product.sku)
+      const entry = cart.current.cartDetails[product.sku]
+
+      expect(entry.quantity).toBe(1)
+      expect(entry.value).toBe(product.price)
+      expect(entry.formattedValue).toBe('$2.00')
+      expect(entry).toMatchObject(product)
+
+      expect(cart.current.cartCount).toBe(1)
+      expect(cart.current.totalPrice).toBe(200)
     })
 
-    expect(result.current.cartCount).toBe(1)
-  })
+    it('adds `count` amount of items to the cart', () => {
+      let totalCount = 0
+      for (let count = 1; count <= 50; ++count) {
+        const product = mockProduct()
 
-  it('checkoutData array updates with sku id and quantity based on addItems', () => {
-    expect(result.current.checkoutData).toEqual([])
+        act(() => {
+          cart.current.addItem(product, count)
+        })
 
-    act(() => {
-      result.current.incrementItem(mockSku)
-    })
+        expect(cart.current.cartDetails).toHaveProperty(product.sku)
+        const entry = cart.current.cartDetails[product.sku]
 
-    expect(result.current.checkoutData).toEqual([
-      {
-        sku: mockSku.sku,
-        quantity: 1
-      }
-    ])
-  })
+        expect(entry.quantity).toBe(count)
+        expect(entry.value).toBe(product.price * count)
 
-  it('checkoutData builds an array of objects to prepare for redirectToCheckout', () => {
-    expect(result.current.checkoutData).toEqual([])
-
-    act(() => {
-      result.current.incrementItem(mockSku)
-    })
-
-    expect(result.current.checkoutData).toEqual([
-      { sku: mockSku.sku, quantity: 1 }
-    ])
-  })
-
-  it('removeCartItem removes item from checkoutData array', () => {
-    act(() => {
-      result.current.incrementItem(mockSku)
-    })
-
-    expect(result.current.checkoutData).toEqual([
-      { sku: mockSku.sku, quantity: 1 }
-    ])
-
-    act(() => {
-      result.current.removeCartItem(mockSku.sku)
-    })
-
-    expect(result.current.checkoutData).toEqual([])
-  })
-
-  it('removeCartItem removes the correct item from the cart', () => {
-    act(() => {
-      result.current.incrementItem(mockSku)
-      result.current.incrementItem(mockSku2)
-    })
-
-    expect(result.current.checkoutData).toEqual([
-      { sku: mockSku.sku, quantity: 1 },
-      { sku: mockSku2.sku, quantity: 1 }
-    ])
-
-    act(() => {
-      result.current.removeCartItem(mockSku.sku)
-    })
-
-    expect(result.current.checkoutData).toEqual([
-      { sku: mockSku2.sku, quantity: 1 }
-    ])
-  })
-
-  it('should update totalPrice', () => {
-    act(() => {
-      result.current.incrementItem(mockSku)
-    })
-
-    expect(result.current.totalPrice()).toBe('$2.00')
-  })
-
-  it('should update totalPrice when two items are added', () => {
-    act(() => {
-      result.current.incrementItem(mockSku)
-      result.current.incrementItem(mockSku3)
-    })
-
-    expect(result.current.totalPrice()).toBe('$3.00')
-  })
-
-  it('storeLastClicked stores the correct value', () => {
-    act(() => {
-      result.current.storeLastClicked(mockSku.sku)
-    })
-
-    expect(result.current.lastClicked).toBe(mockSku.sku)
-  })
-
-  it('shouldDisplayCart should be false initially', () => {
-    expect(result.current.shouldDisplayCart).toBe(false)
-  })
-
-  it('shouldDisplayCart should be true after handleCartClick', () => {
-    act(() => {
-      result.current.handleCartClick()
-    })
-
-    expect(result.current.shouldDisplayCart).toBe(true)
-  })
-
-  it('shouldDisplayCart should be false after 2 handleCartClick', () => {
-    act(() => {
-      result.current.handleCartClick()
-      result.current.handleCartClick()
-    })
-
-    expect(result.current.shouldDisplayCart).toBe(false)
-  })
-
-  it('cartDetails should add give back a more detailed version of what skus gives back', () => {
-    act(() => {
-      result.current.incrementItem(mockSku)
-    })
-
-    expect(result.current.cartDetails).toEqual(mockDetailedSku)
-  })
-
-  it('cartDetails will increase quantitave values when same item is added to cart', () => {
-    act(() => {
-      result.current.incrementItem(mockSku)
-    })
-
-    expect(result.current.cartDetails).toEqual(mockDetailedSku)
-
-    act(() => {
-      result.current.incrementItem(mockSku)
-    })
-
-    expect(result.current.cartDetails).toEqual({
-      [mockSku.sku]: {
-        formattedValue: '$4.00',
-        price: mockSku.price,
-        image: 'https://www.fillmurray.com/300/300',
-        quantity: 2,
-        currency: mockSku.currency,
-        sku: mockSku.sku,
-        value: mockSku.price * 2
+        totalCount += count
+        expect(cart.current.cartCount).toBe(totalCount)
       }
     })
+
+    it('adds multiple different items to the cart', () => {
+      const product1 = mockProduct({ price: 400 })
+      const product2 = mockProduct({ price: 100 })
+
+      act(() => {
+        cart.current.addItem(product1)
+        cart.current.addItem(product2)
+      })
+
+      expect(cart.current.cartDetails).toHaveProperty(product1.sku)
+      const entry1 = cart.current.cartDetails[product1.sku]
+
+      expect(entry1.quantity).toBe(1)
+      expect(entry1.value).toBe(product1.price)
+
+      expect(cart.current.cartDetails).toHaveProperty(product2.sku)
+      const entry2 = cart.current.cartDetails[product2.sku]
+
+      expect(entry2.quantity).toBe(1)
+      expect(entry2.value).toBe(product2.price)
+
+      expect(cart.current.cartCount).toBe(2)
+      expect(cart.current.totalPrice).toBe(500)
+    })
+
+    it('adds multiple of the same item to the cart', () => {
+      const product = mockProduct({ price: 325 })
+
+      act(() => {
+        cart.current.addItem(product)
+        cart.current.addItem(product)
+      })
+
+      expect(cart.current.cartDetails).toHaveProperty(product.sku)
+      const entry = cart.current.cartDetails[product.sku]
+
+      expect(entry.quantity).toBe(2)
+      expect(entry.value).toBe(650)
+      expect(entry.formattedValue).toBe('$6.50')
+
+      expect(cart.current.cartCount).toBe(2)
+      expect(cart.current.totalPrice).toBe(650)
+    })
   })
 
-  it('cartDetails can add 2 skus', () => {
-    act(() => {
-      result.current.incrementItem(mockSku)
-      result.current.incrementItem(mockSku2)
+  describe('removeItem()', () => {
+    it('removes the item from the cart', () => {
+      const product = mockProduct()
+
+      act(() => {
+        cart.current.addItem(product)
+        cart.current.removeItem(product.sku)
+      })
+
+      expect(cart.current.cartDetails).not.toHaveProperty(product.sku)
     })
 
-    expect(result.current.cartDetails).toEqual({
-      ...mockDetailedSku,
-      ...mockDetailedSku2
+    it('should remove correct item', () => {
+      const product1 = mockProduct()
+      const product2 = mockProduct()
+
+      act(() => {
+        cart.current.addItem(product1, 2)
+        cart.current.addItem(product2, 4)
+        cart.current.removeItem(product1.sku)
+      })
+
+      expect(cart.current.cartDetails).not.toHaveProperty(product1.sku)
+      expect(cart.current.cartDetails).toHaveProperty(product2.sku)
     })
   })
 
-  it('cartItems gets items removed when removeCartItem is ran', () => {
-    act(() => {
-      result.current.incrementItem(mockSku)
+  describe('incrementItem()', () => {
+    it('adds one more of that product to the cart', () => {
+      const product = mockProduct()
+
+      act(() => {
+        cart.current.addItem(product)
+        cart.current.incrementItem(product.sku)
+      })
+
+      expect(cart.current.cartDetails).toHaveProperty(product.sku)
+      const entry = cart.current.cartDetails[product.sku]
+
+      expect(entry.quantity).toBe(2)
+      expect(entry.value).toBe(product.price * 2)
+      expect(cart.current.cartCount).toBe(2)
     })
 
-    expect(result.current.cartItems).toEqual([mockSku])
+    it('adds `count` amount more of that item to the cart', () => {
+      let totalCount = 0
+      for (let count = 1; count <= 50; ++count) {
+        const product = mockProduct()
 
-    act(() => {
-      result.current.removeCartItem(mockSku.sku)
+        act(() => {
+          cart.current.addItem(product)
+          cart.current.incrementItem(product.sku, count)
+        })
+
+        expect(cart.current.cartDetails).toHaveProperty(product.sku)
+        const entry = cart.current.cartDetails[product.sku]
+
+        const expectedQuantity = count + 1
+        expect(entry.quantity).toBe(expectedQuantity)
+        expect(entry.value).toBe(product.price * expectedQuantity)
+
+        totalCount += expectedQuantity
+        expect(cart.current.cartCount).toBe(totalCount)
+      }
     })
-
-    expect(result.current.cartItems).toEqual([])
   })
 
-  it('cartItems gets one item removed when removeCartItem is ran', () => {
-    act(() => {
-      result.current.incrementItem(mockSku)
-      result.current.incrementItem(mockSku2)
+  describe('decrementItem()', () => {
+    it('removes one of that item from the cart', () => {
+      const product = mockProduct({ price: 256 })
+
+      act(() => {
+        cart.current.addItem(product, 3)
+        cart.current.decrementItem(product.sku)
+      })
+
+      expect(cart.current.cartDetails).toHaveProperty(product.sku)
+      const entry = cart.current.cartDetails[product.sku]
+
+      expect(entry.quantity).toBe(2)
+      expect(entry.value).toBe(512)
+      expect(entry.formattedValue).toBe('$5.12')
+
+      expect(cart.current.cartCount).toBe(2)
+      expect(cart.current.totalPrice).toBe(512)
     })
 
-    expect(result.current.cartItems).toEqual([mockSku, mockSku2])
+    it('removes `count` amount of that item from the cart', () => {
+      let totalCount = 0
+      for (let count = 1; count <= 50; ++count) {
+        const product = mockProduct()
+        // from count + 1 -> count + 101
+        const randomNumberAboveCount =
+          Math.floor(Math.random() * 100) + count + 1
+        const endQuantity = randomNumberAboveCount - count
 
-    act(() => {
-      result.current.removeCartItem(mockSku.sku)
+        act(() => {
+          // add a random number of product to the cart
+          cart.current.addItem(product, randomNumberAboveCount)
+          cart.current.decrementItem(product.sku, count)
+        })
+
+        expect(cart.current.cartDetails).toHaveProperty(product.sku)
+        const entry = cart.current.cartDetails[product.sku]
+
+        expect(entry.quantity).toBe(endQuantity)
+        expect(entry.value).toBe(endQuantity * product.price)
+
+        totalCount += endQuantity
+        expect(cart.current.cartCount).toBe(totalCount)
+      }
     })
 
-    expect(result.current.cartItems).toEqual([mockSku2])
+    it('removes the item from the cart if the quantity reaches 0', () => {
+      const product = mockProduct()
+
+      act(() => {
+        cart.current.addItem(product)
+        cart.current.decrementItem(product.sku)
+      })
+
+      expect(cart.current.cartDetails).not.toHaveProperty(product.sku)
+      expect(cart.current.totalPrice).toBe(0)
+      expect(cart.current.cartCount).toBe(0)
+    })
+
+    it('does not let you have negative quantities', () => {
+      const product = mockProduct()
+
+      act(() => {
+        cart.current.addItem(product)
+        cart.current.decrementItem(product.sku, 5)
+      })
+
+      expect(cart.current.cartDetails).not.toHaveProperty(product.sku)
+      expect(cart.current.totalPrice).toBe(0)
+      expect(cart.current.cartCount).toBe(0)
+    })
+
+    it('should decrement correct item', () => {
+      const product1 = mockProduct()
+      const product2 = mockProduct()
+
+      act(() => {
+        cart.current.addItem(product1, 2)
+        cart.current.addItem(product2, 4)
+        cart.current.decrementItem(product2.sku)
+      })
+
+      expect(cart.current.cartDetails[product1.sku].quantity).toBe(2)
+      expect(cart.current.cartDetails[product2.sku].quantity).toBe(3)
+    })
   })
 
-  it('decrementItem reduces the cartItem amount of the target SKU by one', () => {
-    act(() => {
-      result.current.incrementItem(mockSku)
-      result.current.incrementItem(mockSku)
-      result.current.incrementItem(mockSku)
+  describe('setItemQuantity()', () => {
+    it('updates the quantity correctly', () => {
+      let totalCount = 0
+      for (let quantity = 1; quantity < 50; ++quantity) {
+        const product = mockProduct()
+        const startingQuantity = Math.floor(Math.random() * 1000) + 1
+
+        act(() => {
+          cart.current.addItem(product, startingQuantity)
+          cart.current.setItemQuantity(product.sku, quantity)
+        })
+
+        expect(cart.current.cartDetails).toHaveProperty(product.sku)
+        const entry = cart.current.cartDetails[product.sku]
+
+        expect(entry.quantity).toBe(quantity)
+        expect(entry.value).toBe(product.price * quantity)
+
+        totalCount += quantity
+        expect(cart.current.cartCount).toBe(totalCount)
+      }
     })
 
-    expect(result.current.cartItems.length).toEqual(3)
+    it('removes the item when quantity is set to 0', () => {
+      const product = mockProduct()
 
-    act(() => {
-      result.current.decrementItem(mockSku.sku)
+      act(() => {
+        cart.current.addItem(product, 10)
+        cart.current.setItemQuantity(product.sku, 0)
+      })
+
+      expect(cart.current.cartDetails).not.toHaveProperty(product.sku)
     })
-    expect(result.current.cartItems.length).toEqual(2)
   })
 
-  it('decrementItem reduces the cartItems amount of the target SKU by one even when other SKUs are present', () => {
-    act(() => {
-      result.current.incrementItem(mockSku)
-      result.current.incrementItem(mockSku)
-      result.current.incrementItem(mockSku)
-      result.current.incrementItem(mockSku2)
-    })
-    expect(result.current.cartItems.length).toEqual(4)
+  describe('persistence', () => {
+    it('data should persist past reload', () => {
+      const product = mockProduct()
+      act(() => {
+        cart.current.addItem(product)
+      })
 
-    act(() => {
-      result.current.decrementItem(mockSku.sku)
+      const snapshot = {
+        cartDetails: cart.current.cartDetails,
+        cartCount: cart.current.cartCount,
+        totalPrice: cart.current.totalPrice
+      }
+
+      reload()
+      expect(cart.current).toMatchObject(snapshot)
     })
-    expect(result.current.cartItems.length).toEqual(3)
+
+    it('clearCart() should empty the cart even after reload', () => {
+      const product = mockProduct()
+
+      act(() => {
+        cart.current.addItem(product)
+        cart.current.clearCart()
+      })
+
+      const emptyCart = {
+        cartDetails: {},
+        cartCount: 0,
+        totalPrice: 0
+      }
+
+      expect(cart.current).toMatchObject(emptyCart)
+      reload()
+      expect(cart.current).toMatchObject(emptyCart)
+    })
   })
 })
 
-describe('useShoppingCart redirectToCheckout', () => {
+describe('redirectToCheckout()', () => {
   beforeEach(() => {
     stripeMock.redirectToCheckout.mockClear()
   })
 
-  it('should send the correct default values', () => {
+  it('should send the correct default values', async () => {
     const wrapper = createWrapper()
-    const { result } = renderHook(() => useShoppingCart(), { wrapper })
+    const cart = renderHook(() => useShoppingCart(), { wrapper }).result
 
-    result.current.redirectToCheckout()
+    const product = mockProduct()
+    act(() => {
+      cart.current.addItem(product)
+    })
+    await cart.current.redirectToCheckout()
 
     expect(stripeMock.redirectToCheckout).toHaveBeenCalled()
     expect(stripeMock.redirectToCheckout.mock.calls[0][0]).toEqual({
-      items: [],
+      items: [{ sku: product.sku, quantity: 1 }],
       successUrl: 'https://egghead.io/success',
       cancelUrl: 'https://egghead.io/cancel',
       billingAddressCollection: 'auto',
@@ -339,30 +424,35 @@ describe('useShoppingCart redirectToCheckout', () => {
     })
   })
 
-  it('should send all formatted items', () => {
+  it('should send all formatted items', async () => {
     const wrapper = createWrapper()
-    const { result } = renderHook(() => useShoppingCart(), { wrapper })
+    const cart = renderHook(() => useShoppingCart(), { wrapper }).result
+
+    const product1 = mockProduct()
+    const product2 = mockProduct()
 
     act(() => {
-      result.current.incrementItem(mockSku)
-      result.current.incrementItem(mockSku)
+      cart.current.addItem(product1, 2)
+      cart.current.addItem(product2, 9)
     })
-    result.current.redirectToCheckout()
+    await cart.current.redirectToCheckout()
 
-    const expectedItems = [{ sku: mockSku.sku, quantity: 2 }]
+    const expectedItems = [
+      { sku: product1.sku, quantity: 2 },
+      { sku: product2.sku, quantity: 9 }
+    ]
 
     expect(stripeMock.redirectToCheckout).toHaveBeenCalled()
-    expect(result.current.checkoutData).toEqual(expectedItems)
     expect(stripeMock.redirectToCheckout.mock.calls[0][0].items).toEqual(
       expectedItems
     )
   })
 
-  it('should send correct billingAddressCollection', () => {
+  it('should send correct billingAddressCollection', async () => {
     const wrapper = createWrapper({ billingAddressCollection: true })
-    const { result } = renderHook(() => useShoppingCart(), { wrapper })
+    const cart = renderHook(() => useShoppingCart(), { wrapper }).result
 
-    result.current.redirectToCheckout()
+    await cart.current.redirectToCheckout()
 
     expect(stripeMock.redirectToCheckout).toHaveBeenCalled()
     expect(
@@ -370,11 +460,11 @@ describe('useShoppingCart redirectToCheckout', () => {
     ).toBe('required')
   })
 
-  it('should send correct shippingAddressCollection', () => {
+  it('should send correct shippingAddressCollection', async () => {
     const wrapper = createWrapper({ allowedCountries: ['US', 'CA'] })
-    const { result } = renderHook(() => useShoppingCart(), { wrapper })
+    const cart = renderHook(() => useShoppingCart(), { wrapper }).result
 
-    result.current.redirectToCheckout()
+    await cart.current.redirectToCheckout()
 
     expect(stripeMock.redirectToCheckout).toHaveBeenCalled()
     expect(
@@ -384,68 +474,20 @@ describe('useShoppingCart redirectToCheckout', () => {
   })
 })
 
-describe('useShoppingCart persistency', () => {
-  function cartItemsFromStorage() {
-    return JSON.parse(window.localStorage.getItem('cart-items'))
-  }
-
-  it('should save cartItems to localStorage', () => {
+describe('stripe handling', () => {
+  it('if stripe is defined, redirectToCheckout can be called', async () => {
     const wrapper = createWrapper()
-    const { result } = renderHook(() => useShoppingCart(), { wrapper })
-
-    act(() => {
-      result.current.incrementItem(mockSku)
-    })
-
-    expect(cartItemsFromStorage()).toEqual(result.current.cartItems)
-  })
-
-  it('should load cartItems from localStorage', () => {
-    let wrapper = createWrapper()
-    let { result } = renderHook(() => useShoppingCart(), { wrapper })
-
-    act(() => {
-      result.current.incrementItem(mockSku)
-    })
-
-    wrapper = createWrapper()
-    result = renderHook(() => useShoppingCart(), { wrapper }).result
-
-    expect(result.current.cartItems).toEqual(cartItemsFromStorage())
-  })
-
-  it('clearCart removes everything from cartItems array', () => {
-    const wrapper = createWrapper()
-    const { result } = renderHook(() => useShoppingCart(), { wrapper })
-
-    act(() => {
-      result.current.incrementItem(mockSku)
-    })
-
-    expect(result.current.cartItems).toEqual([mockSku])
-
-    act(() => {
-      result.current.clearCart()
-    })
-
-    expect(result.current.cartItems).toEqual([])
-  })
-})
-
-describe('useShoppingCart stripe handling', () => {
-  it('if stripe is defined, redirectToCheckout can be called', () => {
-    const wrapper = createWrapper()
-    const { result } = renderHook(() => useShoppingCart(), { wrapper })
-    result.current.redirectToCheckout()
+    const cart = renderHook(() => useShoppingCart(), { wrapper }).result
+    await cart.current.redirectToCheckout()
     expect(stripeMock.redirectToCheckout).toHaveBeenCalled()
   })
 
   it('if stripe is undefined, redirectToCheckout throws an error', async () => {
     const wrapper = createWrapper({ stripe: null })
-    const { result } = renderHook(() => useShoppingCart(), { wrapper })
+    const cart = renderHook(() => useShoppingCart(), { wrapper }).result
     expect.assertions(1)
     try {
-      await result.current.redirectToCheckout()
+      await cart.current.redirectToCheckout()
     } catch (e) {
       expect(e).toEqual(new Error('Stripe is not defined'))
     }
