@@ -2,7 +2,13 @@
 title: decrementItem()
 ---
 
-`decrementItem(sku)` reduces the number of a product, by its sku, in the user's cart by one. This allows the user to reduce the quantity of an item in the cart by one at a time if they added too many.
+`decrementItem(sku)`reduces the quantity of an item based on the sku. By default, it decreases by one.
+
+If you'd like to decrease by more than one, there is an optional quantity param:
+
+`decrementItem(sku, 10)`
+
+This decreases by 10
 
 import CartDisplayWrapper from 'components/cart-display-wrapper';
 import DecrementItem from 'components/decrement-item';

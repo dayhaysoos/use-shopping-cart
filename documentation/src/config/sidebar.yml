@@ -18,6 +18,8 @@
       link: '/usage/incrementItem()'
     - label: 'decrementItem()'
       link: '/usage/decrementItem()'
+    - label: 'setItemQuantity()'
+      link: '/usage/setItemQuantity()'
     - label: 'removeItem()'
       link: '/usage/removeItem()'
     - label: 'clearCart()'
