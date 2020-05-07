@@ -2,24 +2,24 @@ import { validateCartItems } from './serverUtil'
 
 const inventory = [
   {
-    name: 'Bananas',
+    name: 'Banana',
+    description: 'Yummy yellow fruit',
     sku: 'sku_abc123',
     price: 400,
     image: 'https: //www.fillmurray.com/300/300',
     currency: 'USD'
   },
   {
-    name: 'Tangerines',
+    name: 'Banana',
     sku: 'sku_xyz456',
     price: 100,
-    image: 'https: //www.fillmurray.com/300/300',
     currency: 'USD'
   }
 ]
 
 const mockSku = {
   sku: 'sku_abc123',
-  name: 'Bananas',
+  name: 'Banana',
   price: 200,
   image: 'https://www.fillmurray.com/300/300',
   currency: 'usd'
@@ -28,9 +28,8 @@ const mockSku = {
 const mockSku2 = {
   sku: 'sku_xyz456',
   price: 300,
-  image: 'https://www.fillmurray.com/300/300',
   currency: 'USD',
-  name: 'Tangerines'
+  name: 'Banana'
 }
 
 const mockDetailedSku = {
@@ -42,7 +41,7 @@ const mockDetailedSku = {
     formattedValue: '$2.00',
     image: mockSku.image,
     value: 200,
-    name: 'Bananas'
+    name: 'Banana'
   }
 }
 
@@ -55,20 +54,22 @@ const mockDetailedSku2 = {
     formattedValue: '$3.00',
     image: mockSku2.image,
     value: 300,
-    name: 'Tangerines'
+    name: 'Banana'
   }
 }
 
 describe('validateCartItems', () => {
-  it('references the correct price for each item', () => {
+  it('matches on SKU & references the correct price & sets description + images if present', () => {
     expect(
       validateCartItems(inventory, { ...mockDetailedSku, ...mockDetailedSku2 })
     ).toStrictEqual([
       {
         name: inventory[0].name,
+        description: 'Yummy yellow fruit',
         amount: 400,
         currency: inventory[0].currency,
-        quantity: mockDetailedSku[inventory[0].sku].quantity
+        quantity: mockDetailedSku[inventory[0].sku].quantity,
+        images: ['https: //www.fillmurray.com/300/300']
       },
       {
         name: inventory[1].name,
