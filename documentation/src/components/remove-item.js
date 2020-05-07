@@ -1,38 +1,15 @@
----
-title: removeCartItem()
----
+import React from 'react';
+import { useShoppingCart, formatCurrencyString } from 'use-shopping-cart';
 
-Completely removes a product and quantity that comes with it from the removeCartItem
-
-import CartDisplayWrapper from 'components/cart-display-wrapper'
-import RemoveCartItem from 'components/remove-cart-item'
-
-<CartDisplayWrapper>
-  <RemoveCartItem
-    product={{
-      name: 'Bananas',
-      sku: 'sku_GBJ2Ep8246qeeT',
-      price: 400,
-      image:
-        'https://images.unsplash.com/photo-1574226516831-e1dff420e562?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=1050&q=80',
-      currency: 'USD',
-    }}
-  />
-</CartDisplayWrapper>
-
-```jsx
-import { useShoppingCart } from 'use-shopping-cart'
-import { formatCurrencyString } from '../util'
-
-function Product(product) {
-  const { removeCartItem } = useShoppingCart()
+export function RemoveItem({ product }) {
+  const { removeItem } = useShoppingCart();
 
   /* A helper function that turns the price into a readable format */
   const price = formatCurrencyString({
     value: product.price,
     currency: product.currency,
     language: 'en-US',
-  })
+  });
   return (
     <article
       style={{
@@ -47,20 +24,21 @@ function Product(product) {
         <img
           style={{ height: 200, width: 250 }}
           src={product.image}
-          alt={` ${product.name}`}
+          alt={product.name}
         />
         <figcaption>{product.name}</figcaption>
       </figure>
       <p>{price}</p>
       {/* Adds the item to the cart */}
       <button
-        onClick={() => removeCartItem(product.sku)}
+        onClick={() => removeItem(product.sku)}
         aria-label={`Remove ${product.name} from your cart`}
         style={{ height: 50, width: 100, marginBottom: 30 }}
       >
         {`Remove from cart`}
       </button>
     </article>
-  )
+  );
 }
-```
+
+export default RemoveItem;
