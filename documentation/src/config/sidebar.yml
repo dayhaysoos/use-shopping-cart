@@ -12,10 +12,8 @@
   items:
     - label: 'CartProvider'
       link: '/usage/cartprovider'
-    - label: 'incrementItem()'
-      link: '/usage/incrementItem()'
-    - label: 'cartDetails'
-      link: '/usage/cartDetails'
+    - label: 'addItem()'
+      link: '/usage/addItem()'
     - label: 'decrementItem()'
       link: '/usage/decrementItem()'
     - label: 'removeCartItem()'

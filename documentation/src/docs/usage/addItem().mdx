@@ -1,7 +1,16 @@
-import React from 'react';
-import { useShoppingCart, formatCurrencyString } from 'use-shopping-cart';
+---
+title: incrementItem()
+---
 
-export function AddItem({ product }) {
+import CartDisplayWrapper from 'components/cart-display-wrapper';
+import AddItem from 'components/add-item';
+
+<div>{console.log('test')}</div>
+
+To add a product to the cart, use `useShoppingCart()`'s `incrementItem(product)` method. It takes in your product object, which must have a `sku` and a `price`, and adds it to the cart.
+
+```jsx
+export function Product({ product }) {
   const { incrementItem } = useShoppingCart();
 
   /* A helper function that turns the price into a readable format */
@@ -31,7 +40,7 @@ export function AddItem({ product }) {
       <p>{price}</p>
       {/* Adds the item to the cart */}
       <button
-        onClick={() => incrementItem(product)}
+        onClick={() => addItem(product)}
         aria-label={`Add ${product.name} to your cart`}
         style={{ height: 50, width: 100, marginBottom: 30 }}
       >
@@ -40,5 +49,4 @@ export function AddItem({ product }) {
     </article>
   );
 }
-
-export default IncrementItem;
+```

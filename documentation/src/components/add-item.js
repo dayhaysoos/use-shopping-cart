@@ -1,36 +1,15 @@
----
-title: incrementItem()
----
+import React from 'react';
+import { useShoppingCart, formatCurrencyString } from 'use-shopping-cart';
 
-import CartDisplayWrapper from 'components/cart-display-wrapper'
-import IncrementItem from 'components/increment-item'
-
-To add a product to the cart, use `useShoppingCart()`'s `incrementItem(product)` method. It takes in your product object, which must have a `sku` and a `price`, and adds it to the cart.
-
-<CartDisplayWrapper>
-  <IncrementItem
-  product={{
-    name: 'Bananas',
-    sku: 'sku_GBJ2Ep8246qeeT',
-    price: 400,
-    image:
-      'https://images.unsplash.com/photo-1574226516831-e1dff420e562?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=1050&q=80',
-    currency: 'USD',
-  }}
-/>
-
-</CartDisplayWrapper>
-
-```jsx
-export function Product({ product }) {
-  const { incrementItem } = useShoppingCart()
+export function AddItem({ product }) {
+  const { addItem } = useShoppingCart();
 
   /* A helper function that turns the price into a readable format */
   const price = formatCurrencyString({
     value: product.price,
     currency: product.currency,
     language: 'en-US',
-  })
+  });
   return (
     <article
       style={{
@@ -52,13 +31,14 @@ export function Product({ product }) {
       <p>{price}</p>
       {/* Adds the item to the cart */}
       <button
-        onClick={() => incrementItem(product)}
+        onClick={() => addItem(product)}
         aria-label={`Add ${product.name} to your cart`}
         style={{ height: 50, width: 100, marginBottom: 30 }}
       >
         Add to cart
       </button>
     </article>
-  )
+  );
 }
-```
+
+export default AddItem;
