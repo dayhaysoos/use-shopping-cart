@@ -2,15 +2,18 @@ const validateCartItems = (inventorySrc, cartDetails) => {
   const validatedItems = []
   for (const sku in cartDetails) {
     const product = cartDetails[sku]
-    const validatedItem = inventorySrc.find(
-      (currentProduct) => currentProduct.name === product.name
+    const inventoryItem = inventorySrc.find(
+      currentProduct => currentProduct.sku === sku
     )
-    validatedItems.push({
-      name: validatedItem.name,
-      amount: validatedItem.price,
-      currency: validatedItem.currency,
+    const item = {
+      name: inventoryItem.name,
+      amount: inventoryItem.price,
+      currency: inventoryItem.currency,
       quantity: product.quantity
-    })
+    }
+    if (inventoryItem.description) item.description = inventoryItem.description
+    if (inventoryItem.image) item.images = [inventoryItem.image]
+    validatedItems.push(item)
   }
 
   return validatedItems
