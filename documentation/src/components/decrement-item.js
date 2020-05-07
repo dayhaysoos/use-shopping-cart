@@ -1,7 +1,7 @@
 import React from 'react';
 import { useShoppingCart, formatCurrencyString } from 'use-shopping-cart';
 
-export function ReduceItemByOne({ product }) {
+export function DecrementItem({ product }) {
   const { decrementItem } = useShoppingCart();
 
   /* A helper function that turns the price into a readable format */
@@ -41,4 +41,4 @@ export function ReduceItemByOne({ product }) {
   );
 }
 
-export default ReduceItemByOne;
+export default DecrementItem;
