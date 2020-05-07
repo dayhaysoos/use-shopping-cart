@@ -323,11 +323,11 @@ describe('useShoppingCart redirectToCheckout', () => {
     stripeMock.redirectToCheckout.mockClear()
   })
 
-  it('should send the correct default values', () => {
+  it('should send the correct default values', async () => {
     const wrapper = createWrapper()
     const { result } = renderHook(() => useShoppingCart(), { wrapper })
 
-    result.current.redirectToCheckout()
+    await result.current.redirectToCheckout()
 
     expect(stripeMock.redirectToCheckout).toHaveBeenCalled()
     expect(stripeMock.redirectToCheckout.mock.calls[0][0]).toEqual({
@@ -339,7 +339,7 @@ describe('useShoppingCart redirectToCheckout', () => {
     })
   })
 
-  it('should send all formatted items', () => {
+  it('should send all formatted items', async () => {
     const wrapper = createWrapper()
     const { result } = renderHook(() => useShoppingCart(), { wrapper })
 
@@ -347,7 +347,7 @@ describe('useShoppingCart redirectToCheckout', () => {
       result.current.addItem(mockSku)
       result.current.addItem(mockSku)
     })
-    result.current.redirectToCheckout()
+    await result.current.redirectToCheckout()
 
     const expectedItems = [{ sku: mockSku.sku, quantity: 2 }]
 
@@ -358,11 +358,11 @@ describe('useShoppingCart redirectToCheckout', () => {
     )
   })
 
-  it('should send correct billingAddressCollection', () => {
+  it('should send correct billingAddressCollection', async () => {
     const wrapper = createWrapper({ billingAddressCollection: true })
     const { result } = renderHook(() => useShoppingCart(), { wrapper })
 
-    result.current.redirectToCheckout()
+    await result.current.redirectToCheckout()
 
     expect(stripeMock.redirectToCheckout).toHaveBeenCalled()
     expect(
@@ -370,11 +370,11 @@ describe('useShoppingCart redirectToCheckout', () => {
     ).toBe('required')
   })
 
-  it('should send correct shippingAddressCollection', () => {
+  it('should send correct shippingAddressCollection', async () => {
     const wrapper = createWrapper({ allowedCountries: ['US', 'CA'] })
     const { result } = renderHook(() => useShoppingCart(), { wrapper })
 
-    result.current.redirectToCheckout()
+    await result.current.redirectToCheckout()
 
     expect(stripeMock.redirectToCheckout).toHaveBeenCalled()
     expect(

@@ -2,8 +2,8 @@ declare module 'use-shopping-cart' {
   export interface ProviderProps {
     children: JSX.Element
     stripe: stripe.Stripe
-    successUrl: string
-    cancelUrl: string
+    successUrl?: string
+    cancelUrl?: string
     currency: string
     language?: string
     billingAddressCollection?: boolean
@@ -27,9 +27,13 @@ declare module 'use-shopping-cart' {
     /**
      * The name of the product
      */
-    name?: string
+    name: string
     /**
-     * The product sku
+     * The description of the product
+     */
+    description?: string
+    /**
+     * A unique product SKU
      */
     sku: string
     /**
@@ -43,7 +47,7 @@ declare module 'use-shopping-cart' {
     /**
      * The currency of the product
      */
-    currency?: string
+    currency: string
     /**
      * Any additional properties
      */
