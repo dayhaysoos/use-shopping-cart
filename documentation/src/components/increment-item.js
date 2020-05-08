@@ -30,13 +30,28 @@ export function IncrementItem({ product }) {
       </figure>
       <p>{price}</p>
       {/* Adds the item to the cart */}
-      <button
-        onClick={() => incrementItem(product.sku)}
-        aria-label={`Add one ${product.name} to your cart`}
-        style={{ height: 50, width: 100, marginBottom: 30 }}
+      <section
+        style={{
+          width: '100%',
+          display: 'flex',
+          justifyContent: 'space-evenly',
+        }}
       >
-        {`Add one ${product.name} to your cart`}
-      </button>
+        <button
+          onClick={() => incrementItem(product.sku)}
+          aria-label={`Add one ${product.name} to your cart`}
+          style={{ height: 50, width: 100, marginBottom: 30 }}
+        >
+          {`Add one ${product.name} to your cart`}
+        </button>
+        <button
+          onClick={() => incrementItem(product.sku, 10)}
+          aria-label={`Add by 10`}
+          style={{ height: 50, width: 100, marginBottom: 30 }}
+        >
+          {`Add 10 ${product.name} to your cart`}
+        </button>
+      </section>
     </article>
   );
 }
