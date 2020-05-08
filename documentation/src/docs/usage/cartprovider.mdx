@@ -1,0 +1,31 @@
+---
+title: CartProvider
+---
+
+At the root level of your app, wrap your Root app in the `<CartProvider />`
+
+```jsx
+import ReactDOM from 'react-dom';
+
+import { loadStripe } from '@stripe/stripe-js';
+import { CartProvider } from 'use-shopping-cart';
+
+import App from './App';
+
+// Remember to add your public Stripe key
+const stripePromise = loadStripe(process.env.REACT_APP_STRIPE_API_PUBLIC);
+
+ReactDOM.render(
+  <CartProvider
+    stripe={stripePromise}
+    successUrl="stripe.com"
+    cancelUrl="twitter.com/dayhaysoos"
+    currency="USD"
+    allowedCountries={['US', 'GB', 'CA']}
+    billingAddressCollection={true}
+  >
+    <App />
+  </CartProvider>,
+  document.getElementById('root')
+);
+```

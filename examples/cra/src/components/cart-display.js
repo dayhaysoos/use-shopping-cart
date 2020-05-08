@@ -14,7 +14,7 @@ const CartDisplay = () => {
     setItemQuantity,
   } = useShoppingCart();
 
-  const handleSubmit = async event => {
+  const handleSubmit = async (event) => {
     event.preventDefault();
 
     const response = await fetch('/.netlify/functions/create-session', {
@@ -24,10 +24,10 @@ const CartDisplay = () => {
       },
       body: JSON.stringify(cartDetails),
     })
-      .then(res => {
+      .then((res) => {
         return res.json();
       })
-      .catch(error => console.log(error));
+      .catch((error) => console.log(error));
 
     redirectToCheckout({ sessionId: response.sessionId });
   };
@@ -49,7 +49,7 @@ const CartDisplay = () => {
         }}
       >
         <h2>Shopping Cart Display Panel</h2>
-        {Object.keys(cartDetails).map(item => {
+        {Object.keys(cartDetails).map((item) => {
           const cartItem = cartDetails[item];
           const { name, sku, quantity } = cartItem;
           return (
@@ -70,7 +70,7 @@ const CartDisplay = () => {
                 max={99}
                 sx={{ width: 60 }}
                 defaultValue={quantity}
-                onChange={e => {
+                onChange={(e) => {
                   const { value } = e.target;
                   setItemQuantity(sku, value);
                 }}

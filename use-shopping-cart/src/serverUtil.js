@@ -3,7 +3,7 @@ const validateCartItems = (inventorySrc, cartDetails) => {
   for (const sku in cartDetails) {
     const product = cartDetails[sku]
     const inventoryItem = inventorySrc.find(
-      currentProduct => currentProduct.sku === sku
+      (currentProduct) => currentProduct.sku === sku
     )
     const item = {
       name: inventoryItem.name,

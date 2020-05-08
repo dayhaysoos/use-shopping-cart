@@ -78,7 +78,7 @@ declare module 'use-shopping-cart' {
      * Add an item to the cart
      * @param product The product to add to the cart
      */
-    addItem: (product: Product) => void
+    incrementItem: (product: Product) => void
     /**
      * Remove a cart item
      * @param sku The item to remove sku
@@ -88,7 +88,7 @@ declare module 'use-shopping-cart' {
      * Reduce the quantity of items by one in the cart
      * @param sku The sku of the item to reduce quantity by one
      */
-    reduceItemByOne: (sku: string) => void
+    decrementItem: (sku: string) => void
     /**
      * Calculates the total price of the cart items
      */
