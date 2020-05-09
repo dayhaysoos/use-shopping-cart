@@ -87,7 +87,7 @@ declare module 'use-shopping-cart' {
     /**
      * Amount of this product in the cart
      */
-    quantity: number
+    readonly quantity: number
     /**
      * The total line item value, the `price` multiplied by the `quantity`
      */
