@@ -1,25 +1,54 @@
 declare module 'use-shopping-cart' {
-  export interface ProviderProps {
+  interface CommonProviderProps {
     children: JSX.Element
+    /**
+     * The stripe instance
+     */
     stripe: stripe.Stripe
-    successUrl?: string
-    cancelUrl?: string
+    /**
+     * The preferred currency used to format price data
+     */
     currency: string
+    /**
+     * The language to be used format price data
+     */
     language?: string
+  }
+  interface ClientOnlyProviderProps extends CommonProviderProps {
+    /**
+     * Determines checkout mode
+     */
+    mode: 'client-only'
+    /**
+     * The redirect url for a successful sale
+     */
+    successUrl: string
+    /**
+     * The redirect url for a cancelled sale
+     */
+    cancelUrl: string
+    /**
+     * Should the billing address be collected at the checkout. Defaults to false
+     */
     billingAddressCollection?: boolean
+    /**
+     * The allowed countries
+     */
     allowedCountries?: null | string[]
   }
+  interface ServerCheckoutProviderProps extends CommonProviderProps {
+    /**
+     * Determines checkout mode
+     */
+    mode: 'server-checkout'
+  }
+
+  export type ProviderProps =
+    | ClientOnlyProviderProps
+    | ServerCheckoutProviderProps
 
   /**
    * Context provider to interact with Stripe API
-   * @param children The Entry point to your app
-   * @param stripe The stripe object
-   * @param successUrl The redirect url for a successful sale
-   * @param cancelUrl The redirect url for a cancelled sale
-   * @param currency The preferred currency
-   * @param language The language to be used in the checkout
-   * @param billingAddressCollection Should the billing address be collected at the checkout. Defaults to false
-   * @param allowedCountries The allowed countries
    */
   export const CartProvider: (props: ProviderProps) => JSX.Element
 
@@ -41,7 +70,7 @@ declare module 'use-shopping-cart' {
      */
     price: number
     /**
-     * An image of the product
+     * A URL to an image of the product
      */
     image?: string
     /**
@@ -58,15 +87,15 @@ declare module 'use-shopping-cart' {
     /**
      * Amount of this product in the cart
      */
-    quantity: number
+    readonly quantity: number
     /**
-     * The total line item value, the price multiplied by the quantity
+     * The total line item value, the `price` multiplied by the `quantity`
      */
-    value: number
+    readonly value: number
     /**
-     * Currency formatted version of value
+     * Currency formatted version of `value`
      */
-    formattedValue: string
+    readonly formattedValue: string
   }
 
   export type CartDetails = {
@@ -75,35 +104,55 @@ declare module 'use-shopping-cart' {
 
   export interface ShoppingCartUtilities {
     /**
-     * Add an item to the cart
+     * Add `count` amount of a product to the cart
      * @param product The product to add to the cart
+     * @param count The quantity of the product to add
      */
-    incrementItem: (product: Product) => void
+    addItem: (product: Product, count?: number) => void
     /**
-     * Remove a cart item
-     * @param sku The item to remove sku
+     * Remove an item from the cart by its SKU
+     * @param sku The SKU of the item in the cart to remove
      */
-    removeCartItem: (sku: string) => void
+    removeItem: (sku: string) => void
     /**
-     * Reduce the quantity of items by one in the cart
-     * @param sku The sku of the item to reduce quantity by one
+     * Reduce the quantity of an item in the cart by `count`
+     * @param sku The SKU of the item to reduce in quantity
+     * @param count The quantity to reduce by
      */
-    decrementItem: (sku: string) => void
+    decrementItem: (sku: string, count?: number) => void
     /**
-     * Calculates the total price of the cart items
+     * Increase the quantity of an item in the cart by `count`
+     * @param sku The SKU of the item to increase in quantity
+     * @param count The quantity to increase by
      */
-    totalPrice: () => string
+    incrementItem: (sku: string, count?: number) => void
+    /**
+     * Set the quantity of an item in the cart to a specific value
+     * @param sku The SKU of the item to change in quantity
+     * @param quantity The quantity to set the item to
+     */
+    setItemQuantity: (sku: string, quantity: number) => void
+    /**
+     * The total price of the items in the cart
+     */
+    readonly totalPrice: number
+    /**
+     * Currency formatted version of `totalPrice`
+     */
+    readonly formattedTotalPrice: string
     /**
      * The number of items in the cart
      */
-    cartCount: number
+    readonly cartCount: number
     /**
-     * Cart details is an object with skus of the items in the cart as keys and details of the items as the value,
+     * Cart details is an object with SKUs of the items in the cart as
+     * keys and details of the items as the value.
      */
-    cartDetails: CartDetails
+    readonly cartDetails: CartDetails
     /**
      * Redirects customers to the Stripe checkout
-     * @returns result object || error message
+     * @param sessionId only used in Server-checkout mode
+     * @returns Nothing or an error wrapped in a promise if an error occurred
      */
     redirectToCheckout: (sessionId?: string) => Promise<undefined | Error>
     /**
@@ -119,21 +168,21 @@ declare module 'use-shopping-cart' {
 
   interface FormatCurrencyStringProps {
     /**
-     * The value to convert
+     * The value to convert (i.e. 2599 in USD is $25.99)
      */
     value: number
     /**
-     * The currency format. For example US
+     * The currency format (i.e. USD, CAD, GBP)
      */
     currency: string
     /**
-     * The language
+     * The language to be used (i.e. en-US, fr-BE)
      */
-    language: string
+    language?: string
   }
 
   /**
-   * Formats the the currency to a string value
+   * Formats the value to a currency string
    */
   export function formatCurrencyString(props: FormatCurrencyStringProps): string
 }
