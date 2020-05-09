@@ -29,14 +29,29 @@ export function DecrementItem({ product }) {
         <figcaption>{product.name}</figcaption>
       </figure>
       <p>{price}</p>
-      {/* Adds the item to the cart */}
-      <button
-        onClick={() => decrementItem(product.sku)}
-        aria-label={`Remove ${product.name} from your cart`}
-        style={{ height: 50, width: 100, marginBottom: 30 }}
+      {/* Removes the item from the cart */}
+      <section
+        style={{
+          width: '100%',
+          display: 'flex',
+          justifyContent: 'space-evenly',
+        }}
       >
-        Remove from cart
-      </button>
+        <button
+          onClick={() => decrementItem(product.sku)}
+          aria-label={`Remove one ${product.name} from your cart`}
+          style={{ height: 50, width: 100, marginBottom: 30 }}
+        >
+          {`Remove one ${product.name} from your cart`}
+        </button>
+        <button
+          onClick={() => decrementItem(product.sku, 10)}
+          aria-label={`Remove by 10`}
+          style={{ height: 50, width: 100, marginBottom: 30 }}
+        >
+          {`Remove 10 ${product.name} from your cart`}
+        </button>
+      </section>
     </article>
   );
 }

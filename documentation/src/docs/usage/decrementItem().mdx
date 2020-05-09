@@ -2,7 +2,7 @@
 title: decrementItem()
 ---
 
-`decrementItem(sku)`reduces the quantity of an item based on the sku. By default, it decreases by one.
+`decrementItem(sku, quantity = 1)`reduces the quantity of an item based on the sku. By default, it decreases by one.
 
 If you'd like to decrease by more than one, there is an optional quantity param:
 
@@ -53,19 +53,34 @@ function Product(product) {
         <img
           style={{ height: 200, width: 250 }}
           src={product.image}
-          alt={` ${product.name}`}
+          alt={product.name}
         />
         <figcaption>{product.name}</figcaption>
       </figure>
       <p>{price}</p>
-      {/* Adds the item to the cart */}
-      <button
-        onClick={() => decrementItem(product.sku)}
-        aria-label={`Remove ${product.name} from your cart`}
-        style={{ height: 50, width: 100, marginBottom: 30 }}
+      {/* Removes the item from the cart */}
+      <section
+        style={{
+          width: '100%',
+          display: 'flex',
+          justifyContent: 'space-evenly',
+        }}
       >
-        Add to cart
-      </button>
+        <button
+          onClick={() => decrementItem(product.sku)}
+          aria-label={`Remove one ${product.name} from your cart`}
+          style={{ height: 50, width: 100, marginBottom: 30 }}
+        >
+          {`Remove one ${product.name} from your cart`}
+        </button>
+        <button
+          onClick={() => decrementItem(product.sku, 10)}
+          aria-label={`Remove by 10`}
+          style={{ height: 50, width: 100, marginBottom: 30 }}
+        >
+          {`Remove 10 ${product.name} from your cart`}
+        </button>
+      </section>
     </article>
   );
 }
