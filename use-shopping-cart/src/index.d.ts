@@ -1,25 +1,57 @@
 declare module 'use-shopping-cart' {
-  export interface ProviderProps {
+  interface CommonProviderProps {
+    /**
+     * JSX.Element The Entry point to your app
+     */
     children: JSX.Element
+    /**
+     * The stripe object
+     */
     stripe: stripe.Stripe
-    successUrl?: string
-    cancelUrl?: string
+    /**
+     * The preferred currency used to format price data
+     */
     currency: string
+    /**
+     * The language to be used format price data
+     */
     language?: string
+  }
+  interface ClientOnlyProviderProps extends CommonProviderProps {
+    /**
+     * Determines checkout mode
+     */
+    mode: 'client-only'
+    /**
+     * The redirect url for a successful sale
+     */
+    successUrl: string
+    /**
+     * The redirect url for a cancelled sale
+     */
+    cancelUrl: string
+    /**
+     * Should the billing address be collected at the checkout. Defaults to false
+     */
     billingAddressCollection?: boolean
+    /**
+     * The allowed countries
+     */
     allowedCountries?: null | string[]
   }
+  interface ServerCheckoutProviderProps extends CommonProviderProps {
+    /**
+     * Determines checkout mode
+     */
+    mode: 'server-checkout'
+  }
+
+  export type ProviderProps =
+    | ClientOnlyProviderProps
+    | ServerCheckoutProviderProps
 
   /**
    * Context provider to interact with Stripe API
-   * @param children The Entry point to your app
-   * @param stripe The stripe object
-   * @param successUrl The redirect url for a successful sale
-   * @param cancelUrl The redirect url for a cancelled sale
-   * @param currency The preferred currency
-   * @param language The language to be used in the checkout
-   * @param billingAddressCollection Should the billing address be collected at the checkout. Defaults to false
-   * @param allowedCountries The allowed countries
    */
   export const CartProvider: (props: ProviderProps) => JSX.Element
 

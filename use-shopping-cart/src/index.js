@@ -1,4 +1,3 @@
-import PropTypes from 'prop-types'
 import React, {
   createContext,
   useReducer,
@@ -33,6 +32,7 @@ export const CartContext = createContext([
 
 export const CartProvider = ({
   children,
+  mode,
   stripe,
   successUrl,
   cancelUrl,
@@ -60,6 +60,7 @@ export const CartProvider = ({
       {
         ...cart,
         ...cartValues,
+        mode,
         successUrl,
         cancelUrl,
         currency,
@@ -77,6 +78,7 @@ export const CartProvider = ({
       cartDispatch,
       cartValues,
       cartValuesDispatch,
+      mode,
       successUrl,
       cancelUrl,
       currency,
@@ -91,24 +93,11 @@ export const CartProvider = ({
   )
 }
 
-CartProvider.propTypes = {
-  children: PropTypes.oneOfType([
-    PropTypes.arrayOf(PropTypes.element),
-    PropTypes.element
-  ]).isRequired,
-  stripe: PropTypes.any,
-  successUrl: PropTypes.string.isRequired,
-  cancelUrl: PropTypes.string.isRequired,
-  currency: PropTypes.string.isRequired,
-  language: PropTypes.string,
-  billingAddressCollection: PropTypes.bool,
-  allowedCountries: PropTypes.arrayOf(PropTypes.string)
-}
-
 export const useShoppingCart = () => {
   const [cart, dispatch] = useContext(CartContext)
 
   const {
+    mode,
     stripe,
     lastClicked,
     shouldDisplayCart,
@@ -141,31 +130,30 @@ export const useShoppingCart = () => {
   const handleCloseCart = () => dispatch({ type: 'close-cart' })
 
   const redirectToCheckout = async (sessionId) => {
-    const options = {
-      items: getCheckoutData.stripe(cart),
-      successUrl,
-      cancelUrl,
-      billingAddressCollection: billingAddressCollection ? 'required' : 'auto',
-      submitType: 'auto'
-    }
-
-    if (Array.isArray(allowedCountries) && allowedCountries.length) {
-      options.shippingAddressCollection = {
-        allowedCountries
-      }
-    }
-
-    if (stripe === null) {
-      throw new Error('Stripe is not defined')
-    }
-
+    if (stripe === null) throw new Error('Stripe is not defined')
     const resolvedStripe = await Promise.resolve(stripe)
 
-    const { error } = await resolvedStripe.redirectToCheckout(
-      sessionId || options
-    )
-    if (error) {
-      return error
+    if (mode === 'client-only') {
+      // client-only checkout mode
+      const options = {
+        items: getCheckoutData.stripe(cart),
+        successUrl,
+        cancelUrl,
+        billingAddressCollection: billingAddressCollection
+          ? 'required'
+          : 'auto',
+        submitType: 'auto'
+      }
+
+      if (allowedCountries.length)
+        options.shippingAddressCollection = { allowedCountries }
+
+      const { error } = await resolvedStripe.redirectToCheckout(options)
+      if (error) return error
+    } else {
+      // server-checkout mode
+      const { error } = await resolvedStripe.redirectToCheckout(sessionId)
+      if (error) return error
     }
   }
 
@@ -180,14 +168,17 @@ export const useShoppingCart = () => {
         language
       })
     },
+
     addItem,
     removeItem,
     setItemQuantity,
     incrementItem,
     decrementItem,
     clearCart,
+
     lastClicked,
     storeLastClicked,
+
     shouldDisplayCart,
     handleCartClick,
     handleCartHover,
