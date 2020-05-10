@@ -47,22 +47,25 @@ export const cartValuesInitialState = {
   totalPrice: 0,
   cartCount: 0
 }
+function Entry(productData, quantity, currency, language) {
+  return {
+    ...productData,
+    quantity,
+    get value() {
+      return this.price * this.quantity
+    },
+    get formattedValue() {
+      return formatCurrencyString({
+        value: this.value,
+        currency,
+        language
+      })
+    }
+  }
+}
 export function cartValuesReducer(state, action) {
   function createEntry(product, count) {
-    const entry = {
-      ...product,
-      quantity: count,
-      get value() {
-        return this.price * this.quantity
-      },
-      get formattedValue() {
-        return formatCurrencyString({
-          value: this.value,
-          currency: action.currency,
-          language: action.language
-        })
-      }
-    }
+    const entry = Entry(product, count, action.currency, action.language)
 
     return {
       cartDetails: {
@@ -76,11 +79,14 @@ export function cartValuesReducer(state, action) {
   function updateEntry(sku, count) {
     const cartDetails = { ...state.cartDetails }
     const entry = cartDetails[sku]
-    if (entry.quantity + count <= 0) {
-      return removeEntry(sku)
-    }
+    if (entry.quantity + count <= 0) return removeEntry(sku)
 
-    entry.quantity += count
+    cartDetails[sku] = Entry(
+      entry,
+      entry.quantity + count,
+      action.currency,
+      action.language
+    )
 
     return {
       cartDetails,
@@ -104,9 +110,8 @@ export function cartValuesReducer(state, action) {
   switch (action.type) {
     case 'add-item-to-cart':
       if (action.count <= 0) break
-      if (action.product.sku in state.cartDetails) {
+      if (action.product.sku in state.cartDetails)
         return updateEntry(action.product.sku, action.count)
-      }
       return createEntry(action.product, action.count)
 
     case 'increment-item':
@@ -123,9 +128,8 @@ export function cartValuesReducer(state, action) {
 
     case 'set-item-quantity':
       if (action.count < 0) break
-      if (action.sku in state.cartDetails) {
+      if (action.sku in state.cartDetails)
         return updateQuantity(action.sku, action.quantity)
-      }
       break
 
     case 'remove-item-from-cart':
