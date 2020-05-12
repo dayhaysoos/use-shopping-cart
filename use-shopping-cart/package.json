@@ -23,8 +23,7 @@
     "dev": "ntl dev"
   },
   "peerDependencies": {
-    "react": "16.13.1",
-    "stripe": "8.46.0"
+    "react": "16.13.1"
   },
   "devDependencies": {
     "@babel/core": "^7.0.0",
