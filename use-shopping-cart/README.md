@@ -44,30 +44,110 @@ At the root level of your application (or the highest point you'll be using Stri
 
 When loading up Stripe, don't forget to use your public Stripe API key with it. If you need help setting up your environment variables for this, [view a list of environment variable tutorials.](#Environment-Variable-Tutorials)
 
+#### [CheckoutSession mode](https://use-shopping-cart.netlify.app/usage/cartprovider#checkoutsession-mode)
+
+Creating a [CheckoutSession](https://stripe.com/docs/payments/checkout/one-time#create-checkout-session) server-side allows for a more flexible and powerful integration but requires a server component (e.g. a Netlify Function).
+
+At the root level of your app, wrap your Root app in the `<CartProvider />`
+
 ```jsx
-import ReactDOM from 'react-dom';
+import ReactDOM from 'react-dom'
 
-import { loadStripe } from '@stripe/stripe-js';
-import { CartProvider } from 'use-shopping-cart';
+import { loadStripe } from '@stripe/stripe-js'
+import { CartProvider } from 'use-shopping-cart'
 
-import App from './App';
+import App from './App'
 
 // Remember to add your public Stripe key
-const stripePromise = loadStripe(process.env.REACT_APP_STRIPE_API_PUBLIC);
+const stripePromise = loadStripe(process.env.REACT_APP_STRIPE_API_PUBLIC)
+
+ReactDOM.render(
+  <CartProvider mode="server-checkout" stripe={stripePromise} currency="USD">
+    <App />
+  </CartProvider>,
+  document.getElementById('root')
+)
+```
+
+When using CheckoutSessions your product object must adhere to the following shape:
+
+```js
+const products = [
+  {
+    // Line item name to be shown on the Stripe Checkout page
+    name: 'Bananas',
+    // Optional description to be shown on the Stripe Checkout page
+    description: 'Yummy yellow fruit',
+    // A unique identifier for this item (stock keeping unit)
+    sku: 'sku_banana001',
+    // price in smallest currency unit (e.g. cent for USD)
+    price: 400,
+    currency: 'USD',
+    // Optional image to be shown on the Stripe Checkout page
+    image: 'https://my-image.com/image.jpg',
+  },
+  /* ... more products */
+]
+```
+
+Additionally, you must verify the cartItems on the server-side before creating the CheckoutSession. For this you can use the [validateCartItems() helper](https://use-shopping-cart.netlify.app/usage/validateCartItems()).
+
+#### [Client-only Checkout mode](https://use-shopping-cart.netlify.app/usage/cartprovider#client-only-checkout-mode)
+
+To operate a checkout page without any server component you need to enable client-only checkout mode and insert your porudct information in your Stripe Dashboard:
+
+- [Enable client-only Checkout](https://stripe.com/docs/payments/checkout/client#enable-checkout)
+- [Create your products](https://stripe.com/docs/payments/checkout/client#create-products)
+
+At the root level of your app, wrap your Root app in the `<CartProvider />`
+
+```jsx
+import ReactDOM from 'react-dom'
+
+import { loadStripe } from '@stripe/stripe-js'
+import { CartProvider } from 'use-shopping-cart'
+
+import App from './App'
+
+// Remember to add your public Stripe key
+const stripePromise = loadStripe(process.env.REACT_APP_STRIPE_API_PUBLIC)
 
 ReactDOM.render(
   <CartProvider
+    mode="client-only"
     stripe={stripePromise}
-    successUrl="stripe.com"
-    cancelUrl="twitter.com/dayhaysoos"
+    // The URL to which Stripe should send customers when payment is complete.
+    successUrl="http://localhost:3000/success"
+    // The URL to which Stripe should send customers when payment is canceled.
+    cancelUrl="http://localhost:3000"
     currency="USD"
+    // https://stripe.com/docs/payments/checkout/client#collect-shipping-address
     allowedCountries={['US', 'GB', 'CA']}
+    // https://stripe.com/docs/payments/checkout/client#collect-billing-address
     billingAddressCollection={true}
   >
     <App />
   </CartProvider>,
   document.getElementById('root')
-);
+)
+```
+
+When operating in client-only mode you must set the `successUrl` and `cancelUrl` props on the `CartProvider` component, and the product object must adhere to the following shape:
+
+```js
+const products = [
+  {
+    name: 'Bananas',
+    // sku ID from your Stripe Dashboard
+    sku: 'sku_GBJ2Ep8246qeeT',
+    // price in smallest currency unit (e.g. cent for USD)
+    price: 400,
+    currency: 'USD',
+    // Optional image to be shown on the Stripe Checkout page
+    image: 'https://my-image.com/image.jpg',
+  },
+  /* ... more products */
+]
 ```
 
 ### Using the hook
@@ -121,13 +201,13 @@ export function App() {
 
 #### How do I add an item to the user's cart?
 
-To add a product to the cart, use `useShoppingCart()`'s `incrementItem(product)` method. It takes in your product object, which must have a `sku` and a `price`, and adds it to the cart.
+To add a product to the cart, use `useShoppingCart()`'s `addItem(product)` method. It takes in your product object, which must have a `sku` and a `price`, and adds it to the cart.
 
 ```jsx
 import { useShoppingCart, formatCurrencyString } from 'use-shopping-cart';
 
 export function Product({ product }) {
-  const { incrementItem } = useShoppingCart();
+  const { addItem } = useShoppingCart();
 
   /* A helper function that turns the price into a readable format */
   const price = formatCurrencyString({
@@ -146,7 +226,7 @@ export function Product({ product }) {
 
       {/* Adds the item to the cart */}
       <button
-        onClick={() => incrementItem(product)}
+        onClick={() => addItem(product)}
         aria-label={`Add ${product.name} to your cart`}
       >
         Add to cart
@@ -160,7 +240,7 @@ export function Product({ product }) {
 
 Once the user has added their items to the cart, you can use the `cartDetails` object to display the different data about each product in their cart.
 
-Each product in `cartDetails` contains the same data you provided when you called `incrementItem(product)`. In addition, `cartDetails` also provides the following properties:
+Each product in `cartDetails` contains the same data you provided when you called `addItem(product)`. In addition, `cartDetails` also provides the following properties:
 
 <table>
   <tr>
@@ -189,7 +269,7 @@ export function CartItems() {
     cartDetails,
     decrementItem,
     incrementItem,
-    removeCartItem,
+    removeItem,
   } = useShoppingCart();
 
   const cart = [];
@@ -214,7 +294,7 @@ export function CartItems() {
         </button>
         <p>Quantity: {cartEntry.quantity}</p>
         <button
-          onClick={() => incrementItem(cartEntry)}
+          onClick={() => incrementItem(cartEntry.sku)}
           aria-label={`Add one ${cartEntry.name} to your cart`}
         >
           +
@@ -222,7 +302,7 @@ export function CartItems() {
 
         {/* What if we don't want this product at all */}
         <button
-          onClick={() => removeCartItem(cartEntry.sku)}
+          onClick={() => removeItem(cartEntry.sku)}
           aria-label={`Remove all ${cartEntry.name} from your cart`}
         >
           Remove
@@ -235,23 +315,43 @@ export function CartItems() {
 }
 ```
 
-Note that in the above code, to reduce the quantity of a product in the user's cart, you must pass an SKU to `decrementItem()` like so:
+Note that in the above code, to reduce the quantity of a product in the user's cart, you must pass an SKU to `decrementItem()` like so (note that you can also decrease by more than one):
 
 ```js
-decrementItem(cartEntry.sku);
+decrementItem(cartEntry.sku)
+
+// or decrease by a count
+decrementItem(cartEntry.sku, 3)
 ```
 
-Just like you can reduce the quantity of a product you can remove the product entirely with `removeCartItem()`:
+This also works the same when trying to increase the quantity of a product:
 
 ```js
-removeCartItem(cartEntry.sku);
+incrementItem(cartEntry)
+
+// increase by a count
+incrementItem(cartEntry.sku, 4)
 ```
 
-However, those two examples differ from the way that you increase the quantity of a product in the user's cart. Currently, to do this, you must pass the entire `cartEntry` to `incrementItem()`:
+
+Just like you can reduce or increase the quantity of a product you can remove the product entirely with `removeItem()`:
 
 ```js
-incrementItem(cartEntry);
+removeItem(cartEntry.sku)
 ```
+
+#### How could the user set the quantity of an item to a specific number?
+
+This is achievable with the `setItemQuantity(sku, quantity)` method (introduced in 2.0.0). It takes an SKU of a product in the cart and the quantity of that product you wish to have. Here is a very simple example:
+
+```jsx
+export function GiveMeFiveDonutsPlease() {
+  const { setItemQuantity } = useShoppingCart()
+  return <button onClick={() => setItemQuantity('donuts-1a2b3c', 5)}>Set donut quantity to 5</button>
+}
+```
+
+For a real-world robust example visit the [documentation for `setItemQuantity`](https://use-shopping-cart.app/usage/setItemQuantity()).
 
 ## API
 
@@ -259,41 +359,70 @@ You can [view the full API](https://use-shopping-cart.netlify.app/) on our docum
 
 ### `<CartProvider>`
 
-Props for this component:
+Props for this component in Client-only mode:
 
 <table>
   <tr>
     <th>Name</th>
     <th>Type</th>
   </tr>
-    <tr>
-      <td><a href="https://use-shopping-cart.netlify.app/usage/cartprovider#stripe"><code>stripe</code></a></td>
-      <td>Stripe | undefined</td>
-    </tr>
-    <tr>
-      <td><a href="https://use-shopping-cart.netlify.app/usage/cartprovider#successUrl"><code>successUrl</code></a></td>
-      <td>string</td>
-    </tr>
-    <tr>
-      <td><a href="https://use-shopping-cart.netlify.app/usage/cartprovider#cancelUrl"><code>cancelUrl</code></a></td>
-      <td>string</td>
-    </tr>
-    <tr>
-      <td><a href="https://use-shopping-cart.netlify.app/usage/cartprovider#currency"><code>currency</code></a></td>
-      <td>string</td>
-    </tr>
-    <tr>
-      <td><a href="https://use-shopping-cart.netlify.app/usage/cartprovider#language"><code>language</code></a></td>
-      <td>string</td>
-    </tr>
-    <tr>
-      <td><a href="https://use-shopping-cart.netlify.app/usage/cartprovider#billingAddressCollection"><code>billingAddressCollection</code></a></td>
-      <td>boolean</td>
-    </tr>
-    <tr>
-      <td><a href="https://use-shopping-cart.netlify.app/usage/cartprovider#allowedCountries"><code>allowedCountries</code></a></td>
-      <td>null | string[]</td>
-    </tr>
+  <tr>
+    <td><code>mode</code></td>
+    <td>"client-only"</td>
+  </tr>
+  <tr>
+    <td><code>stripe</code></td>
+    <td>Stripe | undefined</td>
+  </tr>
+  <tr>
+    <td><code>successUrl</code></td>
+    <td>string</td>
+  </tr>
+  <tr>
+    <td><code>cancelUrl</code></td>
+    <td>string</td>
+  </tr>
+  <tr>
+    <td><code>currency</code></td>
+    <td>string</td>
+  </tr>
+  <tr>
+    <td><code>language</code></td>
+    <td>string</td>
+  </tr>
+  <tr>
+    <td><code>billingAddressCollection</code></td>
+    <td>boolean</td>
+  </tr>
+  <tr>
+    <td><code>allowedCountries</code></td>
+    <td>null | string[]</td>
+  </tr>
+</table>
+
+And now Server-checkout mode:
+
+<table>
+  <tr>
+    <th>Name</th>
+    <th>Type</th>
+  </tr>
+  <tr>
+    <td><code>mode</code></td>
+    <td>"server-checkout"</td>
+  </tr>
+  <tr>
+    <td><code>stripe</code></td>
+    <td>Stripe | undefined</td>
+  </tr>
+  <tr>
+    <td><code>currency</code></td>
+    <td>string</td>
+  </tr>
+  <tr>
+    <td><code>language</code></td>
+    <td>string</td>
+  </tr>
 </table>
 
 ### `useShoppingCart()`
@@ -307,8 +436,13 @@ Returns an object with all the following properties and methods:
     <th>Return Type</th>
   </tr>
   <tr>
-    <td><a href="https://use-shopping-cart.netlify.app/usage/incrementItem()"><code>incrementItem()</code></a></td>
+    <td><a href="https://use-shopping-cart.netlify.app/usage/addItem()"><code>addItem()</code></a></td>
     <td>product: Object</td>
+    <td>N/A</td>
+  </tr>
+  <tr>
+    <td><a href="https://use-shopping-cart.netlify.app/usage/incrementItem()"><code>incrementItem()</code></a></td>
+    <td>sku: string</td>
     <td>N/A</td>
   </tr>
   <tr>
@@ -317,12 +451,22 @@ Returns an object with all the following properties and methods:
     <td>N/A</td>
   </tr>
   <tr>
-    <td><a href="https://use-shopping-cart.netlify.app/usage/removeCartItem()"><code>removeCartItem()</code></a></td>
+    <td><a href="https://use-shopping-cart.netlify.app/usage/removeItem()"><code>removeItem()</code></a></td>
     <td>sku: string</td>
     <td>N/A</td>
   </tr>
   <tr>
-    <td><a href="https://use-shopping-cart.netlify.app/usage/api#totalPrice"><code>totalPrice()</code></a></td>
+    <td><a href="https://use-shopping-cart.netlify.app/usage/setItemQuantity()"><code>setItemQuantity()</code></a></td>
+    <td>sku: string, quantity: number</td>
+    <td>N/A</td>
+  </tr>
+  <tr>
+    <td><a href="https://use-shopping-cart.netlify.app/usage/api#totalPrice"><code>totalPrice</code></a></td>
+    <td>N/A</td>
+    <td>number</td>
+  </tr>
+  <tr>
+    <td><a href="https://use-shopping-cart.netlify.app/usage/api#formattedTotalPrice"><code>formattedTotalPrice</code></a></td>
     <td>N/A</td>
     <td>string</td>
   </tr>
@@ -367,7 +511,7 @@ This function takes one options argument, these are the options for this functio
   </tr>
   <tr>
     <td>language</td>
-    <td>string</td>
+    <td>string (optional)</td>
   </tr>
 </table>
 
