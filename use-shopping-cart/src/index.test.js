@@ -10,6 +10,7 @@ const stripeMock = {
 
 const createWrapper = (overrides = {}) => ({ children }) => (
   <CartProvider
+    mode="client-only"
     successUrl="https://egghead.io/success"
     cancelUrl="https://egghead.io/cancel"
     stripe={stripeMock}
@@ -472,6 +473,29 @@ describe('redirectToCheckout()', () => {
         .allowedCountries
     ).toEqual(['US', 'CA'])
   })
+
+  it('should send the sessionId if used in server-checkout mode', async () => {
+    const wrapper = createWrapper({ mode: 'server-checkout' })
+    const cart = renderHook(() => useShoppingCart(), { wrapper }).result
+
+    const expectedSessionId = 'bloo-bleh-blah-1234'
+    await cart.current.redirectToCheckout(expectedSessionId)
+
+    expect(stripeMock.redirectToCheckout).toHaveBeenCalled()
+    expect(stripeMock.redirectToCheckout.mock.calls[0][0]).toBe(
+      expectedSessionId
+    )
+  })
+
+  it('invalid mode throws an error', () => {
+    const mode = 'bloo blah bleh'
+    const wrapper = createWrapper({ mode })
+    const cart = renderHook(() => useShoppingCart(), { wrapper }).result
+
+    expect(cart.current.redirectToCheckout()).rejects.toThrow(
+      `Invalid checkout mode '${mode}' was chosen. Valid options are 'client-only' and 'server-checkout'`
+    )
+  })
 })
 
 describe('stripe handling', () => {
@@ -482,14 +506,12 @@ describe('stripe handling', () => {
     expect(stripeMock.redirectToCheckout).toHaveBeenCalled()
   })
 
-  it('if stripe is undefined, redirectToCheckout throws an error', async () => {
+  it('if stripe is undefined, redirectToCheckout throws an error', () => {
     const wrapper = createWrapper({ stripe: null })
     const cart = renderHook(() => useShoppingCart(), { wrapper }).result
-    expect.assertions(1)
-    try {
-      await cart.current.redirectToCheckout()
-    } catch (e) {
-      expect(e).toEqual(new Error('Stripe is not defined'))
-    }
+
+    expect(cart.current.redirectToCheckout()).rejects.toThrow(
+      'Stripe is not defined'
+    )
   })
 })

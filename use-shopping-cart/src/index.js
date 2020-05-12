@@ -129,7 +129,7 @@ export const useShoppingCart = () => {
   const handleCartHover = () => dispatch({ type: 'cart-hover' })
   const handleCloseCart = () => dispatch({ type: 'close-cart' })
 
-  const redirectToCheckout = async (sessionId) => {
+  async function redirectToCheckout(sessionId) {
     if (stripe === null) throw new Error('Stripe is not defined')
     const resolvedStripe = await Promise.resolve(stripe)
 
@@ -145,15 +145,19 @@ export const useShoppingCart = () => {
         submitType: 'auto'
       }
 
-      if (allowedCountries.length)
+      if (allowedCountries?.length)
         options.shippingAddressCollection = { allowedCountries }
 
       const { error } = await resolvedStripe.redirectToCheckout(options)
       if (error) return error
-    } else {
+    } else if (mode === 'server-checkout') {
       // server-checkout mode
       const { error } = await resolvedStripe.redirectToCheckout(sessionId)
       if (error) return error
+    } else {
+      throw new Error(
+        `Invalid checkout mode '${mode}' was chosen. Valid options are 'client-only' and 'server-checkout'`
+      )
     }
   }
 
