@@ -155,9 +155,9 @@ const products = [
 The hook `useShoppingCart()` provides several utilities and pieces of data for you to use in your application. The examples below won't cover every part of the `useShoppingCart()` API but you can [look at the API](#API) below.
 
 ```jsx
-import { useShoppingCart } from 'use-shopping-cart';
-import { Product } from './Product';
-import { CartItems } from './CartItems';
+import { useShoppingCart } from 'use-shopping-cart'
+import { Product } from './Product'
+import { CartItems } from './CartItems'
 
 const productData = [
   {
@@ -174,11 +174,11 @@ const productData = [
     image: 'https://www.fillmurray.com/300/300',
     currency: 'USD',
   },
-];
+]
 
 export function App() {
   /* Gets the totalPrice and a method for redirecting to stripe */
-  const { totalPrice, redirectToCheckout, cartCount } = useShoppingCart();
+  const { totalPrice, redirectToCheckout, cartCount } = useShoppingCart()
 
   return (
     <div>
@@ -195,7 +195,7 @@ export function App() {
       {/* Redirects the user to Stripe */}
       <button onClick={() => redirectToCheckout()}>Checkout</button>
     </div>
-  );
+  )
 }
 ```
 
@@ -204,17 +204,17 @@ export function App() {
 To add a product to the cart, use `useShoppingCart()`'s `addItem(product)` method. It takes in your product object, which must have a `sku` and a `price`, and adds it to the cart.
 
 ```jsx
-import { useShoppingCart, formatCurrencyString } from 'use-shopping-cart';
+import { useShoppingCart, formatCurrencyString } from 'use-shopping-cart'
 
 export function Product({ product }) {
-  const { addItem } = useShoppingCart();
+  const { addItem } = useShoppingCart()
 
   /* A helper function that turns the price into a readable format */
   const price = formatCurrencyString({
     value: product.price,
     currency: product.currency,
     language: navigator.language,
-  });
+  })
 
   return (
     <article>
@@ -232,7 +232,7 @@ export function Product({ product }) {
         Add to cart
       </button>
     </article>
-  );
+  )
 }
 ```
 
@@ -262,7 +262,7 @@ Each product in `cartDetails` contains the same data you provided when you calle
 </table>
 
 ```jsx
-import { useShoppingCart } from 'use-shopping-cart';
+import { useShoppingCart } from 'use-shopping-cart'
 
 export function CartItems() {
   const {
@@ -270,12 +270,12 @@ export function CartItems() {
     decrementItem,
     incrementItem,
     removeItem,
-  } = useShoppingCart();
+  } = useShoppingCart()
 
-  const cart = [];
+  const cart = []
   // Note: Object.keys().map() takes 2x as long as a for-in loop
   for (const sku in cartDetails) {
-    const cartEntry = cartDetails[sku];
+    const cartEntry = cartDetails[sku]
 
     // all of your basic product data still exists (i.e. name, image, price)
     cart.push(
@@ -308,10 +308,10 @@ export function CartItems() {
           Remove
         </button>
       </article>
-    );
+    )
   }
 
-  return cart;
+  return cart
 }
 ```
 
