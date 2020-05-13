@@ -36,16 +36,16 @@ declare module 'use-shopping-cart' {
      */
     allowedCountries?: null | string[]
   }
-  interface ServerCheckoutProviderProps extends CommonProviderProps {
+  interface CheckoutSessionProviderProps extends CommonProviderProps {
     /**
      * Determines checkout mode
      */
-    mode: 'server-checkout'
+    mode: 'checkout-session'
   }
 
   export type ProviderProps =
     | ClientOnlyProviderProps
-    | ServerCheckoutProviderProps
+    | CheckoutSessionProviderProps
 
   /**
    * Context provider to interact with Stripe API
@@ -151,7 +151,7 @@ declare module 'use-shopping-cart' {
     readonly cartDetails: CartDetails
     /**
      * Redirects customers to the Stripe checkout
-     * @param sessionId only used in Server-checkout mode
+     * @param sessionId only used in CheckoutSession mode
      * @returns Nothing or an error wrapped in a promise if an error occurred
      */
     redirectToCheckout: (sessionId?: string) => Promise<undefined | Error>

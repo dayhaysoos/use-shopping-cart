@@ -150,13 +150,13 @@ export const useShoppingCart = () => {
 
       const { error } = await resolvedStripe.redirectToCheckout(options)
       if (error) return error
-    } else if (mode === 'server-checkout') {
-      // server-checkout mode
+    } else if (mode === 'checkout-session') {
+      // checkout-session mode
       const { error } = await resolvedStripe.redirectToCheckout(sessionId)
       if (error) return error
     } else {
       throw new Error(
-        `Invalid checkout mode '${mode}' was chosen. Valid options are 'client-only' and 'server-checkout'`
+        `Invalid checkout mode '${mode}' was chosen. Valid options are 'client-only' and 'checkout-session'`
       )
     }
   }

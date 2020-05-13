@@ -474,8 +474,8 @@ describe('redirectToCheckout()', () => {
     ).toEqual(['US', 'CA'])
   })
 
-  it('should send the sessionId if used in server-checkout mode', async () => {
-    const wrapper = createWrapper({ mode: 'server-checkout' })
+  it('should send the sessionId if used in checkout-session mode', async () => {
+    const wrapper = createWrapper({ mode: 'checkout-session' })
     const cart = renderHook(() => useShoppingCart(), { wrapper }).result
 
     const expectedSessionId = 'bloo-bleh-blah-1234'
@@ -493,7 +493,7 @@ describe('redirectToCheckout()', () => {
     const cart = renderHook(() => useShoppingCart(), { wrapper }).result
 
     expect(cart.current.redirectToCheckout()).rejects.toThrow(
-      `Invalid checkout mode '${mode}' was chosen. Valid options are 'client-only' and 'server-checkout'`
+      `Invalid checkout mode '${mode}' was chosen. Valid options are 'client-only' and 'checkout-session'`
     )
   })
 })

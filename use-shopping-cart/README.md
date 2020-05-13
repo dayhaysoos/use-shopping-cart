@@ -52,7 +52,7 @@ import App from './App'
 const stripePromise = loadStripe(process.env.REACT_APP_STRIPE_API_PUBLIC)
 
 ReactDOM.render(
-  <CartProvider mode="server-checkout" stripe={stripePromise} currency="USD">
+  <CartProvider mode="checkout-session" stripe={stripePromise} currency="USD">
     <App />
   </CartProvider>,
   document.getElementById('root')
@@ -390,7 +390,7 @@ Props for this component in Client-only mode:
   </tr>
 </table>
 
-And now Server-checkout mode:
+And now, CheckoutSession mode:
 
 <table>
   <tr>
@@ -399,7 +399,7 @@ And now Server-checkout mode:
   </tr>
   <tr>
     <td><code>mode</code></td>
-    <td>"server-checkout"</td>
+    <td>"checkout-session"</td>
   </tr>
   <tr>
     <td><code>stripe</code></td>
