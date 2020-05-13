@@ -1,28 +1,28 @@
-import React from 'react';
-import { Link } from 'gatsby';
-import { useShoppingCart, formatCurrencyString } from 'use-shopping-cart';
+import React from 'react'
+import { Link } from 'gatsby'
+import { useShoppingCart, formatCurrencyString } from 'use-shopping-cart'
 
 export function RedirectToCheckout({ product }) {
-  const { redirectToCheckout, cartCount } = useShoppingCart();
+  const { redirectToCheckout, cartCount } = useShoppingCart()
 
-  const hasItems = cartCount > 0;
+  const hasItems = cartCount > 0
 
   const handleClick = (e) => {
-    e.preventDefault();
+    e.preventDefault()
 
     if (hasItems) {
-      redirectToCheckout();
+      redirectToCheckout()
     } else {
-      alert('Please head to incrementItem() and add an item to the cart');
+      alert('Please head to incrementItem() and add an item to the cart')
     }
-  };
+  }
 
   /* A helper function that turns the price into a readable format */
   const price = formatCurrencyString({
     value: product.price,
     currency: product.currency,
-    language: 'en-US',
-  });
+    language: 'en-US'
+  })
   return (
     <article
       style={{
@@ -30,7 +30,7 @@ export function RedirectToCheckout({ product }) {
         flexDirection: 'column',
         justifyContent: 'center',
         alignItems: 'center',
-        width: '50%',
+        width: '50%'
       }}
     >
       <figure style={{ textAlign: 'center' }}>
@@ -59,7 +59,7 @@ export function RedirectToCheckout({ product }) {
         Checkout
       </button>
     </article>
-  );
+  )
 }
 
-export default RedirectToCheckout;
+export default RedirectToCheckout

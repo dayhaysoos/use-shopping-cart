@@ -1,28 +1,28 @@
-import React from "react";
-import { useShoppingCart } from "use-shopping-cart";
+import React from 'react'
+import { useShoppingCart } from 'use-shopping-cart'
 
 export function CartDisplayWrapper({ children }) {
-  const { cartDetails, clearCart } = useShoppingCart();
+  const { cartDetails, clearCart } = useShoppingCart()
 
   return (
     <section
       style={{
-        display: "flex",
-        overflow: "hidden",
-        flexWrap: "wrap",
-        marginBottom: 30,
+        display: 'flex',
+        overflow: 'hidden',
+        flexWrap: 'wrap',
+        marginBottom: 30
       }}
     >
       {children}
-      <div style={{ width: "50%" }}>
+      <div style={{ width: '50%' }}>
         <pre
           style={{
-            backgroundColor: "lightgray",
+            backgroundColor: 'lightgray',
             marginBottom: 10,
             fontSize: 12,
             padding: 10,
             height: 200,
-            overflow: "scroll",
+            overflow: 'scroll'
           }}
         >
           {JSON.stringify(cartDetails, null, 2)}
@@ -32,7 +32,7 @@ export function CartDisplayWrapper({ children }) {
         </button>
       </div>
     </section>
-  );
+  )
 }
 
-export default CartDisplayWrapper;
+export default CartDisplayWrapper

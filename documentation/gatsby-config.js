@@ -11,7 +11,7 @@ module.exports = {
     siteLanguage: `en`,
     themeColor: `#7159c1`,
     basePath: `/`,
-    footer: `use-shopping-cart`,
+    footer: `use-shopping-cart`
   },
   plugins: [
     {
@@ -20,8 +20,8 @@ module.exports = {
         configPath: `src/config`,
         docsPath: `src/docs`,
         githubUrl: `https://github.com/rocketseat/gatsby-themes`,
-        baseDir: `examples/gatsby-theme-docs`,
-      },
+        baseDir: `examples/gatsby-theme-docs`
+      }
     },
     {
       resolve: `gatsby-plugin-manifest`,
@@ -31,22 +31,22 @@ module.exports = {
         start_url: `/`,
         background_color: `#ffffff`,
         display: `standalone`,
-        icon: `static/favicon.png`,
-      },
+        icon: `static/favicon.png`
+      }
     },
     `gatsby-plugin-sitemap`,
     {
       resolve: `gatsby-plugin-google-analytics`,
       options: {
-        trackingId: `UA-165110403-1`,
-      },
+        trackingId: `UA-165110403-1`
+      }
     },
     {
       resolve: `gatsby-plugin-canonical-urls`,
       options: {
-        siteUrl: `https://use-shopping-cart.netlify.app`,
-      },
+        siteUrl: `https://use-shopping-cart.netlify.app`
+      }
     },
-    `gatsby-plugin-offline`,
-  ],
+    `gatsby-plugin-offline`
+  ]
 }

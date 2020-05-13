@@ -1,15 +1,15 @@
-import React from 'react';
-import { useShoppingCart, formatCurrencyString } from 'use-shopping-cart';
+import React from 'react'
+import { useShoppingCart, formatCurrencyString } from 'use-shopping-cart'
 
 export function IncrementItem({ product }) {
-  const { incrementItem } = useShoppingCart();
+  const { incrementItem } = useShoppingCart()
 
   /* A helper function that turns the price into a readable format */
   const price = formatCurrencyString({
     value: product.price,
     currency: product.currency,
-    language: 'en-US',
-  });
+    language: 'en-US'
+  })
   return (
     <article
       style={{
@@ -17,7 +17,7 @@ export function IncrementItem({ product }) {
         flexDirection: 'column',
         justifyContent: 'center',
         alignItems: 'center',
-        width: '50%',
+        width: '50%'
       }}
     >
       <figure style={{ textAlign: 'center' }}>
@@ -34,7 +34,7 @@ export function IncrementItem({ product }) {
         style={{
           width: '100%',
           display: 'flex',
-          justifyContent: 'space-evenly',
+          justifyContent: 'space-evenly'
         }}
       >
         <button
@@ -53,7 +53,7 @@ export function IncrementItem({ product }) {
         </button>
       </section>
     </article>
-  );
+  )
 }
 
-export default IncrementItem;
+export default IncrementItem

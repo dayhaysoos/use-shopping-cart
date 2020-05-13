@@ -5,9 +5,9 @@
  * @see https://stripe.com/docs/payments/checkout/one-time
  */
 
-const stripe = require('stripe')(process.env.REACT_APP_STRIPE_API_SECRET);
+const stripe = require('stripe')(process.env.REACT_APP_STRIPE_API_SECRET)
 const validateCartItems = require('use-shopping-cart/src/serverUtil')
-  .validateCartItems;
+  .validateCartItems
 
 /*
  * Product data can be loaded from anywhere. In this case, we’re loading it from
@@ -17,19 +17,19 @@ const validateCartItems = require('use-shopping-cart/src/serverUtil')
  * The important thing is that the product info is loaded from somewhere trusted
  * so you know the pricing information is accurate.
  */
-const inventory = require('./data/products.json');
+const inventory = require('./data/products.json')
 
 exports.handler = async (event) => {
   try {
-    const productJSON = JSON.parse(event.body);
+    const productJSON = JSON.parse(event.body)
 
-    const line_items = validateCartItems(inventory, productJSON);
+    const line_items = validateCartItems(inventory, productJSON)
 
     const session = await stripe.checkout.sessions.create({
       payment_method_types: ['card'],
       billing_address_collection: 'auto',
       shipping_address_collection: {
-        allowed_countries: ['US', 'CA'],
+        allowed_countries: ['US', 'CA']
       },
 
       /*
@@ -40,14 +40,14 @@ exports.handler = async (event) => {
        */
       success_url: `${process.env.URL}/success.html`,
       cancel_url: process.env.URL,
-      line_items,
-    });
+      line_items
+    })
 
     return {
       statusCode: 200,
-      body: JSON.stringify({ sessionId: session.id }),
-    };
+      body: JSON.stringify({ sessionId: session.id })
+    }
   } catch (error) {
-    console.error(error);
+    console.error(error)
   }
-};
+}

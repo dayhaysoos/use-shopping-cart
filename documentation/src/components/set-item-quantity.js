@@ -1,19 +1,19 @@
-import React from 'react';
-import { useShoppingCart, formatCurrencyString } from 'use-shopping-cart';
+import React from 'react'
+import { useShoppingCart, formatCurrencyString } from 'use-shopping-cart'
 
 export function SetItemQuantity({ product }) {
-  const { setItemQuantity, cartDetails } = useShoppingCart();
+  const { setItemQuantity, cartDetails } = useShoppingCart()
 
   const itemQuantity = !cartDetails[product.sku]
     ? 0
-    : cartDetails[product.sku].quantity;
+    : cartDetails[product.sku].quantity
 
   /* A helper function that turns the price into a readable format */
   const price = formatCurrencyString({
     value: product.price,
     currency: product.currency,
-    language: 'en-US',
-  });
+    language: 'en-US'
+  })
   return (
     <article
       style={{
@@ -21,7 +21,7 @@ export function SetItemQuantity({ product }) {
         flexDirection: 'column',
         justifyContent: 'center',
         alignItems: 'center',
-        width: '50%',
+        width: '50%'
       }}
     >
       <figure style={{ textAlign: 'center' }}>
@@ -37,14 +37,14 @@ export function SetItemQuantity({ product }) {
       <input
         type={'number'}
         defaultValue={itemQuantity}
-        onChange={e => {
-          const { value } = e.target;
+        onChange={(e) => {
+          const { value } = e.target
 
-          setItemQuantity(product.sku, value);
+          setItemQuantity(product.sku, value)
         }}
       />
     </article>
-  );
+  )
 }
 
-export default SetItemQuantity;
+export default SetItemQuantity

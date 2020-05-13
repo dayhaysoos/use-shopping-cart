@@ -1,8 +1,8 @@
-import React from 'react';
-import { Link } from 'gatsby';
+import React from 'react'
+import { Link } from 'gatsby'
 
-import Layout from '@rocketseat/gatsby-theme-docs/src/components/Layout';
-import SEO from '@rocketseat/gatsby-theme-docs/src/components/SEO';
+import Layout from '@rocketseat/gatsby-theme-docs/src/components/Layout'
+import SEO from '@rocketseat/gatsby-theme-docs/src/components/SEO'
 
 export default function NotFound() {
   return (
@@ -14,5 +14,5 @@ export default function NotFound() {
         .
       </p>
     </Layout>
-  );
+  )
 }

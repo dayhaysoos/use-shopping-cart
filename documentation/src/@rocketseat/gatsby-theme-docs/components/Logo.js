@@ -1,5 +1,4 @@
 import React from 'react'
-import { Link } from 'gatsby'
 require('typeface-bungee')
 
 const Logo = () => {
@@ -9,12 +8,12 @@ const Logo = () => {
       style={{
         backgroundColor: 'white',
         color: '#3E4C93',
-        fontFamily: 'bungee',
+        fontFamily: 'bungee'
       }}
     >
       use-shopping-cart
     </span>
-  );
-};
+  )
+}
 
 export default Logo

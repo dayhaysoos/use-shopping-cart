@@ -8,7 +8,7 @@ export default {
       heading: '#aaa',
       linkActive: '#13131A',
       itemActive: '#F5F5FA',
-      footer: 'black',
-    },
-  },
+      footer: 'black'
+    }
+  }
 }

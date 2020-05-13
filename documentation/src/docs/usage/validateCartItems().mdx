@@ -38,7 +38,7 @@ exports.handler = async (event) => {
       payment_method_types: ['card'],
       billing_address_collection: 'auto',
       shipping_address_collection: {
-        allowed_countries: ['US', 'CA'],
+        allowed_countries: ['US', 'CA']
       },
 
       /*
@@ -49,12 +49,12 @@ exports.handler = async (event) => {
        */
       success_url: `${process.env.URL}/success.html`,
       cancel_url: process.env.URL,
-      line_items,
+      line_items
     })
 
     return {
       statusCode: 200,
-      body: JSON.stringify({ sessionId: session.id }),
+      body: JSON.stringify({ sessionId: session.id })
     }
   } catch (error) {
     console.error(error)

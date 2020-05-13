@@ -1,15 +1,15 @@
-import React from 'react';
-import { useShoppingCart, formatCurrencyString } from 'use-shopping-cart';
+import React from 'react'
+import { useShoppingCart, formatCurrencyString } from 'use-shopping-cart'
 
 export function DecrementItem({ product }) {
-  const { decrementItem } = useShoppingCart();
+  const { decrementItem } = useShoppingCart()
 
   /* A helper function that turns the price into a readable format */
   const price = formatCurrencyString({
     value: product.price,
     currency: product.currency,
-    language: 'en-US',
-  });
+    language: 'en-US'
+  })
   return (
     <article
       style={{
@@ -17,7 +17,7 @@ export function DecrementItem({ product }) {
         flexDirection: 'column',
         justifyContent: 'center',
         alignItems: 'center',
-        width: '50%',
+        width: '50%'
       }}
     >
       <figure style={{ textAlign: 'center' }}>
@@ -34,7 +34,7 @@ export function DecrementItem({ product }) {
         style={{
           width: '100%',
           display: 'flex',
-          justifyContent: 'space-evenly',
+          justifyContent: 'space-evenly'
         }}
       >
         <button
@@ -53,7 +53,7 @@ export function DecrementItem({ product }) {
         </button>
       </section>
     </article>
-  );
+  )
 }
 
-export default DecrementItem;
+export default DecrementItem

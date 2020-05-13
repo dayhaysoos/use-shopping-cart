@@ -1,8 +1,8 @@
-import React from 'react';
-import { useShoppingCart } from 'use-shopping-cart';
+import React from 'react'
+import { useShoppingCart } from 'use-shopping-cart'
 
 export function API() {
-  const { cartCount, totalPrice, formattedTotalPrice } = useShoppingCart();
+  const { cartCount, totalPrice, formattedTotalPrice } = useShoppingCart()
 
   return (
     <>
@@ -11,7 +11,7 @@ export function API() {
       <label>Formatted Total Price:</label>
       <p>{formattedTotalPrice}</p>
     </>
-  );
+  )
 }
 
-export default API;
+export default API
