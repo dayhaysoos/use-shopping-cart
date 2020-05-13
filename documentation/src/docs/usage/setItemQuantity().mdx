@@ -27,9 +27,7 @@ import { useShoppingCart, formatCurrencyString } from 'use-shopping-cart'
 function Product({ product }) {
   const { setItemQuantity, cartDetails } = useShoppingCart()
 
-  const itemQuantity = !cartDetails[product.sku]
-    ? 0
-    : cartDetails[product.sku].quantity
+  const itemQuantity = cartDetails[product.sku]?.quantity ?? 0
 
   /* A helper function that turns the price into a readable format */
   const price = formatCurrencyString({
@@ -56,16 +54,21 @@ function Product({ product }) {
         <figcaption>{product.name}</figcaption>
       </figure>
       <p>{price}</p>
-      {/* Adds the item to the cart */}
-      <input
-        type={'number'}
-        defaultValue={itemQuantity}
-        onChange={(e) => {
-          const { value } = e.target
 
-          setItemQuantity(product.sku, value)
+      {/* Dropdown to change the item's quantity */}
+      <select
+        defaultValue={itemQuantity}
+        onChange={(event) => {
+          setItemQuantity(product.sku, event.target.value)
         }}
-      />
+      >
+        <option value="1">1</option>
+        <option value="2">2</option>
+        <option value="3">3</option>
+        <option value="4">4</option>
+        <option value="5">5</option>
+        <option value="6">6</option>
+      </select>
     </article>
   )
 }

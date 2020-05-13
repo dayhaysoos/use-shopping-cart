@@ -33,16 +33,20 @@ export function SetItemQuantity({ product }) {
         <figcaption>{product.name}</figcaption>
       </figure>
       <p>{price}</p>
-      {/* Adds the item to the cart */}
-      <input
-        type={'number'}
+      {/* Dropdown to change the item's quantity */}
+      <select
         defaultValue={itemQuantity}
-        onChange={(e) => {
-          const { value } = e.target
-
-          setItemQuantity(product.sku, value)
+        onChange={(event) => {
+          setItemQuantity(product.sku, event.target.value)
         }}
-      />
+      >
+        <option value="1">1</option>
+        <option value="2">2</option>
+        <option value="3">3</option>
+        <option value="4">4</option>
+        <option value="5">5</option>
+        <option value="6">6</option>
+      </select>
     </article>
   )
 }
