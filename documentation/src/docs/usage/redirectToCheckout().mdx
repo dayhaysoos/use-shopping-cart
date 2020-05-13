@@ -12,8 +12,8 @@ from Stripe because all of the config is handled in the [CartProvider](cartprovi
 
 This is how you'd use `redirectToCheckout()` with a serverless function:
 
-import CartDisplayWrapper from 'components/cart-display-wrapper'
-import RedirectToCheckout from 'components/redirect-to-checkout'
+import CartDisplayWrapper from 'components/cart-display-wrapper';
+import RedirectToCheckout from 'components/redirect-to-checkout';
 
 <CartDisplayWrapper>
   <RedirectToCheckout
@@ -29,64 +29,68 @@ import RedirectToCheckout from 'components/redirect-to-checkout'
 </CartDisplayWrapper>
 
 ```jsx
-import { useShoppingCart } from 'use-shopping-cart'
+import { useShoppingCart } from 'use-shopping-cart';
+import { formatCurrencyString } from '../util';
 
-const { redirectToCheckout, cartCount } = useShoppingCart()
+function Product(product) {
+  const { redirectToCheckout, cartCount } = useShoppingCart();
 
-const hasItems = cartCount > 0
+  const hasItems = cartCount > 0;
 
-const handleClick = (e) => {
-  e.preventDefault()
+  const handleClick = (e) => {
+    e.preventDefault();
 
-  if (hasItems) {
-    redirectToCheckout()
-  } else {
-    alert('Please head to incrementItem() and add an item to the cart')
-  }
-}
+    if (hasItems) {
+      redirectToCheckout();
+    } else {
+      alert('Please head to incrementItem() and add an item to the cart');
+    }
+  };
 
-/* A helper function that turns the price into a readable format */
-const price = formatCurrencyString({
-  value: product.price,
-  currency: product.currency,
-  language: 'en-US',
-})
-return (
-  <article
-    style={{
-      display: 'flex',
-      flexDirection: 'column',
-      justifyContent: 'center',
-      alignItems: 'center',
-      width: '50%',
-    }}
-  >
-    <figure style={{ textAlign: 'center' }}>
-      <img
-        style={{ height: 200, width: 250 }}
-        src={product.image}
-        alt={product.name}
-      />
-      <figcaption>{product.name}</figcaption>
-    </figure>
-    <p>{price}</p>
-
-    {!hasItems && (
-      <p style={{ color: 'black' }}>
-        Please go to <Link to={'/usage/incrementItem()'}>incrementItem()</Link> and add an
-        item to the cart
-      </p>
-    )}
-
-    <button
-      onClick={handleClick}
-      aria-label={`Add ${product.name} to your cart`}
-      style={{ height: 50, width: 100, marginBottom: 30 }}
+  /* A helper function that turns the price into a readable format */
+  const price = formatCurrencyString({
+    value: product.price,
+    currency: product.currency,
+    language: 'en-US',
+  });
+  return (
+    <article
+      style={{
+        display: 'flex',
+        flexDirection: 'column',
+        justifyContent: 'center',
+        alignItems: 'center',
+        width: '50%',
+      }}
     >
-      Checkout
-    </button>
-  </article>
-)
+      <figure style={{ textAlign: 'center' }}>
+        <img
+          style={{ height: 200, width: 250 }}
+          src={product.image}
+          alt={product.name}
+        />
+        <figcaption>{product.name}</figcaption>
+      </figure>
+      <p>{price}</p>
+
+      {!hasItems && (
+        <p style={{ color: 'black' }}>
+          Please go to{' '}
+          <Link to={'/usage/incrementItem()'}>incrementItem()</Link> and add an
+          item to the cart
+        </p>
+      )}
+
+      <button
+        onClick={handleClick}
+        aria-label={`Add ${product.name} to your cart`}
+        style={{ height: 50, width: 100, marginBottom: 30 }}
+      >
+        Checkout
+      </button>
+    </article>
+  );
+}
 ```
 
 Please refer to [Stripe's official documentation](https://stripe.com/docs/js/checkout/redirect_to_checkout)

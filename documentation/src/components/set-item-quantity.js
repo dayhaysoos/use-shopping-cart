@@ -43,13 +43,6 @@ export function SetItemQuantity({ product }) {
           setItemQuantity(product.sku, value);
         }}
       />
-      {/* <button
-        onClick={() => setItemQuantity(product.sku), 10}
-        aria-label={`Add one ${product.name} to your cart`}
-        style={{ height: 50, width: 100, marginBottom: 30 }}
-      >
-        {`Add one ${product.name} to your cart`}
-      </button> */}
     </article>
   );
 }

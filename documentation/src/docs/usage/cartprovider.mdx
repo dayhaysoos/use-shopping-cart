@@ -20,7 +20,7 @@ import App from './App';
 const stripePromise = loadStripe(process.env.REACT_APP_STRIPE_API_PUBLIC);
 
 ReactDOM.render(
-  <CartProvider stripe={stripePromise} currency="USD">
+  <CartProvider mode={'checkout-session'} stripe={stripePromise} currency="USD">
     <App />
   </CartProvider>,
   document.getElementById('root')
@@ -81,6 +81,8 @@ ReactDOM.render(
     allowedCountries={['US', 'GB', 'CA']}
     // https://stripe.com/docs/payments/checkout/client#collect-billing-address
     billingAddressCollection={true}
+    // The mode for how you want to use the hooks. 'client-only' and 'checkout-session' are the options
+    mode={'client-only'}
   >
     <App />
   </CartProvider>,
