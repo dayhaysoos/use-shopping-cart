@@ -17,22 +17,12 @@
 ## Installation
 
 ```bash
-npm install --save @stripe/stripe-js use-shopping-cart
-
-# or
-
+# With Yarn
 yarn add @stripe/stripe-js use-shopping-cart
+
+# With NPM
+npm install --save @stripe/stripe-js use-shopping-cart
 ```
-
-## Development
-
-To run this package for development run:
-
-`yarn dev`
-
-To run tests:
-
-`yarn test`
 
 ## Usage
 
@@ -529,6 +519,31 @@ The following tutorials teach how to set up your custom environment variables fo
 MIT © [dayhaysoos](https://github.com/dayhaysoos)
 
 ---
+
+## Working on this project:
+
+If you're working on this project don't forget to check out
+[the CONTRIBUTING.md file](https://github.com/dayhaysoos/use-shopping-cart/blob/master/use-shopping-cart/CONTRIBUTING.md).
+
+Before you run any of the examples be sure to set your environment variables at the root of
+the project in a `.env` file:
+
+```dotenv
+REACT_APP_STRIPE_API_PUBLIC=pk_test_YOUR_PUBLIC_TEST_KEY
+REACT_APP_STRIPE_API_SECRET=sk_test_YOUR_SECRET_TEST_KEY
+```
+
+
+Here are a couple commands to get you started in development:
+
+```bash
+# Run the development environment which builds use-shopping-cart in watch-mode
+# and starts the CRA example with Netlify functions
+yarn dev
+
+# Runs tests in watch-mode
+yarn test
+```
 
 We created this hook with [create-react-hook](https://github.com/hermanya/create-react-hook).
 
