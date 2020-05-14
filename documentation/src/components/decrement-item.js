@@ -1,59 +1,64 @@
 import React from 'react'
-import { useShoppingCart, formatCurrencyString } from 'use-shopping-cart'
+import { useShoppingCart } from 'use-shopping-cart'
+import { AddMoreItems } from './utilities'
 
-export function DecrementItem({ product }) {
-  const { decrementItem } = useShoppingCart()
+export function DecrementItem() {
+  const { decrementItem, cartDetails } = useShoppingCart()
 
-  /* A helper function that turns the price into a readable format */
-  const price = formatCurrencyString({
-    value: product.price,
-    currency: product.currency,
-    language: 'en-US'
-  })
-  return (
-    <article
-      style={{
-        display: 'flex',
-        flexDirection: 'column',
-        justifyContent: 'center',
-        alignItems: 'center',
-        width: '50%'
-      }}
-    >
-      <figure style={{ textAlign: 'center' }}>
-        <img
-          style={{ height: 200, width: 250 }}
-          src={product.image}
-          alt={product.name}
-        />
-        <figcaption>{product.name}</figcaption>
-      </figure>
-      <p>{price}</p>
-      {/* Removes the item from the cart */}
-      <section
+  const entries = []
+  for (const sku in cartDetails) {
+    const entry = cartDetails[sku]
+    entries.push(
+      <article
         style={{
-          width: '100%',
           display: 'flex',
-          justifyContent: 'space-evenly'
+          flexDirection: 'column',
+          justifyContent: 'center',
+          alignItems: 'center',
+          width: '50%'
         }}
       >
-        <button
-          onClick={() => decrementItem(product.sku)}
-          aria-label={`Remove one ${product.name} from your cart`}
-          style={{ height: 50, width: 100, marginBottom: 30 }}
+        <figure style={{ textAlign: 'center' }}>
+          <img
+            style={{ height: 200, width: 250 }}
+            src={entry.image}
+            alt={entry.name}
+          />
+          <figcaption>{entry.name}</figcaption>
+        </figure>
+        <p>{entry.formattedValue}</p>
+
+        <section
+          style={{
+            width: '100%',
+            display: 'flex',
+            justifyContent: 'space-evenly'
+          }}
         >
-          {`Remove one ${product.name} from your cart`}
-        </button>
-        <button
-          onClick={() => decrementItem(product.sku, 10)}
-          aria-label={`Remove by 10`}
-          style={{ height: 50, width: 100, marginBottom: 30 }}
-        >
-          {`Remove 10 ${product.name} from your cart`}
-        </button>
-      </section>
-    </article>
-  )
+          {/* Decreases the quantity of the item */}
+          <button
+            onClick={() => decrementItem(sku)}
+            aria-label={`Remove one ${entry.name} from your cart`}
+            style={{ height: 50, width: 100, marginBottom: 30 }}
+          >
+            Remove one {entry.name} to your cart
+          </button>
+
+          {/* Decreases the item quantity by 10 */}
+          <button
+            onClick={() => decrementItem(sku, 10)}
+            aria-label={`Remove ten ${entry.name} from your cart`}
+            style={{ height: 50, width: 100, marginBottom: 30 }}
+          >
+            Remove 10 {entry.name} to your cart
+          </button>
+        </section>
+      </article>
+    )
+  }
+
+  if (entries.length) return entries
+  return <AddMoreItems />
 }
 
 export default DecrementItem

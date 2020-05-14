@@ -1,28 +1,23 @@
-import React from 'react'
+import React, { useState } from 'react'
 import { Link } from 'gatsby'
-import { useShoppingCart, formatCurrencyString } from 'use-shopping-cart'
+import { useShoppingCart } from 'use-shopping-cart'
 
-export function RedirectToCheckout({ product }) {
+export function RedirectToCheckout() {
+  const [status, setStatus] = useState('idle')
   const { redirectToCheckout, cartCount } = useShoppingCart()
 
-  const hasItems = cartCount > 0
+  async function handleClick(event) {
+    event.preventDefault()
 
-  const handleClick = (e) => {
-    e.preventDefault()
-
-    if (hasItems) {
-      redirectToCheckout()
+    if (cartCount > 0) {
+      setStatus('idle')
+      const error = await redirectToCheckout()
+      if (error) setStatus('redirect-error')
     } else {
-      alert('Please head to incrementItem() and add an item to the cart')
+      setStatus('missing-items')
     }
   }
 
-  /* A helper function that turns the price into a readable format */
-  const price = formatCurrencyString({
-    value: product.price,
-    currency: product.currency,
-    language: 'en-US'
-  })
   return (
     <article
       style={{
@@ -33,27 +28,20 @@ export function RedirectToCheckout({ product }) {
         width: '50%'
       }}
     >
-      <figure style={{ textAlign: 'center' }}>
-        <img
-          style={{ height: 200, width: 250 }}
-          src={product.image}
-          alt={product.name}
-        />
-        <figcaption>{product.name}</figcaption>
-      </figure>
-      <p>{price}</p>
-
-      {!hasItems && (
-        <p style={{ color: 'black' }}>
-          Please go to{' '}
-          <Link to={'/usage/incrementItem()'}>incrementItem()</Link> and add an
-          item to the cart
+      {status === 'missing-items' && (
+        <p>
+          Your cart is empty. Please go to{' '}
+          <Link to={'/usage/addItem()'}>addItem()</Link> and add an item to the
+          cart
         </p>
+      )}
+
+      {status === 'redirect-error' && (
+        <p>Unable to redirect to Stripe checkout page.</p>
       )}
 
       <button
         onClick={handleClick}
-        aria-label={`Add ${product.name} to your cart`}
         style={{ height: 50, width: 100, marginBottom: 30 }}
       >
         Checkout

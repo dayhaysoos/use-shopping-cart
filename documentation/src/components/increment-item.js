@@ -1,59 +1,64 @@
 import React from 'react'
-import { useShoppingCart, formatCurrencyString } from 'use-shopping-cart'
+import { useShoppingCart } from 'use-shopping-cart'
+import { AddMoreItems } from './utilities'
 
-export function IncrementItem({ product }) {
-  const { incrementItem } = useShoppingCart()
+export function IncrementItem() {
+  const { incrementItem, cartDetails } = useShoppingCart()
 
-  /* A helper function that turns the price into a readable format */
-  const price = formatCurrencyString({
-    value: product.price,
-    currency: product.currency,
-    language: 'en-US'
-  })
-  return (
-    <article
-      style={{
-        display: 'flex',
-        flexDirection: 'column',
-        justifyContent: 'center',
-        alignItems: 'center',
-        width: '50%'
-      }}
-    >
-      <figure style={{ textAlign: 'center' }}>
-        <img
-          style={{ height: 200, width: 250 }}
-          src={product.image}
-          alt={product.name}
-        />
-        <figcaption>{product.name}</figcaption>
-      </figure>
-      <p>{price}</p>
-      {/* Adds the item to the cart */}
-      <section
+  const entries = []
+  for (const sku in cartDetails) {
+    const entry = cartDetails[sku]
+    entries.push(
+      <article
         style={{
-          width: '100%',
           display: 'flex',
-          justifyContent: 'space-evenly'
+          flexDirection: 'column',
+          justifyContent: 'center',
+          alignItems: 'center',
+          width: '50%'
         }}
       >
-        <button
-          onClick={() => incrementItem(product.sku)}
-          aria-label={`Add one ${product.name} to your cart`}
-          style={{ height: 50, width: 100, marginBottom: 30 }}
+        <figure style={{ textAlign: 'center' }}>
+          <img
+            style={{ height: 200, width: 250 }}
+            src={entry.image}
+            alt={entry.name}
+          />
+          <figcaption>{entry.name}</figcaption>
+        </figure>
+        <p>{entry.formattedValue}</p>
+
+        <section
+          style={{
+            width: '100%',
+            display: 'flex',
+            justifyContent: 'space-evenly'
+          }}
         >
-          {`Add one ${product.name} to your cart`}
-        </button>
-        <button
-          onClick={() => incrementItem(product.sku, 10)}
-          aria-label={`Add by 10`}
-          style={{ height: 50, width: 100, marginBottom: 30 }}
-        >
-          {`Add 10 ${product.name} to your cart`}
-        </button>
-      </section>
-    </article>
-  )
+          {/* Increases the quantity of the item */}
+          <button
+            onClick={() => incrementItem(sku)}
+            aria-label={`Add one ${entry.name} to your cart`}
+            style={{ height: 50, width: 100, marginBottom: 30 }}
+          >
+            Add one {entry.name} to your cart
+          </button>
+
+          {/* Increases the item quantity by 10 */}
+          <button
+            onClick={() => incrementItem(sku, 10)}
+            aria-label={`Add ten ${entry.name} to your cart`}
+            style={{ height: 50, width: 100, marginBottom: 30 }}
+          >
+            Add 10 {entry.name} to your cart
+          </button>
+        </section>
+      </article>
+    )
+  }
+
+  if (entries.length) return entries
+  return <AddMoreItems />
 }
 
 export default IncrementItem

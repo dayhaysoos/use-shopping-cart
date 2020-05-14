@@ -1,5 +1,6 @@
 import React from 'react'
 import { useShoppingCart } from 'use-shopping-cart'
+import { AddMoreItems } from './utilities'
 
 export function SetItemQuantity() {
   const { setItemQuantity, cartDetails } = useShoppingCart()
@@ -52,7 +53,7 @@ export function SetItemQuantity() {
   }
 
   if (entries.length) return entries
-  return <p>You currently don't have any items in your cart.</p>
+  return <AddMoreItems />
 }
 
 export default SetItemQuantity
