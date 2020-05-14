@@ -1,7 +1,6 @@
 [build]
   command="yarn workspace documentation build"
-  publish="examples/cra/build"
-  functions="examples/cra/functions"
+  publish="documentation/public"
 
   [dev]
   command="yarn workspace use-shopping-cart start"
