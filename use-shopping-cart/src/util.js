@@ -24,11 +24,6 @@ export const formatCurrencyString = ({
   return numberFormat.format(value.toFixed(2))
 }
 
-export const calculateTotalValue = (currency, cartItems) => {
-  const value = cartItems.reduce((acc, { price }) => acc + price, 0)
-  return formatCurrencyString({ value, currency })
-}
-
 export function useLocalStorageReducer(key, reducer, initialState) {
   const dummyStorage = {
     getItem() {
@@ -43,4 +38,14 @@ export function useLocalStorageReducer(key, reducer, initialState) {
     reducer,
     initialState
   )
+}
+
+export const getCheckoutData = {
+  stripe(cart) {
+    const checkoutData = []
+    for (const sku in cart.cartDetails) {
+      checkoutData.push({ sku, quantity: cart.cartDetails[sku].quantity })
+    }
+    return checkoutData
+  }
 }

@@ -17,22 +17,12 @@
 ## Installation
 
 ```bash
-npm install --save @stripe/stripe-js use-shopping-cart
-
-# or
-
+# With Yarn
 yarn add @stripe/stripe-js use-shopping-cart
+
+# With NPM
+npm install --save @stripe/stripe-js use-shopping-cart
 ```
-
-## Development
-
-To run this package for development run:
-
-`yarn dev`
-
-To run tests:
-
-`yarn test`
 
 ## Usage
 
@@ -62,7 +52,7 @@ import App from './App'
 const stripePromise = loadStripe(process.env.REACT_APP_STRIPE_API_PUBLIC)
 
 ReactDOM.render(
-  <CartProvider stripe={stripePromise} currency="USD">
+  <CartProvider mode="checkout-session" stripe={stripePromise} currency="USD">
     <App />
   </CartProvider>,
   document.getElementById('root')
@@ -86,6 +76,7 @@ const products = [
     // Optional image to be shown on the Stripe Checkout page
     image: 'https://my-image.com/image.jpg',
   },
+  /* ... more products */
 ]
 ```
 
@@ -113,6 +104,7 @@ const stripePromise = loadStripe(process.env.REACT_APP_STRIPE_API_PUBLIC)
 
 ReactDOM.render(
   <CartProvider
+    mode="client-only"
     stripe={stripePromise}
     // The URL to which Stripe should send customers when payment is complete.
     successUrl="http://localhost:3000/success"
@@ -144,6 +136,7 @@ const products = [
     // Optional image to be shown on the Stripe Checkout page
     image: 'https://my-image.com/image.jpg',
   },
+  /* ... more products */
 ]
 ```
 
@@ -152,9 +145,9 @@ const products = [
 The hook `useShoppingCart()` provides several utilities and pieces of data for you to use in your application. The examples below won't cover every part of the `useShoppingCart()` API but you can [look at the API](#API) below.
 
 ```jsx
-import { useShoppingCart } from 'use-shopping-cart';
-import { Product } from './Product';
-import { CartItems } from './CartItems';
+import { useShoppingCart } from 'use-shopping-cart'
+import { Product } from './Product'
+import { CartItems } from './CartItems'
 
 const productData = [
   {
@@ -171,11 +164,11 @@ const productData = [
     image: 'https://www.fillmurray.com/300/300',
     currency: 'USD',
   },
-];
+]
 
 export function App() {
   /* Gets the totalPrice and a method for redirecting to stripe */
-  const { totalPrice, redirectToCheckout, cartCount } = useShoppingCart();
+  const { totalPrice, redirectToCheckout, cartCount } = useShoppingCart()
 
   return (
     <div>
@@ -192,7 +185,7 @@ export function App() {
       {/* Redirects the user to Stripe */}
       <button onClick={() => redirectToCheckout()}>Checkout</button>
     </div>
-  );
+  )
 }
 ```
 
@@ -201,17 +194,17 @@ export function App() {
 To add a product to the cart, use `useShoppingCart()`'s `addItem(product)` method. It takes in your product object, which must have a `sku` and a `price`, and adds it to the cart.
 
 ```jsx
-import { useShoppingCart, formatCurrencyString } from 'use-shopping-cart';
+import { useShoppingCart, formatCurrencyString } from 'use-shopping-cart'
 
 export function Product({ product }) {
-  const { addItem } = useShoppingCart();
+  const { addItem } = useShoppingCart()
 
   /* A helper function that turns the price into a readable format */
   const price = formatCurrencyString({
     value: product.price,
     currency: product.currency,
     language: navigator.language,
-  });
+  })
 
   return (
     <article>
@@ -229,7 +222,7 @@ export function Product({ product }) {
         Add to cart
       </button>
     </article>
-  );
+  )
 }
 ```
 
@@ -259,20 +252,20 @@ Each product in `cartDetails` contains the same data you provided when you calle
 </table>
 
 ```jsx
-import { useShoppingCart } from 'use-shopping-cart';
+import { useShoppingCart } from 'use-shopping-cart'
 
 export function CartItems() {
   const {
     cartDetails,
-    reduceItemByOne,
-    addItem,
-    removeCartItem,
-  } = useShoppingCart();
+    decrementItem,
+    incrementItem,
+    removeItem,
+  } = useShoppingCart()
 
-  const cart = [];
+  const cart = []
   // Note: Object.keys().map() takes 2x as long as a for-in loop
   for (const sku in cartDetails) {
-    const cartEntry = cartDetails[sku];
+    const cartEntry = cartDetails[sku]
 
     // all of your basic product data still exists (i.e. name, image, price)
     cart.push(
@@ -284,14 +277,14 @@ export function CartItems() {
 
         {/* What if we want to remove one of the item... or add one */}
         <button
-          onClick={() => reduceItemByOne(cartEntry.sku)}
+          onClick={() => decrementItem(cartEntry.sku)}
           aria-label={`Remove one ${cartEntry.name} from your cart`}
         >
           -
         </button>
         <p>Quantity: {cartEntry.quantity}</p>
         <button
-          onClick={() => addItem(cartEntry)}
+          onClick={() => incrementItem(cartEntry.sku)}
           aria-label={`Add one ${cartEntry.name} to your cart`}
         >
           +
@@ -299,36 +292,56 @@ export function CartItems() {
 
         {/* What if we don't want this product at all */}
         <button
-          onClick={() => removeCartItem(cartEntry.sku)}
+          onClick={() => removeItem(cartEntry.sku)}
           aria-label={`Remove all ${cartEntry.name} from your cart`}
         >
           Remove
         </button>
       </article>
-    );
+    )
   }
 
-  return cart;
+  return cart
 }
 ```
 
-Note that in the above code, to reduce the quantity of a product in the user's cart, you must pass an SKU to `reduceItemByOne()` like so:
+Note that in the above code, to reduce the quantity of a product in the user's cart, you must pass an SKU to `decrementItem()` like so (note that you can also decrease by more than one):
 
 ```js
-reduceItemByOne(cartEntry.sku);
+decrementItem(cartEntry.sku)
+
+// or decrease by a count
+decrementItem(cartEntry.sku, 3)
 ```
 
-Just like you can reduce the quantity of a product you can remove the product entirely with `removeCartItem()`:
+This also works the same when trying to increase the quantity of a product:
 
 ```js
-removeCartItem(cartEntry.sku);
+incrementItem(cartEntry)
+
+// increase by a count
+incrementItem(cartEntry.sku, 4)
 ```
 
-However, those two examples differ from the way that you increase the quantity of a product in the user's cart. Currently, to do this, you must pass the entire `cartEntry` to `addItem()`:
+
+Just like you can reduce or increase the quantity of a product you can remove the product entirely with `removeItem()`:
 
 ```js
-addItem(cartEntry);
+removeItem(cartEntry.sku)
 ```
+
+#### How could the user set the quantity of an item to a specific number?
+
+This is achievable with the `setItemQuantity(sku, quantity)` method (introduced in 2.0.0). It takes an SKU of a product in the cart and the quantity of that product you wish to have. Here is a very simple example:
+
+```jsx
+export function GiveMeFiveDonutsPlease() {
+  const { setItemQuantity } = useShoppingCart()
+  return <button onClick={() => setItemQuantity('donuts-1a2b3c', 5)}>Set donut quantity to 5</button>
+}
+```
+
+For a real-world robust example visit the [documentation for `setItemQuantity`](https://use-shopping-cart.app/usage/setItemQuantity()).
 
 ## API
 
@@ -336,41 +349,70 @@ You can [view the full API](https://use-shopping-cart.netlify.app/) on our docum
 
 ### `<CartProvider>`
 
-Props for this component:
+Props for this component in Client-only mode:
 
 <table>
   <tr>
     <th>Name</th>
     <th>Type</th>
   </tr>
-    <tr>
-      <td><a href="https://use-shopping-cart.netlify.app/usage/cartprovider#stripe"><code>stripe</code></a></td>
-      <td>Stripe | undefined</td>
-    </tr>
-    <tr>
-      <td><a href="https://use-shopping-cart.netlify.app/usage/cartprovider#successUrl"><code>successUrl</code></a></td>
-      <td>string</td>
-    </tr>
-    <tr>
-      <td><a href="https://use-shopping-cart.netlify.app/usage/cartprovider#cancelUrl"><code>cancelUrl</code></a></td>
-      <td>string</td>
-    </tr>
-    <tr>
-      <td><a href="https://use-shopping-cart.netlify.app/usage/cartprovider#currency"><code>currency</code></a></td>
-      <td>string</td>
-    </tr>
-    <tr>
-      <td><a href="https://use-shopping-cart.netlify.app/usage/cartprovider#language"><code>language</code></a></td>
-      <td>string</td>
-    </tr>
-    <tr>
-      <td><a href="https://use-shopping-cart.netlify.app/usage/cartprovider#billingAddressCollection"><code>billingAddressCollection</code></a></td>
-      <td>boolean</td>
-    </tr>
-    <tr>
-      <td><a href="https://use-shopping-cart.netlify.app/usage/cartprovider#allowedCountries"><code>allowedCountries</code></a></td>
-      <td>null | string[]</td>
-    </tr>
+  <tr>
+    <td><code>mode</code></td>
+    <td>"client-only"</td>
+  </tr>
+  <tr>
+    <td><code>stripe</code></td>
+    <td>Stripe | undefined</td>
+  </tr>
+  <tr>
+    <td><code>successUrl</code></td>
+    <td>string</td>
+  </tr>
+  <tr>
+    <td><code>cancelUrl</code></td>
+    <td>string</td>
+  </tr>
+  <tr>
+    <td><code>currency</code></td>
+    <td>string</td>
+  </tr>
+  <tr>
+    <td><code>language</code></td>
+    <td>string</td>
+  </tr>
+  <tr>
+    <td><code>billingAddressCollection</code></td>
+    <td>boolean</td>
+  </tr>
+  <tr>
+    <td><code>allowedCountries</code></td>
+    <td>null | string[]</td>
+  </tr>
+</table>
+
+And now, CheckoutSession mode:
+
+<table>
+  <tr>
+    <th>Name</th>
+    <th>Type</th>
+  </tr>
+  <tr>
+    <td><code>mode</code></td>
+    <td>"checkout-session"</td>
+  </tr>
+  <tr>
+    <td><code>stripe</code></td>
+    <td>Stripe | undefined</td>
+  </tr>
+  <tr>
+    <td><code>currency</code></td>
+    <td>string</td>
+  </tr>
+  <tr>
+    <td><code>language</code></td>
+    <td>string</td>
+  </tr>
 </table>
 
 ### `useShoppingCart()`
@@ -389,17 +431,32 @@ Returns an object with all the following properties and methods:
     <td>N/A</td>
   </tr>
   <tr>
-    <td><a href="https://use-shopping-cart.netlify.app/usage/reduceItemByOne()"><code>reduceItemByOne()</code></a></td>
+    <td><a href="https://use-shopping-cart.netlify.app/usage/incrementItem()"><code>incrementItem()</code></a></td>
     <td>sku: string</td>
     <td>N/A</td>
   </tr>
   <tr>
-    <td><a href="https://use-shopping-cart.netlify.app/usage/removeCartItem()"><code>removeCartItem()</code></a></td>
+    <td><a href="https://use-shopping-cart.netlify.app/usage/decrementItem()"><code>decrementItem()</code></a></td>
     <td>sku: string</td>
     <td>N/A</td>
   </tr>
   <tr>
-    <td><a href="https://use-shopping-cart.netlify.app/usage/api#totalPrice"><code>totalPrice()</code></a></td>
+    <td><a href="https://use-shopping-cart.netlify.app/usage/removeItem()"><code>removeItem()</code></a></td>
+    <td>sku: string</td>
+    <td>N/A</td>
+  </tr>
+  <tr>
+    <td><a href="https://use-shopping-cart.netlify.app/usage/setItemQuantity()"><code>setItemQuantity()</code></a></td>
+    <td>sku: string, quantity: number</td>
+    <td>N/A</td>
+  </tr>
+  <tr>
+    <td><a href="https://use-shopping-cart.netlify.app/usage/api#totalPrice"><code>totalPrice</code></a></td>
+    <td>N/A</td>
+    <td>number</td>
+  </tr>
+  <tr>
+    <td><a href="https://use-shopping-cart.netlify.app/usage/api#formattedTotalPrice"><code>formattedTotalPrice</code></a></td>
     <td>N/A</td>
     <td>string</td>
   </tr>
@@ -444,7 +501,7 @@ This function takes one options argument, these are the options for this functio
   </tr>
   <tr>
     <td>language</td>
-    <td>string</td>
+    <td>string (optional)</td>
   </tr>
 </table>
 
@@ -462,6 +519,31 @@ The following tutorials teach how to set up your custom environment variables fo
 MIT © [dayhaysoos](https://github.com/dayhaysoos)
 
 ---
+
+## Working on this project:
+
+If you're working on this project don't forget to check out
+[the CONTRIBUTING.md file](https://github.com/dayhaysoos/use-shopping-cart/blob/master/use-shopping-cart/CONTRIBUTING.md).
+
+Before you run any of the examples be sure to set your environment variables at the root of
+the project in a `.env` file:
+
+```dotenv
+REACT_APP_STRIPE_API_PUBLIC=pk_test_YOUR_PUBLIC_TEST_KEY
+REACT_APP_STRIPE_API_SECRET=sk_test_YOUR_SECRET_TEST_KEY
+```
+
+
+Here are a couple commands to get you started in development:
+
+```bash
+# Run the development environment which builds use-shopping-cart in watch-mode
+# and starts the CRA example with Netlify functions
+yarn dev
+
+# Runs tests in watch-mode
+yarn test
+```
 
 We created this hook with [create-react-hook](https://github.com/hermanya/create-react-hook).
 

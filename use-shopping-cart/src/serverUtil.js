@@ -1,11 +1,9 @@
 const validateCartItems = (inventorySrc, cartDetails) => {
   const validatedItems = []
   for (const sku in cartDetails) {
-    if (!Object.prototype.hasOwnProperty.call(cartDetails, sku)) continue
-
     const product = cartDetails[sku]
     const inventoryItem = inventorySrc.find(
-      currentProduct => currentProduct.sku === sku
+      (currentProduct) => currentProduct.sku === sku
     )
     const item = {
       name: inventoryItem.name,

@@ -10,7 +10,7 @@ const containerStyles = {
   padding: '1rem 0 1rem 0',
 }
 
-export default props => (
+export default () => (
   <StaticQuery
     query={graphql`
       query SkusForProduct {

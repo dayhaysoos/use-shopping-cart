@@ -1,37 +1,34 @@
 /**@jsx jsx */
-import { jsx, Box, Flex, Image, Button } from 'theme-ui';
-import { useShoppingCart } from 'use-shopping-cart';
+import { jsx, Box, Flex, Image, Button, Input } from 'theme-ui'
+import { useShoppingCart } from 'use-shopping-cart'
 
 const CartDisplay = () => {
   const {
     cartDetails,
-    cartItems,
     cartCount,
-    addItem,
-    removeCartItem,
-    totalPrice,
+    formattedTotalPrice,
     redirectToCheckout,
-    reduceItemByOne,
     clearCart,
-  } = useShoppingCart();
+    setItemQuantity
+  } = useShoppingCart()
 
   const handleSubmit = async (event) => {
-    event.preventDefault();
+    event.preventDefault()
 
     const response = await fetch('/.netlify/functions/create-session', {
       method: 'post',
       headers: {
-        'Content-Type': 'application/json',
+        'Content-Type': 'application/json'
       },
-      body: JSON.stringify(cartDetails),
+      body: JSON.stringify(cartDetails)
     })
       .then((res) => {
-        return res.json();
+        return res.json()
       })
-      .catch((error) => console.log(error));
+      .catch((error) => console.log(error))
 
-    redirectToCheckout({ sessionId: response.sessionId });
-  };
+    redirectToCheckout({ sessionId: response.sessionId })
+  }
 
   if (Object.keys(cartDetails).length === 0) {
     return (
@@ -39,54 +36,48 @@ const CartDisplay = () => {
         <h2>Shopping Cart Display Panel</h2>
         <h3>No items in cart</h3>
       </Box>
-    );
+    )
   } else {
     return (
       <Flex
         sx={{
           flexDirection: 'column',
           justifyContent: 'center',
-          alignItems: 'center',
+          alignItems: 'center'
         }}
       >
         <h2>Shopping Cart Display Panel</h2>
         {Object.keys(cartDetails).map((item) => {
-          const cartItem = cartDetails[item];
-          const { name, sku, formattedValue, quantity } = cartItem;
+          const cartItem = cartDetails[item]
+          const { name, sku, quantity } = cartItem
           return (
             <Flex
               key={cartItem.sku}
               sx={{
-                justifyContent: 'space-between',
+                justifyContent: 'space-around',
                 alignItems: 'center',
-                width: '100%',
+                width: '100%'
               }}
             >
               <Flex sx={{ flexDirection: 'column', alignItems: 'center' }}>
                 <Image sx={{ width: 100 }} src={cartItem.image} />
                 <p>{name}</p>
               </Flex>
-              <Box>
-                <span sx={{ display: 'block' }}>Price: {formattedValue}</span>
-                <span sx={{ display: 'block' }}>qty: {quantity}</span>
-                <Button
-                  backgroundColor={'black'}
-                  onClick={() => addItem(cartItem)}
-                >
-                  +
-                </Button>
-                <Button
-                  backgroundColor={'black'}
-                  onClick={() => reduceItemByOne(sku)}
-                >
-                  -
-                </Button>
-              </Box>
+              <Input
+                type={'number'}
+                max={99}
+                sx={{ width: 60 }}
+                defaultValue={quantity}
+                onChange={(e) => {
+                  const { value } = e.target
+                  setItemQuantity(sku, value)
+                }}
+              />
             </Flex>
-          );
+          )
         })}
         <h3>Total Items in Cart: {cartCount}</h3>
-        <h3>Total Price: {totalPrice()}</h3>
+        <h3>Total Price: {formattedTotalPrice}</h3>
         <Box
           as={'form'}
           action={'/.netlify/functions/create-session'}
@@ -100,8 +91,8 @@ const CartDisplay = () => {
           Clear Cart Items
         </Button>
       </Flex>
-    );
+    )
   }
-};
+}
 
-export default CartDisplay;
+export default CartDisplay
