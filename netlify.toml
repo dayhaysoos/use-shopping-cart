@@ -1,5 +1,5 @@
 [build]
-  command="yarn workspace use-shopping-cart predeploy"
+  command="yarn workspace documentation build"
   publish="examples/cra/build"
   functions="examples/cra/functions"
 
