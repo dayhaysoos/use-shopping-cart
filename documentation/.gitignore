@@ -26,3 +26,6 @@ node_modules/
 *.env*
 *.cache*
 *public*
+
+# Local Netlify folder
+.netlify
