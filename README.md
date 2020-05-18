@@ -1,1 +1,1 @@
-./use-shopping-cart/README.md
+https://useshoppingcart.com
