@@ -11,8 +11,7 @@
     "dev:gatsby": "yarn workspace ecommerce-gatsby-tutorial start",
     "build:gatsby": "yarn workspace use-shopping-cart build && yarn workspace ecommerce-gatsby-tutorial build",
     "dev:docs": "yarn workspace use-shopping-cart build && yarn workspace documentation start",
-    "format": "lint-staged",
-    "prepublish": "cp ../README.md ./README.md"
+    "format": "lint-staged"
   },
   "dependencies": {
     "husky": "^4.2.5",
