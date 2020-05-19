@@ -168,7 +168,7 @@ export const useShoppingCart = () => {
       const options = {
         items: [
           {
-            sku: item.sku,
+            sku,
             quantity: 1
           }
         ],
