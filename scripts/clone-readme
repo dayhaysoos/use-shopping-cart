@@ -1,0 +1,5 @@
+#!/bin/bash
+if [ -f README.md ]; then
+  rm README.md
+fi
+cp use-shopping-cart/README.md READM.md

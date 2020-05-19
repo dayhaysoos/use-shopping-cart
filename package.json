@@ -11,17 +11,14 @@
     "dev:gatsby": "yarn workspace ecommerce-gatsby-tutorial start",
     "build:gatsby": "yarn workspace use-shopping-cart build && yarn workspace ecommerce-gatsby-tutorial build",
     "dev:docs": "yarn workspace use-shopping-cart build && yarn workspace documentation start",
-    "format": "lint-staged"
+    "format": "lint-staged",
+    "clone-readme": "./scripts/clone-readme"
   },
   "dependencies": {
     "husky": "^4.2.5",
     "lint-staged": "^10.2.0",
-    "prettier": "^2.0.5"
-  },
-  "husky": {
-    "hooks": {
-      "pre-commit": "lint-staged"
-    }
+    "prettier": "^2.0.5",
+    "shx": "^0.3.2"
   },
   "lint-staged": {
     "*.{js,jsx,.d.ts,ts,tsx,mdx}": "prettier --write"
