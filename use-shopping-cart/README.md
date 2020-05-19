@@ -88,7 +88,8 @@ Additionally, you must verify the cartItems on the server-side before creating t
 
 #### [Client-only Checkout mode](https://use-shopping-cart.netlify.app/usage/cartprovider#client-only-checkout-mode)
 
-To operate a checkout page without any server component you need to enable client-only checkout mode and insert your porudct information in your Stripe Dashboard:
+To operate a checkout page without any server component you need to enable client-only checkout mode and insert your
+ product information in your Stripe Dashboard:
 
 - [Enable client-only Checkout](https://stripe.com/docs/payments/checkout/client#enable-checkout)
 - [Create your products](https://stripe.com/docs/payments/checkout/client#create-products)
