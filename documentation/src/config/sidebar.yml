@@ -1,0 +1,38 @@
+# Sidebar navigation
+
+- label: 'Introduction'
+  link: '/'
+- label: 'Github'
+  link: 'https://github.com/dayhaysoos/use-shopping-cart'
+- label: 'Discord'
+  link: '/discord'
+- label: 'Getting started'
+  link: '/getting-started'
+- label: Usage
+  items:
+    - label: 'CartProvider'
+      link: '/usage/cartprovider'
+    - label: 'addItem()'
+      link: '/usage/addItem()'
+    - label: 'incrementItem()'
+      link: '/usage/incrementItem()'
+    - label: 'decrementItem()'
+      link: '/usage/decrementItem()'
+    - label: 'setItemQuantity()'
+      link: '/usage/setItemQuantity()'
+    - label: 'removeItem()'
+      link: '/usage/removeItem()'
+    - label: 'clearCart()'
+      link: '/usage/clearCart()'
+    - label: 'redirectToCheckout()'
+      link: '/usage/redirectToCheckout()'
+    - label: 'validateCartItems()'
+      link: '/usage/validateCartItems()'
+    - label: 'API'
+      link: '/usage/api'
+- label: 'Contributors'
+  link: '/contributors'
+- label: 'Util'
+  items:
+    - label: formatCurrencyString()
+      link: '/util/formatCurrencyString()'

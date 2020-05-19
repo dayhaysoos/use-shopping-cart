@@ -1,0 +1,36 @@
+Arguments: 
+  /usr/local/bin/node /usr/local/bin/yarn workspaces info
+
+PATH: 
+  /usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin:/Applications/Postgres.app/Contents/Versions/latest/bin
+
+Yarn version: 
+  1.22.0
+
+Node version: 
+  12.16.2
+
+Platform: 
+  darwin x64
+
+Trace: 
+  SyntaxError: /Users/nickdejesus/Code/hooks/use-stripe-cart/package.json: Unexpected end of JSON input
+      at JSON.parse (<anonymous>)
+      at /usr/local/lib/node_modules/yarn/lib/cli.js:1625:59
+      at Generator.next (<anonymous>)
+      at step (/usr/local/lib/node_modules/yarn/lib/cli.js:310:30)
+      at /usr/local/lib/node_modules/yarn/lib/cli.js:321:13
+
+npm manifest: 
+  {
+    "private": true,
+    "workspaces": [
+      "examples/*",
+      "use-shopping-cart"
+    ]
+
+yarn manifest: 
+  No manifest
+
+Lockfile: 
+  No lockfile
