@@ -23,8 +23,6 @@ exports.handler = async (event) => {
   try {
     const productJSON = JSON.parse(event.body)
 
-    console.log('omg', productJSON)
-
     const line_items = validateCartItems(inventory, productJSON)
 
     const session = await stripe.checkout.sessions.create({
