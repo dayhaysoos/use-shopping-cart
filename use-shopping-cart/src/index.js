@@ -161,14 +161,14 @@ export const useShoppingCart = () => {
     }
   }
 
-  const checkoutSingleItem = async ({ item, sessionId }) => {
+  const checkoutSingleItem = async ({ sku, sessionId }) => {
     const resolvedStripe = await Promise.resolve(stripe)
 
     if (mode === 'client-only') {
       const options = {
         items: [
           {
-            sku: item.sku,
+            sku,
             quantity: 1
           }
         ],
