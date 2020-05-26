@@ -1,0 +1,5 @@
+{
+  "hooks": {
+    "pre-commit": "yarn run clone-readme && lint-staged"
+  }
+}

@@ -10,7 +10,7 @@ const stripePromise = loadStripe(process.env.REACT_APP_STRIPE_API_PUBLIC)
 
 ReactDOM.render(
   <CartProvider
-    mode="client-only"
+    mode="checkout-session"
     stripe={stripePromise}
     billingAddressCollection={false}
     successUrl="https://stripe.com"
