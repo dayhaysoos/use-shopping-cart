@@ -1,5 +1,5 @@
 {
   "hooks": {
-    "pre-commit": "yarn run clone-readme && lint-staged"
+    "pre-commit": "lint-staged"
   }
 }
