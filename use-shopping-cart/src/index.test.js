@@ -514,4 +514,27 @@ describe('stripe handling', () => {
       'Stripe is not defined'
     )
   })
+
+  it('if checkoutSingleItem is called, redirectToCheckout is called', async () => {
+    const wrapper = createWrapper()
+    const cart = renderHook(() => useShoppingCart(), { wrapper }).result
+
+    act(() => {
+      cart.current.checkoutSingleItem(mockProduct({ quantity: 1 }))
+    })
+
+    expect(stripeMock.redirectToCheckout).toHaveBeenCalled()
+  })
+
+  it('if checkoutSingleItem is called in checkout-session mode, redirectToCheckout is called', async () => {
+    const wrapper = createWrapper({ mode: 'checkout-session' })
+    const cart = renderHook(() => useShoppingCart(), { wrapper }).result
+    const sessionId = 'some cool session id'
+
+    act(() => {
+      cart.current.checkoutSingleItem({ sessionId })
+    })
+
+    expect(stripeMock.redirectToCheckout).toHaveBeenCalled()
+  })
 })
