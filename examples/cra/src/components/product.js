@@ -6,7 +6,7 @@ const Product = (product) => {
   const { addItem, checkoutSingleItem } = useShoppingCart()
   const { name, price, image, currency } = product
 
-  const handleSubmit = async (product) => {
+  const handleCheckout = async (product) => {
     try {
       const response = await fetch('/.netlify/functions/create-session', {
         method: 'post',
@@ -42,7 +42,7 @@ const Product = (product) => {
       <Button onClick={() => addItem(product)} backgroundColor={'black'}>
         Add To Cart
       </Button>
-      <Button onClick={() => handleSubmit(product)} backgroundColor={'black'}>
+      <Button onClick={() => handleCheckout(product)} backgroundColor={'black'}>
         Checkout
       </Button>
     </Flex>
