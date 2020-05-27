@@ -14,7 +14,7 @@ const Product = (product) => {
         headers: {
           'Content-Type': 'application/json'
         },
-        body: JSON.stringify({ [product.sku]: { ...product, quantity: 1 } })
+        body: JSON.stringify({ [product.sku]: { ...product, quantity: 10 } })
       }
     )
       .then((res) => {
