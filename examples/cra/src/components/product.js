@@ -7,19 +7,23 @@ const Product = (product) => {
   const { name, price, image, currency } = product
 
   const handleSubmit = async (product) => {
-    const response = await fetch('/.netlify/functions/create-session', {
-      method: 'post',
-      headers: {
-        'Content-Type': 'application/json'
-      },
-      body: JSON.stringify({ [product.sku]: { ...product, quantity: 10 } })
-    })
-      .then((res) => {
-        return res.json()
+    try {
+      const response = await fetch('/.netlify/functions/create-session', {
+        method: 'post',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          [product.sku]: { ...product, quantity: 10 }
+        })
       })
-      .catch((error) => console.log(error))
 
-    checkoutSingleItem({ sessionId: response.sessionId })
+      const data = await response.json()
+
+      checkoutSingleItem({ sessionId: data.sessionId })
+    } catch (error) {
+      console.log(error)
+    }
   }
 
   return (
