@@ -7,16 +7,13 @@ const Product = (product) => {
   const { name, price, image, currency } = product
 
   const handleSubmit = async (product) => {
-    const response = await fetch(
-      '/.netlify/functions/one-click-create-session',
-      {
-        method: 'post',
-        headers: {
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({ [product.sku]: { ...product, quantity: 10 } })
-      }
-    )
+    const response = await fetch('/.netlify/functions/create-session', {
+      method: 'post',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({ [product.sku]: { ...product, quantity: 10 } })
+    })
       .then((res) => {
         return res.json()
       })
