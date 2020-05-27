@@ -2,7 +2,7 @@ node_modules/
 .idea/
 *.env*
 *.cache*
-*public*
+
 
 # Local Netlify folder
 .netlify
