@@ -161,6 +161,32 @@ export const useShoppingCart = () => {
     }
   }
 
+  async function checkoutSingleItem({ sku, quantity = 1 }) {
+    const resolvedStripe = await Promise.resolve(stripe)
+
+    if (mode === 'client-only') {
+      const options = {
+        items: [{ sku, quantity }],
+        successUrl,
+        cancelUrl,
+        billingAddressCollection: billingAddressCollection
+          ? 'required'
+          : 'auto',
+        submitType: 'auto'
+      }
+
+      if (allowedCountries?.length)
+        options.shippingAddressCollection = { allowedCountries }
+
+      const { error } = await resolvedStripe.redirectToCheckout(options)
+      if (error) return error
+    } else {
+      throw new Error(
+        `Invalid checkout mode '${mode}' was chosen. The only option for single-item checkout is 'client-only'`
+      )
+    }
+  }
+
   return {
     cartDetails,
     cartCount,
@@ -182,12 +208,12 @@ export const useShoppingCart = () => {
 
     lastClicked,
     storeLastClicked,
-
     shouldDisplayCart,
     handleCartClick,
     handleCartHover,
     handleCloseCart,
 
-    redirectToCheckout
+    redirectToCheckout,
+    checkoutSingleItem
   }
 }

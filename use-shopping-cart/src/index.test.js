@@ -498,6 +498,38 @@ describe('redirectToCheckout()', () => {
   })
 })
 
+describe('checkoutSingleItem()', () => {
+  beforeEach(() => {
+    stripeMock.redirectToCheckout.mockClear()
+  })
+
+  it('should send the formatted item with no quantity parameter', async () => {
+    const wrapper = createWrapper()
+    const cart = renderHook(() => useShoppingCart(), { wrapper }).result
+
+    const product = mockProduct()
+    await cart.current.checkoutSingleItem({ sku: product.sku })
+
+    expect(stripeMock.redirectToCheckout).toHaveBeenCalled()
+    expect(stripeMock.redirectToCheckout.mock.calls[0][0].items).toEqual([
+      { sku: product.sku, quantity: 1 }
+    ])
+  })
+
+  it('should send the formatted item with a custom quantity parameter', async () => {
+    const wrapper = createWrapper()
+    const cart = renderHook(() => useShoppingCart(), { wrapper }).result
+
+    const product = mockProduct()
+    await cart.current.checkoutSingleItem({ sku: product.sku, quantity: 47 })
+
+    expect(stripeMock.redirectToCheckout).toHaveBeenCalled()
+    expect(stripeMock.redirectToCheckout.mock.calls[0][0].items).toEqual([
+      { sku: product.sku, quantity: 47 }
+    ])
+  })
+})
+
 describe('stripe handling', () => {
   it('if stripe is defined, redirectToCheckout can be called', async () => {
     const wrapper = createWrapper()
