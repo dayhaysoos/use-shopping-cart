@@ -3,27 +3,21 @@ import { jsx, Box, Image, Button, Flex } from 'theme-ui'
 import { useShoppingCart, formatCurrencyString } from 'use-shopping-cart'
 
 const Product = (product) => {
-  const { addItem, checkoutSingleItem } = useShoppingCart()
+  const { addItem, redirectToCheckout } = useShoppingCart()
   const { name, price, image, currency } = product
 
-  const handleCheckout = async (product) => {
-    try {
-      const response = await fetch('/.netlify/functions/create-session', {
-        method: 'post',
-        headers: {
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({
-          [product.sku]: { ...product, quantity: 10 }
-        })
-      })
+  async function handleCheckout() {
+    const response = await fetch('/.netlify/functions/create-session', {
+      method: 'post',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({ [product.sku]: { ...product, quantity: 1 } })
+    }).then((res) => {
+      return res.json()
+    })
 
-      const data = await response.json()
-
-      checkoutSingleItem({ sessionId: data.sessionId })
-    } catch (error) {
-      console.log(error)
-    }
+    redirectToCheckout({ sessionId: response.sessionId })
   }
 
   return (
@@ -42,8 +36,8 @@ const Product = (product) => {
       <Button onClick={() => addItem(product)} backgroundColor={'black'}>
         Add To Cart
       </Button>
-      <Button onClick={() => handleCheckout(product)} backgroundColor={'black'}>
-        Checkout
+      <Button onClick={handleCheckout} backgroundColor={'black'}>
+        Buy Now
       </Button>
     </Flex>
   )
