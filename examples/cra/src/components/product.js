@@ -13,9 +13,11 @@ const Product = (product) => {
         'Content-Type': 'application/json'
       },
       body: JSON.stringify({ [product.sku]: { ...product, quantity: 1 } })
-    }).then((res) => {
-      return res.json()
     })
+      .then((res) => {
+        return res.json()
+      })
+      .catch((error) => console.log(error))
 
     redirectToCheckout({ sessionId: response.sessionId })
   }
