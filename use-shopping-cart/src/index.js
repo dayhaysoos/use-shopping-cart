@@ -161,7 +161,7 @@ export const useShoppingCart = () => {
     }
   }
 
-  const checkoutSingleItem = async ({ sku, quantity = 1 }) => {
+  async function checkoutSingleItem({ sku, quantity = 1 }) {
     const resolvedStripe = await Promise.resolve(stripe)
 
     if (mode === 'client-only') {
@@ -200,18 +200,20 @@ export const useShoppingCart = () => {
     },
 
     addItem,
-    checkoutSingleItem,
     removeItem,
     setItemQuantity,
     incrementItem,
     decrementItem,
     clearCart,
+
     lastClicked,
     storeLastClicked,
     shouldDisplayCart,
     handleCartClick,
     handleCartHover,
     handleCloseCart,
-    redirectToCheckout
+
+    redirectToCheckout,
+    checkoutSingleItem
   }
 }
