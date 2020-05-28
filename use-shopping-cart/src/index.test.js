@@ -498,6 +498,38 @@ describe('redirectToCheckout()', () => {
   })
 })
 
+describe('checkoutSingleItem()', () => {
+  beforeEach(() => {
+    stripeMock.redirectToCheckout.mockClear()
+  })
+
+  it('should send the formatted item with no quantity parameter', async () => {
+    const wrapper = createWrapper()
+    const cart = renderHook(() => useShoppingCart(), { wrapper }).result
+
+    const product = mockProduct()
+    await cart.current.checkoutSingleItem({ sku: product.sku })
+
+    expect(stripeMock.redirectToCheckout).toHaveBeenCalled()
+    expect(stripeMock.redirectToCheckout.mock.calls[0][0].items).toEqual([
+      { sku: product.sku, quantity: 1 }
+    ])
+  })
+
+  it('should send the formatted item with a custom quantity parameter', async () => {
+    const wrapper = createWrapper()
+    const cart = renderHook(() => useShoppingCart(), { wrapper }).result
+
+    const product = mockProduct()
+    await cart.current.checkoutSingleItem({ sku: product.sku, quantity: 47 })
+
+    expect(stripeMock.redirectToCheckout).toHaveBeenCalled()
+    expect(stripeMock.redirectToCheckout.mock.calls[0][0].items).toEqual([
+      { sku: product.sku, quantity: 47 }
+    ])
+  })
+})
+
 describe('stripe handling', () => {
   it('if stripe is defined, redirectToCheckout can be called', async () => {
     const wrapper = createWrapper()
@@ -513,28 +545,5 @@ describe('stripe handling', () => {
     expect(cart.current.redirectToCheckout()).rejects.toThrow(
       'Stripe is not defined'
     )
-  })
-
-  it('if checkoutSingleItem is called, redirectToCheckout is called', async () => {
-    const wrapper = createWrapper()
-    const cart = renderHook(() => useShoppingCart(), { wrapper }).result
-
-    act(() => {
-      cart.current.checkoutSingleItem(mockProduct({ quantity: 1 }))
-    })
-
-    expect(stripeMock.redirectToCheckout).toHaveBeenCalled()
-  })
-
-  it('if checkoutSingleItem is called in checkout-session mode, redirectToCheckout is called', async () => {
-    const wrapper = createWrapper({ mode: 'checkout-session' })
-    const cart = renderHook(() => useShoppingCart(), { wrapper }).result
-    const sessionId = 'some cool session id'
-
-    act(() => {
-      cart.current.checkoutSingleItem({ sessionId })
-    })
-
-    expect(stripeMock.redirectToCheckout).toHaveBeenCalled()
   })
 })

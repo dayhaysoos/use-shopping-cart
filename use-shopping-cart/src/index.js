@@ -161,17 +161,12 @@ export const useShoppingCart = () => {
     }
   }
 
-  const checkoutSingleItem = async ({ sku, sessionId, quantity }) => {
+  const checkoutSingleItem = async ({ sku, quantity = 1 }) => {
     const resolvedStripe = await Promise.resolve(stripe)
 
     if (mode === 'client-only') {
       const options = {
-        items: [
-          {
-            sku,
-            quantity
-          }
-        ],
+        items: [{ sku, quantity }],
         successUrl,
         cancelUrl,
         billingAddressCollection: billingAddressCollection
@@ -185,13 +180,9 @@ export const useShoppingCart = () => {
 
       const { error } = await resolvedStripe.redirectToCheckout(options)
       if (error) return error
-    } else if (mode === 'checkout-session') {
-      // checkout-session mode
-      const { error } = await resolvedStripe.redirectToCheckout({ sessionId })
-      if (error) return error
     } else {
       throw new Error(
-        `Invalid checkout mode '${mode}' was chosen. Valid options are 'client-only' and 'checkout-session'`
+        `Invalid checkout mode '${mode}' was chosen. The only option for single-item checkout is 'client-only'`
       )
     }
   }
