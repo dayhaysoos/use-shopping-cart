@@ -8,15 +8,23 @@ describe('getCheckoutData', () => {
       sku3: { quantity: 3, price: 50 }
     },
     totalPrice: 550, // 100 * 1 + 150 * 2 + 50 * 3
-    cartCount: 6
+    cartCount: 6,
+    successUrl: 'https://example.com/sucess',
+    cancelUrl: 'https://example.com/'
   }
 
   it('stripe()', () => {
-    expect(getCheckoutData.stripe(cart)).toEqual([
-      { sku: 'sku1', quantity: 1 },
-      { sku: 'sku2', quantity: 2 },
-      { sku: 'sku3', quantity: 3 }
-    ])
+    expect(getCheckoutData.stripe(cart)).toEqual({
+      billingAddressCollection: 'auto',
+      successUrl: cart.successUrl,
+      cancelUrl: cart.cancelUrl,
+      items: [
+        { quantity: 1, sku: 'sku1' },
+        { quantity: 2, sku: 'sku2' },
+        { quantity: 3, sku: 'sku3' }
+      ],
+      submitType: 'auto'
+    })
   })
 })
 
