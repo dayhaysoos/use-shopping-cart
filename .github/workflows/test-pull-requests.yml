@@ -1,0 +1,33 @@
+# For all pull requests made to 'master' and 'next' branches, this workflow will:
+# - install all dependencies
+# - run all tests for the 'use-shopping-cart' workspace with yarn
+
+name: Tests
+
+on:
+  pull_request:
+    branches: [ master, next ]
+
+jobs:
+  test-package:
+    name: Run Tests with Yarn
+    runs-on: ubuntu-latest
+
+    strategy:
+      matrix:
+        node_version: ['12']
+
+    steps:
+    - uses: actions/checkout@v2
+
+    # Setup node
+    - name: Use Node.js ${{ matrix.node-version }}
+      uses: actions/setup-node@v1
+      with:
+        node-version: ${{ matrix.node-version }}
+
+    - name: Install dependencies
+      run: yarn
+
+    - name: Run tests
+      run: yarn workspace use-shopping-cart test
