@@ -1,0 +1,16 @@
+documentation:
+  - documentation/*
+  - documentation/**/*
+  - use-shopping-cart/README.md
+
+example: examples/**/*
+
+package:
+  - use-shopping-cart/src/*
+  - use-shopping-cart/src/**/*
+
+tests:
+  - use-shopping-cart/tests/*
+  - use-shopping-cart/tests/**/*
+
+
