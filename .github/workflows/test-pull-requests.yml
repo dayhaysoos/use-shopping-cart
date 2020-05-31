@@ -2,7 +2,7 @@
 # - install all dependencies
 # - run all tests for the 'use-shopping-cart' workspace with yarn
 
-name: Test PRs to Master and Next
+name: Tests
 
 on:
   pull_request:
@@ -25,9 +25,12 @@ jobs:
       uses: actions/setup-node@v1
       with:
         node-version: ${{ matrix.node-version }}
-    
-    # The real work
+ 
     - name: Install dependencies
       run: yarn
+      
+    - name: Set environment variables
+      run: echo '::set-env SKIP_PREFLIGHT_CHECK=true'
+
     - name: Run tests
-      run: yarn workspace use-shopping-cart test  
+      run: yarn workspace use-shopping-cart test
