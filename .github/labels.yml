@@ -1,6 +1,7 @@
 documentation:
   - documentation/*
   - documentation/**/*
+  - ./README.md
   - use-shopping-cart/README.md
 
 example: examples/**/*

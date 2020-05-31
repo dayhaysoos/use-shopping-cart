@@ -151,10 +151,21 @@ declare module 'use-shopping-cart' {
     readonly cartDetails: CartDetails
     /**
      * Redirects customers to the Stripe checkout
-     * @param sessionId only used in CheckoutSession mode
+     * @param options {{ sessionId?: string }} only used in CheckoutSession mode
      * @returns Nothing or an error wrapped in a promise if an error occurred
      */
-    redirectToCheckout: (sessionId?: string) => Promise<undefined | Error>
+    redirectToCheckout: (options: {
+      sessionId?: string
+    }) => Promise<undefined | Error>
+    /**
+     * Redirects customers to the Stripe checkout
+     * @param options {{ sku: string, quantity?: number }} only used in CheckoutSession mode
+     * @returns Nothing or an error wrapped in a promise if an error occurred
+     */
+    checkoutSingleItem: (options: {
+      sku: string
+      quantity?: number
+    }) => Promise<undefined | Error>
     /**
      * Totally clears the cart of all items
      */
