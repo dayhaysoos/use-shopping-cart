@@ -19869,6 +19869,15 @@ urql@^1.9.7:
     "@urql/core" "^1.11.0"
     wonka "^4.0.9"
 
+use-shopping-cart@2.0.0:
+  version "1.1.4"
+  resolved "https://npm-registry.local.corp.stripe.com/use-shopping-cart/-/use-shopping-cart-1.1.4.tgz#5fc60952f3a528f6e9415e4fa986fd5d6137b17b"
+  integrity sha512-Oxq7WRuczD84AtbXfE26g/BjaSRf5V1cNRQyb5HXwLEYcSaJjWfrwu0OhMpUrp6MW95v7mA/e9f5lCFmgoHqEA==
+  dependencies:
+    "@types/stripe-v3" "^3.1.17"
+    prop-types "^15.7.2"
+    react-storage-hooks "^4.0.0"
+
 use@^3.1.0:
   version "3.1.1"
   resolved "https://registry.yarnpkg.com/use/-/use-3.1.1.tgz#d50c8cac79a19fbc20f2911f56eb973f4e10070f"

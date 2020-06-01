@@ -417,7 +417,8 @@ describe('redirectToCheckout()', () => {
 
     expect(stripeMock.redirectToCheckout).toHaveBeenCalled()
     expect(stripeMock.redirectToCheckout.mock.calls[0][0]).toEqual({
-      items: [{ sku: product.sku, quantity: 1 }],
+      mode: 'payment',
+      lineItems: [{ price: product.sku, quantity: 1 }],
       successUrl: 'https://egghead.io/success',
       cancelUrl: 'https://egghead.io/cancel',
       billingAddressCollection: 'auto',
@@ -439,12 +440,12 @@ describe('redirectToCheckout()', () => {
     await cart.current.redirectToCheckout()
 
     const expectedItems = [
-      { sku: product1.sku, quantity: 2 },
-      { sku: product2.sku, quantity: 9 }
+      { price: product1.sku, quantity: 2 },
+      { price: product2.sku, quantity: 9 }
     ]
 
     expect(stripeMock.redirectToCheckout).toHaveBeenCalled()
-    expect(stripeMock.redirectToCheckout.mock.calls[0][0].items).toEqual(
+    expect(stripeMock.redirectToCheckout.mock.calls[0][0].lineItems).toEqual(
       expectedItems
     )
   })

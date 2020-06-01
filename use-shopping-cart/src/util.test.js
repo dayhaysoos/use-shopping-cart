@@ -13,9 +13,9 @@ describe('getCheckoutData', () => {
 
   it('stripe()', () => {
     expect(getCheckoutData.stripe(cart)).toEqual([
-      { sku: 'sku1', quantity: 1 },
-      { sku: 'sku2', quantity: 2 },
-      { sku: 'sku3', quantity: 3 }
+      { price: 'sku1', quantity: 1 },
+      { price: 'sku2', quantity: 2 },
+      { price: 'sku3', quantity: 3 }
     ])
   })
 })

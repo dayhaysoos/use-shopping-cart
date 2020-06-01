@@ -44,7 +44,10 @@ export const getCheckoutData = {
   stripe(cart) {
     const checkoutData = []
     for (const sku in cart.cartDetails) {
-      checkoutData.push({ sku, quantity: cart.cartDetails[sku].quantity })
+      checkoutData.push({
+        price: sku,
+        quantity: cart.cartDetails[sku].quantity
+      })
     }
     return checkoutData
   }

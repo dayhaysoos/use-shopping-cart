@@ -136,7 +136,8 @@ export const useShoppingCart = () => {
     if (mode === 'client-only') {
       // client-only checkout mode
       const options = {
-        items: getCheckoutData.stripe(cart),
+        mode: 'payment',
+        lineItems: getCheckoutData.stripe(cart),
         successUrl,
         cancelUrl,
         billingAddressCollection: billingAddressCollection
