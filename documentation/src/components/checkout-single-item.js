@@ -4,6 +4,16 @@ import { useShoppingCart, formatCurrencyString } from 'use-shopping-cart'
 export function CheckoutSingleItem({ product }) {
   const { checkoutSingleItem } = useShoppingCart()
 
+  /* Go to checkout with one of the `product` */
+  function buyNow() {
+    checkoutSingleItem({ sku: product.sku })
+  }
+
+  /* Go to checkout with ten of the `product` */
+  function buyTenNow() {
+    checkoutSingleItem({ sku: product.sku, quantity: 10 })
+  }
+
   /* A helper function that turns the price into a readable format */
   const price = formatCurrencyString({
     value: product.price,
@@ -37,15 +47,15 @@ export function CheckoutSingleItem({ product }) {
         }}
       >
         <button
-          onClick={() => checkoutSingleItem(product)}
-          aria-label={`Buy ${product.name} to your cart`}
+          onClick={buyNow}
+          aria-label={`Buy a ${product.name}`}
           style={{ height: 50, width: 100, marginBottom: 30 }}
         >
           Buy Now
         </button>
         <button
-          onClick={() => checkoutSingleItem({ ...product, quantity: 10 })}
-          aria-label={`Buy 10 ${product.name} to your cart`}
+          onClick={buyTenNow}
+          aria-label={`Buy ten ${product.name}`}
           style={{ height: 50, width: 100, marginBottom: 30 }}
         >
           Buy 10 Now
