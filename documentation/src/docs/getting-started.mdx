@@ -92,3 +92,19 @@ export function App() {
 ```
 
 Once you have successfully installed `stripe` and `use-shopping-cart` and wrap your root component with CartProvider, you are ready to go! 🚀
+
+### ⚠️ HEADS UP!
+
+You may not be able to see the SKUs section in your products but a `Prices` section. If that's the case, you can use the price ID (with this shape: `price_abcd1234`) as the sku in yout inventory
+
+```js
+const productData = [
+  {
+    name: 'Bananas',
+    sku: 'price_GBJ2Ep8246qeeT', // 👈
+    price: 400,
+    image: 'https://www.fillmurray.com/300/300',
+    currency: 'USD'
+  }
+]
+```
