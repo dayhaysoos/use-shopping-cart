@@ -18,10 +18,11 @@ describe('getCheckoutData', () => {
       billingAddressCollection: 'auto',
       successUrl: cart.successUrl,
       cancelUrl: cart.cancelUrl,
-      items: [
-        { quantity: 1, sku: 'sku1' },
-        { quantity: 2, sku: 'sku2' },
-        { quantity: 3, sku: 'sku3' }
+      mode: 'payment',
+      lineItems: [
+        { quantity: 1, price: 'sku1' },
+        { quantity: 2, price: 'sku2' },
+        { quantity: 3, price: 'sku3' }
       ],
       submitType: 'auto'
     })
