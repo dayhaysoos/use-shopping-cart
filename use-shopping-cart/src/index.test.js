@@ -1,6 +1,6 @@
 import React from 'react'
-import { renderHook, act } from '@testing-library/react-hooks'
-import { useShoppingCart, CartProvider } from './index'
+import { act, renderHook } from '@testing-library/react-hooks'
+import { CartProvider, useShoppingCart } from './index'
 
 afterEach(() => window.localStorage.clear())
 
@@ -417,7 +417,8 @@ describe('redirectToCheckout()', () => {
 
     expect(stripeMock.redirectToCheckout).toHaveBeenCalled()
     expect(stripeMock.redirectToCheckout.mock.calls[0][0]).toEqual({
-      items: [{ sku: product.sku, quantity: 1 }],
+      mode: 'payment',
+      lineItems: [{ price: product.sku, quantity: 1 }],
       successUrl: 'https://egghead.io/success',
       cancelUrl: 'https://egghead.io/cancel',
       billingAddressCollection: 'auto',
@@ -439,12 +440,12 @@ describe('redirectToCheckout()', () => {
     await cart.current.redirectToCheckout()
 
     const expectedItems = [
-      { sku: product1.sku, quantity: 2 },
-      { sku: product2.sku, quantity: 9 }
+      { price: product1.sku, quantity: 2 },
+      { price: product2.sku, quantity: 9 }
     ]
 
     expect(stripeMock.redirectToCheckout).toHaveBeenCalled()
-    expect(stripeMock.redirectToCheckout.mock.calls[0][0].items).toEqual(
+    expect(stripeMock.redirectToCheckout.mock.calls[0][0].lineItems).toEqual(
       expectedItems
     )
   })
@@ -479,10 +480,10 @@ describe('redirectToCheckout()', () => {
     const cart = renderHook(() => useShoppingCart(), { wrapper }).result
 
     const expectedSessionId = 'bloo-bleh-blah-1234'
-    await cart.current.redirectToCheckout(expectedSessionId)
+    await cart.current.redirectToCheckout({ sessionId: expectedSessionId })
 
     expect(stripeMock.redirectToCheckout).toHaveBeenCalled()
-    expect(stripeMock.redirectToCheckout.mock.calls[0][0]).toBe(
+    expect(stripeMock.redirectToCheckout.mock.calls[0][0].sessionId).toBe(
       expectedSessionId
     )
   })
@@ -493,20 +494,21 @@ describe('redirectToCheckout()', () => {
     const cart = renderHook(() => useShoppingCart(), { wrapper }).result
 
     expect(cart.current.redirectToCheckout()).rejects.toThrow(
-      `Invalid checkout mode '${mode}' was chosen. Valid options are 'client-only' and 'checkout-session'`
+      `Invalid checkout mode '${mode}' was chosen. The valid modes are client-only and checkout-session.`
     )
   })
 })
 
 describe('checkoutSingleItem()', () => {
+  let cart
   beforeEach(() => {
     stripeMock.redirectToCheckout.mockClear()
+
+    const wrapper = createWrapper()
+    cart = renderHook(() => useShoppingCart(), { wrapper }).result
   })
 
   it('should send the formatted item with no quantity parameter', async () => {
-    const wrapper = createWrapper()
-    const cart = renderHook(() => useShoppingCart(), { wrapper }).result
-
     const product = mockProduct()
     await cart.current.checkoutSingleItem({ sku: product.sku })
 
@@ -517,9 +519,6 @@ describe('checkoutSingleItem()', () => {
   })
 
   it('should send the formatted item with a custom quantity parameter', async () => {
-    const wrapper = createWrapper()
-    const cart = renderHook(() => useShoppingCart(), { wrapper }).result
-
     const product = mockProduct()
     await cart.current.checkoutSingleItem({ sku: product.sku, quantity: 47 })
 
@@ -527,6 +526,18 @@ describe('checkoutSingleItem()', () => {
     expect(stripeMock.redirectToCheckout.mock.calls[0][0].items).toEqual([
       { sku: product.sku, quantity: 47 }
     ])
+  })
+
+  it('does not support checkout-session mode', async () => {
+    const wrapper = createWrapper({ mode: 'checkout-session' })
+    cart = renderHook(() => useShoppingCart(), { wrapper }).result
+
+    const product = mockProduct()
+    expect(
+      cart.current.checkoutSingleItem({ sku: product.sku })
+    ).rejects.toThrow(
+      "Invalid checkout mode 'checkout-session' was chosen. The valid modes are client-only."
+    )
   })
 })
 
@@ -543,7 +554,7 @@ describe('stripe handling', () => {
     const cart = renderHook(() => useShoppingCart(), { wrapper }).result
 
     expect(cart.current.redirectToCheckout()).rejects.toThrow(
-      'Stripe is not defined'
+      'No compatible API has been defined, your options are: Stripe'
     )
   })
 })

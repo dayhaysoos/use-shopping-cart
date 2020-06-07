@@ -1,16 +1,16 @@
 import React, {
   createContext,
-  useReducer,
   useContext,
+  useEffect,
   useMemo,
-  useEffect
+  useReducer
 } from 'react'
 
 import {
-  useLocalStorageReducer,
+  checkoutHandler,
+  formatCurrencyString,
   isClient,
-  getCheckoutData,
-  formatCurrencyString
+  useLocalStorageReducer
 } from './util'
 import {
   cartInitialState,
@@ -97,14 +97,8 @@ export const useShoppingCart = () => {
   const [cart, dispatch] = useContext(CartContext)
 
   const {
-    mode,
-    stripe,
     lastClicked,
     shouldDisplayCart,
-    successUrl,
-    cancelUrl,
-    billingAddressCollection,
-    allowedCountries,
     cartCount,
     cartDetails,
     totalPrice,
@@ -129,63 +123,20 @@ export const useShoppingCart = () => {
   const handleCartHover = () => dispatch({ type: 'cart-hover' })
   const handleCloseCart = () => dispatch({ type: 'close-cart' })
 
-  async function redirectToCheckout(sessionId) {
-    if (stripe === null) throw new Error('Stripe is not defined')
-    const resolvedStripe = await Promise.resolve(stripe)
-
-    if (mode === 'client-only') {
-      // client-only checkout mode
-      const options = {
-        items: getCheckoutData.stripe(cart),
-        successUrl,
-        cancelUrl,
-        billingAddressCollection: billingAddressCollection
-          ? 'required'
-          : 'auto',
-        submitType: 'auto'
-      }
-
-      if (allowedCountries?.length)
-        options.shippingAddressCollection = { allowedCountries }
-
-      const { error } = await resolvedStripe.redirectToCheckout(options)
-      if (error) return error
-    } else if (mode === 'checkout-session') {
-      // checkout-session mode
-      const { error } = await resolvedStripe.redirectToCheckout(sessionId)
-      if (error) return error
-    } else {
-      throw new Error(
-        `Invalid checkout mode '${mode}' was chosen. Valid options are 'client-only' and 'checkout-session'`
-      )
+  const redirectToCheckout = checkoutHandler(cart, {
+    modes: ['client-only', 'checkout-session'],
+    stripe(stripe, options) {
+      return stripe.redirectToCheckout(options)
     }
-  }
+  })
 
-  async function checkoutSingleItem({ sku, quantity = 1 }) {
-    const resolvedStripe = await Promise.resolve(stripe)
-
-    if (mode === 'client-only') {
-      const options = {
-        items: [{ sku, quantity }],
-        successUrl,
-        cancelUrl,
-        billingAddressCollection: billingAddressCollection
-          ? 'required'
-          : 'auto',
-        submitType: 'auto'
-      }
-
-      if (allowedCountries?.length)
-        options.shippingAddressCollection = { allowedCountries }
-
-      const { error } = await resolvedStripe.redirectToCheckout(options)
-      if (error) return error
-    } else {
-      throw new Error(
-        `Invalid checkout mode '${mode}' was chosen. The only option for single-item checkout is 'client-only'`
-      )
+  const checkoutSingleItem = checkoutHandler(cart, {
+    modes: ['client-only'],
+    stripe(stripe, options, { sku, quantity = 1 }) {
+      options.items = [{ price: sku, quantity }]
+      return stripe.redirectToCheckout(options)
     }
-  }
+  })
 
   return {
     cartDetails,
