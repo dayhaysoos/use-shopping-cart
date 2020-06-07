@@ -45,13 +45,13 @@ export function useLocalStorageReducer(key, reducer, initialState) {
 
 export const getCheckoutData = {
   stripe(cart) {
-    const items = []
+    const lineItems = []
     for (const sku in cart.cartDetails)
-      items.push({ price: sku, quantity: cart.cartDetails[sku].quantity })
+      lineItems.push({ price: sku, quantity: cart.cartDetails[sku].quantity })
 
     const options = {
       mode: 'payment',
-      lineItems: items,
+      lineItems,
       successUrl: cart.successUrl,
       cancelUrl: cart.cancelUrl,
       billingAddressCollection: cart.billingAddressCollection

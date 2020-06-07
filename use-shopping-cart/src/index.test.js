@@ -513,8 +513,8 @@ describe('checkoutSingleItem()', () => {
     await cart.current.checkoutSingleItem({ sku: product.sku })
 
     expect(stripeMock.redirectToCheckout).toHaveBeenCalled()
-    expect(stripeMock.redirectToCheckout.mock.calls[0][0].items).toEqual([
-      { sku: product.sku, quantity: 1 }
+    expect(stripeMock.redirectToCheckout.mock.calls[0][0].lineItems).toEqual([
+      { price: product.sku, quantity: 1 }
     ])
   })
 
@@ -523,8 +523,8 @@ describe('checkoutSingleItem()', () => {
     await cart.current.checkoutSingleItem({ sku: product.sku, quantity: 47 })
 
     expect(stripeMock.redirectToCheckout).toHaveBeenCalled()
-    expect(stripeMock.redirectToCheckout.mock.calls[0][0].items).toEqual([
-      { sku: product.sku, quantity: 47 }
+    expect(stripeMock.redirectToCheckout.mock.calls[0][0].lineItems).toEqual([
+      { price: product.sku, quantity: 47 }
     ])
   })
 
