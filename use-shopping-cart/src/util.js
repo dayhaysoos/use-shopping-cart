@@ -47,10 +47,11 @@ export const getCheckoutData = {
   stripe(cart) {
     const items = []
     for (const sku in cart.cartDetails)
-      items.push({ sku, quantity: cart.cartDetails[sku].quantity })
+      items.push({ price: sku, quantity: cart.cartDetails[sku].quantity })
 
     const options = {
-      items,
+      mode: 'payment',
+      lineItems: items,
       successUrl: cart.successUrl,
       cancelUrl: cart.cancelUrl,
       billingAddressCollection: cart.billingAddressCollection
