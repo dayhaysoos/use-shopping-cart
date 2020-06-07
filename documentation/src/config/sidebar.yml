@@ -26,6 +26,8 @@
       link: '/usage/clearCart()'
     - label: 'redirectToCheckout()'
       link: '/usage/redirectToCheckout()'
+    - label: 'checkoutSingleItem()'
+      link: '/usage/checkoutSingleItem()'
     - label: 'validateCartItems()'
       link: '/usage/validateCartItems()'
     - label: 'API'

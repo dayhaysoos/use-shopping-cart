@@ -10,13 +10,13 @@
     "test": "yarn workspace use-shopping-cart test:watch",
     "dev:gatsby": "yarn workspace ecommerce-gatsby-tutorial start",
     "build:gatsby": "yarn workspace use-shopping-cart build && yarn workspace ecommerce-gatsby-tutorial build",
-    "dev:docs": "yarn workspace use-shopping-cart build && yarn workspace documentation start",
-    "format": "lint-staged"
+    "dev:docs": "yarn workspace use-shopping-cart build && yarn workspace documentation start"
   },
   "dependencies": {
     "husky": "^4.2.5",
     "lint-staged": "^10.2.0",
-    "prettier": "^2.0.5"
+    "prettier": "^2.0.5",
+    "shx": "^0.3.2"
   },
   "husky": {
     "hooks": {

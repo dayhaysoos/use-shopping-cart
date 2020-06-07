@@ -11,7 +11,7 @@
     "@rocketseat/gatsby-theme-docs-core": "^1.1.0",
     "@stripe/stripe-js": "^1.5.0",
     "dotenv": "^8.2.0",
-    "gatsby": "^2.19.10",
+    "gatsby": "^2.22.11",
     "gatsby-plugin-canonical-urls": "^2.1.19",
     "gatsby-plugin-google-analytics": "^2.1.34",
     "gatsby-plugin-manifest": "^2.2.37",
@@ -22,7 +22,7 @@
     "react": "^16.12.0",
     "react-dom": "^16.12.0",
     "typeface-bungee": "^0.0.72",
-    "use-shopping-cart": "2.0.0"
+    "use-shopping-cart": "*"
   },
   "devDependencies": {},
   "keywords": [
