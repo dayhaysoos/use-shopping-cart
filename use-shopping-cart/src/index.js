@@ -133,7 +133,7 @@ export const useShoppingCart = () => {
   const checkoutSingleItem = checkoutHandler(cart, {
     modes: ['client-only'],
     stripe(stripe, options, { sku, quantity = 1 }) {
-      options.items = [{ sku, quantity }]
+      options.items = [{ price: sku, quantity }]
       return stripe.redirectToCheckout(options)
     }
   })
