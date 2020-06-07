@@ -53,7 +53,7 @@ import { CartProvider } from 'use-shopping-cart'
 import App from './App'
 
 // Remember to add your public Stripe key
-const stripePromise = loadStripe(process.env.REACT_APP_STRIPE_API_PUBLIC)
+const stripePromise = loadStripe(process.env.STRIPE_API_PUBLIC)
 
 ReactDOM.render(
   <CartProvider mode="checkout-session" stripe={stripePromise} currency="USD">
@@ -105,7 +105,7 @@ import { CartProvider } from 'use-shopping-cart'
 import App from './App'
 
 // Remember to add your public Stripe key
-const stripePromise = loadStripe(process.env.REACT_APP_STRIPE_API_PUBLIC)
+const stripePromise = loadStripe(process.env.STRIPE_API_PUBLIC)
 
 ReactDOM.render(
   <CartProvider
@@ -534,11 +534,15 @@ If you're working on this project don't forget to check out
 [the CONTRIBUTING.md file](https://github.com/dayhaysoos/use-shopping-cart/blob/master/use-shopping-cart/CONTRIBUTING.md).
 
 Before you run any of the examples be sure to set your environment variables at the root of
-the project in a `.env` file:
+the project in a `.env` file (or `documentation/.env` for the documentation workspace). There is a `.env.example` and a `documentation/.env.example` file with the example variables you'll need to run the examples and documentation workspaces in this project. You'll need to fill them in with your own API keys from Stripe.
 
 ```dotenv
-REACT_APP_STRIPE_API_PUBLIC=pk_test_YOUR_PUBLIC_TEST_KEY
-REACT_APP_STRIPE_API_SECRET=sk_test_YOUR_SECRET_TEST_KEY
+# .env.example
+STRIPE_API_PUBLIC=
+STRIPE_API_SECRET=
+
+# documentation/.env.example
+GATSBY_STRIPE_PUBLISHABLE_KEY=
 ```
 
 Here are a couple commands to get you started in development:
@@ -550,6 +554,9 @@ yarn dev
 
 # Runs tests in watch-mode
 yarn test
+
+# Runs the documentation page locally
+yarn dev:docs
 ```
 
 ### Warning
