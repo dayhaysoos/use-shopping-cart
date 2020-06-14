@@ -79,4 +79,9 @@ describe('validateCartItems', () => {
       }
     ])
   })
+  it('throws an error if product does not exist in inventory', () => {
+    expect(() => {
+      validateCartItems(inventory, { sku_1234: { sku: 'sku_1234' } })
+    }).toThrow('Product sku_1234 not found!')
+  })
 })

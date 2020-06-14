@@ -2,9 +2,11 @@ declare module 'use-shopping-cart' {
   interface CommonProviderProps {
     children: JSX.Element
     /**
-     * The stripe instance
+     * The stripe instance or a Promise that resolves with a Stripe instance
      */
-    stripe: stripe.Stripe
+    stripe:
+      | import('@stripe/stripe-js').Stripe
+      | Promise<import('@stripe/stripe-js').Stripe | null>
     /**
      * The preferred currency used to format price data
      */
@@ -151,11 +153,11 @@ declare module 'use-shopping-cart' {
     readonly cartDetails: CartDetails
     /**
      * Redirects customers to the Stripe checkout
-     * @param options {{ sessionId?: string }} only used in CheckoutSession mode
+     * @param options {{ sessionId: string }} only used in CheckoutSession mode
      * @returns Nothing or an error wrapped in a promise if an error occurred
      */
-    redirectToCheckout: (options: {
-      sessionId?: string
+    redirectToCheckout: (options?: {
+      sessionId: string
     }) => Promise<undefined | Error>
     /**
      * Redirects customers to the Stripe checkout
