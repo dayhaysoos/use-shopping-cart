@@ -46,3 +46,6 @@ coverage
 
 # Optional REPL history
 .node_repl_history
+
+# Local Netlify folder
+.netlify
