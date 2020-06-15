@@ -1,7 +1,7 @@
 {
   "name": "documentation",
   "private": true,
-  "version": "1.0.1",
+  "version": "2.1.0",
   "description": "React Hooks library for your Stripe powered shopping cart needs!",
   "author": "Nick DeJesus <ndejesus1227@gmail.com> (@dayhaysoos)",
   "license": "MIT",
