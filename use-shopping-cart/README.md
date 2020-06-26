@@ -133,7 +133,7 @@ When operating in client-only mode you must set the `successUrl` and `cancelUrl`
 const products = [
   {
     name: 'Bananas',
-    // sku ID from your Stripe Dashboard
+    // sku ID from your Stripe Dashboard (price ID for newer accounts)
     sku: 'sku_GBJ2Ep8246qeeT',
     // price in smallest currency unit (e.g. cent for USD)
     price: 400,
