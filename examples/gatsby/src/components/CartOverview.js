@@ -18,7 +18,7 @@ const Cart = () => {
   const [loading, setLoading] = useState(false)
   /* Gets the totalPrice and a method for redirecting to stripe */
   const {
-    totalPrice,
+    formattedTotalPrice,
     redirectToCheckout,
     cartCount,
     clearCart,
@@ -28,7 +28,7 @@ const Cart = () => {
     <div>
       {/* This is where we'll render our cart */}
       <p>Number of Items: {cartCount}</p>
-      <p>Total: {totalPrice()}</p>
+      <p>Total: {formattedTotalPrice}</p>
 
       {/* Redirects the user to Stripe */}
       <button
