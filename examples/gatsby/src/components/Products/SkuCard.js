@@ -27,7 +27,7 @@ const buttonStyles = {
 }
 
 const SkuCard = ({ sku }) => {
-  const { incrementItem } = useShoppingCart()
+  const { addItem } = useShoppingCart()
 
   return (
     <div style={cardStyles}>
@@ -35,11 +35,11 @@ const SkuCard = ({ sku }) => {
       <p>
         Price:{' '}
         {formatCurrencyString({
-          value: sku.price,
+          value: parseInt(sku.price),
           currency: sku.currency,
         })}
       </p>
-      <button style={buttonStyles} onClick={() => incrementItem(sku)}>
+      <button style={buttonStyles} onClick={() => addItem(sku)}>
         ADD TO CART
       </button>
     </div>
