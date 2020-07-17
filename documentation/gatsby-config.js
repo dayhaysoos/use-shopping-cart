@@ -5,7 +5,7 @@ module.exports = {
     siteTitleShort: `use-shopping-cart`,
     siteDescription:
       'React Hooks library for your Stripe powered shopping cart needs!',
-    siteUrl: `https://use-shopping-cart.netlify.app/`,
+    siteUrl: `https://useshoppingcart.com/`,
     siteAuthor: `use-shopping-cart`,
     siteImage: `/banner.png`,
     siteLanguage: `en`,
@@ -44,7 +44,7 @@ module.exports = {
     {
       resolve: `gatsby-plugin-canonical-urls`,
       options: {
-        siteUrl: `https://use-shopping-cart.netlify.app`
+        siteUrl: `https://useshoppingcart.com`
       }
     },
     `gatsby-plugin-offline`
