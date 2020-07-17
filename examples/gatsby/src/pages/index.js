@@ -16,8 +16,7 @@ const CartExample = () => (
     <SEO title="Cart Example" />
     <h1>Checkout with cart example</h1>
     <h2>
-      With{' '}
-      <a href="https://use-shopping-cart.netlify.app/">use-shopping-cart</a>
+      With <a href="https://useshoppingcart.com/">use-shopping-cart</a>
     </h2>
     <CartProvider
       mode="client-only"
