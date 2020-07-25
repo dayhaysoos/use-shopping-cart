@@ -7,13 +7,20 @@ module.exports = {
       'React Hooks library for your Stripe powered shopping cart needs!',
     siteUrl: `https://use-shopping-cart.netlify.app/`,
     siteAuthor: `use-shopping-cart`,
-    siteImage: `/banner.png`,
+    siteImage: `src/images/banner.png`,
     siteLanguage: `en`,
     themeColor: `#7159c1`,
     basePath: `/`,
     footer: `use-shopping-cart`
   },
   plugins: [
+    {
+      resolve: `gatsby-source-filesystem`,
+      options: {
+        name: `images`,
+        path: `${__dirname}/src/images`,
+      },
+    },
     {
       resolve: `@rocketseat/gatsby-theme-docs`,
       options: {
@@ -31,7 +38,7 @@ module.exports = {
         start_url: `/`,
         background_color: `#ffffff`,
         display: `standalone`,
-        icon: `static/favicon.png`
+        icon: `src/images/icon.png`
       }
     },
     `gatsby-plugin-sitemap`,
