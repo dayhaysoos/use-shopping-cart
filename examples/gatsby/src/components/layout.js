@@ -34,7 +34,10 @@ const Layout = ({ children }) => (
           <footer>
             <div>
               © 2019, Built by <a href="https://twitter.com/thorwebdev">Thor</a>{' '}
-              with <a href="https://www.gatsbyjs.org">Gatsby</a>
+              with <a href="https://www.gatsbyjs.org">Gatsby</a> | View{' '}
+              <a href="https://github.com/dayhaysoos/use-shopping-cart/tree/master/examples/gatsby">
+                source
+              </a>
             </div>
             <div>
               <a href="https://stripe.com">

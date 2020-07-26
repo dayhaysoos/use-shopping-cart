@@ -2,7 +2,7 @@
   "name": "documentation",
   "private": true,
   "version": "2.1.0",
-  "description": "React Hooks library for your Stripe powered shopping cart needs!",
+  "description": "React Hooks library for your Stripe powered shopping cart needs!!",
   "author": "Nick DeJesus <ndejesus1227@gmail.com> (@dayhaysoos)",
   "license": "MIT",
   "starter-name": "gatsby-starter-rocket-docs",
@@ -22,7 +22,7 @@
     "react": "^16.12.0",
     "react-dom": "^16.12.0",
     "typeface-bungee": "^0.0.72",
-    "use-shopping-cart": "2.1.0"
+    "use-shopping-cart": "^2.1.0"
   },
   "devDependencies": {},
   "keywords": [

@@ -8,7 +8,7 @@ const SuccessPage = () => {
   return (
     <Layout>
       <SEO title="Payment Success" />
-      <h1>Sucess!</h1>
+      <h1>Success!</h1>
       <Link to="/">Shop again</Link>
     </Layout>
   )

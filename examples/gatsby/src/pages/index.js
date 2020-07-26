@@ -20,9 +20,10 @@ const CartExample = () => (
       <a href="https://use-shopping-cart.netlify.app/">use-shopping-cart</a>
     </h2>
     <CartProvider
+      mode="client-only"
       stripe={stripePromise}
-      successUrl={`http://localhost:8000/page-2/`}
-      cancelUrl={`http://localhost:8000/`}
+      successUrl={`${window.location.origin}/page-2/`}
+      cancelUrl={`${window.location.origin}/`}
       currency="USD"
       allowedCountries={['US', 'GB', 'CA']}
       billingAddressCollection={true}
