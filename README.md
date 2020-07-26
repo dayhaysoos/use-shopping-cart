@@ -36,7 +36,7 @@ At the root level of your application (or the highest point you'll be using Stri
 
 When loading up Stripe, don't forget to use your public Stripe API key with it. If you need help setting up your environment variables for this, [view a list of environment variable tutorials.](#Environment-Variable-Tutorials)
 
-#### [CheckoutSession mode](https://use-shopping-cart.netlify.app/usage/cartprovider#checkoutsession-mode)
+#### [CheckoutSession mode](https://useshoppingcart.com/usage/cartprovider#checkoutsession-mode)
 
 Creating a [CheckoutSession](https://stripe.com/docs/payments/checkout/one-time#create-checkout-session) server-side allows for a more flexible and powerful integration but requires a server component (e.g. a Netlify Function).
 
@@ -82,9 +82,9 @@ const products = [
 ]
 ```
 
-Additionally, you must verify the cartItems on the server-side before creating the CheckoutSession. For this you can use the [validateCartItems() helper](<https://use-shopping-cart.netlify.app/usage/validateCartItems()>).
+Additionally, you must verify the cartItems on the server-side before creating the CheckoutSession. For this you can use the [validateCartItems() helper](<https://useshoppingcart.com/usage/validateCartItems()>).
 
-#### [Client-only Checkout mode](https://use-shopping-cart.netlify.app/usage/cartprovider#client-only-checkout-mode)
+#### [Client-only Checkout mode](https://useshoppingcart.com/usage/cartprovider#client-only-checkout-mode)
 
 To operate a checkout page without any server component you need to enable client-only checkout mode and insert your
  product information in your Stripe Dashboard:
@@ -351,7 +351,7 @@ For a real-world robust example visit the [documentation for `setItemQuantity`](
 
 ## API
 
-You can [view the full API](https://use-shopping-cart.netlify.app/) on our documentation page.
+You can [view the full API](https://useshoppingcart.com/) on our documentation page.
 
 ### `<CartProvider>`
 
@@ -432,57 +432,57 @@ Returns an object with all the following properties and methods:
     <th>Return Type</th>
   </tr>
   <tr>
-    <td><a href="https://use-shopping-cart.netlify.app/usage/addItem()"><code>addItem()</code></a></td>
+    <td><a href="https://useshoppingcart.com/usage/addItem()"><code>addItem()</code></a></td>
     <td>product: Object</td>
     <td>N/A</td>
   </tr>
   <tr>
-    <td><a href="https://use-shopping-cart.netlify.app/usage/incrementItem()"><code>incrementItem()</code></a></td>
+    <td><a href="https://useshoppingcart.com/usage/incrementItem()"><code>incrementItem()</code></a></td>
     <td>sku: string</td>
     <td>N/A</td>
   </tr>
   <tr>
-    <td><a href="https://use-shopping-cart.netlify.app/usage/decrementItem()"><code>decrementItem()</code></a></td>
+    <td><a href="https://useshoppingcart.com/usage/decrementItem()"><code>decrementItem()</code></a></td>
     <td>sku: string</td>
     <td>N/A</td>
   </tr>
   <tr>
-    <td><a href="https://use-shopping-cart.netlify.app/usage/removeItem()"><code>removeItem()</code></a></td>
+    <td><a href="https://useshoppingcart.com/usage/removeItem()"><code>removeItem()</code></a></td>
     <td>sku: string</td>
     <td>N/A</td>
   </tr>
   <tr>
-    <td><a href="https://use-shopping-cart.netlify.app/usage/setItemQuantity()"><code>setItemQuantity()</code></a></td>
+    <td><a href="https://useshoppingcart.com/usage/setItemQuantity()"><code>setItemQuantity()</code></a></td>
     <td>sku: string, quantity: number</td>
     <td>N/A</td>
   </tr>
   <tr>
-    <td><a href="https://use-shopping-cart.netlify.app/usage/api#totalPrice"><code>totalPrice</code></a></td>
+    <td><a href="https://useshoppingcart.com/usage/api#totalPrice"><code>totalPrice</code></a></td>
     <td>N/A</td>
     <td>number</td>
   </tr>
   <tr>
-    <td><a href="https://use-shopping-cart.netlify.app/usage/api#formattedTotalPrice"><code>formattedTotalPrice</code></a></td>
+    <td><a href="https://useshoppingcart.com/usage/api#formattedTotalPrice"><code>formattedTotalPrice</code></a></td>
     <td>N/A</td>
     <td>string</td>
   </tr>
   <tr>
-    <td><a href="https://use-shopping-cart.netlify.app/usage/api#cartCount"><code>cartCount</code></a></td>
+    <td><a href="https://useshoppingcart.com/usage/api#cartCount"><code>cartCount</code></a></td>
     <td>number</td>
     <td>N/A</td>
   </tr>
   <tr>
-    <td><a href="https://use-shopping-cart.netlify.app/usage/api#cartDetails"><code>cartDetails</code></a></td>
+    <td><a href="https://useshoppingcart.com/usage/api#cartDetails"><code>cartDetails</code></a></td>
     <td>Object of cart entries</td>
     <td>N/A</td>
   </tr>
   <tr>
-    <td><a href="https://use-shopping-cart.netlify.app/usage/redirectToCheckout()"><code>redirectToCheckout()</code></a></td>
+    <td><a href="https://useshoppingcart.com/usage/redirectToCheckout()"><code>redirectToCheckout()</code></a></td>
     <td>sessionId?: string</td>
     <td>Error (if one occurrs)</td>
   </tr>
   <tr>
-    <td><a href="https://use-shopping-cart.netlify.app/usage/clearCart()"><code>clearCart()</code></a></td>
+    <td><a href="https://useshoppingcart.com/usage/clearCart()"><code>clearCart()</code></a></td>
     <td>N/A</td>
     <td>N/A</td>
   </tr>
