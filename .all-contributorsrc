@@ -109,6 +109,15 @@
       "contributions": [
         "doc"
       ]
+    },
+    {
+      "login": "maxcell",
+      "name": "Prince Wilson",
+      "avatar_url": "https://avatars1.githubusercontent.com/u/8431042?v=4",
+      "profile": "https://prince.dev",
+      "contributions": [
+        "doc"
+      ]
     }
   ],
   "contributorsPerLine": 7,
