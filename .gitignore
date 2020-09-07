@@ -49,3 +49,6 @@ coverage
 
 # Local Netlify folder
 .netlify
+
+# Build file for UMD
+examples/umd/src/use-shopping-cart.umd.js
