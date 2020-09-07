@@ -9,6 +9,8 @@
   "types": "./src/index.d.ts",
   "module": "dist/index.es.js",
   "jsnext:main": "dist/index.es.js",
+  "unpkg": "dist/index.umd.js",
+  "umd": "dist/index.umd.js",
   "engines": {
     "node": ">=8",
     "npm": ">=5"
@@ -47,6 +49,11 @@
     "@babel/plugin-transform-runtime": "^7.9.0",
     "@babel/preset-env": "^7.0.0",
     "@babel/preset-react": "^7.0.0",
+    "@rollup/plugin-babel": "^5.2.0",
+    "@rollup/plugin-commonjs": "^15.0.0",
+    "@rollup/plugin-node-resolve": "^9.0.0",
+    "@rollup/plugin-sucrase": "^3.1.0",
+    "@rollup/plugin-url": "^5.0.1",
     "@testing-library/react-hooks": "^3.2.1",
     "babel-eslint": "^10.1.0",
     "cross-env": "^7.0.2",
@@ -64,12 +71,7 @@
     "react": "16.13.1",
     "react-scripts": "3.4.1",
     "react-test-renderer": "16.13.1",
-    "rollup": "^2.3.3",
-    "rollup-plugin-babel": "^4.3.2",
-    "rollup-plugin-commonjs": "^10.1.0",
-    "rollup-plugin-node-resolve": "^5.2.0",
-    "rollup-plugin-peer-deps-external": "^2.2.0",
-    "rollup-plugin-url": "^3.0.1"
+    "rollup": "^2.3.3"
   },
   "dependencies": {
     "react-storage-hooks": "^4.0.0"
