@@ -30,7 +30,7 @@ export const CartContext = createContext([
   () => {}
 ])
 
-export const CartProvider = ({
+export function CartProvider({
   children,
   mode,
   stripe,
@@ -40,7 +40,7 @@ export const CartProvider = ({
   language = isClient ? navigator.language : 'en-US',
   billingAddressCollection = false,
   allowedCountries = null
-}) => {
+}) {
   const [cart, cartDispatch] = useReducer(cartReducer, cartInitialState)
 
   useEffect(() => {

@@ -1,0 +1,18 @@
+{
+  "name": "use-shopping-cart-umd",
+  "version": "1.0.0",
+  "devDependencies": {
+    "koa": "^2.13.0",
+    "serve": "^11.3.2",
+    "stream-replace": "^1.0.0",
+    "use-shopping-cart": "*"
+  },
+  "scripts": {
+    "copy": "node scripts/copy.js",
+    "start": "node server.js"
+  },
+  "dependencies": {
+    "clipboardy": "^2.3.0",
+    "dotenv": "^8.2.0"
+  }
+}
