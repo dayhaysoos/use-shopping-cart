@@ -558,3 +558,75 @@ describe('stripe handling', () => {
     )
   })
 })
+
+describe('loadCart()', () => {
+  it('should add cartDetails to cart object', async () => {
+    const wrapper = createWrapper()
+    const cart = renderHook(() => useShoppingCart(), { wrapper }).result
+
+    const mockCartDetails1 = {
+      mock_1: {
+        name: 'Bananas',
+        sku: 'sku_GBJ2Ep8246qeeT',
+        image:
+          'https://images.unsplash.com/photo-1574226516831-e1dff420e562?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=1050&q=80',
+        price: 400,
+        currency: 'USD',
+        value: 800,
+        quantity: 2,
+        formattedValue: '$8.00'
+      }
+    }
+
+    act(() => {
+      cart.current.loadCart(mockCartDetails1)
+    })
+
+    expect(cart.current.cartDetails).toEqual(mockCartDetails1)
+  })
+
+  it('should merge two cart details items by default', async () => {
+    const wrapper = createWrapper()
+    const cart = renderHook(() => useShoppingCart(), { wrapper }).result
+
+    const mockCartDetails1 = {
+      mock_1: {
+        name: 'Bananas',
+        sku: 'sku_GBJ2Ep8246qeeT',
+        image:
+          'https://images.unsplash.com/photo-1574226516831-e1dff420e562?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=1050&q=80',
+        price: 400,
+        currency: 'USD',
+        value: 800,
+        quantity: 2,
+        formattedValue: '$8.00'
+      }
+    }
+
+    const product = mockProduct({ price: 200 })
+
+    act(() => {
+      cart.current.addItem(product)
+      cart.current.loadCart(mockCartDetails1)
+    })
+
+    const entry = cart.current.cartDetails[product.sku]
+
+    expect(cart.current.cartDetails).toEqual({
+      [product.sku]: { ...entry },
+      mock_1: {
+        name: 'Bananas',
+        sku: 'sku_GBJ2Ep8246qeeT',
+        image:
+          'https://images.unsplash.com/photo-1574226516831-e1dff420e562?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=1050&q=80',
+        price: 400,
+        currency: 'USD',
+        value: 800,
+        quantity: 2,
+        formattedValue: '$8.00'
+      }
+    })
+
+    console.log(cart.current.cartDetails)
+  })
+})

@@ -139,6 +139,19 @@ export function cartValuesReducer(state, action) {
     case 'clear-cart':
       return cartValuesInitialState
 
+    case 'load-cart':
+      if (action.shouldMerge) {
+        return {
+          ...state,
+          cartDetails: { ...state.cartDetails, ...action.cartDetails }
+        }
+      } else {
+        return {
+          ...state,
+          cartDetails: { ...action.cartDetails }
+        }
+      }
+
     default:
       return state
   }
