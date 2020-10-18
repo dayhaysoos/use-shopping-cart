@@ -626,7 +626,5 @@ describe('loadCart()', () => {
         formattedValue: '$8.00'
       }
     })
-
-    console.log(cart.current.cartDetails)
   })
 })
