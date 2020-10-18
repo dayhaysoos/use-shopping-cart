@@ -174,6 +174,7 @@ declare module 'use-shopping-cart' {
     clearCart: () => void
     /**
      * @param cartDetails cartDetails: [product.sku]: {...}
+     * @param shouldMerge Boolean, defaults to true. If false, it would replace cartDetails
      */
     loadCart: (cartDetails: Object<CartDetails>, shouldMerge?: Boolean) => void
   }
