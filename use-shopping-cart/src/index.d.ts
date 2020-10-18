@@ -172,6 +172,10 @@ declare module 'use-shopping-cart' {
      * Totally clears the cart of all items
      */
     clearCart: () => void
+    /**
+     * @param cartDetails cartDetails: [product.sku]: {...}
+     */
+    loadCart: (cartDetails: Object<CartDetails>, shouldMerge?: Boolean) => void
   }
 
   /**
