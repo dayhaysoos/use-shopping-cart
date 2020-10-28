@@ -146,8 +146,8 @@ export function cartValuesReducer(state, action) {
       if (!action.shouldMerge) state = { ...cartValuesInitialState }
 
       for (const sku in action.cartDetails) {
-        const product = action.cartDetails[sku]
-        state = createEntry(product, product.quantity)
+        const entry = action.cartDetails[sku]
+        state = createEntry(entry, entry.quantity)
       }
       return state
 
