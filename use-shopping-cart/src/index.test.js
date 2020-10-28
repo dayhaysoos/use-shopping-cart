@@ -559,72 +559,69 @@ describe('stripe handling', () => {
   })
 })
 
+function mockCartDetails(overrides) {
+  return {
+    [`sku_abc${counter}`]: {
+      sku: `sku_abc${counter++}`,
+      name: 'Bananas',
+      image: 'https://blah.com/banana.avif',
+      price: 400,
+      currency: 'USD',
+      value: 800,
+      quantity: 2,
+      formattedValue: '$8.00',
+      ...overrides
+    },
+    [`sku_efg${counter}`]: {
+      sku: `sku_efg${counter++}`,
+      name: 'Oranges',
+      image: 'https://blah.com/orange.avif',
+      currency: 'USD',
+      price: 250,
+      value: 1000,
+      quantity: 4,
+      formattedValue: '$10.00',
+      ...overrides
+    }
+  }
+}
+
 describe('loadCart()', () => {
   it('should add cartDetails to cart object', async () => {
     const wrapper = createWrapper()
     const cart = renderHook(() => useShoppingCart(), { wrapper }).result
-
-    const mockCartDetails1 = {
-      mock_1: {
-        name: 'Bananas',
-        sku: 'sku_GBJ2Ep8246qeeT',
-        image:
-          'https://images.unsplash.com/photo-1574226516831-e1dff420e562?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=1050&q=80',
-        price: 400,
-        currency: 'USD',
-        value: 800,
-        quantity: 2,
-        formattedValue: '$8.00'
-      }
-    }
+    const cartDetails = mockCartDetails()
+    const product = mockProduct({ price: 200 })
 
     act(() => {
-      cart.current.loadCart(mockCartDetails1)
+      cart.current.addItem(product)
+      cart.current.loadCart(cartDetails, false)
     })
 
-    expect(cart.current.cartDetails).toEqual(mockCartDetails1)
+    expect(cart.current.cartDetails).toEqual(cartDetails)
+    expect(cart.current.totalPrice).toEqual(1800)
+    expect(cart.current.cartCount).toEqual(6)
   })
 
   it('should merge two cart details items by default', async () => {
     const wrapper = createWrapper()
     const cart = renderHook(() => useShoppingCart(), { wrapper }).result
 
-    const mockCartDetails1 = {
-      mock_1: {
-        name: 'Bananas',
-        sku: 'sku_GBJ2Ep8246qeeT',
-        image:
-          'https://images.unsplash.com/photo-1574226516831-e1dff420e562?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=1050&q=80',
-        price: 400,
-        currency: 'USD',
-        value: 800,
-        quantity: 2,
-        formattedValue: '$8.00'
-      }
-    }
-
+    const cartDetails = mockCartDetails()
     const product = mockProduct({ price: 200 })
 
     act(() => {
       cart.current.addItem(product)
-      cart.current.loadCart(mockCartDetails1)
+      cart.current.incrementItem(product.sku)
+      cart.current.loadCart(cartDetails)
     })
 
     const entry = cart.current.cartDetails[product.sku]
-
     expect(cart.current.cartDetails).toEqual({
-      [product.sku]: { ...entry },
-      mock_1: {
-        name: 'Bananas',
-        sku: 'sku_GBJ2Ep8246qeeT',
-        image:
-          'https://images.unsplash.com/photo-1574226516831-e1dff420e562?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=1050&q=80',
-        price: 400,
-        currency: 'USD',
-        value: 800,
-        quantity: 2,
-        formattedValue: '$8.00'
-      }
+      [entry.sku]: entry,
+      ...cartDetails
     })
+    expect(cart.current.totalPrice).toEqual(2200)
+    expect(cart.current.cartCount).toEqual(8)
   })
 })
