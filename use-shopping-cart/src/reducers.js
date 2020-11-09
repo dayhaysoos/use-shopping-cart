@@ -147,6 +147,9 @@ export function cartValuesReducer(state, action) {
 
       for (const sku in action.cartDetails) {
         const entry = action.cartDetails[sku]
+        if (action.filter && !action.filter(entry))
+          continue
+
         state = createEntry(entry, entry.quantity)
       }
       return state
