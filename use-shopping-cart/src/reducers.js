@@ -76,6 +76,7 @@ export function cartValuesReducer(state, action) {
       cartCount: state.cartCount + count
     }
   }
+
   function updateEntry(sku, count) {
     const cartDetails = { ...state.cartDetails }
     const entry = cartDetails[sku]
@@ -94,6 +95,7 @@ export function cartValuesReducer(state, action) {
       cartCount: state.cartCount + count
     }
   }
+
   function removeEntry(sku) {
     const cartDetails = { ...state.cartDetails }
     const totalPrice = state.totalPrice - cartDetails[sku].value
@@ -102,6 +104,7 @@ export function cartValuesReducer(state, action) {
 
     return { cartDetails, totalPrice, cartCount }
   }
+
   function updateQuantity(sku, quantity) {
     const entry = state.cartDetails[sku]
     return updateEntry(sku, quantity - entry.quantity)
@@ -140,17 +143,13 @@ export function cartValuesReducer(state, action) {
       return cartValuesInitialState
 
     case 'load-cart':
-      if (action.shouldMerge) {
-        return {
-          ...state,
-          cartDetails: { ...state.cartDetails, ...action.cartDetails }
-        }
-      } else {
-        return {
-          ...state,
-          cartDetails: { ...action.cartDetails }
-        }
+      if (!action.shouldMerge) state = { ...cartValuesInitialState }
+
+      for (const sku in action.cartDetails) {
+        const entry = action.cartDetails[sku]
+        state = createEntry(entry, entry.quantity)
       }
+      return state
 
     default:
       return state
