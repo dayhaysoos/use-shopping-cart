@@ -10,7 +10,8 @@ import {
   checkoutHandler,
   formatCurrencyString,
   isClient,
-  useLocalStorageReducer
+  useLocalStorageReducer,
+  filterCart
 } from './util'
 import {
   cartInitialState,
@@ -167,6 +168,7 @@ export const useShoppingCart = () => {
     handleCloseCart,
     redirectToCheckout,
     checkoutSingleItem,
-    loadCart
+    loadCart,
+    filterCart
   }
 }

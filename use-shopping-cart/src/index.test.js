@@ -625,3 +625,30 @@ describe('loadCart()', () => {
     expect(cart.current.cartCount).toEqual(8)
   })
 })
+
+describe('filterCart', () => {
+  it('should load a filteredCart', async () => {
+    const wrapper = createWrapper()
+    const cart = renderHook(() => useShoppingCart(), { wrapper }).result
+
+    const cartDetails = mockCartDetails()
+
+    function mockFilter(item) {
+      return item.value < 1000
+    }
+
+    act(() => {
+      cart.current.loadCart(cartDetails)
+    })
+
+    let filteredCart = await cart.current.filterCart(cartDetails, mockFilter)
+
+    // doing load cart again, but filtering out one value and seeing if the end result
+    // goes back to the filteredCart
+    act(() => {
+      cart.current.loadCart(filteredCart, false)
+    })
+
+    expect(cart.current.cartDetails).toEqual(filteredCart)
+  })
+})
