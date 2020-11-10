@@ -627,28 +627,44 @@ describe('loadCart()', () => {
 })
 
 describe('filterCart', () => {
-  it('should load a filteredCart', async () => {
-    const wrapper = createWrapper()
-    const cart = renderHook(() => useShoppingCart(), { wrapper }).result
+	it('filter out all cart items that fail filter callback', async () => {
+		const cartDetails = {
+			'test-sku-123': {
+				sku: 'test-sku-123',
+				name: 'Bananas',
+				image: 'https://blah.com/banana.avif',
+				price: 200,
+				currency: 'USD',
+				value: 400,
+				quantity: 2,
+				formattedValue: '$4.00',
+			},
+			'test-sku-234': {
+				sku: 'test-sku-234',
+				name: 'Oranges',
+				image: 'https://blah.com/orange.avif',
+				currency: 'USD',
+				price: 250,
+				value: 1000,
+				quantity: 4,
+				formattedValue: '$10.00',
+			}
+		}
+		
+		const mockFilter = item => item.value < 500
+		const filteredCart = await filterCart(cartDetails, mockFilter)
 
-    const cartDetails = mockCartDetails()
-
-    function mockFilter(item) {
-      return item.value < 1000
-    }
-
-    act(() => {
-      cart.current.loadCart(cartDetails)
-    })
-
-    let filteredCart = await cart.current.filterCart(cartDetails, mockFilter)
-
-    // doing load cart again, but filtering out one value and seeing if the end result
-    // goes back to the filteredCart
-    act(() => {
-      cart.current.loadCart(filteredCart, false)
-    })
-
-    expect(cart.current.cartDetails).toEqual(filteredCart)
-  })
+		expect(filteredCart).toEqual({
+			'test-sku-123': {
+				sku: 'test-sku-123',
+				name: 'Bananas',
+				image: 'https://blah.com/banana.avif',
+				price: 200,
+				currency: 'USD',
+				value: 400,
+				quantity: 2,
+				formattedValue: '$4.00',
+			},
+		})
+	})
 })
