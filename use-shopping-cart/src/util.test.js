@@ -1,4 +1,4 @@
-import { formatCurrencyString, getCheckoutData } from './util'
+import { formatCurrencyString, getCheckoutData, filterCart } from './util'
 
 describe('getCheckoutData', () => {
   const cart = {
@@ -67,5 +67,48 @@ describe('formatCurrencyString()', () => {
     expect(
       formatCurrencyString({ value: 439, currency: 'USD', language: 'en-US' })
     ).toBe('$4.39')
+  })
+})
+
+describe('filterCart', () => {
+  it('filter out all cart items that fail filter callback', async () => {
+    const cartDetails = {
+      'test-sku-123': {
+        sku: 'test-sku-123',
+        name: 'Bananas',
+        image: 'https://blah.com/banana.avif',
+        price: 200,
+        currency: 'USD',
+        value: 400,
+        quantity: 2,
+        formattedValue: '$4.00'
+      },
+      'test-sku-234': {
+        sku: 'test-sku-234',
+        name: 'Oranges',
+        image: 'https://blah.com/orange.avif',
+        currency: 'USD',
+        price: 250,
+        value: 1000,
+        quantity: 4,
+        formattedValue: '$10.00'
+      }
+    }
+
+    const mockFilter = (item) => item.value < 500
+    const filteredCart = await filterCart(cartDetails, mockFilter)
+
+    expect(filteredCart).toEqual({
+      'test-sku-123': {
+        sku: 'test-sku-123',
+        name: 'Bananas',
+        image: 'https://blah.com/banana.avif',
+        price: 200,
+        currency: 'USD',
+        value: 400,
+        quantity: 2,
+        formattedValue: '$4.00'
+      }
+    })
   })
 })

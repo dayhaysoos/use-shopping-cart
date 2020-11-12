@@ -558,3 +558,70 @@ describe('stripe handling', () => {
     )
   })
 })
+
+function mockCartDetails(overrides) {
+  return {
+    [`sku_abc${counter}`]: {
+      sku: `sku_abc${counter++}`,
+      name: 'Bananas',
+      image: 'https://blah.com/banana.avif',
+      price: 400,
+      currency: 'USD',
+      value: 800,
+      quantity: 2,
+      formattedValue: '$8.00',
+      ...overrides
+    },
+    [`sku_efg${counter}`]: {
+      sku: `sku_efg${counter++}`,
+      name: 'Oranges',
+      image: 'https://blah.com/orange.avif',
+      currency: 'USD',
+      price: 250,
+      value: 1000,
+      quantity: 4,
+      formattedValue: '$10.00',
+      ...overrides
+    }
+  }
+}
+
+describe('loadCart()', () => {
+  it('should add cartDetails to cart object', async () => {
+    const wrapper = createWrapper()
+    const cart = renderHook(() => useShoppingCart(), { wrapper }).result
+    const cartDetails = mockCartDetails()
+    const product = mockProduct({ price: 200 })
+
+    act(() => {
+      cart.current.addItem(product)
+      cart.current.loadCart(cartDetails, false)
+    })
+
+    expect(cart.current.cartDetails).toEqual(cartDetails)
+    expect(cart.current.totalPrice).toEqual(1800)
+    expect(cart.current.cartCount).toEqual(6)
+  })
+
+  it('should merge two cart details items by default', async () => {
+    const wrapper = createWrapper()
+    const cart = renderHook(() => useShoppingCart(), { wrapper }).result
+
+    const cartDetails = mockCartDetails()
+    const product = mockProduct({ price: 200 })
+
+    act(() => {
+      cart.current.addItem(product)
+      cart.current.incrementItem(product.sku)
+      cart.current.loadCart(cartDetails)
+    })
+
+    const entry = cart.current.cartDetails[product.sku]
+    expect(cart.current.cartDetails).toEqual({
+      [entry.sku]: entry,
+      ...cartDetails
+    })
+    expect(cart.current.totalPrice).toEqual(2200)
+    expect(cart.current.cartCount).toEqual(8)
+  })
+})

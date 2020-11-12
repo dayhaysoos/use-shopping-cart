@@ -123,6 +123,9 @@ export const useShoppingCart = () => {
   const handleCartHover = () => dispatch({ type: 'cart-hover' })
   const handleCloseCart = () => dispatch({ type: 'close-cart' })
 
+  const loadCart = (cartDetails, shouldMerge = true) =>
+    dispatch({ type: 'load-cart', cartDetails, shouldMerge })
+
   const redirectToCheckout = checkoutHandler(cart, {
     modes: ['client-only', 'checkout-session'],
     stripe(stripe, options) {
@@ -156,15 +159,14 @@ export const useShoppingCart = () => {
     incrementItem,
     decrementItem,
     clearCart,
-
     lastClicked,
     storeLastClicked,
     shouldDisplayCart,
     handleCartClick,
     handleCartHover,
     handleCloseCart,
-
     redirectToCheckout,
-    checkoutSingleItem
+    checkoutSingleItem,
+    loadCart
   }
 }
