@@ -7,16 +7,16 @@ import CartDisplay from './components/cart-display'
 const fakeData = [
   {
     name: 'Bananas',
-    sku: 'sku_GBJ2Ep8246qeeT',
+    sku: 'test1',
     price: 400,
-    image: 'https://www.fillmurray.com/300/300',
+    image: 'https://i.imgur.com/AUJQtJC.jpg',
     currency: 'USD'
   },
   {
     name: 'Tangerines',
-    sku: 'sku_GBJ2WWfMaGNC2Z',
+    sku: 'test2',
     price: 100,
-    image: 'https://www.fillmurray.com/300/300',
+    image: 'https://i.imgur.com/4rVhatT.jpg',
     currency: 'USD'
   }
 ]
