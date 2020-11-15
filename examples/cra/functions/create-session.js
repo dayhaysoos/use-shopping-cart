@@ -31,7 +31,7 @@ exports.handler = async (event) => {
       shipping_address_collection: {
         allowed_countries: ['US', 'CA']
       },
-
+      mode: 'payment',
       /*
        * This env var is set by Netlify and inserts the live site URL. If you want
        * to use a different URL, you can hard-code it here or check out the
