@@ -5,15 +5,21 @@ const validateCartItems = (inventorySrc, cartDetails) => {
     const inventoryItem = inventorySrc.find(
       (currentProduct) => currentProduct.sku === sku
     )
-    if (!inventoryItem) throw new Error(`Product ${sku} not found!`)
+    if (!inventoryItem) throw new Error(`Product not found!`)
     const item = {
-      name: inventoryItem.name,
-      amount: inventoryItem.price,
-      currency: inventoryItem.currency,
+      price_data: {
+        currency: inventoryItem.currency,
+        unit_amount: inventoryItem.price,
+        product_data: {
+          name: inventoryItem.name
+        }
+      },
       quantity: product.quantity
     }
-    if (inventoryItem.description) item.description = inventoryItem.description
-    if (inventoryItem.image) item.images = [inventoryItem.image]
+    if (inventoryItem.description)
+      item.price_data.product_data.description = inventoryItem.description
+    if (inventoryItem.image)
+      item.price_data.product_data.images = [inventoryItem.image]
     validatedItems.push(item)
   }
 
