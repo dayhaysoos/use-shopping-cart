@@ -1,11 +1,15 @@
 const validateCartItems = (inventorySrc, cartDetails) => {
   const validatedItems = []
+
   for (const sku in cartDetails) {
     const product = cartDetails[sku]
     const inventoryItem = inventorySrc.find(
-      (currentProduct) => currentProduct.sku === sku
+      (currentProduct) =>
+        currentProduct.sku === sku || currentProduct.id === sku
     )
-    if (!inventoryItem) throw new Error(`Product not found!`)
+
+    if (!inventoryItem) throw new Error(`Product ${sku} not found!`)
+
     const item = {
       price_data: {
         currency: inventoryItem.currency,
@@ -26,6 +30,18 @@ const validateCartItems = (inventorySrc, cartDetails) => {
   return validatedItems
 }
 
+const formatLineItems = (cartDetails) => {
+  const lineItems = []
+
+  for (const itemId in cartDetails) {
+    if (cartDetails[itemId].sku_id || cartDetails[itemId].price_id)
+      lineItems.push({ price: itemId, quantity: cartDetails[itemId].quantity })
+  }
+
+  return lineItems
+}
+
 module.exports = {
-  validateCartItems
+  validateCartItems,
+  formatLineItems
 }
