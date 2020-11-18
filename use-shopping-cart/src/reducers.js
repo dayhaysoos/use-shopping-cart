@@ -1,4 +1,5 @@
 import { formatCurrencyString } from './util'
+import { v4 as uuidv4 } from 'uuid'
 
 export const cartInitialState = {
   lastClicked: '',
@@ -48,8 +49,26 @@ export const cartValuesInitialState = {
   cartCount: 0
 }
 function Entry(productData, quantity, currency, language) {
+  const getProductId = () => {
+    if (productData.id) {
+      return productData.id
+    }
+    if (productData.price_id) {
+      return productData.price_id
+    }
+    if (productData.sku_id) {
+      return productData.sku_id
+    }
+    if (productData.sku) {
+      return productData.sku
+    } else {
+      return uuidv4()
+    }
+  }
+
   return {
     ...productData,
+    id: getProductId(),
     quantity,
     get value() {
       return this.price * this.quantity
@@ -147,8 +166,7 @@ export function cartValuesReducer(state, action) {
 
       for (const sku in action.cartDetails) {
         const entry = action.cartDetails[sku]
-        if (action.filter && !action.filter(entry))
-          continue
+        if (action.filter && !action.filter(entry)) continue
 
         state = createEntry(entry, entry.quantity)
       }
