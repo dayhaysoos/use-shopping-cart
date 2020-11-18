@@ -25,6 +25,7 @@ let counter = 0
 function mockProduct(overrides) {
   return {
     sku: `sku_abc${counter++}`,
+    id: `sku_abc${counter++}`,
     name: 'blah bleh bloo',
     price: Math.floor(Math.random() * 1000 + 1),
     image: 'https://blah.com/bleh',
@@ -563,6 +564,7 @@ function mockCartDetails(overrides) {
   return {
     [`sku_abc${counter}`]: {
       sku: `sku_abc${counter++}`,
+      id: `sku_abc${counter++}`,
       name: 'Bananas',
       image: 'https://blah.com/banana.avif',
       price: 400,
@@ -574,6 +576,7 @@ function mockCartDetails(overrides) {
     },
     [`sku_efg${counter}`]: {
       sku: `sku_efg${counter++}`,
+      id: `sku_efg${counter++}`,
       name: 'Oranges',
       image: 'https://blah.com/orange.avif',
       currency: 'USD',
