@@ -24,7 +24,6 @@ exports.handler = async (event) => {
     const productJSON = JSON.parse(event.body)
 
     const line_items = formatLineItems(productJSON)
-    console.log('line-items', line_items)
 
     const session = await stripe.checkout.sessions.create({
       payment_method_types: ['card'],
