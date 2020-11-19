@@ -11,7 +11,7 @@ export function cartReducer(cart, action) {
     case 'store-last-clicked':
       return {
         ...cart,
-        lastClicked: action.sku
+        lastClicked: action.id
       }
 
     case 'cart-click':
@@ -138,24 +138,24 @@ export function cartValuesReducer(state, action) {
 
     case 'increment-item':
       if (action.count <= 0) break
-      if (action.sku in state.cartDetails)
-        return updateEntry(action.sku, action.count)
+      if (action.id in state.cartDetails)
+        return updateEntry(action.id, action.count)
       break
 
     case 'decrement-item':
       if (action.count <= 0) break
-      if (action.sku in state.cartDetails)
-        return updateEntry(action.sku, -action.count)
+      if (action.id in state.cartDetails)
+        return updateEntry(action.id, -action.count)
       break
 
     case 'set-item-quantity':
       if (action.count < 0) break
-      if (action.sku in state.cartDetails)
-        return updateQuantity(action.sku, action.quantity)
+      if (action.id in state.cartDetails)
+        return updateQuantity(action.id, action.quantity)
       break
 
     case 'remove-item-from-cart':
-      if (action.sku in state.cartDetails) return removeEntry(action.sku)
+      if (action.id in state.cartDetails) return removeEntry(action.id)
       break
 
     case 'clear-cart':

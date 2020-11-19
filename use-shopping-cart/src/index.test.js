@@ -24,7 +24,6 @@ const createWrapper = (overrides = {}) => ({ children }) => (
 let counter = 0
 function mockProduct(overrides) {
   return {
-    sku: `sku_abc${counter++}`,
     id: `sku_abc${counter++}`,
     name: 'blah bleh bloo',
     price: Math.floor(Math.random() * 1000 + 1),
@@ -564,7 +563,6 @@ function mockCartDetails(overrides) {
   return {
     [`sku_abc${counter}`]: {
       sku: `sku_abc${counter++}`,
-      id: `sku_abc${counter++}`,
       name: 'Bananas',
       image: 'https://blah.com/banana.avif',
       price: 400,
@@ -576,7 +574,6 @@ function mockCartDetails(overrides) {
     },
     [`sku_efg${counter}`]: {
       sku: `sku_efg${counter++}`,
-      id: `sku_efg${counter++}`,
       name: 'Oranges',
       image: 'https://blah.com/orange.avif',
       currency: 'USD',
@@ -601,7 +598,19 @@ describe('loadCart()', () => {
       cart.current.loadCart(cartDetails, false)
     })
 
-    expect(cart.current.cartDetails).toEqual(cartDetails)
+    const itemId1 = Object.keys(cartDetails)[0]
+    const itemId2 = Object.keys(cartDetails)[1]
+
+    expect(cart.current.cartDetails).toEqual({
+      [itemId1]: {
+        ...cartDetails[itemId1],
+        id: itemId1
+      },
+      [itemId2]: {
+        ...cartDetails[itemId2],
+        id: itemId2
+      }
+    })
     expect(cart.current.totalPrice).toEqual(1800)
     expect(cart.current.cartCount).toEqual(6)
   })
@@ -619,10 +628,20 @@ describe('loadCart()', () => {
       cart.current.loadCart(cartDetails)
     })
 
+    const itemId1 = Object.keys(cartDetails)[0]
+    const itemId2 = Object.keys(cartDetails)[1]
+
     const entry = cart.current.cartDetails[product.id]
     expect(cart.current.cartDetails).toEqual({
       [entry.id]: entry,
-      ...cartDetails
+      [itemId1]: {
+        ...cartDetails[itemId1],
+        id: itemId1
+      },
+      [itemId2]: {
+        ...cartDetails[itemId2],
+        id: itemId2
+      }
     })
     expect(cart.current.totalPrice).toEqual(2200)
     expect(cart.current.cartCount).toEqual(8)
