@@ -89,7 +89,7 @@ export function cartValuesReducer(state, action) {
     return {
       cartDetails: {
         ...state.cartDetails,
-        [product.sku]: entry
+        [entry.id]: entry
       },
       totalPrice: state.totalPrice + product.price * count,
       cartCount: state.cartCount + count
@@ -132,8 +132,8 @@ export function cartValuesReducer(state, action) {
   switch (action.type) {
     case 'add-item-to-cart':
       if (action.count <= 0) break
-      if (action.product.sku in state.cartDetails)
-        return updateEntry(action.product.sku, action.count)
+      if (action.product.id in state.cartDetails)
+        return updateEntry(action.product.id, action.count)
       return createEntry(action.product, action.count)
 
     case 'increment-item':
