@@ -8,7 +8,7 @@ const validateCartItems = (inventorySrc, cartDetails) => {
         currentProduct.sku === itemId || currentProduct.id === itemId
     )
 
-    if (!inventoryItem) throw new Error(`Product ${sku} not found!`)
+    if (!inventoryItem) throw new Error(`Product ${itemId} not found!`)
 
     const item = {
       price_data: {
