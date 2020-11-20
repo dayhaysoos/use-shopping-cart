@@ -5,7 +5,7 @@ const validateCartItems = (inventorySrc, cartDetails) => {
     const product = cartDetails[itemId]
     const inventoryItem = inventorySrc.find(
       (currentProduct) =>
-        currentProduct.sku === sku || currentProduct.id === sku
+        currentProduct.sku === itemId || currentProduct.id === itemId
     )
 
     if (!inventoryItem) throw new Error(`Product ${sku} not found!`)
