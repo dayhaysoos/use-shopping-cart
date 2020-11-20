@@ -1,8 +1,8 @@
 const validateCartItems = (inventorySrc, cartDetails) => {
   const validatedItems = []
 
-  for (const sku in cartDetails) {
-    const product = cartDetails[sku]
+  for (const itemId in cartDetails) {
+    const product = cartDetails[itemId]
     const inventoryItem = inventorySrc.find(
       (currentProduct) =>
         currentProduct.sku === sku || currentProduct.id === sku
