@@ -61,9 +61,8 @@ function Entry(productData, quantity, currency, language) {
     }
     if (productData.sku) {
       return productData.sku
-    } else {
-      return uuidv4()
     }
+    return uuidv4()
   }
 
   return {
