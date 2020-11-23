@@ -20,13 +20,20 @@ const validateCartItems = (inventorySrc, cartDetails) => {
       },
       quantity: product.quantity
     }
-    if (inventoryItem.price_data) item.price_data = { ...price_data }
-    if (inventoryItem.product_data)
-      item.price_data.product_data = { ...product_data }
     if (inventoryItem.description)
       item.price_data.product_data.description = inventoryItem.description
     if (inventoryItem.image)
       item.price_data.product_data.images = [inventoryItem.image]
+    if (inventoryItem.price_data)
+      item.price_data = {
+        ...item.price_data,
+        ...inventoryItem.price_data
+      }
+    if (inventoryItem.product_data)
+      item.price_data.product_data = {
+        ...item.price_data.product_data,
+        ...inventoryItem.product_data
+      }
     validatedItems.push(item)
   }
 
