@@ -21147,6 +21147,13 @@ use-callback-ref@^1.2.1, use-callback-ref@^1.2.3:
   resolved "https://registry.yarnpkg.com/use-callback-ref/-/use-callback-ref-1.2.4.tgz#d86d1577bfd0b955b6e04aaf5971025f406bea3c"
   integrity sha512-rXpsyvOnqdScyied4Uglsp14qzag1JIemLeTWGKbwpotWht57hbP78aNT+Q4wdFKQfQibbUX4fb6Qb4y11aVOQ==
 
+use-shopping-cart@*:
+  version "2.2.0"
+  resolved "https://registry.yarnpkg.com/use-shopping-cart/-/use-shopping-cart-2.2.0.tgz#aee9be0cc26a25f0668fd224328bd525386e315e"
+  integrity sha512-/3CeEVdGPZuVaKO3zMzwTykmaOpk0tVa8AqLS4O2RDLn7PTDkzThqil+hDJySI4lnUjjcwQso2O8dBOYIaSqMg==
+  dependencies:
+    react-storage-hooks "^4.0.0"
+
 use-sidecar@^1.0.1:
   version "1.0.3"
   resolved "https://registry.yarnpkg.com/use-sidecar/-/use-sidecar-1.0.3.tgz#17a4e567d4830c0c0ee100040e85a7fe68611e0f"
