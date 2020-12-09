@@ -8,7 +8,7 @@ export function AddMoreItems() {
       <p>
         You currently don't have any items in your cart.
         <br />
-        Come back after you <Link to="usage/addItem()">add more items</Link> to
+        Come back after you <Link to="/usage/addItem()">add more items</Link> to
         your cart.
       </p>
     </div>
