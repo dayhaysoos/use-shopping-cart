@@ -1,4 +1,5 @@
 import { formatCurrencyString } from './util'
+import { v4 as uuidv4 } from 'uuid'
 
 export const cartInitialState = {
   lastClicked: '',
@@ -10,7 +11,7 @@ export function cartReducer(cart, action) {
     case 'store-last-clicked':
       return {
         ...cart,
-        lastClicked: action.sku
+        lastClicked: action.id
       }
 
     case 'cart-click':
@@ -48,8 +49,25 @@ export const cartValuesInitialState = {
   cartCount: 0
 }
 function Entry(productData, quantity, currency, language) {
+  const getProductId = () => {
+    if (productData.id) {
+      return productData.id
+    }
+    if (productData.price_id) {
+      return productData.price_id
+    }
+    if (productData.sku_id) {
+      return productData.sku_id
+    }
+    if (productData.sku) {
+      return productData.sku
+    }
+    return uuidv4()
+  }
+
   return {
     ...productData,
+    id: getProductId(),
     quantity,
     get value() {
       return this.price * this.quantity
@@ -70,7 +88,7 @@ export function cartValuesReducer(state, action) {
     return {
       cartDetails: {
         ...state.cartDetails,
-        [product.sku]: entry
+        [entry.id]: entry
       },
       totalPrice: state.totalPrice + product.price * count,
       cartCount: state.cartCount + count
@@ -113,30 +131,30 @@ export function cartValuesReducer(state, action) {
   switch (action.type) {
     case 'add-item-to-cart':
       if (action.count <= 0) break
-      if (action.product.sku in state.cartDetails)
-        return updateEntry(action.product.sku, action.count)
+      if (action.product.id in state.cartDetails)
+        return updateEntry(action.product.id, action.count)
       return createEntry(action.product, action.count)
 
     case 'increment-item':
       if (action.count <= 0) break
-      if (action.sku in state.cartDetails)
-        return updateEntry(action.sku, action.count)
+      if (action.id in state.cartDetails)
+        return updateEntry(action.id, action.count)
       break
 
     case 'decrement-item':
       if (action.count <= 0) break
-      if (action.sku in state.cartDetails)
-        return updateEntry(action.sku, -action.count)
+      if (action.id in state.cartDetails)
+        return updateEntry(action.id, -action.count)
       break
 
     case 'set-item-quantity':
       if (action.count < 0) break
-      if (action.sku in state.cartDetails)
-        return updateQuantity(action.sku, action.quantity)
+      if (action.id in state.cartDetails)
+        return updateQuantity(action.id, action.quantity)
       break
 
     case 'remove-item-from-cart':
-      if (action.sku in state.cartDetails) return removeEntry(action.sku)
+      if (action.id in state.cartDetails) return removeEntry(action.id)
       break
 
     case 'clear-cart':
@@ -147,8 +165,7 @@ export function cartValuesReducer(state, action) {
 
       for (const sku in action.cartDetails) {
         const entry = action.cartDetails[sku]
-        if (action.filter && !action.filter(entry))
-          continue
+        if (action.filter && !action.filter(entry)) continue
 
         state = createEntry(entry, entry.quantity)
       }

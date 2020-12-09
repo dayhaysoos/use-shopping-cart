@@ -1,4 +1,4 @@
-import { validateCartItems } from './serverUtil'
+import { validateCartItems, formatLineItems } from './serverUtil'
 
 const inventory = [
   {
@@ -22,7 +22,9 @@ const mockSku = {
   name: 'Banana',
   price: 200,
   image: 'https://www.fillmurray.com/300/300',
-  currency: 'usd'
+  currency: 'usd',
+  sku_id: 'sku_abc123',
+  product_data: { metadata: { type: 'test' } }
 }
 
 const mockSku2 = {
@@ -41,7 +43,9 @@ const mockDetailedSku = {
     formattedValue: '$2.00',
     image: mockSku.image,
     value: 200,
-    name: 'Banana'
+    name: 'Banana',
+    sku_id: 'sku_abc123',
+    product_data: { metadata: { type: 'test' } }
   }
 }
 
@@ -58,30 +62,110 @@ const mockDetailedSku2 = {
   }
 }
 
+const mockPrice = {
+  price_id: 'price_123',
+  unit_amount: 350,
+  currency: 'USD',
+  name: 'Pants'
+}
+
+const mockDetailedPrice = {
+  [mockPrice.price_id]: {
+    ...mockPrice,
+    quantity: 5
+  }
+}
+
 describe('validateCartItems', () => {
   it('matches on SKU & references the correct price & sets description + images if present', () => {
     expect(
       validateCartItems(inventory, { ...mockDetailedSku, ...mockDetailedSku2 })
     ).toStrictEqual([
       {
-        name: inventory[0].name,
-        description: 'Yummy yellow fruit',
-        amount: 400,
-        currency: inventory[0].currency,
-        quantity: mockDetailedSku[inventory[0].sku].quantity,
-        images: ['https: //www.fillmurray.com/300/300']
+        price_data: {
+          currency: inventory[0].currency,
+          unit_amount: 400,
+          product_data: {
+            name: inventory[0].name,
+            description: 'Yummy yellow fruit',
+            images: ['https: //www.fillmurray.com/300/300']
+          }
+        },
+        quantity: mockDetailedSku[inventory[0].sku].quantity
       },
       {
-        name: inventory[1].name,
-        amount: 100,
-        currency: inventory[1].currency,
+        price_data: {
+          currency: inventory[1].currency,
+          unit_amount: 100,
+          product_data: {
+            name: inventory[1].name
+          }
+        },
         quantity: mockDetailedSku2[inventory[1].sku].quantity
       }
     ])
   })
+
+  it('Properly spreads product_data from the product object into price_data.product_data', () => {
+    inventory[0].product_data = { metadata: { type: 'test' } }
+    expect(validateCartItems(inventory, { ...mockDetailedSku })).toStrictEqual([
+      {
+        price_data: {
+          currency: inventory[0].currency,
+          unit_amount: 400,
+          product_data: {
+            name: inventory[0].name,
+            description: 'Yummy yellow fruit',
+            images: ['https: //www.fillmurray.com/300/300'],
+            metadata: {
+              type: 'test'
+            }
+          }
+        },
+        quantity: mockDetailedSku[inventory[0].sku].quantity
+      }
+    ])
+  })
+
+  it('Properly spreads price_data from the product object into price_data', () => {
+    inventory[0].price_data = { metadata: { type: 'test' } }
+    expect(validateCartItems(inventory, { ...mockDetailedSku })).toStrictEqual([
+      {
+        price_data: {
+          currency: inventory[0].currency,
+          unit_amount: 400,
+          metadata: { type: 'test' },
+          product_data: {
+            name: inventory[0].name,
+            description: 'Yummy yellow fruit',
+            images: ['https: //www.fillmurray.com/300/300'],
+            metadata: {
+              type: 'test'
+            }
+          }
+        },
+        quantity: mockDetailedSku[inventory[0].sku].quantity
+      }
+    ])
+  })
+
   it('throws an error if product does not exist in inventory', () => {
     expect(() => {
       validateCartItems(inventory, { sku_1234: { sku: 'sku_1234' } })
     }).toThrow('Product sku_1234 not found!')
+  })
+})
+
+describe('formatLineItems', () => {
+  it('Formats line items with price_id appropriately', () => {
+    expect(formatLineItems(mockDetailedPrice)).toStrictEqual([
+      { price: 'price_123', quantity: 5 }
+    ])
+  })
+
+  it('Formats line items with sku_id appropriately', () => {
+    expect(formatLineItems(mockDetailedSku)).toStrictEqual([
+      { price: 'sku_abc123', quantity: 3 }
+    ])
   })
 })

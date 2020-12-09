@@ -1,6 +1,6 @@
 {
   "name": "use-shopping-cart",
-  "version": "2.2.0",
+  "version": "2.3.0",
   "description": "Shopping cart state and logic for Stripe",
   "author": "dayhaysoos",
   "license": "MIT",
@@ -74,6 +74,7 @@
     "rollup": "^2.3.3"
   },
   "dependencies": {
-    "react-storage-hooks": "^4.0.0"
+    "react-storage-hooks": "^4.0.0",
+    "uuid": "^8.3.1"
   }
 }
