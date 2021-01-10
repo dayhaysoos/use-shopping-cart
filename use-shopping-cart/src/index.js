@@ -106,8 +106,16 @@ export const useShoppingCart = () => {
     language
   } = cart
 
-  const addItem = (product, count = 1) =>
-    dispatch({ type: 'add-item-to-cart', product, count })
+  const addItem = (product, count = 1, price_metadata, product_metadata) => {
+    dispatch({
+      type: 'add-item-to-cart',
+      product,
+      count,
+      price_metadata,
+      product_metadata
+    })
+  }
+
   const removeItem = (id) => dispatch({ type: 'remove-item-from-cart', id })
   const setItemQuantity = (id, quantity) =>
     dispatch({ type: 'set-item-quantity', id, quantity })
