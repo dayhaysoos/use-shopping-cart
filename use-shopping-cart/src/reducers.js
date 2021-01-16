@@ -49,29 +49,9 @@ export const cartValuesInitialState = {
   cartCount: 0
 }
 
-function Entry(
-  product,
-  quantity,
-  currency,
-  language,
-  price_metadata,
-  product_metadata
-) {
-  const getProductId = () => {
-    if (product.id) {
-      return product.id
-    }
-    if (product.price_id) {
-      return product.price_id
-    }
-    if (product.sku_id) {
-      return product.sku_id
-    }
-    if (product.sku) {
-      return product.sku
-    }
-    return uuidv4()
-  }
+function Entry(product, quantity, currency, language, price_metadata) {
+  const id =
+    product.id || product.price_id || product.sku_id || product.sku || uuidv4()
 
   if (!product.price_data && price_metadata) {
     product.price_data = {}
@@ -86,18 +66,7 @@ function Entry(
       ...product.price_data,
       ...price_metadata
     }
-    console.log('product line 90', product)
   }
-
-  // product.price_metadata = {
-  //   ...product.price_metadata,
-  //   ...price_metadata
-  // }
-
-  // product.product_metadata = {
-  //   ...product.product_metadata,
-  //   ...product_metadata
-  // }
 
   return {
     ...product,
