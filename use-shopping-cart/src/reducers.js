@@ -49,28 +49,42 @@ export const cartValuesInitialState = {
   cartCount: 0
 }
 
-function Entry(product, quantity, currency, language, price_metadata) {
+function Entry(
+  product,
+  quantity,
+  currency,
+  language,
+  price_metadata,
+  product_metadata
+) {
   const id =
     product.id || product.price_id || product.sku_id || product.sku || uuidv4()
 
   if (!product.price_data && price_metadata) {
-    product.price_data = {}
-
     product.price_data = {
       ...price_metadata
     }
-  }
-
-  if (product.price_data && price_metadata) {
+  } else if (product.price_data && price_metadata) {
     product.price_data = {
       ...product.price_data,
       ...price_metadata
     }
   }
 
+  if (!product.product_data && product_metadata) {
+    product.product_data = {
+      ...product_metadata
+    }
+  } else if (product.product_data && product_metadata) {
+    product.product_data = {
+      ...product.product_data,
+      ...product_metadata
+    }
+  }
+
   return {
     ...product,
-    id: getProductId(),
+    id,
     quantity,
     get value() {
       return this.price * this.quantity
@@ -111,17 +125,24 @@ export function cartValuesReducer(state, action) {
     if (entry.quantity + count <= 0) return removeEntry(sku)
 
     if (!entry.price_data && price_metadata) {
-      entry.price_data = {}
-
       entry.price_data = {
+        ...price_metadata
+      }
+    } else if (entry.price_data && price_metadata) {
+      entry.price_data = {
+        ...entry.price_data,
         ...price_metadata
       }
     }
 
-    if (entry.price_data && price_metadata) {
-      entry.price_data = {
-        ...entry.price_data,
-        ...price_metadata
+    if (!entry.product_data && product_metadata) {
+      entry.product_data = {
+        ...product_metadata
+      }
+    } else if (entry.product_data && product_metadata) {
+      entry.product_data = {
+        ...entry.product_data,
+        ...product_metadata
       }
     }
 
