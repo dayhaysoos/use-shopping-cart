@@ -1,6 +1,6 @@
 {
   "name": "use-shopping-cart",
-  "version": "2.3.0",
+  "version": "2.4.1",
   "description": "Shopping cart state and logic for Stripe",
   "author": "dayhaysoos",
   "license": "MIT",
@@ -25,7 +25,7 @@
     "dev": "ntl dev"
   },
   "peerDependencies": {
-    "react": "16.13.1"
+    "react": ">=16.8.0"
   },
   "devDependencies": {
     "@babel/core": "^7.0.0",
