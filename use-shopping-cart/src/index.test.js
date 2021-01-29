@@ -111,7 +111,7 @@ describe('useShoppingCart()', () => {
     it('adds `count` amount of items to the cart', () => {
       let totalCount = 0
       for (let count = 1; count <= 50; ++count) {
-        const product = mockProduct()
+        const product = mockProduct({ price_data: { randomness: 'hello' } })
 
         act(() => {
           cart.current.addItem(product, count)
@@ -170,6 +170,70 @@ describe('useShoppingCart()', () => {
 
       expect(cart.current.cartCount).toBe(2)
       expect(cart.current.totalPrice).toBe(650)
+    })
+
+    it('adds price_data from the metadata object from the 3rd param', () => {
+      const product = mockProduct()
+
+      act(() => {
+        cart.current.addItem(product, 1, {
+          type: 'tacos',
+          test: 'testing'
+        })
+      })
+
+      expect(cart.current.cartDetails[product.id].price_data).toStrictEqual({
+        type: 'tacos',
+        test: 'testing'
+      })
+    })
+
+    it('successfully stacks data to price_data if there is already content there', () => {
+      const product = mockProduct({ price_data: { test: 'static metadata' } })
+
+      act(() => {
+        cart.current.addItem(product, 1, {
+          dynamicTest: 'dynamic data'
+        })
+      })
+
+      expect(cart.current.cartDetails[product.id].price_data).toStrictEqual({
+        test: 'static metadata',
+        dynamicTest: 'dynamic data'
+      })
+    })
+
+    it('adds product_data from the metadata object from the 4th param', () => {
+      const product = mockProduct()
+
+      act(() => {
+        cart.current.addItem(product, 1, null, {
+          type: 'tacos',
+          test: 'testing'
+        })
+      })
+
+      expect(cart.current.cartDetails[product.id].product_data).toStrictEqual({
+        type: 'tacos',
+        test: 'testing'
+      })
+    })
+
+    it('successfully stacks data to product_data if there is already content there', () => {
+      const product = mockProduct({
+        product_data: { test: 'static metadata' }
+      })
+
+      act(() => {
+        cart.current.addItem(product, 1, null, {
+          dynamicTest: 'dynamic data'
+        })
+      })
+
+      expect(cart.current.cartDetails[product.id].product_data).toStrictEqual({
+        test: 'static metadata',
+        dynamicTest: 'dynamic data'
+      })
     })
   })
 

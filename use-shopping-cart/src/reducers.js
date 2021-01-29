@@ -48,26 +48,43 @@ export const cartValuesInitialState = {
   totalPrice: 0,
   cartCount: 0
 }
-function Entry(productData, quantity, currency, language) {
-  const getProductId = () => {
-    if (productData.id) {
-      return productData.id
+
+function Entry(
+  product,
+  quantity,
+  currency,
+  language,
+  price_metadata,
+  product_metadata
+) {
+  const id =
+    product.id || product.price_id || product.sku_id || product.sku || uuidv4()
+
+  if (!product.price_data && price_metadata) {
+    product.price_data = {
+      ...price_metadata
     }
-    if (productData.price_id) {
-      return productData.price_id
+  } else if (product.price_data && price_metadata) {
+    product.price_data = {
+      ...product.price_data,
+      ...price_metadata
     }
-    if (productData.sku_id) {
-      return productData.sku_id
+  }
+
+  if (!product.product_data && product_metadata) {
+    product.product_data = {
+      ...product_metadata
     }
-    if (productData.sku) {
-      return productData.sku
+  } else if (product.product_data && product_metadata) {
+    product.product_data = {
+      ...product.product_data,
+      ...product_metadata
     }
-    return uuidv4()
   }
 
   return {
-    ...productData,
-    id: getProductId(),
+    ...product,
+    id,
     quantity,
     get value() {
       return this.price * this.quantity
@@ -82,8 +99,15 @@ function Entry(productData, quantity, currency, language) {
   }
 }
 export function cartValuesReducer(state, action) {
-  function createEntry(product, count) {
-    const entry = Entry(product, count, action.currency, action.language)
+  function createEntry(product, count, price_metadata, product_metadata) {
+    const entry = Entry(
+      product,
+      count,
+      action.currency,
+      action.language,
+      price_metadata,
+      product_metadata
+    )
 
     return {
       cartDetails: {
@@ -95,16 +119,40 @@ export function cartValuesReducer(state, action) {
     }
   }
 
-  function updateEntry(sku, count) {
+  function updateEntry(sku, count, price_metadata, product_metadata) {
     const cartDetails = { ...state.cartDetails }
     const entry = cartDetails[sku]
     if (entry.quantity + count <= 0) return removeEntry(sku)
+
+    if (!entry.price_data && price_metadata) {
+      entry.price_data = {
+        ...price_metadata
+      }
+    } else if (entry.price_data && price_metadata) {
+      entry.price_data = {
+        ...entry.price_data,
+        ...price_metadata
+      }
+    }
+
+    if (!entry.product_data && product_metadata) {
+      entry.product_data = {
+        ...product_metadata
+      }
+    } else if (entry.product_data && product_metadata) {
+      entry.product_data = {
+        ...entry.product_data,
+        ...product_metadata
+      }
+    }
 
     cartDetails[sku] = Entry(
       entry,
       entry.quantity + count,
       action.currency,
-      action.language
+      action.language,
+      price_metadata,
+      product_metadata
     )
 
     return {
@@ -132,8 +180,18 @@ export function cartValuesReducer(state, action) {
     case 'add-item-to-cart':
       if (action.count <= 0) break
       if (action.product.id in state.cartDetails)
-        return updateEntry(action.product.id, action.count)
-      return createEntry(action.product, action.count)
+        return updateEntry(
+          action.product.id,
+          action.count,
+          action.price_metadata,
+          action.product_metadata
+        )
+      return createEntry(
+        action.product,
+        action.count,
+        action.price_metadata,
+        action.product_metadata
+      )
 
     case 'increment-item':
       if (action.count <= 0) break
