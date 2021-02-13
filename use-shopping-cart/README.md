@@ -12,44 +12,24 @@ https://useshoppingcart.com
 
 [View our comprehensive documentation website.](https://useshoppingcart.com) ✨📚
 
+## Frequently Asked Questions
+
+This is a list of questions that you might have about use-shopping-cart once you get started.
+
+### Why am I getting an error about `formatToParts` not being a `function` on older browsers?
+
+You need to polyfill `formatToParts` if you want to support older browsers. You can find more [info on manually polyfilling `formatToParts` in issue #158](https://github.com/dayhaysoos/use-shopping-cart/issues/158).
+
+### Why am I getting an SSR error about text content not matching?
+
+It is likely that you are using a value like `cartCount` that is loaded from LocalStorage which doesn't exist on the server. More info in [issue #122](https://github.com/dayhaysoos/use-shopping-cart/issues/122)
+
+
 ## Contributing to use-shopping-cart
 
-If you're working on this project don't forget to check out
-[the CONTRIBUTING.md file](https://github.com/dayhaysoos/use-shopping-cart/blob/master/use-shopping-cart/CONTRIBUTING.md).
+If you're working on this project **please check out
+[the CONTRIBUTING.md file](https://github.com/dayhaysoos/use-shopping-cart/blob/master/use-shopping-cart/CONTRIBUTING.md)**.
 
-Before you run any of the examples be sure to set your environment variables at the root of
-the project in a `.env.development` file (or `documentation/.env.development` for the documentation workspace). There is a `.env.example` and a `documentation/.env.example` file with the example variables you'll need to run the examples and documentation workspaces in this project. You'll need to fill them in with your own API keys from Stripe.
-
-```dotenv
-# .env.example
-STRIPE_API_PUBLIC=
-STRIPE_API_SECRET=
-
-# documentation/.env.example
-GATSBY_STRIPE_PUBLISHABLE_KEY=
-```
-
-The following tutorials teach how to set up your custom environment variables for your project for their respective frameworks.
-
-- [create-react-app](https://create-react-app.dev/docs/adding-custom-environment-variables/)
-- [gatsby.js](https://www.gatsbyjs.org/docs/environment-variables/)
-- [next.js](https://nextjs.org/docs/api-reference/next.config.js/environment-variables)
-- [react-static](https://github.com/react-static/react-static/blob/master/docs/concepts.md#environment-variables)
-
-
-Here are a couple commands to get you started in development:
-
-```bash
-# Run the development environment which builds use-shopping-cart in watch-mode
-# and starts the CRA example with Netlify functions
-yarn dev
-
-# Runs tests in watch-mode
-yarn test
-
-# Runs the documentation page locally
-yarn dev:docs
-```
 
 ## Contributors ✨
 
