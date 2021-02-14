@@ -55,6 +55,10 @@ yarn test
 yarn dev:docs
 ```
 
-## Warning about editing the README
+### Warning about editing the README
 
 Please make all README edits to `/README.md` and when you're done copy them to `/use-shopping-cart/README.md`. This is done so that once the README updates are merged and published to NPM, you can see the README appear on both GitHub and NPM.
+
+### Looking to add a payment service to use-shopping-cart
+
+If you're looking to add a new payment service like Square, Amazon Pay, PayPal, or even Shopify's Billing API, please [view this guide](https://github.com/dayhaysoos/use-shopping-cart/blob/master/use-shopping-cart/CONTRIBUTING-SERVICES.md) on how to do so.
