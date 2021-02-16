@@ -1,6 +1,6 @@
 {
   "name": "use-shopping-cart",
-  "version": "2.4.1",
+  "version": "2.4.2",
   "description": "Shopping cart state and logic for Stripe",
   "author": "dayhaysoos",
   "license": "MIT",
