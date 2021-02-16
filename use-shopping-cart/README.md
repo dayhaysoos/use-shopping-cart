@@ -8,6 +8,14 @@ https://useshoppingcart.com
 
 [![All Contributors](https://img.shields.io/badge/all_contributors-12-orange.svg?style=flat-square)](#contributors-) [![NPM](https://img.shields.io/npm/v/use-shopping-cart.svg)](https://www.npmjs.com/package/use-shopping-cart) [![JavaScript Style Guide](https://img.shields.io/badge/code_style-standard-brightgreen.svg)](https://standardjs.com)
 
+[
+![Product JSON example](/assets/products.png)
+![Front-End code example](/assets/front-end.png)
+![Serverless code example](/assets/serverless.png)
+Click to open gist.
+](https://gist.github.com/ChrisBrownie55/f4d395b104a06e8df44e009440247856)
+
+
 ## Documentation
 
 [View our comprehensive documentation website.](https://useshoppingcart.com) ✨📚
