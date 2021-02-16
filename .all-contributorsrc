@@ -118,6 +118,15 @@
       "contributions": [
         "doc"
       ]
+    },
+    {
+      "login": "ehowey",
+      "name": "Eric Howey",
+      "avatar_url": "https://avatars.githubusercontent.com/u/204841?v=4",
+      "profile": "https://www.erichowey.dev/",
+      "contributions": [
+        "doc"
+      ]
     }
   ],
   "contributorsPerLine": 7,
