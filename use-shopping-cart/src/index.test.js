@@ -1,6 +1,10 @@
 import React from 'react'
+
 import { act, renderHook } from '@testing-library/react-hooks'
-import { CartProvider, useShoppingCart } from './index'
+import { render, screen, getByRole } from '@testing-library/react'
+import '@testing-library/jest-dom/extend-expect'
+
+import { CartProvider, useShoppingCart, DebugCart } from './index'
 
 afterEach(() => window.localStorage.clear())
 
@@ -20,6 +24,14 @@ const createWrapper = (overrides = {}) => ({ children }) => (
     {children}
   </CartProvider>
 )
+
+const expectedInitialCartState = {
+  cartDetails: {},
+  totalPrice: 0,
+  formattedTotalPrice: '$0.00',
+  cartCount: 0,
+  shouldDisplayCart: false
+}
 
 let counter = 0
 function mockProduct(overrides) {
@@ -43,13 +55,7 @@ describe('useShoppingCart()', () => {
   beforeEach(() => reload())
 
   it('initial state', () => {
-    expect(cart.current).toMatchObject({
-      cartDetails: {},
-      totalPrice: 0,
-      formattedTotalPrice: '$0.00',
-      cartCount: 0,
-      shouldDisplayCart: false
-    })
+    expect(cart.current).toMatchObject(expectedInitialCartState)
   })
 
   it('storeLastClicked() updates lastClicked', () => {
@@ -709,5 +715,38 @@ describe('loadCart()', () => {
     })
     expect(cart.current.totalPrice).toEqual(2200)
     expect(cart.current.cartCount).toEqual(8)
+  })
+})
+
+describe('<DebugCart>', () => {
+  beforeAll(() => {
+    const Wrapper = createWrapper()
+    render(
+      <Wrapper>
+        <DebugCart />
+      </Wrapper>
+    )
+  })
+
+  it('should make a table of properties and values from the cart', () => {
+    expect(screen.getByRole('table')).toBeVisible()
+
+    const { cartDetails, ...others } = expectedInitialCartState
+
+    let cell = screen.getByRole('cell', { name: 'cartDetails' })
+    expect(cell).toBeVisible()
+    expect(
+      getByRole(cell.parentElement, 'button', { name: /log value/i })
+    ).toBeVisible()
+
+    for (const name in others) {
+      cell = screen.getByRole('cell', { name })
+      expect(cell).toBeVisible()
+      expect(
+        getByRole(cell.parentElement, 'cell', {
+          name: JSON.stringify(others[name])
+        })
+      )
+    }
   })
 })
