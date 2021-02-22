@@ -32,6 +32,8 @@
       link: "/usage/validateCartItems()"
     - label: "loadCart()"
       link: "/usage/loadCart()"
+    - label: "DebugCart"
+      link: "/usage/debugcart"
     - label: formatLineItems()
       link: "/usage/formatLineItems()"
     - label: "API"

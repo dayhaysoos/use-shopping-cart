@@ -54,6 +54,8 @@
     "@rollup/plugin-node-resolve": "^9.0.0",
     "@rollup/plugin-sucrase": "^3.1.0",
     "@rollup/plugin-url": "^5.0.1",
+    "@testing-library/jest-dom": "^5.11.9",
+    "@testing-library/react": "^11.2.5",
     "@testing-library/react-hooks": "^3.2.1",
     "babel-eslint": "^10.1.0",
     "cross-env": "^7.0.2",

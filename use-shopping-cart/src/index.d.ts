@@ -184,6 +184,14 @@ declare module 'use-shopping-cart' {
    */
   export function useShoppingCart(): ShoppingCartUtilities
 
+  /**
+   * Displays the values returned by `useShoppingCart()` in a table format.
+   */
+  export declare const DebugCart: React.FunctionComponent<React.DetailedHTMLProps<
+    React.TableHTMLAttributes<HTMLTableElement>,
+    HTMLTableElement
+  >>
+
   interface FormatCurrencyStringProps {
     /**
      * The value to convert (i.e. 2599 in USD is $25.99)
