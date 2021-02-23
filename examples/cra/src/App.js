@@ -4,10 +4,7 @@ import { Flex, Box } from 'theme-ui'
 import Products from './components/products'
 import PriceProducts from './components/price-products'
 import CartDisplay from './components/cart-display'
-import {
-  addItem,
-  incrementItem
-} from 'use-shopping-cart/src/core/slices/cartSlice'
+import { addItem, incrementItem } from 'use-shopping-cart/core/slices/cartSlice'
 import { useStore, useDispatch } from 'react-redux'
 
 const fakeData = [
