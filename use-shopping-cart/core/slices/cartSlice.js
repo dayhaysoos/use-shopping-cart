@@ -1,5 +1,5 @@
 import { createSlice } from '@reduxjs/toolkit'
-import { createEntry, updateEntry, updateQuantity, removeEntry } from '../Entry'
+import { createEntry, updateEntry, removeEntry } from '../Entry'
 
 export const cartInitialState = {
   lastClicked: '',
@@ -18,65 +18,115 @@ export const cartSlice = createSlice({
   name: 'cart',
   initialState: cartInitialState,
   reducers: {
-    addItem: (state, { payload }) => {
-      const { count = 1, price_metadata, product_metadata } = payload
-      if (count <= 0) return
+    addItem: {
+      reducer: (state, { payload }) => {
+        const {
+          product,
+          options: { count, price_metadata, product_metadata }
+        } = payload
 
-      if (payload?.id in state.cartDetails) {
-        return updateEntry({
-          id: payload.id,
+        if (count <= 0) return
+
+        if (payload?.id in state.cartDetails) {
+          return updateEntry({
+            id: payload.id,
+            count,
+            price_metadata,
+            product_metadata,
+            currency: state.currency,
+            language: state.language
+          })
+        }
+
+        return createEntry({
+          ...state,
+          state,
+          product,
           count,
           price_metadata,
           product_metadata,
           currency: state.currency,
           language: state.language
         })
+      },
+      prepare: (product, options = { count: 1 }) => {
+        if (!options.price_metadata) {
+          options.price_metadata = {}
+        }
+        if (!options.product_metadata) {
+          options.product_metadata = {}
+        }
+        return { payload: { product, options } }
       }
+    },
+    incrementItem: {
+      reducer: (state, { payload }) => {
+        const {
+          id,
+          options: { count }
+        } = payload
 
-      return createEntry({
-        ...state,
-        state,
-        product: payload,
-        count,
-        price_metadata,
-        product_metadata,
-        currency: state.currency,
-        language: state.language
-      })
+        return updateEntry({ ...state, state, id, count })
+      },
+      prepare: (id, options = { count: 1 }) => {
+        return { payload: { id, options } }
+      }
     },
-    incrementItem: (state, { payload }) => {
-      const { id, count = 1 } = payload
+    decrementItem: {
+      reducer: (state, { payload }) => {
+        const {
+          id,
+          options: { count }
+        } = payload
 
-      return updateEntry({ ...state, state, id, count })
+        return updateEntry({ ...state, state, id, count })
+      },
+      prepare: (id, options = { count: 1 }) => {
+        return { payload: { id, options } }
+      }
     },
-    decrementItem: (state, { payload }) => {
-      const { id, count = 1 } = payload
-      return updateEntry({ ...state, state, id, count })
-    },
-    clearCart: () => cartInitialState,
-    setItemQuantity: (state, { payload }) => {
-      const { id, count = 1 } = payload
-      if (count < 0) return
-
-      if (id in state.cartDetails)
-        return updateQuantity({ ...state, state, id, count })
-    },
-    removeItem: (state, { payload }) => {
-      const { id } = payload
-      if (id in state.cartDetails)
+    clearCart: {
+      reducer: (state) => {
         return {
           ...state,
-          cartDetails: removeEntry({ state, id })
+          cartDetails: {}
         }
+      }
     },
-    updateQuantity: (state, { payload }) => {
-      const { id, quantity } = payload
-      return updateEntry({
-        ...state,
-        state,
-        id,
-        count: quantity - state.cartDetails[id].quantity
-      })
+    setItemQuantity: {
+      reducer: (state, { payload }) => {
+        const { id, quantity } = payload
+        if (count < 0) return
+
+        if (id in state.cartDetails)
+          return updateQuantity({ ...state, state, id, quantity })
+      },
+      prepare: (id, quantity = 1) => {
+        return { payload: { id, quantity } }
+      }
+    },
+    removeItem: {
+      reducer: (state, { payload }) => {
+        if (id in state.cartDetails)
+          return {
+            ...state,
+            cartDetails: removeEntry({ state, payload })
+          }
+      }
+    },
+    updateQuantity: {
+      reducer: (state, { payload }) => {
+        const { id, quantity } = payload
+        return updateEntry({
+          ...state,
+          state,
+          id,
+          count: quantity - state.cartDetails[id].quantity
+        })
+      },
+      prepare: (id, quantity) => {
+        return { payload: { id, quantity } }
+      }
     }
   }
 })

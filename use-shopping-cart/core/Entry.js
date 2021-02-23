@@ -77,8 +77,7 @@ export function createEntry({
       [entry.id]: entry
     },
     totalPrice: state.totalPrice + product.price * count,
-    cartCount: state.cartCount + count,
-    wtf: 'wtf'
+    cartCount: state.cartCount + count
   }
 }
 
@@ -140,9 +139,4 @@ export function removeEntry(id) {
   delete cartDetails[id]
 
   return { cartDetails, totalPrice, cartCount }
-}
-
-export function updateQuantity(id, quantity) {
-  const entry = state.cartDetails[id]
-  return updateEntry(id, quantity - entry.quantity)
 }

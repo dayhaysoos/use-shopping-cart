@@ -21,7 +21,10 @@ describe('actions', () => {
 
     const expectedAction = {
       type: 'cart/addItem',
-      payload: product
+      payload: {
+        product,
+        options: { count: 1, price_metadata: {}, product_metadata: {} }
+      }
     }
 
     expect(cartActions.addItem(product)).toEqual(expectedAction)
@@ -31,24 +34,20 @@ describe('actions', () => {
     const product = mockProduct()
     const expectedAction = {
       type: 'cart/incrementItem',
-      payload: { id: product.id, count: 3 }
+      payload: { id: product.id, options: { count: 1 } }
     }
 
-    expect(cartActions.incrementItem({ id: product.id, count: 3 })).toEqual(
-      expectedAction
-    )
+    expect(cartActions.incrementItem(product.id)).toEqual(expectedAction)
   })
 
   it('should create an action to decrementItem', () => {
     const product = mockProduct()
     const expectedAction = {
       type: 'cart/decrementItem',
-      payload: { id: product.id, count: 3 }
+      payload: { id: product.id, options: { count: 1 } }
     }
 
-    expect(cartActions.decrementItem({ id: product.id, count: 3 })).toEqual(
-      expectedAction
-    )
+    expect(cartActions.decrementItem(product.id)).toEqual(expectedAction)
   })
 
   it('should create an action to clear the cart', () => {
@@ -64,22 +63,20 @@ describe('actions', () => {
     const product = mockProduct()
     const expectedAction = {
       type: 'cart/setItemQuantity',
-      payload: { id: product.id, count: 3 }
+      payload: { id: product.id, quantity: 1 }
     }
 
-    expect(cartActions.setItemQuantity({ id: product.id, count: 3 })).toEqual(
-      expectedAction
-    )
+    expect(cartActions.setItemQuantity(product.id, 1)).toEqual(expectedAction)
   })
 
   it('should create an action to removeItem', () => {
     const product = mockProduct()
     const expectedAction = {
       type: 'cart/removeItem',
-      payload: { id: product.id }
+      payload: product.id
     }
 
-    expect(cartActions.removeItem({ id: product.id })).toEqual(expectedAction)
+    expect(cartActions.removeItem(product.id)).toEqual(expectedAction)
   })
 
   it('should create an action to updateQuantity', () => {
@@ -89,8 +86,6 @@ describe('actions', () => {
       payload: { id: product.id, quantity: 4 }
     }
 
-    expect(cartActions.updateQuantity({ id: product.id, quantity: 4 })).toEqual(
-      expectedAction
-    )
+    expect(cartActions.updateQuantity(product.id, 4)).toEqual(expectedAction)
   })
 })
