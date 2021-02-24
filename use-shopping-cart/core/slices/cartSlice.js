@@ -79,7 +79,7 @@ export const cartSlice = createSlice({
           options: { count }
         } = payload
 
-        return updateEntry({ ...state, state, id, count })
+        return updateEntry({ ...state, state, id, count: -count })
       },
       prepare: (id, options = { count: 1 }) => {
         return { payload: { id, options } }
