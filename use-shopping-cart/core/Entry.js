@@ -62,7 +62,7 @@ export function createEntry({
 }) {
   const entry = Entry({
     product,
-    count,
+    quantity: count,
     language,
     price_metadata,
     product_metadata,
