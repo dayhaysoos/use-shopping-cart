@@ -91,8 +91,12 @@ export function updateEntry({
   state
 }) {
   const cartDetails = { ...state.cartDetails }
+
   const entry = cartDetails[id]
-  if (entry.quantity + count <= 0) return removeEntry(id)
+
+  if (entry.quantity + count <= 0) {
+    return removeEntry({ state, id })
+  }
 
   if (!entry.price_data && price_metadata) {
     entry.price_data = {
@@ -126,17 +130,28 @@ export function updateEntry({
   })
 
   return {
+    ...state,
     cartDetails,
     totalPrice: state.totalPrice + entry.price * count,
     cartCount: state.cartCount + count
   }
 }
 
-export function removeEntry(id) {
-  const cartDetails = { ...state.cartDetails }
+export function removeEntry({ state, id }) {
+  const cartDetails = state.cartDetails
   const totalPrice = state.totalPrice - cartDetails[id].value
   const cartCount = state.cartCount - cartDetails[id].quantity
+
   delete cartDetails[id]
 
-  return { cartDetails, totalPrice, cartCount }
+  return {
+    ...state,
+    cartDetails,
+    totalPrice,
+    cartCount
+  }
+}
+
+export function updateQuantity({ state, id, quantity }) {
+  return updateEntry({ ...state, state, id, count: quantity })
 }
