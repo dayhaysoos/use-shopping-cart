@@ -1,4 +1,4 @@
-import { cartSlice, cartInitialState } from '../core/slices/cartSlice'
+import { cartSlice } from '../core/slices/cartSlice'
 
 const cartActions = cartSlice.actions
 
@@ -79,13 +79,13 @@ describe('actions', () => {
     expect(cartActions.removeItem(product.id)).toEqual(expectedAction)
   })
 
-  it('should create an action to updateQuantity', () => {
+  it('should create an action to setItemQuantity', () => {
     const product = mockProduct()
     const expectedAction = {
-      type: 'cart/updateQuantity',
+      type: 'cart/setItemQuantity',
       payload: { id: product.id, quantity: 4 }
     }
 
-    expect(cartActions.updateQuantity(product.id, 4)).toEqual(expectedAction)
+    expect(cartActions.setItemQuantity(product.id, 4)).toEqual(expectedAction)
   })
 })
