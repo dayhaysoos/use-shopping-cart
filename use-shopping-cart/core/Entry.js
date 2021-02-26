@@ -139,17 +139,10 @@ export function updateEntry({
 
 export function removeEntry({ state, id }) {
   const cartDetails = state.cartDetails
-  const totalPrice = state.totalPrice - cartDetails[id].value
-  const cartCount = state.cartCount - cartDetails[id].quantity
+  state.totalPrice = state.totalPrice - cartDetails[id].value
+  state.cartCount = state.cartCount - cartDetails[id].quantity
 
   delete cartDetails[id]
-
-  return {
-    ...state,
-    cartDetails,
-    totalPrice,
-    cartCount
-  }
 }
 
 export function updateQuantity({ state, id, quantity }) {

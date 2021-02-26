@@ -104,16 +104,14 @@ export function createCartSlice(initialState) {
         reducer: (state) => {
           return {
             ...state,
-            totalPrice: 0,
-            cartCount: 0,
-            cartDetails: {}
+            ...initialState
           }
         }
       },
       setItemQuantity: {
         reducer: (state, { payload }) => {
           const { id, quantity } = payload
-          if (count < 0) return
+          if (quantity < 0) return
 
           if (id in state.cartDetails)
             return updateQuantity({ ...state, state, id, quantity })
@@ -124,11 +122,7 @@ export function createCartSlice(initialState) {
       },
       removeItem: {
         reducer: (state, { payload }) => {
-          if (id in state.cartDetails)
-            return {
-              ...state,
-              cartDetails: removeEntry({ state, payload })
-            }
+          return removeEntry({ state, id: payload })
         }
       }
     }

@@ -289,8 +289,79 @@ describe('decrementItem', () => {
 
     const cartDetails = result.cartDetails
 
-    expect(result.cartCount).toEqual(3)
+    expect(result.cartCount).toEqual(4)
     expect(result.totalPrice).toEqual(1000)
-    expect(cartDetails[product0.sku].quantity).toBeFalsy()
+    expect(cartDetails[product0.sku]).toBeFalsy()
+  })
+})
+
+describe('clearCart', () => {
+  it('should reset back into initialState', () => {
+    const result = reducer(
+      {
+        ...cartInitialState,
+        cartDetails: mockCartDetails(),
+        cartCount: 6,
+        totalPrice: 1800
+      },
+      {
+        type: ACTION_TYPES.clearCart,
+        payload: undefined
+      }
+    )
+
+    expect(result).toEqual(cartInitialState)
+  })
+})
+
+describe('setItemQuantity', () => {
+  it('sets the proper quantity for a cart Item', () => {
+    const mockDetails = mockCartDetails()
+
+    const products = Object.keys(mockDetails).map(
+      (product) => mockDetails[product]
+    )
+
+    const product0 = products[0]
+    const result = reducer(
+      {
+        ...cartInitialState,
+        cartDetails: mockDetails,
+        cartCount: 6,
+        totalPrice: 1800
+      },
+      {
+        type: ACTION_TYPES.setItemQuantity,
+        payload: { id: product0.sku, quantity: 10 }
+      }
+    )
+
+    const cartDetails = result.cartDetails
+
+    expect(cartDetails[product0.sku].quantity).toBe(12)
+    expect(result.cartCount).toBe(16)
+    expect(result.totalPrice).toBe(5800)
+  })
+})
+
+describe('removeItem', () => {
+  it('removes the proper item from cart details', () => {
+    const mockDetails = mockCartDetails()
+
+    const products = Object.keys(mockDetails).map(
+      (product) => mockDetails[product]
+    )
+
+    const product0 = products[0]
+
+    const result = reducer(
+      {
+        ...cartInitialState,
+        cartDetails: mockDetails,
+        cartCount: 6,
+        totalPrice: 1800
+      },
+      { type: ACTION_TYPES.removeItem, payload: product0.sku }
+    )
   })
 })
