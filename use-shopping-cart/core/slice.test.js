@@ -1,4 +1,4 @@
-import { reducer } from '../core/slices/cartSlice'
+import { reducer } from './slice'
 
 const ACTION_TYPES = {
   addItem: 'cart/addItem',
@@ -64,8 +64,6 @@ export const cartInitialState = {
   lastClicked: '',
   shouldDisplayCart: false,
   stripe: null,
-  lastClicked: '',
-  shouldDisplayCart: false,
   cartDetails: {},
   totalPrice: 0,
   cartCount: 0,
@@ -110,7 +108,7 @@ describe('addItem', () => {
         // already 6 items in mockCartDetails
         cartCount: 6,
         cartDetails: mockDetails,
-        //total price based on quantity and values of each cartDetails product
+        // total price based on quantity and values of each cartDetails product
         totalPrice: 1800
       },
       {

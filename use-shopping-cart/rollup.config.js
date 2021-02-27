@@ -7,22 +7,22 @@ import pkg from './package.json'
 
 export default [
   {
-    input: 'src/index.js',
+    input: './react/index.js',
     external: ['react', 'crypto'],
     output: [
       {
-        file: pkg.main,
+        file: pkg.exports['.'].require,
         format: 'cjs',
         sourcemap: true
       },
       {
-        file: pkg.module,
+        file: pkg.exports['.'].import,
         format: 'es',
         sourcemap: true
       },
       {
         name: 'UseShoppingCart',
-        file: pkg.umd,
+        file: pkg.exports['.'].browser,
         format: 'umd',
         sourcemap: true,
         globals: { react: 'React', crypto: 'crypto' }
@@ -39,24 +39,24 @@ export default [
     ]
   },
   {
-    input: 'core/slices/cartSlice.js',
+    input: './core/store.js',
     external: ['@reduxjs/toolkit', 'uuid'],
     output: [
       {
-        file: pkg.main,
+        file: pkg.exports['./core'].require,
         format: 'cjs',
         sourcemap: true,
         exports: 'named'
       },
       {
-        file: pkg.module,
+        file: pkg.exports['./core'].import,
         format: 'es',
         sourcemap: true,
         exports: 'named'
       },
       {
-        name: 'UseShoppingCart-Core',
-        file: pkg.umd,
+        name: 'UseShoppingCartCore',
+        file: pkg.exports['./core'].browser,
         format: 'umd',
         sourcemap: true,
         globals: {

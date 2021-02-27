@@ -1,6 +1,4 @@
-import { useStorageReducer } from 'react-storage-hooks'
-
-export const isClient = typeof window === 'object'
+import { isClient } from './SSR'
 
 export const formatCurrencyString = ({
   value,
@@ -25,22 +23,6 @@ export const formatCurrencyString = ({
 
   value = zeroDecimalCurrency ? value : value / 100
   return numberFormat.format(value.toFixed(2))
-}
-
-export function useLocalStorageReducer(key, reducer, initialState) {
-  const dummyStorage = {
-    getItem() {
-      return null
-    },
-    setItem() {},
-    removeItem() {}
-  }
-  return useStorageReducer(
-    isClient ? window.localStorage : dummyStorage,
-    key,
-    reducer,
-    initialState
-  )
 }
 
 export const getCheckoutData = {

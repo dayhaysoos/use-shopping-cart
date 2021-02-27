@@ -1,6 +1,4 @@
-import { cartSlice } from '../core/slices/cartSlice'
-
-const cartActions = cartSlice.actions
+import { actions } from './slice'
 
 let counter = 0
 function mockProduct(overrides) {
@@ -27,7 +25,7 @@ describe('actions', () => {
       }
     }
 
-    expect(cartActions.addItem(product)).toEqual(expectedAction)
+    expect(actions.addItem(product)).toEqual(expectedAction)
   })
 
   it('should create an action to incrementItem', () => {
@@ -37,7 +35,7 @@ describe('actions', () => {
       payload: { id: product.id, options: { count: 1 } }
     }
 
-    expect(cartActions.incrementItem(product.id)).toEqual(expectedAction)
+    expect(actions.incrementItem(product.id)).toEqual(expectedAction)
   })
 
   it('should create an action to decrementItem', () => {
@@ -47,7 +45,7 @@ describe('actions', () => {
       payload: { id: product.id, options: { count: 1 } }
     }
 
-    expect(cartActions.decrementItem(product.id)).toEqual(expectedAction)
+    expect(actions.decrementItem(product.id)).toEqual(expectedAction)
   })
 
   it('should create an action to clear the cart', () => {
@@ -56,7 +54,7 @@ describe('actions', () => {
       payload: undefined
     }
 
-    expect(cartActions.clearCart()).toEqual(expectedAction)
+    expect(actions.clearCart()).toEqual(expectedAction)
   })
 
   it('should create an action to setItemQuantity', () => {
@@ -66,7 +64,7 @@ describe('actions', () => {
       payload: { id: product.id, quantity: 1 }
     }
 
-    expect(cartActions.setItemQuantity(product.id, 1)).toEqual(expectedAction)
+    expect(actions.setItemQuantity(product.id, 1)).toEqual(expectedAction)
   })
 
   it('should create an action to removeItem', () => {
@@ -76,7 +74,7 @@ describe('actions', () => {
       payload: product.id
     }
 
-    expect(cartActions.removeItem(product.id)).toEqual(expectedAction)
+    expect(actions.removeItem(product.id)).toEqual(expectedAction)
   })
 
   it('should create an action to setItemQuantity', () => {
@@ -86,6 +84,6 @@ describe('actions', () => {
       payload: { id: product.id, quantity: 4 }
     }
 
-    expect(cartActions.setItemQuantity(product.id, 4)).toEqual(expectedAction)
+    expect(actions.setItemQuantity(product.id, 4)).toEqual(expectedAction)
   })
 })
