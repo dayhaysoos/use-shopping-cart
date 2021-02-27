@@ -4,8 +4,6 @@ import { Flex, Box } from 'theme-ui'
 import Products from './components/products'
 import PriceProducts from './components/price-products'
 import CartDisplay from './components/cart-display'
-import { addItem, incrementItem } from 'use-shopping-cart/core/slices/cartSlice'
-import { useStore, useDispatch } from 'react-redux'
 
 const fakeData = [
   {
@@ -39,31 +37,6 @@ const priceProducts = [
 ]
 
 const App = () => {
-  const dispatch = useDispatch()
-
-  dispatch(
-    addItem({
-      name: 'Sunglasses',
-      price_id: 'price_1GwzfVCNNrtKkPVCh2MVxRkO',
-      price: 100,
-      image: 'https://files.stripe.com/links/fl_test_FR8EZTS7UDXE0uljMfT7hwmH',
-      currency: 'USD'
-    })
-  )
-
-  dispatch(
-    addItem({
-      name: 'Sunglasses',
-      price_id: 'price_1GwzfVCNNrtKkPVCh2MVxRkO',
-      price: 100,
-      image: 'https://files.stripe.com/links/fl_test_FR8EZTS7UDXE0uljMfT7hwmH',
-      currency: 'USD'
-    })
-  )
-
-  dispatch(incrementItem({ id: 'price_1GwzfVCNNrtKkPVCh2MVxRkO', count: 3 }))
-
-  console.log('help', useStore().getState())
   return (
     <Flex sx={{ justifyContent: 'space-evenly' }}>
       <Box>
