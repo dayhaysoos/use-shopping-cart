@@ -17,10 +17,17 @@ export function CartProvider({ children, ...props }) {
     store.dispatch({ type: 'stripe-changed', payload: props.stripe })
   }, [props.stripe])
 
-  return <Provider value={store}>{children}</Provider>
+  return (
+    <Provider context={CartContext} store={store} value={store}>
+      {children}
+    </Provider>
+  )
 }
 
-export function useShoppingCart(selector = (state) => ({}), equalityFn) {
+export function useShoppingCart(
+  selector = (state) => ({ ...state }),
+  equalityFn
+) {
   const dispatch = useDispatch()
   const cartState = useSelector(selector, equalityFn)
 
