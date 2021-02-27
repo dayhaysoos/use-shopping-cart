@@ -3,7 +3,7 @@ import { reducer, actions, initialState } from './slice'
 
 export { reducer, actions }
 export function createShoppingCartStore(options) {
-  configureStore({
+  return configureStore({
     reducer,
     preloadedState: { ...initialState, ...options }
   })
