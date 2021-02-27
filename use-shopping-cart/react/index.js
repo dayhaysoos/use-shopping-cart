@@ -24,22 +24,6 @@ export function useShoppingCart(selector = (state) => ({}), equalityFn) {
   const dispatch = useDispatch()
   const cartState = useSelector(selector, equalityFn)
 
-  // Add checkout options
-  // TODO: Checkout options should be integrated into the "core" of this library so that they can be used without a framework or with other frameworks.
-  cartState.redirectToCheckout = checkoutHandler(cartState, {
-    modes: ['client-only', 'checkout-session'],
-    stripe(stripe, options) {
-      return stripe.redirectToCheckout(options)
-    }
-  })
-  cartState.checkoutSingleItem = checkoutHandler(cartState, {
-    modes: ['client-only'],
-    stripe(stripe, options, { sku, quantity = 1 }) {
-      options.lineItems = [{ price: sku, quantity }]
-      return stripe.redirectToCheckout(options)
-    }
-  })
-
   // Add action dispatchors
   for (const key in actions)
     cartState[key] = (...args) => dispatch(actions[key](...args))
