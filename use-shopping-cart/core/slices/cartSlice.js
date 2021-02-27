@@ -1,10 +1,12 @@
 import { createSlice } from '@reduxjs/toolkit'
 import { createEntry, updateEntry, removeEntry, updateQuantity } from '../Entry'
+import { checkoutHandler } from '../../src/util'
 
 export const cartInitialState = {
   lastClicked: '',
   shouldDisplayCart: false,
   stripe: null,
+  mode: '',
   lastClicked: '',
   shouldDisplayCart: false,
   cartDetails: {},
@@ -19,6 +21,7 @@ export function createCartSlice(initialState) {
     lastClicked: '',
     shouldDisplayCart: false,
     stripe: null,
+    mode: '',
     lastClicked: '',
     shouldDisplayCart: false,
     cartDetails: {},
@@ -124,6 +127,50 @@ export function createCartSlice(initialState) {
         reducer: (state, { payload }) => {
           return removeEntry({ state, id: payload })
         }
+      },
+      loadCart: {
+        reducer: (state, { payload }) => {
+          const { cartDetails, shouldMerge } = payload
+          if (!shouldMerge) state = { ...initialState }
+
+          for (const id in cartDetails) {
+            const entry = cartDetails[id]
+            state = createEntry({
+              ...state,
+              state,
+              product: entry,
+              count: entry.quantity
+            })
+          }
+          return state
+        },
+        prepare: (cartDetails, shouldMerge = true) => {
+          return { payload: { cartDetails, shouldMerge } }
+        }
+      },
+      redirectToCheckout: {
+        reducer: (state) =>
+          checkoutHandler(state, {
+            modes: ['client-only', 'checkout-session'],
+            stripe() {
+              return state.stripe.redirectToCheckout(options)
+            }
+          })
+      },
+      checkoutSingleItem: {
+        reducer: (state) =>
+          checkoutHandler(state, {
+            modes: ['client-only'],
+            stripe() {
+              return state.stripe.redirectToCheckout(options)
+            }
+          })
+      },
+      handleCartClick: (state) => {
+        !state.shouldDisplayCart
+      },
+      handleCloseCart: (state) => {
+        state.shouldDisplayCart = false
       }
     }
   })
@@ -137,7 +184,10 @@ export const {
   decrementItem,
   setItemQuantity,
   removeItem,
-  clearCart
+  clearCart,
+  handleCartClick,
+  redirectToCheckout,
+  checkoutSingleItem
 } = cartSlice.actions
 
 export const selectState = (state) => state
