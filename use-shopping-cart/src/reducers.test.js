@@ -1,4 +1,4 @@
-import reducer from '../core/slices/cartSlice'
+import { reducer } from '../core/slices/cartSlice'
 
 const ACTION_TYPES = {
   addItem: 'cart/addItem',

@@ -142,4 +142,4 @@ export const {
 
 export const selectState = (state) => state
 
-export default cartSlice.reducer
+export const { reducer } = cartSlice
