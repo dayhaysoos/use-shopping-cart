@@ -23,7 +23,8 @@
     "jsx-quotes": ["warn", "prefer-double"],
     "curly": ["warn", "multi-or-nest"],
     "arrow-parens": "warn",
-    "react/prop-types": "off"
+    "react/prop-types": "off",
+    "object-curly-spacing": ["error", "always"]
   },
   "ignorePatterns": ["*.d.ts"]
 }
