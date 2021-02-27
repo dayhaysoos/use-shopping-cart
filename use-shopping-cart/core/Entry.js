@@ -12,30 +12,32 @@ function Entry({
   const id =
     product.id || product.price_id || product.sku_id || product.sku || uuidv4()
 
-  if (!product.price_data && price_metadata) {
-    product.price_data = {
+  const productCopy = { ...product }
+
+  if (!productCopy.price_data && price_metadata) {
+    productCopy.price_data = {
       ...price_metadata
     }
-  } else if (product.price_data && price_metadata) {
-    product.price_data = {
-      ...product.price_data,
+  } else if (productCopy.price_data && price_metadata) {
+    productCopy.price_data = {
+      ...productCopy.price_data,
       ...price_metadata
     }
   }
 
-  if (!product.product_data && product_metadata) {
-    product.product_data = {
+  if (!productCopy.product_data && product_metadata) {
+    productCopy.product_data = {
       ...product_metadata
     }
-  } else if (product.product_data && product_metadata) {
-    product.product_data = {
-      ...product.product_data,
-      ...product_metadata
+  } else if (productCopy.product_data && product_metadata) {
+    productCopy.product_data = {
+      ...productCopy.product_data,
+      ...productCopy
     }
   }
 
   return {
-    ...product,
+    ...productCopy,
     id,
     quantity,
     get value() {
