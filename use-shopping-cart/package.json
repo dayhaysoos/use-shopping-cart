@@ -5,12 +5,30 @@
   "author": "dayhaysoos",
   "license": "MIT",
   "repository": "dayhaysoos/use-shopping-cart",
-  "main": "dist/index.js",
-  "types": "./src/index.d.ts",
-  "module": "dist/index.es.js",
-  "jsnext:main": "dist/index.es.js",
-  "unpkg": "dist/index.umd.js",
-  "umd": "dist/index.umd.js",
+  "main": "dist/react.js",
+  "types": "./src/react.d.ts",
+  "module": "dist/react.es.js",
+  "jsnext:main": "dist/react.es.js",
+  "unpkg": "dist/react.umd.js",
+  "umd": "dist/react.umd.js",
+  "exports": {
+    ".": {
+      "require": "./dist/react.js",
+      "node": "./dist/react.js",
+      "import": "./dist/react.es.js",
+      "browser": "./dist/react.umd.js"
+    },
+    "./core": {
+      "require": "./dist/core.js",
+      "node": "./dist/core.js",
+      "import": "./dist/core.es.js",
+      "browser": "./dist/core.umd.js"
+    },
+    "./serverless": {
+      "require": "./utilities/serverless.js",
+      "node": "./utilities/serverless.js"
+    }
+  },
   "engines": {
     "node": ">=8",
     "npm": ">=5"
@@ -77,7 +95,7 @@
   },
   "dependencies": {
     "@reduxjs/toolkit": "^1.5.0",
-    "react-storage-hooks": "^4.0.0",
+    "react-redux": "^7.2.2",
     "redux-mock-store": "^1.5.4",
     "uuid": "^8.3.1"
   }

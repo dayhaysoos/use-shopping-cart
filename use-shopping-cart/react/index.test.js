@@ -50,7 +50,7 @@ describe('useShoppingCart()', () => {
   const wrapper = createWrapper()
   let cart
   function reload() {
-    cart = renderHook(() => useShoppingCart(), { wrapper }).result
+    cart = renderHook(() => useShoppingCart((state) => state), { wrapper }).result
   }
   beforeEach(() => reload())
 
@@ -477,7 +477,7 @@ describe('redirectToCheckout()', () => {
 
   it('should send the correct default values', async () => {
     const wrapper = createWrapper()
-    const cart = renderHook(() => useShoppingCart(), { wrapper }).result
+    const cart = renderHook(() => useShoppingCart((state) => state), { wrapper }).result
 
     const product = mockProduct()
     act(() => {
@@ -498,7 +498,7 @@ describe('redirectToCheckout()', () => {
 
   it('should send all formatted items', async () => {
     const wrapper = createWrapper()
-    const cart = renderHook(() => useShoppingCart(), { wrapper }).result
+    const cart = renderHook(() => useShoppingCart((state) => state), { wrapper }).result
 
     const product1 = mockProduct()
     const product2 = mockProduct()
@@ -522,7 +522,7 @@ describe('redirectToCheckout()', () => {
 
   it('should send correct billingAddressCollection', async () => {
     const wrapper = createWrapper({ billingAddressCollection: true })
-    const cart = renderHook(() => useShoppingCart(), { wrapper }).result
+    const cart = renderHook(() => useShoppingCart((state) => state), { wrapper }).result
 
     await cart.current.redirectToCheckout()
 
@@ -534,7 +534,7 @@ describe('redirectToCheckout()', () => {
 
   it('should send correct shippingAddressCollection', async () => {
     const wrapper = createWrapper({ allowedCountries: ['US', 'CA'] })
-    const cart = renderHook(() => useShoppingCart(), { wrapper }).result
+    const cart = renderHook(() => useShoppingCart((state) => state), { wrapper }).result
 
     await cart.current.redirectToCheckout()
 
@@ -547,7 +547,7 @@ describe('redirectToCheckout()', () => {
 
   it('should send the sessionId if used in checkout-session mode', async () => {
     const wrapper = createWrapper({ mode: 'checkout-session' })
-    const cart = renderHook(() => useShoppingCart(), { wrapper }).result
+    const cart = renderHook(() => useShoppingCart((state) => state), { wrapper }).result
 
     const expectedSessionId = 'bloo-bleh-blah-1234'
     await cart.current.redirectToCheckout({ sessionId: expectedSessionId })
@@ -561,7 +561,7 @@ describe('redirectToCheckout()', () => {
   it('invalid mode throws an error', () => {
     const mode = 'bloo blah bleh'
     const wrapper = createWrapper({ mode })
-    const cart = renderHook(() => useShoppingCart(), { wrapper }).result
+    const cart = renderHook(() => useShoppingCart((state) => state), { wrapper }).result
 
     expect(cart.current.redirectToCheckout()).rejects.toThrow(
       `Invalid checkout mode '${mode}' was chosen. The valid modes are client-only and checkout-session.`
@@ -575,7 +575,7 @@ describe('checkoutSingleItem()', () => {
     stripeMock.redirectToCheckout.mockClear()
 
     const wrapper = createWrapper()
-    cart = renderHook(() => useShoppingCart(), { wrapper }).result
+    cart = renderHook(() => useShoppingCart((state) => state), { wrapper }).result
   })
 
   it('should send the formatted item with no quantity parameter', async () => {
@@ -600,7 +600,7 @@ describe('checkoutSingleItem()', () => {
 
   it('does not support checkout-session mode', async () => {
     const wrapper = createWrapper({ mode: 'checkout-session' })
-    cart = renderHook(() => useShoppingCart(), { wrapper }).result
+    cart = renderHook(() => useShoppingCart((state) => state), { wrapper }).result
 
     const product = mockProduct()
     expect(
@@ -614,14 +614,14 @@ describe('checkoutSingleItem()', () => {
 describe('stripe handling', () => {
   it('if stripe is defined, redirectToCheckout can be called', async () => {
     const wrapper = createWrapper()
-    const cart = renderHook(() => useShoppingCart(), { wrapper }).result
+    const cart = renderHook(() => useShoppingCart((state) => state), { wrapper }).result
     await cart.current.redirectToCheckout()
     expect(stripeMock.redirectToCheckout).toHaveBeenCalled()
   })
 
   it('if stripe is undefined, redirectToCheckout throws an error', () => {
     const wrapper = createWrapper({ stripe: null })
-    const cart = renderHook(() => useShoppingCart(), { wrapper }).result
+    const cart = renderHook(() => useShoppingCart((state) => state), { wrapper }).result
 
     expect(cart.current.redirectToCheckout()).rejects.toThrow(
       'No compatible API has been defined, your options are: Stripe'
@@ -659,7 +659,7 @@ function mockCartDetails(overrides) {
 describe('loadCart()', () => {
   it('should add cartDetails to cart object', async () => {
     const wrapper = createWrapper()
-    const cart = renderHook(() => useShoppingCart(), { wrapper }).result
+    const cart = renderHook(() => useShoppingCart((state) => state), { wrapper }).result
     const cartDetails = mockCartDetails()
     const product = mockProduct({ price: 200 })
 
@@ -687,7 +687,7 @@ describe('loadCart()', () => {
 
   it('should merge two cart details items by default', async () => {
     const wrapper = createWrapper()
-    const cart = renderHook(() => useShoppingCart(), { wrapper }).result
+    const cart = renderHook(() => useShoppingCart((state) => state), { wrapper }).result
 
     const cartDetails = mockCartDetails()
     const product = mockProduct({ price: 200 })
