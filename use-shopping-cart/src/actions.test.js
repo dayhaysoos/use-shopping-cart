@@ -152,4 +152,22 @@ describe('actions', () => {
 
     expect(cartActions.checkoutSingleItem()).toEqual(expectedAction)
   })
+
+  it('should create an action for handleCloseCart', () => {
+    const expectedAction = {
+      type: 'cart/handleCloseCart',
+      payload: undefined
+    }
+
+    expect(cartActions.handleCloseCart()).toEqual(expectedAction)
+  })
+
+  it('should create an action for handleCartClick', () => {
+    const expectedAction = {
+      type: 'cart/handleCartClick',
+      payload: undefined
+    }
+
+    expect(cartActions.handleCartClick()).toEqual(expectedAction)
+  })
 })
