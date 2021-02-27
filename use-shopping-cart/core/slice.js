@@ -1,6 +1,7 @@
 import { createSlice } from '@reduxjs/toolkit'
 import { createEntry, updateEntry, removeEntry, updateQuantity } from './Entry'
 import { isClient } from '../utilities/SSR'
+import { checkoutHandler } from '../utilities/old-utils'
 
 export const initialState = {
   mode: 'checkout-session',
@@ -51,9 +52,7 @@ const slice = createSlice({
       },
       prepare: (product, options = { count: 1 }) => {
         if (!options.price_metadata) options.price_metadata = {}
-
         if (!options.product_metadata) options.product_metadata = {}
-
         return { payload: { product, options } }
       }
     },
@@ -106,6 +105,53 @@ const slice = createSlice({
       reducer: (state, { payload }) => {
         return removeEntry({ state, id: payload })
       }
+    },
+    loadCart: {
+      reducer: (state, { payload }) => {
+        const { cartDetails, shouldMerge } = payload
+        if (!shouldMerge) state = { ...initialState }
+
+        for (const id in cartDetails) {
+          const entry = cartDetails[id]
+          state = createEntry({
+            ...state,
+            state,
+            product: entry,
+            count: entry.quantity
+          })
+        }
+        return state
+      },
+      prepare: (cartDetails, shouldMerge = true) => {
+        return { payload: { cartDetails, shouldMerge } }
+      }
+    },
+    // TODO: discuss solutions to this. The two following actions do not redirect to checkout.
+    redirectToCheckout: {
+      reducer: (state) =>
+        checkoutHandler(state, {
+          modes: ['client-only', 'checkout-session'],
+          stripe(stripe, options) {
+            return stripe.redirectToCheckout(options)
+          }
+        })
+    },
+    checkoutSingleItem: {
+      reducer: (state) =>
+        checkoutHandler(state, {
+          modes: ['client-only'],
+          stripe(stripe, options, { sku, quantity = 1 }) {
+            options.lineItems = [{ price: sku, quantity }]
+            return stripe.redirectToCheckout(options)
+          }
+        })
+    },
+    handleCartClick: (state) => {
+      // TODO: Fix the following line. It is underlined by ESLint because it doesn't do anything.
+      !state.shouldDisplayCart
+    },
+    handleCloseCart: (state) => {
+      state.shouldDisplayCart = false
     }
   }
 })

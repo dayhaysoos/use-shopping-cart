@@ -13,6 +13,33 @@ function mockProduct(overrides) {
   }
 }
 
+function mockCartDetails(overrides) {
+  return {
+    [`sku_abc${counter}`]: {
+      sku: `sku_abc${counter++}`,
+      name: 'Bananas',
+      image: 'https://blah.com/banana.avif',
+      price: 400,
+      currency: 'USD',
+      value: 800,
+      quantity: 2,
+      formattedValue: '$8.00',
+      ...overrides
+    },
+    [`sku_efg${counter}`]: {
+      sku: `sku_efg${counter++}`,
+      name: 'Oranges',
+      image: 'https://blah.com/orange.avif',
+      currency: 'USD',
+      price: 250,
+      value: 1000,
+      quantity: 4,
+      formattedValue: '$10.00',
+      ...overrides
+    }
+  }
+}
+
 describe('actions', () => {
   it('should create an action to add item to cart', () => {
     const product = mockProduct()
@@ -85,5 +112,60 @@ describe('actions', () => {
     }
 
     expect(actions.setItemQuantity(product.id, 4)).toEqual(expectedAction)
+  })
+
+  it('should create an action to loadCart', () => {
+    const mockDetails = mockCartDetails()
+    const expectedAction = {
+      type: 'cart/loadCart',
+      payload: { cartDetails: mockDetails, shouldMerge: true }
+    }
+
+    expect(cartActions.loadCart(mockDetails)).toEqual(expectedAction)
+  })
+
+  it('should create an action for handleCartClick', () => {
+    const expectedAction = {
+      type: 'cart/handleCartClick',
+      payload: undefined
+    }
+
+    expect(cartActions.handleCartClick()).toEqual(expectedAction)
+  })
+
+  it('should create an action for redirectToCheckout', () => {
+    const expectedAction = {
+      type: 'cart/redirectToCheckout',
+      payload: undefined
+    }
+
+    expect(cartActions.redirectToCheckout()).toEqual(expectedAction)
+  })
+
+  it('should create an action for checkoutSingleItem', () => {
+    const expectedAction = {
+      type: 'cart/checkoutSingleItem',
+      payload: undefined
+    }
+
+    expect(cartActions.checkoutSingleItem()).toEqual(expectedAction)
+  })
+
+  it('should create an action for handleCloseCart', () => {
+    const expectedAction = {
+      type: 'cart/handleCloseCart',
+      payload: undefined
+    }
+
+    expect(cartActions.handleCloseCart()).toEqual(expectedAction)
+  })
+
+  it('should create an action for handleCartClick', () => {
+    const expectedAction = {
+      type: 'cart/handleCartClick',
+      payload: undefined
+    }
+
+    expect(cartActions.handleCartClick()).toEqual(expectedAction)
   })
 })

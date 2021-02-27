@@ -1,4 +1,4 @@
-import { reducer } from './slice'
+import { reducer, initialState } from './slice'
 
 const ACTION_TYPES = {
   addItem: 'cart/addItem',
@@ -6,13 +6,16 @@ const ACTION_TYPES = {
   decrementItem: 'cart/decrementItem',
   clearCart: 'cart/clearCart',
   setItemQuantity: 'cart/setItemQuantity',
-  removeItem: 'cart/removeItem'
+  removeItem: 'cart/removeItem',
+  loadCart: 'cart/loadCart',
+  handleCartClick: 'cart/handleCartClick',
+  handleCloseCart: 'cart/handleCloseCart'
 }
 
 let counter = 0
 function mockProduct(overrides) {
   return {
-    id: `sku_abc${counter++}`,
+    id: `id_abc${counter++}`,
     name: 'blah bleh bloo',
     price: Math.floor(Math.random() * 1000 + 1),
     image: 'https://blah.com/bleh',
@@ -22,10 +25,10 @@ function mockProduct(overrides) {
   }
 }
 
-function mockCartDetails(overrides) {
+function mockCartDetails(overrides1, overrides2) {
   return {
-    [`sku_abc${counter}`]: {
-      sku: `sku_abc${counter++}`,
+    [`id_abc${counter}`]: {
+      id: `id_abc${counter++}`,
       name: 'Bananas',
       image: 'https://blah.com/banana.avif',
       price: 400,
@@ -33,10 +36,10 @@ function mockCartDetails(overrides) {
       value: 800,
       quantity: 2,
       formattedValue: '$8.00',
-      ...overrides
+      ...overrides1
     },
-    [`sku_efg${counter}`]: {
-      sku: `sku_efg${counter++}`,
+    [`id_efg${counter}`]: {
+      id: `id_efg${counter++}`,
       name: 'Oranges',
       image: 'https://blah.com/orange.avif',
       currency: 'USD',
@@ -44,7 +47,7 @@ function mockCartDetails(overrides) {
       value: 1000,
       quantity: 4,
       formattedValue: '$10.00',
-      ...overrides
+      ...overrides2
     }
   }
 }
@@ -53,27 +56,16 @@ function mockCart(overrides) {
   const mockDetails = mockCartDetails()
 
   return {
-    ...cartInitialState,
+    ...initialState,
     cartDetails: mockDetails,
     cartCount: 6,
     totalPrice: 1800
   }
 }
 
-export const cartInitialState = {
-  lastClicked: '',
-  shouldDisplayCart: false,
-  stripe: null,
-  cartDetails: {},
-  totalPrice: 0,
-  cartCount: 0,
-  currency: 'USD',
-  language: 'en-US'
-}
-
 describe('cart reducer', () => {
   it('should return initial state', () => {
-    expect(reducer(undefined, {})).toEqual(cartInitialState)
+    expect(reducer(undefined, {})).toEqual(initialState)
   })
 })
 
@@ -81,7 +73,7 @@ describe('addItem', () => {
   it('should handle addItem', () => {
     const product = mockProduct()
 
-    const result = reducer(cartInitialState, {
+    const result = reducer(initialState, {
       type: ACTION_TYPES.addItem,
       payload: {
         product,
@@ -104,7 +96,7 @@ describe('addItem', () => {
 
     const result = reducer(
       {
-        ...cartInitialState,
+        ...initialState,
         // already 6 items in mockCartDetails
         cartCount: 6,
         cartDetails: mockDetails,
@@ -131,7 +123,7 @@ describe('addItem', () => {
   it('should handle adding price_metadata along with added cart item', () => {
     const product = mockProduct()
 
-    const result = reducer(cartInitialState, {
+    const result = reducer(initialState, {
       type: ACTION_TYPES.addItem,
       payload: {
         product,
@@ -150,7 +142,7 @@ describe('addItem', () => {
   it('should handle adding product_metadata along with added cart item', () => {
     const product = mockProduct()
 
-    const result = reducer(cartInitialState, {
+    const result = reducer(initialState, {
       type: ACTION_TYPES.addItem,
       payload: {
         product,
@@ -173,7 +165,7 @@ describe('incrementItem', () => {
   it('should increment a cartItem by 1', () => {
     const mockDetails = mockCartDetails()
     const initialState = {
-      ...cartInitialState,
+      ...initialState,
       cartDetails: mockDetails,
       cartCount: 6,
       totalPrice: 1800
@@ -188,7 +180,7 @@ describe('incrementItem', () => {
     const result = reducer(initialState, {
       type: ACTION_TYPES.incrementItem,
       payload: {
-        id: products[0].sku,
+        id: products[0].id,
         options: { count: 1 }
       }
     })
@@ -197,13 +189,13 @@ describe('incrementItem', () => {
 
     expect(result.cartCount).toEqual(7)
     expect(result.totalPrice).toEqual(2200)
-    expect(cartDetails[product0.sku].quantity).toEqual(3)
+    expect(cartDetails[product0.id].quantity).toEqual(3)
   })
 
   it('should increment a cartItem by 2', () => {
     const mockDetails = mockCartDetails()
     const initialState = {
-      ...cartInitialState,
+      ...initialState,
       cartDetails: mockDetails,
       cartCount: 6,
       totalPrice: 1800
@@ -218,7 +210,7 @@ describe('incrementItem', () => {
     const result = reducer(initialState, {
       type: ACTION_TYPES.incrementItem,
       payload: {
-        id: products[0].sku,
+        id: products[0].id,
         options: { count: 2 }
       }
     })
@@ -227,7 +219,7 @@ describe('incrementItem', () => {
 
     expect(result.cartCount).toEqual(8)
     expect(result.totalPrice).toEqual(2600)
-    expect(cartDetails[product0.sku].quantity).toEqual(4)
+    expect(cartDetails[product0.id].quantity).toEqual(4)
   })
 })
 
@@ -235,7 +227,7 @@ describe('decrementItem', () => {
   it('should decrease an item by 1', () => {
     const mockDetails = mockCartDetails()
     const initialState = {
-      ...cartInitialState,
+      ...initialState,
       cartDetails: mockDetails,
       cartCount: 6,
       totalPrice: 1800
@@ -250,7 +242,7 @@ describe('decrementItem', () => {
     const result = reducer(initialState, {
       type: ACTION_TYPES.decrementItem,
       payload: {
-        id: products[0].sku,
+        id: products[0].id,
         options: { count: 1 }
       }
     })
@@ -259,13 +251,13 @@ describe('decrementItem', () => {
 
     expect(result.cartCount).toEqual(5)
     expect(result.totalPrice).toEqual(1400)
-    expect(cartDetails[product0.sku].quantity).toEqual(1)
+    expect(cartDetails[product0.id].quantity).toEqual(1)
   })
 
   it('should remove an item when it hits 0 an item by 2', () => {
     const mockDetails = mockCartDetails()
     const initialState = {
-      ...cartInitialState,
+      ...initialState,
       cartDetails: mockDetails,
       cartCount: 6,
       totalPrice: 1800
@@ -280,7 +272,7 @@ describe('decrementItem', () => {
     const result = reducer(initialState, {
       type: ACTION_TYPES.decrementItem,
       payload: {
-        id: product0.sku,
+        id: product0.id,
         options: { count: 2 }
       }
     })
@@ -289,7 +281,7 @@ describe('decrementItem', () => {
 
     expect(result.cartCount).toEqual(4)
     expect(result.totalPrice).toEqual(1000)
-    expect(cartDetails[product0.sku]).toBeFalsy()
+    expect(cartDetails[product0.id]).toBeFalsy()
   })
 })
 
@@ -297,7 +289,7 @@ describe('clearCart', () => {
   it('should reset back into initialState', () => {
     const result = reducer(
       {
-        ...cartInitialState,
+        ...initialState,
         cartDetails: mockCartDetails(),
         cartCount: 6,
         totalPrice: 1800
@@ -308,7 +300,7 @@ describe('clearCart', () => {
       }
     )
 
-    expect(result).toEqual(cartInitialState)
+    expect(result).toEqual(initialState)
   })
 })
 
@@ -323,27 +315,27 @@ describe('setItemQuantity', () => {
     const product0 = products[0]
     const result = reducer(
       {
-        ...cartInitialState,
+        ...initialState,
         cartDetails: mockDetails,
         cartCount: 6,
         totalPrice: 1800
       },
       {
         type: ACTION_TYPES.setItemQuantity,
-        payload: { id: product0.sku, quantity: 10 }
+        payload: { id: product0.id, quantity: 10 }
       }
     )
 
     const cartDetails = result.cartDetails
 
-    expect(cartDetails[product0.sku].quantity).toBe(12)
+    expect(cartDetails[product0.id].quantity).toBe(12)
     expect(result.cartCount).toBe(16)
     expect(result.totalPrice).toBe(5800)
   })
 })
 
 describe('removeItem', () => {
-  it('removes the proper item from cart details', () => {
+  it('removes the proper item from caart details', () => {
     const mockDetails = mockCartDetails()
 
     const products = Object.keys(mockDetails).map(
@@ -354,12 +346,79 @@ describe('removeItem', () => {
 
     const result = reducer(
       {
-        ...cartInitialState,
+        ...initialState,
         cartDetails: mockDetails,
         cartCount: 6,
         totalPrice: 1800
       },
-      { type: ACTION_TYPES.removeItem, payload: product0.sku }
+      { type: ACTION_TYPES.removeItem, payload: product0.id }
     )
+
+    expect(result.cartDetails[product0.id]).toBeFalsy()
+  })
+})
+
+describe('loadCart', () => {
+  it('properly merges a new cartDetails into the current cartDetails', () => {
+    const mockDetails = mockCartDetails()
+    const mockDetails2 = mockCartDetails(
+      { name: 'Carrots' },
+      { name: 'Broccoli' }
+    )
+
+    const result = reducer(
+      {
+        ...initialState,
+        cartDetails: mockDetails,
+        cartCount: 6,
+        totalPrice: 1800
+      },
+      {
+        type: ACTION_TYPES.loadCart,
+        payload: {
+          cartDetails: mockDetails2,
+          shouldMerge: true
+        }
+      }
+    )
+
+    expect(result.cartDetails).toEqual({ ...mockDetails, ...mockDetails2 })
+    expect(result.totalPrice).toBe(3600)
+    expect(result.cartCount).toBe(12)
+  })
+})
+
+describe('handleCartClick', () => {
+  it('should return shouldDisplayCart as true, if false', () => {
+    const result = reducer(initialState, {
+      type: ACTION_TYPES.handleCartClick,
+      payload: undefined
+    })
+    expect(result.shouldDisplayCart).toBeFalsy()
+  })
+
+  it('should return shouldDisplayCart as, if true', () => {
+    const result = reducer(
+      { ...initialState, shouldDisplayCart: true },
+      {
+        type: ACTION_TYPES.handleCartClick,
+        payload: undefined
+      }
+    )
+    expect(result.shouldDisplayCart).toBeTruthy()
+  })
+})
+
+describe('handleCloseCart', () => {
+  it('should return shouldDisplayCart as false ', () => {
+    const result = reducer(
+      { ...initialState, shouldDisplayCart: true },
+      {
+        type: ACTION_TYPES.handleCloseCart,
+        payload: undefined
+      }
+    )
+
+    expect(result.shouldDisplayCart).toBeFalsy()
   })
 })
