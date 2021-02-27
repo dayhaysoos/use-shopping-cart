@@ -23,6 +23,10 @@
       "node": "./dist/core.js",
       "import": "./dist/core.es.js",
       "browser": "./dist/core.umd.js"
+    },
+    "./serverless": {
+      "require": "./utilities/serverless.js",
+      "node": "./utilities/serverless.js"
     }
   },
   "engines": {
