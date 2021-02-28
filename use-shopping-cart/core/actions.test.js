@@ -121,7 +121,7 @@ describe('actions', () => {
       payload: { cartDetails: mockDetails, shouldMerge: true }
     }
 
-    expect(cartActions.loadCart(mockDetails)).toEqual(expectedAction)
+    expect(actions.loadCart(mockDetails)).toEqual(expectedAction)
   })
 
   it('should create an action for handleCartClick', () => {
@@ -130,7 +130,7 @@ describe('actions', () => {
       payload: undefined
     }
 
-    expect(cartActions.handleCartClick()).toEqual(expectedAction)
+    expect(actions.handleCartClick()).toEqual(expectedAction)
   })
 
   it('should create an action for redirectToCheckout', () => {
@@ -139,7 +139,7 @@ describe('actions', () => {
       payload: undefined
     }
 
-    expect(cartActions.redirectToCheckout()).toEqual(expectedAction)
+    expect(actions.redirectToCheckout()).toEqual(expectedAction)
   })
 
   it('should create an action for checkoutSingleItem', () => {
@@ -148,7 +148,7 @@ describe('actions', () => {
       payload: undefined
     }
 
-    expect(cartActions.checkoutSingleItem()).toEqual(expectedAction)
+    expect(actions.checkoutSingleItem()).toEqual(expectedAction)
   })
 
   it('should create an action for handleCloseCart', () => {
@@ -157,7 +157,7 @@ describe('actions', () => {
       payload: undefined
     }
 
-    expect(cartActions.handleCloseCart()).toEqual(expectedAction)
+    expect(actions.handleCloseCart()).toEqual(expectedAction)
   })
 
   it('should create an action for handleCartClick', () => {
@@ -166,6 +166,6 @@ describe('actions', () => {
       payload: undefined
     }
 
-    expect(cartActions.handleCartClick()).toEqual(expectedAction)
+    expect(actions.handleCartClick()).toEqual(expectedAction)
   })
 })
