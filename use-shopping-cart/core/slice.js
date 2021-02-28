@@ -3,7 +3,7 @@ import { createEntry, updateEntry, removeEntry, updateQuantity } from './Entry'
 import { isClient } from '../utilities/SSR'
 import { checkoutHandler } from '../utilities/old-utils'
 
-export const initialState = {
+export const cartInitialState = {
   mode: 'checkout-session',
   stripe: null,
   currency: 'USD',
@@ -17,7 +17,7 @@ export const initialState = {
 
 const slice = createSlice({
   name: 'cart',
-  initialState: initialState,
+  initialState: cartInitialState,
   reducers: {
     addItem: {
       reducer: (state, { payload }) => {
@@ -86,7 +86,7 @@ const slice = createSlice({
       reducer: (state) => {
         state.cartCount = 0
         state.totalPrice = 0
-        state.cart = {}
+        state.cartDetails = {}
       }
     },
     setItemQuantity: {
@@ -109,7 +109,7 @@ const slice = createSlice({
     loadCart: {
       reducer: (state, { payload }) => {
         const { cartDetails, shouldMerge } = payload
-        if (!shouldMerge) state = { ...initialState }
+        if (!shouldMerge) state = { ...cartInitialState }
 
         for (const id in cartDetails) {
           const entry = cartDetails[id]
