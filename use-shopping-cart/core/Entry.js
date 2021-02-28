@@ -1,4 +1,4 @@
-import { formatCurrencyString } from '../utilities/old-utils'
+import { formatCurrencyString } from './store'
 import { v4 as uuidv4 } from 'uuid'
 
 function Entry({
