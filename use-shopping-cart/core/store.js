@@ -1,5 +1,6 @@
 import { configureStore } from '@reduxjs/toolkit'
 import { reducer, actions, initialState } from './slice'
+import { isClient } from '../utilities/SSR'
 
 export const formatCurrencyString = ({
   value,
