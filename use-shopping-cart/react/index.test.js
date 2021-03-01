@@ -1,50 +1,104 @@
-// import React from 'react'
+import React from 'react'
 
-// import { act, renderHook } from '@testing-library/react-hooks'
-// import { render, screen, getByRole } from '@testing-library/react'
-// import '@testing-library/jest-dom/extend-expect'
+import { act, renderHook } from '@testing-library/react-hooks'
+import { render, screen, getByRole } from '@testing-library/react'
+import '@testing-library/jest-dom/extend-expect'
 
-// import { CartProvider, useShoppingCart, DebugCart } from './index'
+import { CartProvider, useShoppingCart, DebugCart } from './index'
 
-// afterEach(() => window.localStorage.clear())
+const expectedInitialCartState = {
+  cartDetails: {},
+  totalPrice: 0,
+  formattedTotalPrice: '$0.00',
+  cartCount: 0,
+  shouldDisplayCart: false
+}
 
-// const stripeMock = {
-//   redirectToCheckout: jest.fn().mockReturnValue(() => Promise.resolve())
-// }
+let counter = 0
+function mockProduct(overrides) {
+  return {
+    id: `sku_abc${counter++}`,
+    name: 'blah bleh bloo',
+    price: Math.floor(Math.random() * 1000 + 1),
+    image: 'https://blah.com/bleh',
+    alt: 'a bleh glowing under a soft sunrise',
+    currency: 'usd',
+    ...overrides
+  }
+}
 
-// const createWrapper = (overrides = {}) => ({ children }) => (
-//   <CartProvider
-//     mode="client-only"
-//     successUrl="https://egghead.io/success"
-//     cancelUrl="https://egghead.io/cancel"
-//     stripe={stripeMock}
-//     currency="USD"
-//     {...overrides}
-//   >
-//     {children}
-//   </CartProvider>
-// )
+afterEach(() => window.localStorage.clear())
 
-// const expectedInitialCartState = {
-//   cartDetails: {},
-//   totalPrice: 0,
-//   formattedTotalPrice: '$0.00',
-//   cartCount: 0,
-//   shouldDisplayCart: false
-// }
+const stripeMock = {
+  redirectToCheckout: jest.fn().mockReturnValue(() => Promise.resolve())
+}
 
-// let counter = 0
-// function mockProduct(overrides) {
-//   return {
-//     id: `sku_abc${counter++}`,
-//     name: 'blah bleh bloo',
-//     price: Math.floor(Math.random() * 1000 + 1),
-//     image: 'https://blah.com/bleh',
-//     alt: 'a bleh glowing under a soft sunrise',
-//     currency: 'usd',
-//     ...overrides
-//   }
-// }
+const createWrapper = (overrides = {}) => ({ children }) => (
+  <CartProvider
+    mode="client-only"
+    successUrl="https://egghead.io/success"
+    cancelUrl="https://egghead.io/cancel"
+    stripe={stripeMock}
+    currency="USD"
+    {...overrides}
+  >
+    {children}
+  </CartProvider>
+)
+
+describe('useShoppingCart()', () => {
+  const wrapper = createWrapper()
+  let cart
+  function reload() {
+    cart = renderHook(() => useShoppingCart((state) => state), { wrapper })
+      .result
+  }
+  beforeEach(() => reload())
+
+  it('initial state', () => {
+    expect(cart.current).toMatchObject(expectedInitialCartState)
+  })
+
+  describe('shouldDisplayCart', () => {
+    it('shouldDisplayCart should be false by default', () => {
+      expect(cart.current.shouldDisplayCart).toBeFalsy()
+    })
+
+    it('should set shouldDisplayCart to true after running handleCartClick() once', () => {
+      act(() => {
+        cart.current.handleCartClick()
+      })
+
+      expect(cart.current.shouldDisplayCart).toBe(true)
+    })
+
+    it('handleCartClick() toggles value', () => {
+      act(() => {
+        cart.current.handleCartClick()
+      })
+      expect(cart.current.shouldDisplayCart).toBe(true)
+
+      act(() => {
+        cart.current.handleCartClick()
+      })
+      expect(cart.current.shouldDisplayCart).toBe(false)
+    })
+
+    // it('handleCartHover() opens cart', () => {
+    //   act(() => {
+    //     cart.current.handleCartHover()
+    //   })
+    //   expect(cart.current.shouldDisplayCart).toBe(true)
+    // })
+
+    it('handleCloseCart() closes cart', () => {
+      act(() => {
+        cart.current.handleCloseCart()
+      })
+      expect(cart.current.shouldDisplayCart).toBe(false)
+    })
+  })
+})
 
 // describe('useShoppingCart()', () => {
 //   const wrapper = createWrapper()
@@ -64,34 +118,6 @@
 //       cart.current.storeLastClicked(product.id)
 //     })
 //     expect(cart.current.lastClicked).toBe(product.id)
-//   })
-
-//   describe('shouldDisplayCart', () => {
-//     it('handleCartClick() toggles value', () => {
-//       act(() => {
-//         cart.current.handleCartClick()
-//       })
-//       expect(cart.current.shouldDisplayCart).toBe(true)
-
-//       act(() => {
-//         cart.current.handleCartClick()
-//       })
-//       expect(cart.current.shouldDisplayCart).toBe(false)
-//     })
-
-//     it('handleCartHover() opens cart', () => {
-//       act(() => {
-//         cart.current.handleCartHover()
-//       })
-//       expect(cart.current.shouldDisplayCart).toBe(true)
-//     })
-
-//     it('handleCloseCart() closes cart', () => {
-//       act(() => {
-//         cart.current.handleCloseCart()
-//       })
-//       expect(cart.current.shouldDisplayCart).toBe(false)
-//     })
 //   })
 
 //   describe('addItem()', () => {
@@ -750,3 +776,4 @@
 //     }
 //   })
 // })
+//
