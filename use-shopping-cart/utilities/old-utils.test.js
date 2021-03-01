@@ -1,8 +1,4 @@
-import {
-  formatCurrencyString,
-  getCheckoutData,
-  filterCart
-} from '../core/store'
+import { formatCurrencyString, getCheckoutData, filterCart } from './old-utils'
 
 describe('getCheckoutData', () => {
   const cart = {

@@ -30,7 +30,7 @@ const CartDisplay = () => {
     redirectToCheckout({ sessionId: response.sessionId })
   }
 
-  if (Object.keys(cartDetails).length === 0) {
+  if (cartCount === 0) {
     return (
       <Box sx={{ textAlign: 'center' }}>
         <h2>Shopping Cart Display Panel</h2>

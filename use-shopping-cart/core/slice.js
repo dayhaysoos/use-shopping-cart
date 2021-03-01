@@ -3,7 +3,7 @@ import { createEntry, updateEntry, removeEntry, updateQuantity } from './Entry'
 import { isClient } from '../utilities/SSR'
 import { checkoutHandler } from '../utilities/old-utils'
 
-export const cartInitialState = {
+export const initialState = {
   mode: 'checkout-session',
   stripe: null,
   currency: 'USD',
@@ -17,20 +17,25 @@ export const cartInitialState = {
 
 const slice = createSlice({
   name: 'cart',
-  initialState: cartInitialState,
+  initialState,
   reducers: {
     addItem: {
-      reducer: (state, { payload }) => {
+      reducer: (state, action) => {
         const {
           product,
           options: { count, price_metadata, product_metadata }
-        } = payload
+        } = action.payload
 
-        if (count <= 0) return
+        if (count <= 0) {
+          console.warn(
+            'addItem requires the count to be greater than zero.',
+            action
+          )
+        }
 
-        if (payload?.id in state.cartDetails) {
+        if (action.payload.id in state.cartDetails) {
           return updateEntry({
-            id: payload.id,
+            id: action.payload.id,
             count,
             price_metadata,
             product_metadata,
@@ -90,9 +95,15 @@ const slice = createSlice({
       }
     },
     setItemQuantity: {
-      reducer: (state, { payload }) => {
-        const { id, quantity } = payload
-        if (quantity < 0) return
+      reducer: (state, action) => {
+        const { id, quantity } = action.payload
+        if (quantity < 0) {
+          console.warn(
+            'setItemQuantity requires the quantity to be greater than or equal to zero.',
+            action
+          )
+          return
+        }
 
         if (id in state.cartDetails)
           return updateQuantity({ ...state, state, id, quantity })
@@ -108,8 +119,15 @@ const slice = createSlice({
     },
     loadCart: {
       reducer: (state, { payload }) => {
+        // TODO: Figure out how `loadCart` should work when merging.
+        // Right now, if you were to `useEffect(() => loadCart(cartDetailsFromServer), [])`,
+        // your cart would just keep getting bigger on every reload. Also, is merging a good idea?
         const { cartDetails, shouldMerge } = payload
-        if (!shouldMerge) state = { ...cartInitialState }
+        if (!shouldMerge) {
+          state.cartCount = 0
+          state.totalPrice = 0
+          state.cartDetails = {}
+        }
 
         for (const id in cartDetails) {
           const entry = cartDetails[id]
@@ -146,9 +164,11 @@ const slice = createSlice({
           }
         })
     },
+    handleCartHover: (state) => {
+      state.shouldDisplayCart = true
+    },
     handleCartClick: (state) => {
-      // TODO: Fix the following line. It is underlined by ESLint because it doesn't do anything.
-      !state.shouldDisplayCart
+      state.shouldDisplayCart = !state.shouldDisplayCart
     },
     handleCloseCart: (state) => {
       state.shouldDisplayCart = false
