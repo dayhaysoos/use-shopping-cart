@@ -12,6 +12,7 @@ export const initialState = {
   shouldDisplayCart: false,
   cartCount: 0,
   totalPrice: 0,
+  formattedTotalPrice: '$0.00',
   cartDetails: {}
 }
 
