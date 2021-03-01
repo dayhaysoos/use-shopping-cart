@@ -394,10 +394,10 @@ describe('handleCartClick', () => {
       type: ACTION_TYPES.handleCartClick,
       payload: undefined
     })
-    expect(result.shouldDisplayCart).toBeFalsy()
+    expect(result.shouldDisplayCart).toBe(true)
   })
 
-  it('should return shouldDisplayCart as, if true', () => {
+  it('should return shouldDisplayCart as false, if true', () => {
     const result = reducer(
       { ...cartInitialState, shouldDisplayCart: true },
       {
@@ -405,7 +405,7 @@ describe('handleCartClick', () => {
         payload: undefined
       }
     )
-    expect(result.shouldDisplayCart).toBeTruthy()
+    expect(result.shouldDisplayCart).toBe(false)
   })
 })
 

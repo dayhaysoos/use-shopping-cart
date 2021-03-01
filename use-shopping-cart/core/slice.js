@@ -12,6 +12,7 @@ export const cartInitialState = {
   shouldDisplayCart: false,
   cartCount: 0,
   totalPrice: 0,
+  formattedTotalPrice: '$0.00',
   cartDetails: {}
 }
 
@@ -147,8 +148,9 @@ const slice = createSlice({
         })
     },
     handleCartClick: (state) => {
-      // TODO: Fix the following line. It is underlined by ESLint because it doesn't do anything.
-      !state.shouldDisplayCart
+      state.shouldDisplayCart = !state.shouldDisplayCart
+
+      return state
     },
     handleCloseCart: (state) => {
       state.shouldDisplayCart = false

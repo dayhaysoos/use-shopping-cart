@@ -1,5 +1,5 @@
 import { configureStore } from '@reduxjs/toolkit'
-import { reducer, actions, initialState } from './slice'
+import { reducer, actions, cartInitialState } from './slice'
 import { isClient } from '../utilities/SSR'
 
 export const formatCurrencyString = ({
@@ -31,6 +31,6 @@ export { reducer, actions }
 export function createShoppingCartStore(options) {
   return configureStore({
     reducer,
-    preloadedState: { ...initialState, ...options }
+    preloadedState: { ...cartInitialState, ...options }
   })
 }
