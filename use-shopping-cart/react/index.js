@@ -5,6 +5,7 @@ import {
   formatCurrencyString,
   filterCart
 } from '../core/store'
+import { bindActionCreators } from '@reduxjs/toolkit'
 import { createDispatchHook, createSelectorHook, Provider } from 'react-redux'
 
 export { actions, filterCart, formatCurrencyString }
@@ -35,11 +36,7 @@ export function useShoppingCart(
   const cartState = useSelector(selector, equalityFn)
 
   const shoppingCart = React.useMemo(() => {
-    // Add action dispatchors
-    const cartActions = {}
-    for (const key in actions)
-      cartActions[key] = (...args) => dispatch(actions[key](...args))
-
+    const cartActions = bindActionCreators(actions, dispatch)
     return { ...cartState, ...cartActions }
   }, [cartState, dispatch])
 
