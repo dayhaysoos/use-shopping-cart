@@ -1,13 +1,4 @@
 [build]
-  command="yarn workspace use-shopping-cart build && yarn workspace documentation build"
-  publish="documentation/public"
-  functions="examples/cra/functions"
-
-  [dev]
-  command="yarn workspace use-shopping-cart start"
-
-  [[redirects]]
-  from = "https://use-shopping-cart.netlify.app"
-  to = "https://useshoppingcart.com"
-  status = 301
-
+  base = "docs/"
+  publish = "build/"
+  command = "npm run build"
