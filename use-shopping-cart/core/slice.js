@@ -54,6 +54,7 @@ const slice = createSlice({
       prepare: (product, options = { count: 1 }) => {
         if (!options.price_metadata) options.price_metadata = {}
         if (!options.product_metadata) options.product_metadata = {}
+        if (!options.count) options.count = 1
         return { payload: { product, options } }
       }
     },
@@ -129,23 +130,27 @@ const slice = createSlice({
     },
     // TODO: discuss solutions to this. The two following actions do not redirect to checkout.
     redirectToCheckout: {
-      reducer: (state) =>
-        checkoutHandler(state, {
-          modes: ['client-only', 'checkout-session'],
-          stripe(stripe, options) {
-            return stripe.redirectToCheckout(options)
-          }
-        })
+      reducer: (state) => {
+        return state
+      }
+      // checkoutHandler(state, {
+      //   modes: ['client-only', 'checkout-session'],
+      //   stripe(stripe, options) {
+      //     return stripe.redirectToCheckout(options)
+      //   }
+      // })
     },
     checkoutSingleItem: {
-      reducer: (state) =>
-        checkoutHandler(state, {
-          modes: ['client-only'],
-          stripe(stripe, options, { sku, quantity = 1 }) {
-            options.lineItems = [{ price: sku, quantity }]
-            return stripe.redirectToCheckout(options)
-          }
-        })
+      reducer: (state) => {
+        return state
+      }
+      // checkoutHandler(state, {
+      //   modes: ['client-only'],
+      //   stripe(stripe, options, { sku, quantity = 1 }) {
+      //     options.lineItems = [{ price: sku, quantity }]
+      //     return stripe.redirectToCheckout(options)
+      //   }
+      // })
     },
     handleCartClick: (state) => {
       state.shouldDisplayCart = !state.shouldDisplayCart
