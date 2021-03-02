@@ -26,7 +26,7 @@
     },
     {
       "login": "ChrisBrownie55",
-      "name": "Christopher Brown",
+      "name": "Chris Brown",
       "avatar_url": "https://avatars2.githubusercontent.com/u/19195374?v=4",
       "profile": "https://chrisbrownie.dev/",
       "contributions": [
@@ -115,6 +115,15 @@
       "name": "Prince Wilson",
       "avatar_url": "https://avatars1.githubusercontent.com/u/8431042?v=4",
       "profile": "https://prince.dev",
+      "contributions": [
+        "doc"
+      ]
+    },
+    {
+      "login": "ehowey",
+      "name": "Eric Howey",
+      "avatar_url": "https://avatars.githubusercontent.com/u/204841?v=4",
+      "profile": "https://www.erichowey.dev/",
       "contributions": [
         "doc"
       ]

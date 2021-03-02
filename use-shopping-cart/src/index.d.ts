@@ -172,12 +172,25 @@ declare module 'use-shopping-cart' {
      * Totally clears the cart of all items
      */
     clearCart: () => void
+    /**
+     * @param cartDetails cartDetails: [product.sku]: {...}
+     * @param shouldMerge Boolean, defaults to true. If false, it would replace cartDetails
+     */
+    loadCart: (cartDetails: Object<CartDetails>, shouldMerge?: Boolean) => void
   }
 
   /**
    * Provides several utilities and pieces of data for you to use in your application.
    */
   export function useShoppingCart(): ShoppingCartUtilities
+
+  /**
+   * Displays the values returned by `useShoppingCart()` in a table format.
+   */
+  export declare const DebugCart: React.FunctionComponent<React.DetailedHTMLProps<
+    React.TableHTMLAttributes<HTMLTableElement>,
+    HTMLTableElement
+  >>
 
   interface FormatCurrencyStringProps {
     /**

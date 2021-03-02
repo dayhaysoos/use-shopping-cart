@@ -29,6 +29,7 @@ const stripePromise = loadStripe(process.env.REACT_APP_STRIPE_API_PUBLIC)
 
 ReactDOM.render(
   <CartProvider
+    mode="client-only"
     stripe={stripePromise}
     successUrl="stripe.com"
     cancelUrl="twitter.com/dayhaysoos"
@@ -42,9 +43,14 @@ ReactDOM.render(
 )
 ```
 
-### Using the hook
+## Using the hook
 
 The hook `useShoppingCart()` provides several utilities and pieces of data for you to use in your application. The examples below won't cover every part of the `useShoppingCart()` API but you can [look at the API](#API) below.
+
+### Products Created on Stripe's Dashboard
+
+This is for products you created on the Stripe Dashboard. Stripe provides you with a Price ID String. You don't need a server(less)
+set up to use this library this way unless you want more control over how the payments are handled.
 
 ```jsx
 import { useShoppingCart } from 'use-shopping-cart'
@@ -54,14 +60,14 @@ import { CartItems } from './CartItems'
 const productData = [
   {
     name: 'Bananas',
-    sku: 'sku_GBJ2Ep8246qeeT',
+    price_id: 'price_GBJ2Ep8246qeeT',
     price: 400,
     image: 'https://www.fillmurray.com/300/300',
     currency: 'USD'
   },
   {
     name: 'Tangerines',
-    sku: 'sku_GBJ2WWfMaGNC2Z',
+    price_id: 'price_GBJ2WWfMaGNC2Z',
     price: 100,
     image: 'https://www.fillmurray.com/300/300',
     currency: 'USD'
@@ -81,7 +87,7 @@ export function App() {
 
       {/* This is where we'll render our cart */}
       <p>Number of Items: {cartCount}</p>
-      <p>Total: {totalPrice()}</p>
+      <p>Total: {totalPrice}</p>
       <CartItems />
 
       {/* Redirects the user to Stripe */}
@@ -91,20 +97,57 @@ export function App() {
 }
 ```
 
-Once you have successfully installed `stripe`, `use-shopping-cart`, and wrapped your root component with `<CartProvider>`, you are ready to go! 🚀
+### Server(less) implementation
 
-### ⚠️ HEADS UP!
+If you're data source isn't coming from Stripe's dashboard, you can still make products and make payments happen from them.
 
-You may not be able to see the SKUs section in your products on Stripe but a **Prices** section instead. If that's the case, you can use the price ID (i.e. `price_abcd1234`) as the `sku` property in your inventory.
+You're product data should look like this:
 
-```js
+```jsx
 const productData = [
   {
     name: 'Bananas',
-    sku: 'price_GBJ2Ep8246qeeT', // 👈
+    id: 'some_unique_id_1',
     price: 400,
     image: 'https://www.fillmurray.com/300/300',
     currency: 'USD'
+    product_data: {
+      metadata: {
+        type: 'fruit'
+      }
+    },
+    price_data: {
+      recurring: {
+        interval: 'week'
+      }
+    }
+  },
+  {
+    name: 'Tangerines',
+    id: 'some_unique_id_2',
+    price: 100,
+    image: 'https://www.fillmurray.com/300/300',
+    currency: 'USD',
+    product_data: {
+      metadata: {
+        type: 'fruit'
+      }
+    },
+    price_data: {
+      recurring: {
+        interval: 'week'
+      }
+    }
   }
 ]
 ```
+
+_NOTE_: `price_data` and `product_data` are not required for use-shopping-cart to work, but they are required for creating Sessions with Stripe.
+
+This library manages `price_data` and `product_data` for you, but if you need to pass extra data to your Sessions, you can add them directly to your
+product objects.
+
+Also keep in mind that `product_data` is a child of `price_data` when being sent to Stripe, but you don't need to nest for use-shopping-cart. Learn more about
+creating Sessions here: https://stripe.com/docs/api/checkout/sessions/create
+
+Once you have successfully installed `stripe`, `use-shopping-cart`, and wrapped your root component with `<CartProvider>`, you are ready to go! 🚀

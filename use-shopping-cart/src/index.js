@@ -1,6 +1,7 @@
 import React, {
   createContext,
   useContext,
+  useDebugValue,
   useEffect,
   useMemo,
   useReducer
@@ -106,22 +107,32 @@ export const useShoppingCart = () => {
     language
   } = cart
 
-  const addItem = (product, count = 1) =>
-    dispatch({ type: 'add-item-to-cart', product, count })
-  const removeItem = (sku) => dispatch({ type: 'remove-item-from-cart', sku })
-  const setItemQuantity = (sku, quantity) =>
-    dispatch({ type: 'set-item-quantity', sku, quantity })
-  const incrementItem = (sku, count = 1) =>
-    dispatch({ type: 'increment-item', sku, count })
-  const decrementItem = (sku, count = 1) =>
-    dispatch({ type: 'decrement-item', sku, count })
+  const addItem = (product, count = 1, price_metadata, product_metadata) => {
+    dispatch({
+      type: 'add-item-to-cart',
+      product,
+      count,
+      price_metadata,
+      product_metadata
+    })
+  }
+
+  const removeItem = (id) => dispatch({ type: 'remove-item-from-cart', id })
+  const setItemQuantity = (id, quantity) =>
+    dispatch({ type: 'set-item-quantity', id, quantity })
+  const incrementItem = (id, count = 1) =>
+    dispatch({ type: 'increment-item', id, count })
+  const decrementItem = (id, count = 1) =>
+    dispatch({ type: 'decrement-item', id, count })
   const clearCart = () => dispatch({ type: 'clear-cart' })
 
-  const storeLastClicked = (sku) =>
-    dispatch({ type: 'store-last-clicked', sku })
+  const storeLastClicked = (id) => dispatch({ type: 'store-last-clicked', id })
   const handleCartClick = () => dispatch({ type: 'cart-click' })
   const handleCartHover = () => dispatch({ type: 'cart-hover' })
   const handleCloseCart = () => dispatch({ type: 'close-cart' })
+
+  const loadCart = (cartDetails, shouldMerge = true) =>
+    dispatch({ type: 'load-cart', cartDetails, shouldMerge })
 
   const redirectToCheckout = checkoutHandler(cart, {
     modes: ['client-only', 'checkout-session'],
@@ -138,7 +149,7 @@ export const useShoppingCart = () => {
     }
   })
 
-  return {
+  const shoppingCart = {
     cartDetails,
     cartCount,
     totalPrice,
@@ -156,15 +167,58 @@ export const useShoppingCart = () => {
     incrementItem,
     decrementItem,
     clearCart,
-
     lastClicked,
     storeLastClicked,
     shouldDisplayCart,
     handleCartClick,
     handleCartHover,
     handleCloseCart,
-
     redirectToCheckout,
-    checkoutSingleItem
+    checkoutSingleItem,
+    loadCart
   }
+  useDebugValue(shoppingCart)
+  return shoppingCart
+}
+
+export function DebugCart(props) {
+  const cart = useShoppingCart()
+  const cartPropertyRows = Object.entries(cart)
+    .filter(([, value]) => typeof value !== 'function')
+    .map(([key, value]) => (
+      <tr key={key}>
+        <td>{key}</td>
+        <td>
+          {typeof value === 'object' ? (
+            <button onClick={() => console.log(value)}>Log value</button>
+          ) : (
+            JSON.stringify(value)
+          )}
+        </td>
+      </tr>
+    ))
+
+  return (
+    <table
+      style={{
+        position: 'fixed',
+        top: 50,
+        right: 50,
+        backgroundColor: '#eee',
+        textAlign: 'left',
+        maxWidth: 500,
+        padding: 20,
+        borderSpacing: '25px 5px'
+      }}
+      {...props}
+    >
+      <thead>
+        <tr>
+          <th>Key</th>
+          <th>Value</th>
+        </tr>
+      </thead>
+      <tbody>{cartPropertyRows}</tbody>
+    </table>
+  )
 }

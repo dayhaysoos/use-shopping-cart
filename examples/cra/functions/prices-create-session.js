@@ -6,8 +6,9 @@
  */
 
 const stripe = require('stripe')(process.env.REACT_APP_STRIPE_API_SECRET)
-const validateCartItems = require('use-shopping-cart/src/serverUtil')
-  .validateCartItems
+
+const formatLineItems = require('use-shopping-cart/src/serverUtil')
+  .formatLineItems
 
 /*
  * Product data can be loaded from anywhere. In this case, we’re loading it from
@@ -17,13 +18,12 @@ const validateCartItems = require('use-shopping-cart/src/serverUtil')
  * The important thing is that the product info is loaded from somewhere trusted
  * so you know the pricing information is accurate.
  */
-const inventory = require('./data/products.json')
 
 exports.handler = async (event) => {
   try {
     const productJSON = JSON.parse(event.body)
 
-    const line_items = validateCartItems(inventory, productJSON)
+    const line_items = formatLineItems(productJSON)
 
     const session = await stripe.checkout.sessions.create({
       payment_method_types: ['card'],
