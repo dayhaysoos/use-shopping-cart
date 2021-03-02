@@ -30,12 +30,8 @@ module.exports = {
           title: 'Docs',
           items: [
             {
-              label: 'Style Guide',
-              to: 'docs/'
-            },
-            {
-              label: 'Second Doc',
-              to: 'docs/doc2/'
+              label: 'Getting Started',
+              to: 'docs/getting-started'
             }
           ]
         },
@@ -59,10 +55,6 @@ module.exports = {
         {
           title: 'More',
           items: [
-            {
-              label: 'Blog',
-              to: 'blog'
-            },
             {
               label: 'GitHub',
               href: 'https://github.com/dayhaysoos/use-shopping-cart'
