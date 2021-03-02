@@ -38,7 +38,7 @@ const createWrapper = (overrides = {}) => ({ children }) => (
     mode="client-only"
     successUrl="https://egghead.io/success"
     cancelUrl="https://egghead.io/cancel"
-    stripe={stripeMock}
+    stripe={null}
     currency="USD"
     {...overrides}
   >
@@ -84,18 +84,167 @@ describe('useShoppingCart()', () => {
       expect(cart.current.shouldDisplayCart).toBe(false)
     })
 
-    // it('handleCartHover() opens cart', () => {
-    //   act(() => {
-    //     cart.current.handleCartHover()
-    //   })
-    //   expect(cart.current.shouldDisplayCart).toBe(true)
-    // })
+    it.todo('handleCartHover()')
 
     it('handleCloseCart() closes cart', () => {
       act(() => {
         cart.current.handleCloseCart()
       })
       expect(cart.current.shouldDisplayCart).toBe(false)
+    })
+  })
+
+  describe('addItem()', () => {
+    it('adds an item to the cart', () => {
+      const product = mockProduct({ price: 200 })
+
+      act(() => {
+        cart.current.addItem(product)
+      })
+
+      expect(cart.current.cartDetails).toHaveProperty(product.id)
+      const entry = cart.current.cartDetails[product.id]
+
+      expect(entry.quantity).toBe(1)
+      expect(entry.value).toBe(product.price)
+      expect(entry.formattedValue).toBe('$2.00')
+      expect(entry).toMatchObject(product)
+
+      expect(cart.current.cartCount).toBe(1)
+      expect(cart.current.totalPrice).toBe(200)
+    })
+
+    it('adds `count` amount of items to the cart', () => {
+      let product
+      let count = 1
+
+      while (count <= 50) {
+        product = mockProduct()
+        act(() => {
+          cart.current.addItem(product, { count: 1 })
+        })
+        count++
+      }
+
+      expect(cart.current.cartDetails).toHaveProperty(product.id)
+      const entry = cart.current.cartDetails[product.id]
+
+      const totalValue = Object.keys(cart.current.cartDetails)
+        .map((item) => cart.current.cartDetails[item].value)
+        .reduce((acc, current) => acc + current)
+
+      expect(cart.current.cartCount).toBe(50)
+      expect(cart.current.totalPrice).toBe(totalValue)
+    })
+
+    it('adds multiple different items to the cart', () => {
+      const product1 = mockProduct({ price: 400 })
+      const product2 = mockProduct({ price: 100 })
+
+      act(() => {
+        cart.current.addItem(product1)
+        cart.current.addItem(product2)
+      })
+
+      expect(cart.current.cartDetails).toHaveProperty(product1.id)
+      const entry1 = cart.current.cartDetails[product1.id]
+
+      expect(entry1.quantity).toBe(1)
+      expect(entry1.value).toBe(product1.price)
+
+      expect(cart.current.cartDetails).toHaveProperty(product2.id)
+      const entry2 = cart.current.cartDetails[product2.id]
+
+      expect(entry2.quantity).toBe(1)
+      expect(entry2.value).toBe(product2.price)
+
+      expect(cart.current.cartCount).toBe(2)
+      expect(cart.current.totalPrice).toBe(500)
+    })
+
+    it('adds multiple of the same item to the cart', () => {
+      const product = mockProduct({ price: 325 })
+
+      act(() => {
+        cart.current.addItem(product)
+        cart.current.addItem(product)
+      })
+
+      expect(cart.current.cartDetails).toHaveProperty(product.id)
+      const entry = cart.current.cartDetails[product.id]
+
+      expect(entry.quantity).toBe(2)
+      expect(entry.value).toBe(650)
+      expect(entry.formattedValue).toBe('$6.50')
+
+      expect(cart.current.cartCount).toBe(2)
+      expect(cart.current.totalPrice).toBe(650)
+    })
+
+    it('adds price_data from the metadata object from the 3rd param', () => {
+      const product = mockProduct()
+
+      act(() => {
+        cart.current.addItem(product, {
+          price_metadata: {
+            type: 'tacos',
+            test: 'testing'
+          }
+        })
+      })
+
+      expect(cart.current.cartDetails[product.id].price_data).toStrictEqual({
+        type: 'tacos',
+        test: 'testing'
+      })
+    })
+
+    it('successfully stacks data to price_data if there is already content there', () => {
+      const product = mockProduct({ price_data: { test: 'static metadata' } })
+
+      act(() => {
+        cart.current.addItem(product, 1, {
+          dynamicTest: 'dynamic data'
+        })
+      })
+
+      expect(cart.current.cartDetails[product.id].price_data).toStrictEqual({
+        test: 'static metadata',
+        dynamicTest: 'dynamic data'
+      })
+    })
+
+    it('adds product_data from the metadata object from the options object', () => {
+      const product = mockProduct()
+
+      act(() => {
+        cart.current.addItem(product, {
+          count: 1,
+          product_metadata: { type: 'tacos', test: 'testing' }
+        })
+      })
+
+      expect(cart.current.cartDetails[product.id].product_data).toStrictEqual({
+        type: 'tacos',
+        test: 'testing'
+      })
+    })
+
+    it('successfully stacks data to product_data if there is already content there', () => {
+      const product = mockProduct({
+        product_data: { test: 'static metadata' }
+      })
+
+      act(() => {
+        cart.current.addItem(product, 1, null, {
+          dynamicTest: 'dynamic data'
+        })
+      })
+
+      expect(cart.current.cartDetails[product.id].product_data).toStrictEqual({
+        test: 'static metadata',
+        dynamicTest: 'dynamic data'
+      })
     })
   })
 })
@@ -118,155 +267,6 @@ describe('useShoppingCart()', () => {
 //       cart.current.storeLastClicked(product.id)
 //     })
 //     expect(cart.current.lastClicked).toBe(product.id)
-//   })
-
-//   describe('addItem()', () => {
-//     it('adds an item to the cart', () => {
-//       const product = mockProduct({ price: 200 })
-
-//       act(() => {
-//         cart.current.addItem(product)
-//       })
-
-//       expect(cart.current.cartDetails).toHaveProperty(product.id)
-//       const entry = cart.current.cartDetails[product.id]
-
-//       expect(entry.quantity).toBe(1)
-//       expect(entry.value).toBe(product.price)
-//       expect(entry.formattedValue).toBe('$2.00')
-//       expect(entry).toMatchObject(product)
-
-//       expect(cart.current.cartCount).toBe(1)
-//       expect(cart.current.totalPrice).toBe(200)
-//     })
-
-//     it('adds `count` amount of items to the cart', () => {
-//       let totalCount = 0
-//       for (let count = 1; count <= 50; ++count) {
-//         const product = mockProduct({ price_data: { randomness: 'hello' } })
-
-//         act(() => {
-//           cart.current.addItem(product, count)
-//         })
-
-//         expect(cart.current.cartDetails).toHaveProperty(product.id)
-//         const entry = cart.current.cartDetails[product.id]
-
-//         expect(entry.quantity).toBe(count)
-//         expect(entry.value).toBe(product.price * count)
-
-//         totalCount += count
-//         expect(cart.current.cartCount).toBe(totalCount)
-//       }
-//     })
-
-//     it('adds multiple different items to the cart', () => {
-//       const product1 = mockProduct({ price: 400 })
-//       const product2 = mockProduct({ price: 100 })
-
-//       act(() => {
-//         cart.current.addItem(product1)
-//         cart.current.addItem(product2)
-//       })
-
-//       expect(cart.current.cartDetails).toHaveProperty(product1.id)
-//       const entry1 = cart.current.cartDetails[product1.id]
-
-//       expect(entry1.quantity).toBe(1)
-//       expect(entry1.value).toBe(product1.price)
-
-//       expect(cart.current.cartDetails).toHaveProperty(product2.id)
-//       const entry2 = cart.current.cartDetails[product2.id]
-
-//       expect(entry2.quantity).toBe(1)
-//       expect(entry2.value).toBe(product2.price)
-
-//       expect(cart.current.cartCount).toBe(2)
-//       expect(cart.current.totalPrice).toBe(500)
-//     })
-
-//     it('adds multiple of the same item to the cart', () => {
-//       const product = mockProduct({ price: 325 })
-
-//       act(() => {
-//         cart.current.addItem(product)
-//         cart.current.addItem(product)
-//       })
-
-//       expect(cart.current.cartDetails).toHaveProperty(product.id)
-//       const entry = cart.current.cartDetails[product.id]
-
-//       expect(entry.quantity).toBe(2)
-//       expect(entry.value).toBe(650)
-//       expect(entry.formattedValue).toBe('$6.50')
-
-//       expect(cart.current.cartCount).toBe(2)
-//       expect(cart.current.totalPrice).toBe(650)
-//     })
-
-//     it('adds price_data from the metadata object from the 3rd param', () => {
-//       const product = mockProduct()
-
-//       act(() => {
-//         cart.current.addItem(product, 1, {
-//           type: 'tacos',
-//           test: 'testing'
-//         })
-//       })
-
-//       expect(cart.current.cartDetails[product.id].price_data).toStrictEqual({
-//         type: 'tacos',
-//         test: 'testing'
-//       })
-//     })
-
-//     it('successfully stacks data to price_data if there is already content there', () => {
-//       const product = mockProduct({ price_data: { test: 'static metadata' } })
-
-//       act(() => {
-//         cart.current.addItem(product, 1, {
-//           dynamicTest: 'dynamic data'
-//         })
-//       })
-
-//       expect(cart.current.cartDetails[product.id].price_data).toStrictEqual({
-//         test: 'static metadata',
-//         dynamicTest: 'dynamic data'
-//       })
-//     })
-
-//     it('adds product_data from the metadata object from the 4th param', () => {
-//       const product = mockProduct()
-
-//       act(() => {
-//         cart.current.addItem(product, 1, null, {
-//           type: 'tacos',
-//           test: 'testing'
-//         })
-//       })
-
-//       expect(cart.current.cartDetails[product.id].product_data).toStrictEqual({
-//         type: 'tacos',
-//         test: 'testing'
-//       })
-//     })
-
-//     it('successfully stacks data to product_data if there is already content there', () => {
-//       const product = mockProduct({
-//         product_data: { test: 'static metadata' }
-//       })
-
-//       act(() => {
-//         cart.current.addItem(product, 1, null, {
-//           dynamicTest: 'dynamic data'
-//         })
-//       })
-
-//       expect(cart.current.cartDetails[product.id].product_data).toStrictEqual({
-//         test: 'static metadata',
-//         dynamicTest: 'dynamic data'
-//       })
-//     })
 //   })
 
 //   describe('removeItem()', () => {
