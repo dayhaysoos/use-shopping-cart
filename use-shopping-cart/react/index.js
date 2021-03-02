@@ -1,12 +1,8 @@
 import * as React from 'react'
 import { actions, cartInitialState } from '../core/slice'
 import { createShoppingCartStore } from '../core/store'
-import {
-  createDispatchHook,
-  createSelectorHook,
-  Provider,
-  batch
-} from 'react-redux'
+import { createDispatchHook, createSelectorHook, Provider } from 'react-redux'
+import { bindActionCreators } from '@reduxjs/toolkit'
 import { checkoutHandler, filterCart } from '../utilities/old-utils'
 //TODO figure out how to apply formatCurrencyString
 import { formatCurrencyString } from '../core/store'
@@ -37,11 +33,8 @@ export function useShoppingCart(
 ) {
   const dispatch = useDispatch()
   const cartState = useSelector(selector, equalityFn)
-  let cartActions = {}
 
-  // Add action dispatchers
-  for (const key in actions)
-    cartActions[key] = (...args) => dispatch(actions[key](...args))
+  const cartActions = bindActionCreators(actions, dispatch)
 
   const newState = { ...cartState, ...cartActions }
 
