@@ -1,6 +1,6 @@
 module.exports = {
-  title: 'Use Shopping Cart',
-  tagline: 'Shopping Cart State and Logic for Stripe',
+  title: 'USE-SHOPPING-CART',
+  tagline: 'Shopping cart state and logic for Stripe checkout',
   url: 'https://useshoppingcart.com/',
   baseUrl: '/',
   onBrokenLinks: 'throw',
@@ -16,10 +16,22 @@ module.exports = {
       },
       items: [
         {
+          to: 'docs/getting-started',
+          activeBasePath: 'docs/getting-started',
+          label: 'Get Started',
+          position: 'left'
+        },
+        {
           to: 'docs/',
-          activeBasePath: 'docs',
+          activeBasePath: 'docs/',
           label: 'Docs',
           position: 'left'
+        },
+        {
+          to: 'https://github.com/dayhaysoos/use-shopping-cart',
+          activeBasePath: 'docs',
+          label: 'GitHub',
+          position: 'right'
         }
       ]
     },
@@ -30,39 +42,31 @@ module.exports = {
           title: 'Docs',
           items: [
             {
+              label: 'Introduction',
+              to: 'docs/introduction'
+            },
+            {
               label: 'Getting Started',
               to: 'docs/getting-started'
             }
           ]
         },
+        {},
         {
           title: 'Community',
           items: [
             {
-              label: 'Stack Overflow',
-              href: 'https://stackoverflow.com/questions/tagged/docusaurus'
+              label: 'GitHub',
+              href: 'https://github.com/dayhaysoos/use-shopping-cart'
             },
             {
               label: 'Discord',
-              href: 'https://discordapp.com/invite/docusaurus'
-            },
-            {
-              label: 'Twitter',
-              href: 'https://twitter.com/docusaurus'
-            }
-          ]
-        },
-        {
-          title: 'More',
-          items: [
-            {
-              label: 'GitHub',
-              href: 'https://github.com/dayhaysoos/use-shopping-cart'
+              href: 'https://discord.gg/TNQfW4W'
             }
           ]
         }
       ],
-      copyright: `Copyright © ${new Date().getFullYear()} My Project, Inc. Built with Docusaurus.`
+      copyright: `MIT License`
     }
   },
   presets: [
