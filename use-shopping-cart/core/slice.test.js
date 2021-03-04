@@ -329,9 +329,9 @@ describe('setItemQuantity', () => {
 
     const cartDetails = result.cartDetails
 
-    expect(cartDetails[product0.id].quantity).toBe(12)
-    expect(result.cartCount).toBe(16)
-    expect(result.totalPrice).toBe(5800)
+    expect(cartDetails[product0.id].quantity).toBe(10)
+    expect(result.cartCount).toBe(14)
+    expect(result.totalPrice).toBe(5000)
   })
 })
 

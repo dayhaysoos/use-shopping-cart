@@ -73,7 +73,13 @@ const slice = createSlice({
           options: { count }
         } = payload
 
-        return updateQuantity({ state, id, quantity: count })
+        return updateEntry({
+          state,
+          id,
+          count,
+          currency: state.currency,
+          language: state.language
+        })
       },
       prepare: (id, options = { count: 1 }) => {
         return { payload: { id, options } }
@@ -86,7 +92,13 @@ const slice = createSlice({
           options: { count }
         } = payload
 
-        return updateQuantity({ state, id, quantity: -count })
+        return updateEntry({
+          state,
+          id,
+          count: -count,
+          currency: state.currency,
+          language: state.language
+        })
       },
       prepare: (id, options = { count: 1 }) => {
         return { payload: { id, options } }

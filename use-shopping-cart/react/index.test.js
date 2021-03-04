@@ -394,12 +394,12 @@ describe('useShoppingCart()', () => {
 
       act(() => {
         cart.current.addItem(product, { count: 1 })
-        cart.current.setItemQuantity(product.id, 1)
+        cart.current.setItemQuantity(product.id, 5)
       })
       const entry = cart.current.cartDetails[product.id]
 
-      expect(entry.quantity).toBe(2)
-      expect(entry.value).toBe(product.price * 2)
+      expect(entry.quantity).toBe(5)
+      expect(entry.value).toBe(product.price * 5)
     })
 
     it('removes the item when quantity is set to 0', () => {
