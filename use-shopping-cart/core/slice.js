@@ -24,14 +24,33 @@ const slice = createSlice({
       reducer: (state, { payload }) => {
         const {
           product,
+          options,
           options: { count, price_metadata, product_metadata }
         } = payload
 
+        const id =
+          product.id ||
+          product.price_id ||
+          product.sku_id ||
+          product.sku ||
+          uuidv4()
         if (count <= 0) return
 
-        if (payload?.id in state.cartDetails) {
+        if (id in state.cartDetails) {
           return updateEntry({
-            id: payload.id,
+            state,
+            id,
+            count,
+            price_metadata,
+            product_metadata,
+            currency: state.currency,
+            language: state.language
+          })
+        } else {
+          return createEntry({
+            ...state,
+            state,
+            product,
             count,
             price_metadata,
             product_metadata,
@@ -39,17 +58,6 @@ const slice = createSlice({
             language: state.language
           })
         }
-
-        return createEntry({
-          ...state,
-          state,
-          product,
-          count,
-          price_metadata,
-          product_metadata,
-          currency: state.currency,
-          language: state.language
-        })
       },
       prepare: (product, options = { count: 1 }) => {
         if (!options.price_metadata) options.price_metadata = {}
@@ -94,10 +102,14 @@ const slice = createSlice({
     setItemQuantity: {
       reducer: (state, { payload }) => {
         const { id, quantity } = payload
-        if (quantity < 0) return
 
-        if (id in state.cartDetails)
+        if (quantity <= 0) {
+          return removeEntry({ state, id })
+        }
+
+        if (id in state.cartDetails) {
           return updateQuantity({ ...state, state, id, quantity })
+        }
       },
       prepare: (id, quantity = 1) => {
         return { payload: { id, quantity } }
@@ -159,6 +171,9 @@ const slice = createSlice({
     },
     handleCloseCart: (state) => {
       state.shouldDisplayCart = false
+    },
+    storeLastClicked: (state, { payload }) => {
+      state.lastClicked = payload
     }
   }
 })
