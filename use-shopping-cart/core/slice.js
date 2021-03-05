@@ -5,7 +5,6 @@ import { checkoutHandler } from '../utilities/old-utils'
 
 export const cartInitialState = {
   mode: 'checkout-session',
-  stripe: null,
   currency: 'USD',
   language: isClient ? navigator.language : 'en-US',
   lastClicked: '',
@@ -13,7 +12,8 @@ export const cartInitialState = {
   cartCount: 0,
   totalPrice: 0,
   formattedTotalPrice: '$0.00',
-  cartDetails: {}
+  cartDetails: {},
+  stripe: ''
 }
 
 const slice = createSlice({
@@ -152,17 +152,10 @@ const slice = createSlice({
         return { payload: { cartDetails, shouldMerge } }
       }
     },
-    // TODO: discuss solutions to this. The two following actions do not redirect to checkout.
     redirectToCheckout: {
       reducer: (state) => {
         return state
       }
-      // checkoutHandler(state, {
-      //   modes: ['client-only', 'checkout-session'],
-      //   stripe(stripe, options) {
-      //     return stripe.redirectToCheckout(options)
-      //   }
-      // })
     },
     checkoutSingleItem: {
       reducer: (state) => {
@@ -186,6 +179,9 @@ const slice = createSlice({
     },
     storeLastClicked: (state, { payload }) => {
       state.lastClicked = payload
+    },
+    initializeStripe: (state, { payload }) => {
+      state.stripe = payload
     }
   }
 })
