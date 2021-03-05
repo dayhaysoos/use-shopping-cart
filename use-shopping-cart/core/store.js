@@ -1,6 +1,7 @@
 import { configureStore } from '@reduxjs/toolkit'
 import { reducer, actions, cartInitialState } from './slice'
 import { isClient } from '../utilities/SSR'
+import { handleStripe } from './stripe-middleware'
 
 export const formatCurrencyString = ({
   value,
@@ -31,6 +32,8 @@ export { reducer, actions }
 export function createShoppingCartStore(options) {
   return configureStore({
     reducer,
-    preloadedState: { ...cartInitialState, ...options }
+    preloadedState: { ...cartInitialState, ...options },
+    middleware: (getDefaultMiddleware) =>
+      getDefaultMiddleware().concat(handleStripe)
   })
 }
