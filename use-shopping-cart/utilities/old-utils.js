@@ -25,31 +25,29 @@ export const formatCurrencyString = ({
   return numberFormat.format(value.toFixed(2))
 }
 
-export const getCheckoutData = {
-  stripe(cart) {
-    const lineItems = []
-    for (const sku in cart.cartDetails)
-      lineItems.push({ price: sku, quantity: cart.cartDetails[sku].quantity })
+export const getCheckoutData = (cart) => {
+  const lineItems = []
+  for (const sku in cart.cartDetails)
+    lineItems.push({ price: sku, quantity: cart.cartDetails[sku].quantity })
 
-    const options = {
-      mode: 'payment',
-      lineItems,
-      successUrl: cart.successUrl,
-      cancelUrl: cart.cancelUrl,
-      billingAddressCollection: cart.billingAddressCollection
-        ? 'required'
-        : 'auto',
-      submitType: 'auto'
-    }
-
-    if (cart.allowedCountries?.length) {
-      options.shippingAddressCollection = {
-        allowedCountries: cart.allowedCountries
-      }
-    }
-
-    return options
+  const options = {
+    mode: 'payment',
+    lineItems,
+    successUrl: cart.successUrl,
+    cancelUrl: cart.cancelUrl,
+    billingAddressCollection: cart.billingAddressCollection
+      ? 'required'
+      : 'auto',
+    submitType: 'auto'
   }
+
+  if (cart.allowedCountries?.length) {
+    options.shippingAddressCollection = {
+      allowedCountries: cart.allowedCountries
+    }
+  }
+
+  return options
 }
 
 export function checkoutHandler(cart, checkoutOptions) {
