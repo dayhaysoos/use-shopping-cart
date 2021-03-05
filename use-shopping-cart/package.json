@@ -24,7 +24,7 @@
       "import": "./dist/core.es.js",
       "browser": "./dist/core.umd.js"
     },
-    "./serverless": {
+    "./utilities": {
       "require": "./utilities/serverless.js",
       "node": "./utilities/serverless.js"
     }

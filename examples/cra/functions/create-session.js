@@ -6,9 +6,8 @@
  */
 
 const stripe = require('stripe')(process.env.REACT_APP_STRIPE_API_SECRET)
-const validateCartItems = require('use-shopping-cart/src/serverUtil')
+const validateCartItems = require('use-shopping-cart/utilities')
   .validateCartItems
-
 /*
  * Product data can be loaded from anywhere. In this case, we’re loading it from
  * a local JSON file, but this could also come from an async call to your
