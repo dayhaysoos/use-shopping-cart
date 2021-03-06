@@ -45,7 +45,7 @@ export function AddItem({ product }) {
           Add to cart
         </button>
         <button
-          onClick={() => addItem(product, 10)}
+          onClick={() => addItem(product, { count: 10 })}
           aria-label={`Add 10 ${product.name} to your cart`}
           style={{ height: 50, width: 100, marginBottom: 30 }}
         >
