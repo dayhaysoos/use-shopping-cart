@@ -2,6 +2,17 @@ import { configureStore } from '@reduxjs/toolkit'
 import { reducer, actions, cartInitialState } from './slice'
 import { isClient } from '../utilities/SSR'
 import { handleStripe } from './stripe-middleware'
+import {
+  persistStore,
+  persistReducer,
+  FLUSH,
+  REHYDRATE,
+  PAUSE,
+  PERSIST,
+  PURGE,
+  REGISTER
+} from 'redux-persist'
+import storage from 'redux-persist/lib/storage'
 
 export const formatCurrencyString = ({
   value,
@@ -29,11 +40,24 @@ export const formatCurrencyString = ({
 }
 
 export { reducer, actions }
+
 export function createShoppingCartStore(options) {
+  const persistConfig = {
+    key: 'root',
+    version: 1,
+    storage
+  }
+
+  const persistedReducer = persistReducer(persistConfig, reducer)
+
   return configureStore({
-    reducer,
+    reducer: persistedReducer,
     preloadedState: { ...cartInitialState, ...options },
     middleware: (getDefaultMiddleware) =>
-      getDefaultMiddleware().concat(handleStripe)
+      getDefaultMiddleware({
+        serializableCheck: {
+          ignoredActions: [FLUSH, REHYDRATE, PAUSE, PERSIST, PURGE, REGISTER]
+        }
+      }).concat(handleStripe)
   })
 }

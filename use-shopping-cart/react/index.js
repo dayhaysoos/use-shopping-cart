@@ -3,9 +3,11 @@ import { actions, cartInitialState } from '../core/slice'
 import { createShoppingCartStore } from '../core/store'
 import { createDispatchHook, createSelectorHook, Provider } from 'react-redux'
 import { bindActionCreators } from '@reduxjs/toolkit'
-import { checkoutHandler, filterCart } from '../utilities/old-utils'
+import { filterCart } from '../utilities/old-utils'
 //TODO figure out how to apply formatCurrencyString
 import { formatCurrencyString } from '../core/store'
+import { PersistGate } from 'redux-persist/integration/react'
+import { persistStore } from 'redux-persist'
 
 export { actions, filterCart, formatCurrencyString }
 export const CartContext = React.createContext(cartInitialState)
@@ -14,10 +16,20 @@ export const useDispatch = createDispatchHook(CartContext)
 
 export function CartProvider({ children, ...props }) {
   const store = React.useMemo(() => createShoppingCartStore(props), [props])
+  const persistor = persistStore(store)
 
   return (
     <Provider context={CartContext} store={store}>
-      {children}
+      <PersistGate
+        persistor={persistor}
+        children={(bootstrapped) => {
+          if (!bootstrapped) {
+            return <h1>Loading . . . </h1>
+          }
+
+          return children
+        }}
+      />
     </Provider>
   )
 }
