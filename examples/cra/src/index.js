@@ -6,12 +6,10 @@ import { CartProvider } from 'use-shopping-cart'
 import './index.css'
 import App from './App'
 
-const stripePromise = loadStripe(process.env.REACT_APP_STRIPE_API_PUBLIC)
-
 ReactDOM.render(
   <CartProvider
     mode="checkout-session"
-    stripe={stripePromise}
+    stripe={process.env.REACT_APP_STRIPE_API_PUBLIC}
     billingAddressCollection={false}
     successUrl="https://stripe.com"
     cancelUrl="https://twitter.com/dayhaysoos"
