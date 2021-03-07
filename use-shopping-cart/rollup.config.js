@@ -40,7 +40,7 @@ export default [
   },
   {
     input: './core/store.js',
-    external: ['@reduxjs/toolkit', 'uuid'],
+    external: ['uuid'],
     output: [
       {
         file: pkg.exports['./core'].require,
@@ -61,8 +61,7 @@ export default [
         sourcemap: true,
         globals: {
           react: 'React',
-          uuid: 'uuid',
-          '@reduxjs/toolkit': '@reduxjs/toolkit'
+          uuid: 'uuid'
         }
       }
     ],
