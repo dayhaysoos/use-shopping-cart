@@ -61,3 +61,8 @@ export function createShoppingCartStore(options) {
       }).concat(handleStripe)
   })
 }
+
+// for non react apps
+export function createPersistedStore(store) {
+  return persistStore(store)
+}
