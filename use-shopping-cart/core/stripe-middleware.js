@@ -26,6 +26,6 @@ export const handleStripe = (store) => (next) => async (action) => {
   try {
     return next(action)
   } catch (error) {
-    console.error('Error:', err)
+    console.error('Error:', error)
   }
 }
