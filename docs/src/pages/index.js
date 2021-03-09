@@ -8,32 +8,32 @@ import styles from './styles.module.css'
 
 const features = [
   {
-    title: 'Easy to Use',
-    imageUrl: 'img/undraw_docusaurus_mountain.svg',
+    title: 'Security first',
+    imageUrl: 'img/padlock.svg',
     description: (
       <>
-        Docusaurus was designed from the ground up to be easily installed and
-        used to get your website up and running quickly.
+        Backed by world class payment solutions from Stripe you can be sure your
+        transactions are secure and trusted.
       </>
     )
   },
   {
-    title: 'Focus on What Matters',
-    imageUrl: 'img/undraw_docusaurus_tree.svg',
+    title: 'Developer friendly API',
+    imageUrl: 'img/api.svg',
     description: (
       <>
-        Docusaurus lets you focus on your docs, and we&apos;ll do the chores. Go
-        ahead and move your docs into the <code>docs</code> directory.
+        Abstract away the complexity of working with Stripe so that you can
+        focus on products your customers will love!
       </>
     )
   },
   {
-    title: 'Powered by React',
-    imageUrl: 'img/undraw_docusaurus_react.svg',
+    title: 'Framework agnostic',
+    imageUrl: 'img/beaker.svg',
     description: (
       <>
-        Extend or customize your website layout by reusing React. Docusaurus can
-        be extended while reusing the same header and footer.
+        Whether you are using React, Vue, Svelte or any other framework
+        Use-Shopping-Cart has got your back!
       </>
     )
   }
@@ -44,7 +44,7 @@ function Feature({ imageUrl, title, description }) {
   return (
     <div className={clsx('col col--4', styles.feature)}>
       {imgUrl && (
-        <div className="text--center">
+        <div className={clsx('text--center', styles.featureImg)}>
           <img className={styles.featureImage} src={imgUrl} alt={title} />
         </div>
       )}
@@ -57,6 +57,7 @@ function Feature({ imageUrl, title, description }) {
 function Home() {
   const context = useDocusaurusContext()
   const { siteConfig = {} } = context
+  const logo = useBaseUrl('img/logo-512.png')
   return (
     <Layout
       title={`${siteConfig.title}`}
@@ -64,12 +65,23 @@ function Home() {
     >
       <header className={clsx('hero hero--primary', styles.heroBanner)}>
         <div className="container">
+          <img
+            className={styles.heroLogo}
+            src={logo}
+            alt="Use-Shopping-Cart logo"
+          />
+
           <h1 className="hero__title">{siteConfig.title}</h1>
           <p className="hero__subtitle">{siteConfig.tagline}</p>
+          <p>
+            <code className={styles.heroCode}>
+              npm install use-shopping-cart
+            </code>
+          </p>
           <div className={styles.buttons}>
             <Link
               className={clsx(
-                'button button--outline button--secondary button--lg',
+                'button button--primary button--lg',
                 styles.getStarted
               )}
               to={useBaseUrl('docs/')}

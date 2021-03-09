@@ -5,16 +5,52 @@
  * and scoped locally.
  */
 
+:root {
+  --usc-green-dark: #0d603d;
+  --usc-green-light: #3dcf91;
+  --usc-blue-dark: #32325c;
+  --usc-blue-light: #6672e2;
+  --usc-orange: #fe9f5d;
+}
+
 .heroBanner {
   padding: 4rem 0;
   text-align: center;
   position: relative;
   overflow: hidden;
+  background-image: linear-gradient(120deg, #84fab0 0%, #8fd3f4 100%);
+  color: var(--usc-blue-dark);
+}
+
+.heroLogo {
+  height: 200px;
+  width: 200px;
+}
+
+.heroCode {
+  font-size: 1.125rem;
 }
 
 @media screen and (max-width: 966px) {
   .heroBanner {
     padding: 2rem;
+  }
+  .heroLogo {
+    height: 150px;
+    width: 150px;
+  }
+}
+
+@media screen and (max-width: 480px) {
+  .heroLogo {
+    height: 120px;
+    width: 120px;
+  }
+  .heroCode {
+    font-size: 1rem;
+  }
+  .heroBanner {
+    padding: 2rem 1rem;
   }
 }
 
@@ -27,11 +63,15 @@
 .features {
   display: flex;
   align-items: center;
-  padding: 2rem 0;
+  padding: 6rem 0;
   width: 100%;
+  text-align: center;
 }
 
 .featureImage {
-  height: 200px;
-  width: 200px;
+  height: 80px;
+  width: 80px;
+  border-radius: 50%;
+  padding: 1rem;
+  background-color: var(--usc-green-light);
 }

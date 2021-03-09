@@ -7,14 +7,19 @@
 
 /* You can override the default Infima variables here. */
 :root {
-  --ifm-color-primary: #25c2a0;
-  --ifm-color-primary-dark: rgb(33, 175, 144);
-  --ifm-color-primary-darker: rgb(31, 165, 136);
-  --ifm-color-primary-darkest: rgb(26, 136, 112);
-  --ifm-color-primary-light: rgb(70, 203, 174);
-  --ifm-color-primary-lighter: rgb(102, 212, 189);
-  --ifm-color-primary-lightest: rgb(146, 224, 208);
+  --ifm-color-primary: #6672e2;
+  --ifm-color-primary-dark: #6835b7;
+  --ifm-color-primary-darker: #7a1687;
+  --ifm-color-primary-darkest: #770087;
+  --ifm-color-primary-light: #977df5;
+  --ifm-color-primary-lighter: #cf9fff;
+  --ifm-color-primary-lightest: #f7cfff;
   --ifm-code-font-size: 95%;
+  --usc-green-dark: #0d603d;
+  --usc-green-light: #3dcf91;
+  --usc-blue-dark: #32325c;
+  --usc-blue-light: #6672e2;
+  --usc-orange: #fe9f5d;
 }
 
 .docusaurus-highlight-code-line {
@@ -22,4 +27,13 @@
   display: block;
   margin: 0 calc(-1 * var(--ifm-pre-padding));
   padding: 0 var(--ifm-pre-padding);
+}
+
+.navbar__link:hover,
+.navbar__link:active,
+.navbar__link:focus {
+  text-decoration: underline;
+  background-color: var(--ifm-color-primary-lightest);
+  border-radius: 6px;
+  transition: all 0.3s;
 }
