@@ -3,14 +3,14 @@ title: DebugCart
 id: debug-cart
 ---
 
-<!-- // import CartDisplayWrapper from '../../src/components/cart-display-wrapper'
-// import DebugCartExample from '../../src/components/debug-cart-example' -->
+import CartDisplayWrapper from '../../src/components/cart-display-wrapper'
+import DebugCartExample from '../../src/components/debug-cart-example'
 
 If you ever need to quickly see the properties and values that `useShoppingCart()` has at a given moment, you can use the `DebugCart` component. It will display a table of all of the properties — not methods — and let you log any objects to the console.
 
 When using this component, you still must have `<CartProvider>` wrapped around your application. See [the documentation for CartProvider](docs/usage/cart-provider) if you don't know how to do that.
 
-{/_ <DebugCartExample /> _/}
+<DebugCartExample />
 
 ```jsx
 import { DebugCart } from 'use-shopping-cart'
