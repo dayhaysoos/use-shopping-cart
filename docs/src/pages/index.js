@@ -183,6 +183,21 @@ function Home() {
               alt="Image of the backend of the website"
             />
           </div>
+          <div className={styles.codeCTA}>
+            <Link
+              className={clsx('button button--primary button--lg')}
+              to="https://github.com/dayhaysoos/use-shopping-cart/tree/master/examples"
+            >
+              Checkout full examples
+            </Link>
+          </div>
+        </section>
+        <section className={styles.creditSection}>
+          <p>
+            Built with ❤️ by{' '}
+            <a href="https://github.com/dayhaysoos">Nick DeJesus</a> and{' '}
+            <a href="/docs/contributors">contributors</a>
+          </p>
         </section>
       </main>
     </Layout>

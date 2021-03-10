@@ -94,6 +94,22 @@
   margin: 0 auto;
 }
 
+.codeCTA {
+  display: grid;
+  place-items: center;
+}
+
+.creditSection {
+  margin: 6rem 1rem;
+  display: grid;
+  place-items: center;
+}
+
+.creditSection p {
+  font-size: 1.25rem;
+  color: var(--usc-blue-dark);
+}
+
 @media screen and (max-width: 966px) {
   .heroBanner {
     padding: 2rem;
