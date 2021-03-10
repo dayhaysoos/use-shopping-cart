@@ -31,33 +31,14 @@
   font-size: 1.125rem;
 }
 
-@media screen and (max-width: 966px) {
-  .heroBanner {
-    padding: 2rem;
-  }
-  .heroLogo {
-    height: 150px;
-    width: 150px;
-  }
-}
-
-@media screen and (max-width: 480px) {
-  .heroLogo {
-    height: 120px;
-    width: 120px;
-  }
-  .heroCode {
-    font-size: 1rem;
-  }
-  .heroBanner {
-    padding: 2rem 1rem;
-  }
-}
-
 .buttons {
   display: flex;
   align-items: center;
   justify-content: center;
+}
+
+.row {
+  margin-bottom: 6rem;
 }
 
 .features {
@@ -74,4 +55,53 @@
   border-radius: 50%;
   padding: 1rem;
   background-color: var(--usc-green-light);
+}
+
+.codeSection {
+  margin: 1rem;
+}
+
+.codeWrapper {
+  display: grid;
+  place-items: center;
+  margin-bottom: 6rem;
+}
+
+.codeText {
+  text-align: center;
+}
+
+.codeText h2 {
+  font-size: 3rem;
+}
+
+.codeText p {
+  max-width: 450px;
+  margin: 0 auto;
+}
+
+@media screen and (max-width: 966px) {
+  .heroBanner {
+    padding: 2rem;
+  }
+  .heroLogo {
+    height: 150px;
+    width: 150px;
+  }
+  .row {
+    margin-bottom: 0rem;
+  }
+}
+
+@media screen and (max-width: 480px) {
+  .heroLogo {
+    height: 120px;
+    width: 120px;
+  }
+  .heroCode {
+    font-size: 1rem;
+  }
+  .heroBanner {
+    padding: 2rem 1rem;
+  }
 }

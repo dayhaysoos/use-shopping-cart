@@ -32,7 +32,7 @@
 .navbar__link:hover,
 .navbar__link:active,
 .navbar__link:focus {
-  text-decoration: underline;
+  color: var(--ifm-color-primary-darkest);
   background-color: var(--ifm-color-primary-lightest);
   border-radius: 6px;
   transition: all 0.3s;
