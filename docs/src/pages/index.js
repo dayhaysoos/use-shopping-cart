@@ -51,7 +51,7 @@ const featuresRowTwo = [
     )
   },
   {
-    title: 'Jamstack Friendly',
+    title: 'Jamstack harmonized',
     imageUrl: 'img/music.svg',
     description: (
       <>
