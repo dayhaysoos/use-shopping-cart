@@ -58,7 +58,8 @@
 }
 
 .codeSection {
-  margin: 1rem;
+  padding: 4rem 1rem;
+  background-color: #abeacf;
 }
 
 .codeWrapper {
@@ -72,7 +73,20 @@
 }
 
 .codeText h2 {
-  font-size: 3rem;
+  font-size: 2.5rem;
+  text-transform: uppercase;
+  color: var(--usc-blue-dark);
+}
+
+.codeText h2:after {
+  display: block;
+  content: '';
+  width: 80px;
+  padding-top: 0.5rem;
+  border-bottom-style: solid;
+  border-bottom-color: green;
+  border-bottom-width: 6px;
+  margin: 0 auto;
 }
 
 .codeText p {
