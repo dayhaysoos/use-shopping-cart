@@ -40,6 +40,7 @@ const slice = createSlice({
             'addItem requires the count to be greater than zero.',
             action
           )
+          return
         }
 
         if (id in state.cartDetails) {
