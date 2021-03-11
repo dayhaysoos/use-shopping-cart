@@ -27,6 +27,33 @@ function mockProduct(overrides) {
   }
 }
 
+function mockCartDetails(overrides1, overrides2) {
+  return {
+    [`id_abc${counter}`]: {
+      id: `id_abc${counter++}`,
+      name: 'Bananas',
+      image: 'https://blah.com/banana.avif',
+      price: 400,
+      currency: 'USD',
+      value: 800,
+      quantity: 2,
+      formattedValue: '$8.00',
+      ...overrides1
+    },
+    [`id_efg${counter}`]: {
+      id: `id_efg${counter++}`,
+      name: 'Oranges',
+      image: 'https://blah.com/orange.avif',
+      currency: 'USD',
+      price: 250,
+      value: 1000,
+      quantity: 4,
+      formattedValue: '$10.00',
+      ...overrides2
+    }
+  }
+}
+
 afterEach(() => window.localStorage.clear())
 
 const stripeMock = {
@@ -203,8 +230,10 @@ describe('useShoppingCart()', () => {
       const product = mockProduct({ price_data: { test: 'static metadata' } })
 
       act(() => {
-        cart.current.addItem(product, 1, {
-          dynamicTest: 'dynamic data'
+        cart.current.addItem(product, {
+          price_metadata: {
+            dynamicTest: 'dynamic data'
+          }
         })
       })
 
@@ -236,15 +265,232 @@ describe('useShoppingCart()', () => {
       })
 
       act(() => {
-        cart.current.addItem(product, 1, null, {
-          dynamicTest: 'dynamic data'
+        cart.current.addItem(product)
+        cart.current.addItem(product, {
+          product_metadata: {
+            dynamicTest: 'dynamic product data'
+          }
         })
       })
 
       expect(cart.current.cartDetails[product.id].product_data).toStrictEqual({
         test: 'static metadata',
-        dynamicTest: 'dynamic data'
+        dynamicTest: 'dynamic product data'
       })
+    })
+  })
+
+  describe('removeItem()', () => {
+    it('removes the item from the cart', () => {
+      const product = mockProduct()
+
+      act(() => {
+        cart.current.addItem(product)
+        cart.current.removeItem(product.id)
+      })
+
+      expect(cart.current.cartDetails).not.toHaveProperty(product.id)
+    })
+
+    it('should remove correct item', () => {
+      const product1 = mockProduct()
+      const product2 = mockProduct()
+
+      act(() => {
+        cart.current.addItem(product1)
+        cart.current.addItem(product2)
+        cart.current.removeItem(product1.id)
+      })
+
+      expect(cart.current.cartDetails).not.toHaveProperty(product1.id)
+      expect(cart.current.cartDetails).toHaveProperty(product2.id)
+    })
+  })
+
+  describe('incrementItem()', () => {
+    it('adds one more of that product to the cart', () => {
+      const product = mockProduct()
+
+      act(() => {
+        cart.current.addItem(product)
+        cart.current.incrementItem(product.id)
+      })
+
+      expect(cart.current.cartDetails).toHaveProperty(product.id)
+      const entry = cart.current.cartDetails[product.id]
+
+      expect(entry.quantity).toBe(2)
+      expect(entry.value).toBe(product.price * 2)
+      expect(cart.current.cartCount).toBe(2)
+    })
+  })
+
+  describe('decrementItem()', () => {
+    it('removes one of that item from the cart', () => {
+      const product = mockProduct({ price: 256 })
+
+      act(() => {
+        cart.current.addItem(product, { count: 3 })
+        cart.current.decrementItem(product.id)
+      })
+
+      expect(cart.current.cartDetails).toHaveProperty(product.id)
+      const entry = cart.current.cartDetails[product.id]
+
+      expect(entry.quantity).toBe(2)
+      expect(entry.value).toBe(512)
+      expect(entry.formattedValue).toBe('$5.12')
+
+      expect(cart.current.cartCount).toBe(2)
+      expect(cart.current.totalPrice).toBe(512)
+    })
+
+    it.todo('removes `count` amount of that item from the cart')
+
+    it('removes the item from the cart if the quantity reaches 0', () => {
+      const product = mockProduct()
+
+      act(() => {
+        cart.current.addItem(product)
+        cart.current.decrementItem(product.id)
+      })
+
+      expect(cart.current.cartDetails).not.toHaveProperty(product.id)
+      expect(cart.current.totalPrice).toBe(0)
+      expect(cart.current.cartCount).toBe(0)
+    })
+
+    it('does not let you have negative quantities', () => {
+      const product = mockProduct()
+
+      act(() => {
+        cart.current.addItem(product)
+        cart.current.decrementItem(product.id, { count: 5 })
+      })
+
+      expect(cart.current.cartDetails).not.toHaveProperty(product.id)
+      expect(cart.current.totalPrice).toBe(0)
+      expect(cart.current.cartCount).toBe(0)
+    })
+
+    it('should decrement correct item', () => {
+      const product1 = mockProduct()
+      const product2 = mockProduct()
+
+      act(() => {
+        cart.current.addItem(product1, { count: 2 })
+        cart.current.addItem(product2, { count: 4 })
+        cart.current.decrementItem(product2.id)
+      })
+
+      expect(cart.current.cartDetails[product1.id].quantity).toBe(2)
+      expect(cart.current.cartDetails[product2.id].quantity).toBe(3)
+    })
+  })
+
+  describe('setItemQuantity()', () => {
+    it('updates the quantity correctly', () => {
+      const product = mockProduct()
+
+      act(() => {
+        cart.current.addItem(product, { count: 1 })
+        cart.current.setItemQuantity(product.id, 5)
+      })
+      const entry = cart.current.cartDetails[product.id]
+
+      expect(entry.quantity).toBe(5)
+      expect(entry.value).toBe(product.price * 5)
+    })
+
+    it('removes the item when quantity is set to 0', () => {
+      const product = mockProduct()
+
+      act(() => {
+        cart.current.addItem(product, { count: 10 })
+        cart.current.setItemQuantity(product.id, 0)
+      })
+
+      expect(cart.current.cartDetails).not.toHaveProperty(product.id)
+    })
+  })
+
+  describe('persistence', () => {
+    it.todo('Actually do persistance things')
+  })
+
+  describe('loadCart()', () => {
+    it('should add cartDetails to cart object', async () => {
+      const wrapper = createWrapper()
+      const cart = renderHook(() => useShoppingCart((state) => state), {
+        wrapper
+      }).result
+      const cartDetails = mockCartDetails()
+      const product = mockProduct({ price: 200 })
+
+      act(() => {
+        cart.current.addItem(product)
+        cart.current.loadCart(cartDetails, false)
+      })
+
+      const itemId1 = Object.keys(cartDetails)[0]
+      const itemId2 = Object.keys(cartDetails)[1]
+
+      expect(cart.current.cartDetails).toEqual({
+        [itemId1]: {
+          ...cartDetails[itemId1],
+          id: itemId1
+        },
+        [itemId2]: {
+          ...cartDetails[itemId2],
+          id: itemId2
+        }
+      })
+      expect(cart.current.totalPrice).toEqual(1800)
+      expect(cart.current.cartCount).toEqual(6)
+    })
+
+    it('should merge two cart details items by default', async () => {
+      const wrapper = createWrapper()
+      const cart = renderHook(() => useShoppingCart((state) => state), {
+        wrapper
+      }).result
+
+      const cartDetails = mockCartDetails()
+      const product = mockProduct({ price: 200 })
+
+      act(() => {
+        cart.current.addItem(product)
+        cart.current.incrementItem(product.id)
+        cart.current.loadCart(cartDetails)
+      })
+
+      const itemId1 = Object.keys(cartDetails)[0]
+      const itemId2 = Object.keys(cartDetails)[1]
+
+      const entry = cart.current.cartDetails[product.id]
+      expect(cart.current.cartDetails).toEqual({
+        [entry.id]: entry,
+        [itemId1]: {
+          ...cartDetails[itemId1],
+          id: itemId1
+        },
+        [itemId2]: {
+          ...cartDetails[itemId2],
+          id: itemId2
+        }
+      })
+      expect(cart.current.totalPrice).toEqual(2200)
+      expect(cart.current.cartCount).toEqual(8)
+    })
+  })
+
+  describe('storeLastClicked()', () => {
+    it(' updates lastClicked', () => {
+      const product = mockProduct()
+      act(() => {
+        cart.current.storeLastClicked(product.id)
+      })
+      expect(cart.current.lastClicked).toBe(product.id)
     })
   })
 })
@@ -259,203 +505,6 @@ describe('useShoppingCart()', () => {
 
 //   it('initial state', () => {
 //     expect(cart.current).toMatchObject(expectedInitialCartState)
-//   })
-
-//   it('storeLastClicked() updates lastClicked', () => {
-//     const product = mockProduct()
-//     act(() => {
-//       cart.current.storeLastClicked(product.id)
-//     })
-//     expect(cart.current.lastClicked).toBe(product.id)
-//   })
-
-//   describe('removeItem()', () => {
-//     it('removes the item from the cart', () => {
-//       const product = mockProduct()
-
-//       act(() => {
-//         cart.current.addItem(product)
-//         cart.current.removeItem(product.id)
-//       })
-
-//       expect(cart.current.cartDetails).not.toHaveProperty(product.id)
-//     })
-
-//     it('should remove correct item', () => {
-//       const product1 = mockProduct()
-//       const product2 = mockProduct()
-
-//       act(() => {
-//         cart.current.addItem(product1, 2)
-//         cart.current.addItem(product2, 4)
-//         cart.current.removeItem(product1.id)
-//       })
-
-//       expect(cart.current.cartDetails).not.toHaveProperty(product1.id)
-//       expect(cart.current.cartDetails).toHaveProperty(product2.id)
-//     })
-//   })
-
-//   describe('incrementItem()', () => {
-//     it('adds one more of that product to the cart', () => {
-//       const product = mockProduct()
-
-//       act(() => {
-//         cart.current.addItem(product)
-//         cart.current.incrementItem(product.id)
-//       })
-
-//       expect(cart.current.cartDetails).toHaveProperty(product.id)
-//       const entry = cart.current.cartDetails[product.id]
-
-//       expect(entry.quantity).toBe(2)
-//       expect(entry.value).toBe(product.price * 2)
-//       expect(cart.current.cartCount).toBe(2)
-//     })
-
-//     it('adds `count` amount more of that item to the cart', () => {
-//       let totalCount = 0
-//       for (let count = 1; count <= 50; ++count) {
-//         const product = mockProduct()
-
-//         act(() => {
-//           cart.current.addItem(product)
-//           cart.current.incrementItem(product.id, count)
-//         })
-
-//         expect(cart.current.cartDetails).toHaveProperty(product.id)
-//         const entry = cart.current.cartDetails[product.id]
-
-//         const expectedQuantity = count + 1
-//         expect(entry.quantity).toBe(expectedQuantity)
-//         expect(entry.value).toBe(product.price * expectedQuantity)
-
-//         totalCount += expectedQuantity
-//         expect(cart.current.cartCount).toBe(totalCount)
-//       }
-//     })
-//   })
-
-//   describe('decrementItem()', () => {
-//     it('removes one of that item from the cart', () => {
-//       const product = mockProduct({ price: 256 })
-
-//       act(() => {
-//         cart.current.addItem(product, 3)
-//         cart.current.decrementItem(product.id)
-//       })
-
-//       expect(cart.current.cartDetails).toHaveProperty(product.id)
-//       const entry = cart.current.cartDetails[product.id]
-
-//       expect(entry.quantity).toBe(2)
-//       expect(entry.value).toBe(512)
-//       expect(entry.formattedValue).toBe('$5.12')
-
-//       expect(cart.current.cartCount).toBe(2)
-//       expect(cart.current.totalPrice).toBe(512)
-//     })
-
-//     it('removes `count` amount of that item from the cart', () => {
-//       let totalCount = 0
-//       for (let count = 1; count <= 50; ++count) {
-//         const product = mockProduct()
-//         // from count + 1 -> count + 101
-//         const randomNumberAboveCount =
-//           Math.floor(Math.random() * 100) + count + 1
-//         const endQuantity = randomNumberAboveCount - count
-
-//         act(() => {
-//           // add a random number of product to the cart
-//           cart.current.addItem(product, randomNumberAboveCount)
-//           cart.current.decrementItem(product.id, count)
-//         })
-
-//         expect(cart.current.cartDetails).toHaveProperty(product.id)
-//         const entry = cart.current.cartDetails[product.id]
-
-//         expect(entry.quantity).toBe(endQuantity)
-//         expect(entry.value).toBe(endQuantity * product.price)
-
-//         totalCount += endQuantity
-//         expect(cart.current.cartCount).toBe(totalCount)
-//       }
-//     })
-
-//     it('removes the item from the cart if the quantity reaches 0', () => {
-//       const product = mockProduct()
-
-//       act(() => {
-//         cart.current.addItem(product)
-//         cart.current.decrementItem(product.id)
-//       })
-
-//       expect(cart.current.cartDetails).not.toHaveProperty(product.id)
-//       expect(cart.current.totalPrice).toBe(0)
-//       expect(cart.current.cartCount).toBe(0)
-//     })
-
-//     it('does not let you have negative quantities', () => {
-//       const product = mockProduct()
-
-//       act(() => {
-//         cart.current.addItem(product)
-//         cart.current.decrementItem(product.id, 5)
-//       })
-
-//       expect(cart.current.cartDetails).not.toHaveProperty(product.id)
-//       expect(cart.current.totalPrice).toBe(0)
-//       expect(cart.current.cartCount).toBe(0)
-//     })
-
-//     it('should decrement correct item', () => {
-//       const product1 = mockProduct()
-//       const product2 = mockProduct()
-
-//       act(() => {
-//         cart.current.addItem(product1, 2)
-//         cart.current.addItem(product2, 4)
-//         cart.current.decrementItem(product2.id)
-//       })
-
-//       expect(cart.current.cartDetails[product1.id].quantity).toBe(2)
-//       expect(cart.current.cartDetails[product2.id].quantity).toBe(3)
-//     })
-//   })
-
-//   describe('setItemQuantity()', () => {
-//     it('updates the quantity correctly', () => {
-//       let totalCount = 0
-//       for (let quantity = 1; quantity < 50; ++quantity) {
-//         const product = mockProduct()
-//         const startingQuantity = Math.floor(Math.random() * 1000) + 1
-
-//         act(() => {
-//           cart.current.addItem(product, startingQuantity)
-//           cart.current.setItemQuantity(product.id, quantity)
-//         })
-
-//         expect(cart.current.cartDetails).toHaveProperty(product.id)
-//         const entry = cart.current.cartDetails[product.id]
-
-//         expect(entry.quantity).toBe(quantity)
-//         expect(entry.value).toBe(product.price * quantity)
-
-//         totalCount += quantity
-//         expect(cart.current.cartCount).toBe(totalCount)
-//       }
-//     })
-
-//     it('removes the item when quantity is set to 0', () => {
-//       const product = mockProduct()
-
-//       act(() => {
-//         cart.current.addItem(product, 10)
-//         cart.current.setItemQuantity(product.id, 0)
-//       })
-
-//       expect(cart.current.cartDetails).not.toHaveProperty(product.id)
-//     })
 //   })
 
 //   describe('persistence', () => {
@@ -682,98 +731,35 @@ describe('useShoppingCart()', () => {
 //   }
 // }
 
-// describe('loadCart()', () => {
-//   it('should add cartDetails to cart object', async () => {
-//     const wrapper = createWrapper()
-//     const cart = renderHook(() => useShoppingCart((state) => state), { wrapper }).result
-//     const cartDetails = mockCartDetails()
-//     const product = mockProduct({ price: 200 })
+describe('<DebugCart>', () => {
+  beforeAll(() => {
+    const Wrapper = createWrapper()
+    render(
+      <Wrapper>
+        <DebugCart />
+      </Wrapper>
+    )
+  })
 
-//     act(() => {
-//       cart.current.addItem(product)
-//       cart.current.loadCart(cartDetails, false)
-//     })
+  it('should make a table of properties and values from the cart', () => {
+    expect(screen.getByRole('table')).toBeVisible()
 
-//     const itemId1 = Object.keys(cartDetails)[0]
-//     const itemId2 = Object.keys(cartDetails)[1]
+    const { cartDetails, ...others } = expectedInitialCartState
 
-//     expect(cart.current.cartDetails).toEqual({
-//       [itemId1]: {
-//         ...cartDetails[itemId1],
-//         id: itemId1
-//       },
-//       [itemId2]: {
-//         ...cartDetails[itemId2],
-//         id: itemId2
-//       }
-//     })
-//     expect(cart.current.totalPrice).toEqual(1800)
-//     expect(cart.current.cartCount).toEqual(6)
-//   })
+    let cell = screen.getByRole('cell', { name: 'cartDetails' })
+    expect(cell).toBeVisible()
+    expect(
+      getByRole(cell.parentElement, 'button', { name: /log value/i })
+    ).toBeVisible()
 
-//   it('should merge two cart details items by default', async () => {
-//     const wrapper = createWrapper()
-//     const cart = renderHook(() => useShoppingCart((state) => state), { wrapper }).result
-
-//     const cartDetails = mockCartDetails()
-//     const product = mockProduct({ price: 200 })
-
-//     act(() => {
-//       cart.current.addItem(product)
-//       cart.current.incrementItem(product.id)
-//       cart.current.loadCart(cartDetails)
-//     })
-
-//     const itemId1 = Object.keys(cartDetails)[0]
-//     const itemId2 = Object.keys(cartDetails)[1]
-
-//     const entry = cart.current.cartDetails[product.id]
-//     expect(cart.current.cartDetails).toEqual({
-//       [entry.id]: entry,
-//       [itemId1]: {
-//         ...cartDetails[itemId1],
-//         id: itemId1
-//       },
-//       [itemId2]: {
-//         ...cartDetails[itemId2],
-//         id: itemId2
-//       }
-//     })
-//     expect(cart.current.totalPrice).toEqual(2200)
-//     expect(cart.current.cartCount).toEqual(8)
-//   })
-// })
-
-// describe('<DebugCart>', () => {
-//   beforeAll(() => {
-//     const Wrapper = createWrapper()
-//     render(
-//       <Wrapper>
-//         <DebugCart />
-//       </Wrapper>
-//     )
-//   })
-
-//   it('should make a table of properties and values from the cart', () => {
-//     expect(screen.getByRole('table')).toBeVisible()
-
-//     const { cartDetails, ...others } = expectedInitialCartState
-
-//     let cell = screen.getByRole('cell', { name: 'cartDetails' })
-//     expect(cell).toBeVisible()
-//     expect(
-//       getByRole(cell.parentElement, 'button', { name: /log value/i })
-//     ).toBeVisible()
-
-//     for (const name in others) {
-//       cell = screen.getByRole('cell', { name })
-//       expect(cell).toBeVisible()
-//       expect(
-//         getByRole(cell.parentElement, 'cell', {
-//           name: JSON.stringify(others[name])
-//         })
-//       )
-//     }
-//   })
-// })
-//
+    for (const name in others) {
+      cell = screen.getByRole('cell', { name })
+      expect(cell).toBeVisible()
+      expect(
+        getByRole(cell.parentElement, 'cell', {
+          name: JSON.stringify(others[name])
+        })
+      )
+    }
+  })
+})

@@ -7,8 +7,7 @@
 
 const stripe = require('stripe')(process.env.REACT_APP_STRIPE_API_SECRET)
 
-const formatLineItems = require('use-shopping-cart/src/serverUtil')
-  .formatLineItems
+const formatLineItems = require('use-shopping-cart/utilities').formatLineItems
 
 /*
  * Product data can be loaded from anywhere. In this case, we’re loading it from

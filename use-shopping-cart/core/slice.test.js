@@ -9,7 +9,8 @@ const ACTION_TYPES = {
   removeItem: 'cart/removeItem',
   loadCart: 'cart/loadCart',
   handleCartClick: 'cart/handleCartClick',
-  handleCloseCart: 'cart/handleCloseCart'
+  handleCloseCart: 'cart/handleCloseCart',
+  storeLastClicked: 'cart/storeLastClicked'
 }
 
 let counter = 0
@@ -328,9 +329,9 @@ describe('setItemQuantity', () => {
 
     const cartDetails = result.cartDetails
 
-    expect(cartDetails[product0.id].quantity).toBe(12)
-    expect(result.cartCount).toBe(16)
-    expect(result.totalPrice).toBe(5800)
+    expect(cartDetails[product0.id].quantity).toBe(10)
+    expect(result.cartCount).toBe(14)
+    expect(result.totalPrice).toBe(5000)
   })
 })
 
@@ -420,5 +421,23 @@ describe('handleCloseCart', () => {
     )
 
     expect(result.shouldDisplayCart).toBeFalsy()
+  })
+})
+
+describe('storeLastClicked', () => {
+  it('should store id of last clicked item', () => {
+    const mockDetails = mockCartDetails()
+
+    const products = Object.keys(mockDetails).map(
+      (product) => mockDetails[product]
+    )
+    const product0 = products[0]
+
+    const result = reducer(mockDetails, {
+      type: ACTION_TYPES.storeLastClicked,
+      payload: product0.id
+    })
+
+    expect(result.lastClicked).toEqual(product0.id)
   })
 })

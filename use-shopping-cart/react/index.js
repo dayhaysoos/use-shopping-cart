@@ -7,6 +7,8 @@ import {
 } from '../core/store'
 import { bindActionCreators } from '@reduxjs/toolkit'
 import { createDispatchHook, createSelectorHook, Provider } from 'react-redux'
+import { PersistGate } from 'redux-persist/integration/react'
+import { persistStore } from 'redux-persist'
 
 export { actions, filterCart, formatCurrencyString }
 export const CartContext = React.createContext(initialState)
@@ -15,15 +17,20 @@ export const useDispatch = createDispatchHook(CartContext)
 
 export function CartProvider({ children, ...props }) {
   const store = React.useMemo(() => createShoppingCartStore(props), [props])
-
-  React.useEffect(() => {
-    // TODO: Add action and reducer in cart slice for stripe changing. Then, make this use the action creator function.
-    store.dispatch({ type: 'stripe-changed', payload: props.stripe })
-  }, [props.stripe])
+  const persistor = persistStore(store)
 
   return (
-    <Provider context={CartContext} store={store} value={store}>
-      {children}
+    <Provider context={CartContext} store={store}>
+      <PersistGate
+        persistor={persistor}
+        children={(bootstrapped) => {
+          if (!bootstrapped) {
+            return <h1>Loading . . . </h1>
+          }
+
+          return children
+        }}
+      />
     </Provider>
   )
 }

@@ -2,10 +2,10 @@ import { createSlice } from '@reduxjs/toolkit'
 import { createEntry, updateEntry, removeEntry, updateQuantity } from './Entry'
 import { isClient } from '../utilities/SSR'
 import { checkoutHandler } from '../utilities/old-utils'
+import { uuidv4 } from 'uuid'
 
 export const initialState = {
   mode: 'checkout-session',
-  stripe: null,
   currency: 'USD',
   language: isClient ? navigator.language : 'en-US',
   lastClicked: '',
@@ -13,7 +13,8 @@ export const initialState = {
   cartCount: 0,
   totalPrice: 0,
   formattedTotalPrice: '$0.00',
-  cartDetails: {}
+  cartDetails: {},
+  stripe: ''
 }
 
 const slice = createSlice({
@@ -27,6 +28,13 @@ const slice = createSlice({
           options: { count, price_metadata, product_metadata }
         } = action.payload
 
+        const id =
+          product.id ||
+          product.price_id ||
+          product.sku_id ||
+          product.sku ||
+          uuidv4()
+
         if (count <= 0) {
           console.warn(
             'addItem requires the count to be greater than zero.',
@@ -34,9 +42,21 @@ const slice = createSlice({
           )
         }
 
-        if (action.payload.id in state.cartDetails) {
+        if (id in state.cartDetails) {
           return updateEntry({
-            id: action.payload.id,
+            state,
+            id,
+            count,
+            price_metadata,
+            product_metadata,
+            currency: state.currency,
+            language: state.language
+          })
+        } else {
+          return createEntry({
+            ...state,
+            state,
+            product,
             count,
             price_metadata,
             product_metadata,
@@ -44,17 +64,6 @@ const slice = createSlice({
             language: state.language
           })
         }
-
-        return createEntry({
-          ...state,
-          state,
-          product,
-          count,
-          price_metadata,
-          product_metadata,
-          currency: state.currency,
-          language: state.language
-        })
       },
       prepare: (product, options = { count: 1 }) => {
         if (!options.price_metadata) options.price_metadata = {}
@@ -70,7 +79,13 @@ const slice = createSlice({
           options: { count }
         } = payload
 
-        return updateQuantity({ state, id, quantity: count })
+        return updateEntry({
+          state,
+          id,
+          count,
+          currency: state.currency,
+          language: state.language
+        })
       },
       prepare: (id, options = { count: 1 }) => {
         return { payload: { id, options } }
@@ -83,7 +98,13 @@ const slice = createSlice({
           options: { count }
         } = payload
 
-        return updateQuantity({ state, id, quantity: -count })
+        return updateEntry({
+          state,
+          id,
+          count: -count,
+          currency: state.currency,
+          language: state.language
+        })
       },
       prepare: (id, options = { count: 1 }) => {
         return { payload: { id, options } }
@@ -106,6 +127,8 @@ const slice = createSlice({
           )
           return
         }
+
+        if (quantity <= 0) return removeEntry({ state, id })
 
         if (id in state.cartDetails)
           return updateQuantity({ ...state, state, id, quantity })
@@ -146,17 +169,10 @@ const slice = createSlice({
         return { payload: { cartDetails, shouldMerge } }
       }
     },
-    // TODO: discuss solutions to this. The two following actions do not redirect to checkout.
     redirectToCheckout: {
       reducer: (state) => {
         return state
       }
-      // checkoutHandler(state, {
-      //   modes: ['client-only', 'checkout-session'],
-      //   stripe(stripe, options) {
-      //     return stripe.redirectToCheckout(options)
-      //   }
-      // })
     },
     checkoutSingleItem: {
       reducer: (state) => {
@@ -178,6 +194,12 @@ const slice = createSlice({
     },
     handleCloseCart: (state) => {
       state.shouldDisplayCart = false
+    },
+    storeLastClicked: (state, { payload }) => {
+      state.lastClicked = payload
+    },
+    initializeStripe: (state, { payload }) => {
+      state.stripe = payload
     }
   }
 })

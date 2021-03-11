@@ -9,6 +9,7 @@ function Entry({
   price_metadata,
   product_metadata
 }) {
+  quantity = parseInt(quantity)
   const id =
     product.id || product.price_id || product.sku_id || product.sku || uuidv4()
 
@@ -32,7 +33,7 @@ function Entry({
   } else if (productCopy.product_data && product_metadata) {
     productCopy.product_data = {
       ...productCopy.product_data,
-      ...productCopy
+      ...product_metadata
     }
   }
 
@@ -40,16 +41,12 @@ function Entry({
     ...productCopy,
     id,
     quantity,
-    get value() {
-      return this.price * this.quantity
-    },
-    get formattedValue() {
-      return formatCurrencyString({
-        value: this.value,
-        currency,
-        language
-      })
-    }
+    value: product.price * quantity,
+    formattedValue: formatCurrencyString({
+      value: product.price * quantity,
+      currency,
+      language
+    })
   }
 }
 
@@ -72,14 +69,21 @@ export function createEntry({
     currency
   })
 
+  const totalPrice = state.totalPrice + product.price * count
+
   return {
     ...state,
     cartDetails: {
       ...state.cartDetails,
       [entry.id]: entry
     },
-    totalPrice: state.totalPrice + product.price * count,
-    cartCount: state.cartCount + count
+    totalPrice,
+    cartCount: state.cartCount + count,
+    formattedTotalPrice: formatCurrencyString({
+      value: totalPrice,
+      currency,
+      language
+    })
   }
 }
 
@@ -92,6 +96,7 @@ export function updateEntry({
   language,
   state
 }) {
+  count = parseInt(count)
   const cartDetails = { ...state.cartDetails }
 
   const entry = cartDetails[id]
@@ -131,22 +136,64 @@ export function updateEntry({
     currency
   })
 
-  return {
-    ...state,
-    cartDetails,
-    totalPrice: state.totalPrice + entry.price * count,
-    cartCount: state.cartCount + count
-  }
+  state.cartDetails = cartDetails
+  state.totalPrice = state.totalPrice + entry.price * count
+  state.cartCount = state.cartCount + count
+  state.formattedTotalPrice = formatCurrencyString({
+    value: state.totalPrice,
+    currency,
+    language
+  })
 }
 
 export function removeEntry({ state, id }) {
   const cartDetails = state.cartDetails
   state.totalPrice = state.totalPrice - cartDetails[id].value
   state.cartCount = state.cartCount - cartDetails[id].quantity
+  state.formattedTotalPrice = formatCurrencyString({
+    value: state.totalPrice,
+    currency: state.currency,
+    language: state.language
+  })
 
   delete cartDetails[id]
 }
 
-export function updateQuantity({ state, id, quantity }) {
-  return updateEntry({ ...state, state, id, count: quantity })
+export function updateQuantity({ state, id, quantity, language, currency }) {
+  function getNewCartCount(entryQuantity) {
+    const currentCartCount = state.cartCount
+    const currentItemQuantity = state.cartDetails[id].quantity
+
+    return currentCartCount + currentItemQuantity - entryQuantity
+  }
+
+  function getNewTotalPrice(entryValue) {
+    const currentCartTotalPrice = state.totalPrice
+    const currentItemValue = state.cartDetails[id].value
+
+    return currentCartTotalPrice + currentItemValue - entryValue
+  }
+
+  quantity = parseInt(quantity)
+  const cartDetails = {
+    ...state.cartDetails
+  }
+
+  const entry = cartDetails[id]
+
+  state.cartDetails[id] = Entry({
+    product: entry,
+    quantity: entry.quantity + quantity - entry.quantity,
+    language,
+    currency,
+    state
+  })
+
+  state.cartCount = getNewCartCount(entry.quantity)
+  state.totalPrice = getNewTotalPrice(entry.value)
+  state.formattedTotalPrice = formatCurrencyString({
+    value: state.totalPrice,
+    currency,
+    language
+  })
 }

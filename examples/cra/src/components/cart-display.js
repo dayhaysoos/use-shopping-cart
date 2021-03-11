@@ -67,7 +67,7 @@ const CartDisplay = () => {
                 type={'number'}
                 max={99}
                 sx={{ width: 60 }}
-                defaultValue={quantity}
+                value={quantity}
                 onChange={(e) => {
                   const { value } = e.target
                   setItemQuantity(sku, value)

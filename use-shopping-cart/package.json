@@ -1,6 +1,6 @@
 {
   "name": "use-shopping-cart",
-  "version": "2.4.2",
+  "version": "3.0.0-beta.2",
   "description": "Shopping cart state and logic for Stripe",
   "author": "dayhaysoos",
   "license": "MIT",
@@ -24,7 +24,7 @@
       "import": "./dist/core.es.js",
       "browser": "./dist/core.umd.js"
     },
-    "./serverless": {
+    "./utilities": {
       "require": "./utilities/serverless.js",
       "node": "./utilities/serverless.js"
     }
@@ -97,6 +97,7 @@
     "@reduxjs/toolkit": "^1.5.0",
     "react-redux": "^7.2.2",
     "redux-mock-store": "^1.5.4",
+    "redux-persist": "^6.0.0",
     "uuid": "^8.3.1"
   }
 }
