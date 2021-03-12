@@ -2,6 +2,7 @@ import { configureStore } from '@reduxjs/toolkit'
 import { reducer, actions, cartInitialState } from './slice'
 import { isClient } from '../utilities/SSR'
 import { handleStripe } from './stripe-middleware'
+import { handleWarnings } from './warning-middleware'
 import {
   persistStore,
   persistReducer,
@@ -58,7 +59,7 @@ export function createShoppingCartStore(options) {
         serializableCheck: {
           ignoredActions: [FLUSH, REHYDRATE, PAUSE, PERSIST, PURGE, REGISTER]
         }
-      }).concat(handleStripe)
+      }).concat(handleStripe, handleWarnings)
   })
 }
 
