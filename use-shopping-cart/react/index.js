@@ -14,7 +14,7 @@ export const CartContext = React.createContext(cartInitialState)
 export const useSelector = createSelectorHook(CartContext)
 export const useDispatch = createDispatchHook(CartContext)
 
-export function CartProvider({ children, ...props }) {
+export function CartProvider({ loading = null, children, ...props }) {
   const store = React.useMemo(() => createShoppingCartStore(props), [props])
   const persistor = persistStore(store)
 
@@ -24,7 +24,7 @@ export function CartProvider({ children, ...props }) {
         persistor={persistor}
         children={(bootstrapped) => {
           if (!bootstrapped) {
-            return <h1>Loading . . . </h1>
+            return loading
           }
 
           return children
