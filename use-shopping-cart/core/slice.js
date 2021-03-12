@@ -24,7 +24,6 @@ const slice = createSlice({
       reducer: (state, { payload }) => {
         const {
           product,
-          options,
           options: { count, price_metadata, product_metadata }
         } = payload
 
