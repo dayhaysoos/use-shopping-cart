@@ -34,8 +34,8 @@
     "npm": ">=5"
   },
   "scripts": {
-    "test": "cross-env CI=1 SKIP_PREFLIGHT_CHECK=true react-scripts test --env=jsdom",
-    "test:watch": "react-scripts test --env=jsdom",
+    "test": "jest",
+    "test:watch": "jest --watch",
     "build": "rollup -c",
     "start": "rollup -c -w & (yarn workspace use-shopping-cart-cra start)",
     "prepare": "yarn run build",
