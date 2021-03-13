@@ -12,9 +12,5 @@ export const handleWarnings = (store) => (next) => async (action) => {
   } else if (quantity) {
     checkCountType(quantity, action)
   }
-  try {
-    return next(action)
-  } catch (error) {
-    console.error('Error:', error)
-  }
+return next(action)
 }
