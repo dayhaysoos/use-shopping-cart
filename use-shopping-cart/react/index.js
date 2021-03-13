@@ -1,16 +1,17 @@
 import * as React from 'react'
-import { actions, cartInitialState } from '../core/slice'
-import { createShoppingCartStore } from '../core/store'
-import { createDispatchHook, createSelectorHook, Provider } from 'react-redux'
+import { actions, initialState } from '../core/slice'
+import {
+  createShoppingCartStore,
+  formatCurrencyString,
+  filterCart
+} from '../core/store'
 import { bindActionCreators } from '@reduxjs/toolkit'
-import { filterCart } from '../utilities/old-utils'
-//TODO figure out how to apply formatCurrencyString
-import { formatCurrencyString } from '../core/store'
+import { createDispatchHook, createSelectorHook, Provider } from 'react-redux'
 import { PersistGate } from 'redux-persist/integration/react'
 import { persistStore } from 'redux-persist'
 
 export { actions, filterCart, formatCurrencyString }
-export const CartContext = React.createContext(cartInitialState)
+export const CartContext = React.createContext(initialState)
 export const useSelector = createSelectorHook(CartContext)
 export const useDispatch = createDispatchHook(CartContext)
 
@@ -41,12 +42,13 @@ export function useShoppingCart(
   const dispatch = useDispatch()
   const cartState = useSelector(selector, equalityFn)
 
-  const cartActions = bindActionCreators(actions, dispatch)
+  const shoppingCart = React.useMemo(() => {
+    const cartActions = bindActionCreators(actions, dispatch)
+    return { ...cartState, ...cartActions }
+  }, [cartState, dispatch])
 
-  const newState = { ...cartState, ...cartActions }
-
-  React.useDebugValue(newState)
-  return newState
+  React.useDebugValue(shoppingCart)
+  return shoppingCart
 }
 
 export function DebugCart(props) {

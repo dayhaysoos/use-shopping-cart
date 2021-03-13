@@ -1,6 +1,6 @@
 import { configureStore } from '@reduxjs/toolkit'
-import { reducer, actions, cartInitialState } from './slice'
-import { isClient } from '../utilities/SSR'
+import { reducer, actions, initialState } from './slice'
+import { filterCart, formatCurrencyString } from '../utilities/old-utils'
 import { handleStripe } from './stripe-middleware'
 import { handleWarnings } from './warning-middleware'
 import {
@@ -15,33 +15,7 @@ import {
 } from 'redux-persist'
 import storage from 'redux-persist/lib/storage'
 
-export const formatCurrencyString = ({
-  value,
-  currency,
-  language = isClient ? navigator.language : 'en-US'
-}) => {
-  value = parseInt(value)
-  const numberFormat = new Intl.NumberFormat(language, {
-    style: 'currency',
-    currency,
-    currencyDisplay: 'symbol'
-  })
-  const parts = numberFormat.formatToParts(value)
-  let zeroDecimalCurrency = true
-
-  for (const part of parts) {
-    if (part.type === 'decimal') {
-      zeroDecimalCurrency = false
-      break
-    }
-  }
-
-  value = zeroDecimalCurrency ? value : value / 100
-  return numberFormat.format(value.toFixed(2))
-}
-
-export { reducer, actions }
-
+export { reducer, actions, filterCart, formatCurrencyString }
 export function createShoppingCartStore(options) {
   const persistConfig = {
     key: 'root',
@@ -53,7 +27,7 @@ export function createShoppingCartStore(options) {
 
   return configureStore({
     reducer: persistedReducer,
-    preloadedState: { ...cartInitialState, ...options },
+    preloadedState: { ...initialState, ...options },
     middleware: (getDefaultMiddleware) =>
       getDefaultMiddleware({
         serializableCheck: {

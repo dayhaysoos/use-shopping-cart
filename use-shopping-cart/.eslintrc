@@ -24,7 +24,10 @@
     "curly": ["warn", "multi-or-nest"],
     "arrow-parens": "warn",
     "react/prop-types": "off",
-    "object-curly-spacing": ["error", "always"]
+    "object-curly-spacing": ["error", "always"],
+    "camelcase": ["error", {
+      "allow": ["price_metadata", "product_metadata"]
+    }]
   },
   "ignorePatterns": ["*.d.ts"]
 }

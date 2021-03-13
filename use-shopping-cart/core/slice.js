@@ -2,8 +2,9 @@ import { createSlice } from '@reduxjs/toolkit'
 import { createEntry, updateEntry, removeEntry, updateQuantity } from './Entry'
 import { isClient } from '../utilities/SSR'
 import { checkoutHandler } from '../utilities/old-utils'
+import { uuidv4 } from 'uuid'
 
-export const cartInitialState = {
+export const initialState = {
   mode: 'checkout-session',
   currency: 'USD',
   language: isClient ? navigator.language : 'en-US',
@@ -18,14 +19,14 @@ export const cartInitialState = {
 
 const slice = createSlice({
   name: 'cart',
-  initialState: cartInitialState,
+  initialState,
   reducers: {
     addItem: {
-      reducer: (state, { payload }) => {
+      reducer: (state, action) => {
         const {
           product,
           options: { count, price_metadata, product_metadata }
-        } = payload
+        } = action.payload
 
         const id =
           product.id ||
@@ -33,7 +34,14 @@ const slice = createSlice({
           product.sku_id ||
           product.sku ||
           uuidv4()
-        if (count <= 0) return
+
+        if (count <= 0) {
+          console.warn(
+            'addItem requires the count to be greater than zero.',
+            action
+          )
+          return
+        }
 
         if (id in state.cartDetails) {
           return updateEntry({
@@ -111,16 +119,20 @@ const slice = createSlice({
       }
     },
     setItemQuantity: {
-      reducer: (state, { payload }) => {
-        const { id, quantity } = payload
-
-        if (quantity <= 0) {
-          return removeEntry({ state, id })
+      reducer: (state, action) => {
+        const { id, quantity } = action.payload
+        if (quantity < 0) {
+          console.warn(
+            'setItemQuantity requires the quantity to be greater than or equal to zero.',
+            action
+          )
+          return
         }
 
-        if (id in state.cartDetails) {
+        if (quantity <= 0) return removeEntry({ state, id })
+
+        if (id in state.cartDetails)
           return updateQuantity({ ...state, state, id, quantity })
-        }
       },
       prepare: (id, quantity = 1) => {
         return { payload: { id, quantity } }
@@ -133,8 +145,15 @@ const slice = createSlice({
     },
     loadCart: {
       reducer: (state, { payload }) => {
+        // TODO: Figure out how `loadCart` should work when merging.
+        // Right now, if you were to `useEffect(() => loadCart(cartDetailsFromServer), [])`,
+        // your cart would just keep getting bigger on every reload. Also, is merging a good idea?
         const { cartDetails, shouldMerge } = payload
-        if (!shouldMerge) state = { ...cartInitialState }
+        if (!shouldMerge) {
+          state.cartCount = 0
+          state.totalPrice = 0
+          state.cartDetails = {}
+        }
 
         for (const id in cartDetails) {
           const entry = cartDetails[id]
@@ -168,10 +187,11 @@ const slice = createSlice({
       //   }
       // })
     },
+    handleCartHover: (state) => {
+      state.shouldDisplayCart = true
+    },
     handleCartClick: (state) => {
       state.shouldDisplayCart = !state.shouldDisplayCart
-
-      return state
     },
     handleCloseCart: (state) => {
       state.shouldDisplayCart = false
