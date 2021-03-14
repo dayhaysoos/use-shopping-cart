@@ -1,8 +1,7 @@
 import { createSlice } from '@reduxjs/toolkit'
 import { createEntry, updateEntry, removeEntry, updateQuantity } from './Entry'
 import { isClient } from '../utilities/SSR'
-import { checkoutHandler } from '../utilities/old-utils'
-import { uuidv4 } from 'uuid'
+import { v4 as uuidv4 } from 'uuid'
 
 export const initialState = {
   mode: 'checkout-session',
@@ -179,13 +178,6 @@ const slice = createSlice({
       reducer: (state) => {
         return state
       }
-      // checkoutHandler(state, {
-      //   modes: ['client-only'],
-      //   stripe(stripe, options, { sku, quantity = 1 }) {
-      //     options.lineItems = [{ price: sku, quantity }]
-      //     return stripe.redirectToCheckout(options)
-      //   }
-      // })
     },
     handleCartHover: (state) => {
       state.shouldDisplayCart = true
