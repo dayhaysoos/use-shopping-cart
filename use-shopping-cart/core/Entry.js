@@ -1,5 +1,5 @@
 import { formatCurrencyString } from '../utilities/old-utils'
-import { v4 as uuidv4 } from 'uuid'
+import { v4 as uuidv4 } from 'uuid/dist/esm-browser/index.js'
 
 function Entry({
   product,

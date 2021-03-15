@@ -8,7 +8,7 @@ import pkg from './package.json'
 export default [
   {
     input: './react/index.js',
-    external: ['react', 'crypto'],
+    external: ['react'],
     output: [
       {
         file: pkg.exports['.'].require,
@@ -40,7 +40,6 @@ export default [
   },
   {
     input: './core/store.js',
-    external: ['uuid'],
     output: [
       {
         file: pkg.exports['./core'].require,
