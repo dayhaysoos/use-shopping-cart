@@ -25,7 +25,7 @@ export default [
         file: pkg.exports['.'].browser,
         format: 'umd',
         sourcemap: true,
-        globals: { react: 'React', crypto: 'crypto' }
+        globals: { react: 'React' }
       }
     ],
     plugins: [
@@ -59,8 +59,7 @@ export default [
         format: 'umd',
         sourcemap: true,
         globals: {
-          react: 'React',
-          uuid: 'uuid'
+          react: 'React'
         }
       }
     ],
