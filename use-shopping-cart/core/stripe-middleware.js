@@ -18,9 +18,34 @@ export const handleStripe = (store) => (next) => async (action) => {
       })
     }
 
-    if (store.getState().mode === 'client-only') {
+    if (cart.cartMode === 'client-only') {
       const checkoutData = getCheckoutData(cart)
       stripe.redirectToCheckout(checkoutData)
+    }
+  }
+
+  if (action.type === 'cart/checkoutSingleItem') {
+    try {
+      stripe = await loadStripe(stripePublicKey)
+    } catch (error) {
+      console.log('error', error)
+    }
+
+    if (action.payload?.sessionId) {
+      return stripe.redirectToCheckout({
+        sessionId: action.payload.sessionId
+      })
+    }
+
+    if (cart.cartMode === 'client-only') {
+      const productId = action.payload.productId
+      const options = {
+        mode: cart.mode,
+        successUrl: cart.successUrl,
+        cancelUrl: cart.cancelUrl,
+        lineItems: [{ price: productId, quantity: 1 }]
+      }
+      stripe.redirectToCheckout(options)
     }
   }
   try {
