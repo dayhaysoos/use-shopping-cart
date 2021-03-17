@@ -1,4 +1,4 @@
-import { reducer, cartInitialState } from './slice'
+import { reducer, initialState } from './slice'
 
 const ACTION_TYPES = {
   addItem: 'cart/addItem',
@@ -57,7 +57,7 @@ function mockCart(overrides) {
   const mockDetails = mockCartDetails()
 
   return {
-    ...cartInitialState,
+    ...initialState,
     cartDetails: mockDetails,
     cartCount: 6,
     totalPrice: 1800
@@ -66,7 +66,7 @@ function mockCart(overrides) {
 
 describe('cart reducer', () => {
   it('should return initial state', () => {
-    expect(reducer(undefined, {})).toEqual(cartInitialState)
+    expect(reducer(undefined, {})).toEqual(initialState)
   })
 })
 
@@ -74,7 +74,7 @@ describe('addItem', () => {
   it('should handle addItem', () => {
     const product = mockProduct()
 
-    const result = reducer(cartInitialState, {
+    const result = reducer(initialState, {
       type: ACTION_TYPES.addItem,
       payload: {
         product,
@@ -97,7 +97,7 @@ describe('addItem', () => {
 
     const result = reducer(
       {
-        ...cartInitialState,
+        ...initialState,
         // already 6 items in mockCartDetails
         cartCount: 6,
         cartDetails: mockDetails,
@@ -124,7 +124,7 @@ describe('addItem', () => {
   it('should handle adding price_metadata along with added cart item', () => {
     const product = mockProduct()
 
-    const result = reducer(cartInitialState, {
+    const result = reducer(initialState, {
       type: ACTION_TYPES.addItem,
       payload: {
         product,
@@ -143,7 +143,7 @@ describe('addItem', () => {
   it('should handle adding product_metadata along with added cart item', () => {
     const product = mockProduct()
 
-    const result = reducer(cartInitialState, {
+    const result = reducer(initialState, {
       type: ACTION_TYPES.addItem,
       payload: {
         product,
@@ -165,8 +165,8 @@ describe('addItem', () => {
 describe('incrementItem', () => {
   it('should increment a cartItem by 1', () => {
     const mockDetails = mockCartDetails()
-    const initialState = {
-      ...cartInitialState,
+    const mockState = {
+      ...initialState,
       cartDetails: mockDetails,
       cartCount: 6,
       totalPrice: 1800
@@ -178,7 +178,7 @@ describe('incrementItem', () => {
 
     const product0 = products[0]
 
-    const result = reducer(initialState, {
+    const result = reducer(mockState, {
       type: ACTION_TYPES.incrementItem,
       payload: {
         id: products[0].id,
@@ -195,8 +195,8 @@ describe('incrementItem', () => {
 
   it('should increment a cartItem by 2', () => {
     const mockDetails = mockCartDetails()
-    const initialState = {
-      ...cartInitialState,
+    const mockState = {
+      ...initialState,
       cartDetails: mockDetails,
       cartCount: 6,
       totalPrice: 1800
@@ -208,7 +208,7 @@ describe('incrementItem', () => {
 
     const product0 = products[0]
 
-    const result = reducer(initialState, {
+    const result = reducer(mockState, {
       type: ACTION_TYPES.incrementItem,
       payload: {
         id: products[0].id,
@@ -227,8 +227,8 @@ describe('incrementItem', () => {
 describe('decrementItem', () => {
   it('should decrease an item by 1', () => {
     const mockDetails = mockCartDetails()
-    const initialState = {
-      ...cartInitialState,
+    const mockState = {
+      ...initialState,
       cartDetails: mockDetails,
       cartCount: 6,
       totalPrice: 1800
@@ -240,7 +240,7 @@ describe('decrementItem', () => {
 
     const product0 = products[0]
 
-    const result = reducer(initialState, {
+    const result = reducer(mockState, {
       type: ACTION_TYPES.decrementItem,
       payload: {
         id: products[0].id,
@@ -257,8 +257,8 @@ describe('decrementItem', () => {
 
   it('should remove an item when it hits 0 an item by 2', () => {
     const mockDetails = mockCartDetails()
-    const initialState = {
-      ...cartInitialState,
+    const mockState = {
+      ...initialState,
       cartDetails: mockDetails,
       cartCount: 6,
       totalPrice: 1800
@@ -270,7 +270,7 @@ describe('decrementItem', () => {
 
     const product0 = products[0]
 
-    const result = reducer(initialState, {
+    const result = reducer(mockState, {
       type: ACTION_TYPES.decrementItem,
       payload: {
         id: product0.id,
@@ -290,7 +290,7 @@ describe('clearCart', () => {
   it('should reset back into initialState', () => {
     const result = reducer(
       {
-        ...cartInitialState,
+        ...initialState,
         cartDetails: mockCartDetails(),
         cartCount: 6,
         totalPrice: 1800
@@ -301,7 +301,7 @@ describe('clearCart', () => {
       }
     )
 
-    expect(result).toEqual({ ...cartInitialState, cartDetails: {} })
+    expect(result).toEqual({ ...initialState, cartDetails: {} })
   })
 })
 
@@ -316,7 +316,7 @@ describe('setItemQuantity', () => {
     const product0 = products[0]
     const result = reducer(
       {
-        ...cartInitialState,
+        ...initialState,
         cartDetails: mockDetails,
         cartCount: 6,
         totalPrice: 1800
@@ -347,7 +347,7 @@ describe('removeItem', () => {
 
     const result = reducer(
       {
-        ...cartInitialState,
+        ...initialState,
         cartDetails: mockDetails,
         cartCount: 6,
         totalPrice: 1800
@@ -369,7 +369,7 @@ describe('loadCart', () => {
 
     const result = reducer(
       {
-        ...cartInitialState,
+        ...initialState,
         cartDetails: mockDetails,
         cartCount: 6,
         totalPrice: 1800
@@ -391,7 +391,7 @@ describe('loadCart', () => {
 
 describe('handleCartClick', () => {
   it('should return shouldDisplayCart as true, if false', () => {
-    const result = reducer(cartInitialState, {
+    const result = reducer(initialState, {
       type: ACTION_TYPES.handleCartClick,
       payload: undefined
     })
@@ -400,7 +400,7 @@ describe('handleCartClick', () => {
 
   it('should return shouldDisplayCart as false, if true', () => {
     const result = reducer(
-      { ...cartInitialState, shouldDisplayCart: true },
+      { ...initialState, shouldDisplayCart: true },
       {
         type: ACTION_TYPES.handleCartClick,
         payload: undefined
@@ -413,7 +413,7 @@ describe('handleCartClick', () => {
 describe('handleCloseCart', () => {
   it('should return shouldDisplayCart as false ', () => {
     const result = reducer(
-      { ...cartInitialState, shouldDisplayCart: true },
+      { ...initialState, shouldDisplayCart: true },
       {
         type: ACTION_TYPES.handleCloseCart,
         payload: undefined

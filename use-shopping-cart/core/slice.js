@@ -5,7 +5,7 @@ import { v4 as uuidv4 } from 'uuid'
 
 export const initialState = {
   mode: 'checkout-session',
-  currency: 'USD',
+  currency: 'usd',
   language: isClient ? navigator.language : 'en-US',
   lastClicked: '',
   shouldDisplayCart: false,
@@ -97,6 +97,10 @@ const slice = createSlice({
           id,
           options: { count }
         } = payload
+
+        if (state.cartDetails[id].quantity - count <= 0) {
+          return removeEntry({ state, id })
+        }
 
         return updateEntry({
           state,

@@ -364,6 +364,8 @@ describe('useShoppingCart()', () => {
       const product = mockProduct()
 
       act(() => {
+        //TODO: figure out why the default state has an actual value. Using clearCart as duct tape solution
+        cart.current.clearCart()
         cart.current.addItem(product)
         cart.current.decrementItem(product.id, { count: 5 })
       })
