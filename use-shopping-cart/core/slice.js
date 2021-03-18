@@ -99,6 +99,10 @@ const slice = createSlice({
           options: { count }
         } = payload
 
+        if (state.cartDetails[id].quantity - count <= 0) {
+          return removeEntry({ state, id })
+        }
+
         return updateEntry({
           state,
           id,
