@@ -9,7 +9,6 @@ function Entry({
   price_metadata,
   product_metadata
 }) {
-  quantity = parseInt(quantity)
   const id =
     product.id || product.price_id || product.sku_id || product.sku || uuidv4()
 
@@ -96,7 +95,6 @@ export function updateEntry({
   language,
   state
 }) {
-  count = parseInt(count)
   const cartDetails = { ...state.cartDetails }
 
   const entry = cartDetails[id]
@@ -174,7 +172,6 @@ export function updateQuantity({ state, id, quantity, language, currency }) {
     return currentCartTotalPrice + currentItemValue - entryValue
   }
 
-  quantity = parseInt(quantity)
   const cartDetails = {
     ...state.cartDetails
   }
