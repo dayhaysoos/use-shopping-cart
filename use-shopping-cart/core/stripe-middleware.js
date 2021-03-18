@@ -12,7 +12,7 @@ export const handleStripe = (store) => (next) => async (action) => {
     } catch (error) {
       console.log('error', error)
     }
-    if (action.payload?.sessionId) {
+    if (cart.cartMode === 'checkout-session') {
       return stripe.redirectToCheckout({
         sessionId: action.payload.sessionId
       })
@@ -22,6 +22,8 @@ export const handleStripe = (store) => (next) => async (action) => {
       const checkoutData = getCheckoutData(cart)
       stripe.redirectToCheckout(checkoutData)
     }
+
+    throw new Error(`Invalid value for "cartMode" was found: ${cart.cartMode}`)
   }
 
   if (action.type === 'cart/checkoutSingleItem') {
@@ -31,10 +33,9 @@ export const handleStripe = (store) => (next) => async (action) => {
       console.log('error', error)
     }
 
-    if (action.payload?.sessionId) {
-      return stripe.redirectToCheckout({
-        sessionId: action.payload.sessionId
-      })
+    if (cart.cartMode !== 'client-only') {
+      console.warn('checkoutSingleItem only works with client-only mode')
+      return
     }
 
     if (cart.cartMode === 'client-only') {
@@ -48,9 +49,5 @@ export const handleStripe = (store) => (next) => async (action) => {
       stripe.redirectToCheckout(options)
     }
   }
-  try {
-    return next(action)
-  } catch (error) {
-    console.error('Error:', error)
-  }
+  return next(action)
 }
