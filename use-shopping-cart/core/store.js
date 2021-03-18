@@ -14,6 +14,7 @@ import {
   REGISTER
 } from 'redux-persist'
 import persistStorage from 'redux-persist/lib/storage'
+import { isClient } from '../utilities/SSR'
 
 const createNoopStorage = () => {
   return {
@@ -29,8 +30,7 @@ const createNoopStorage = () => {
   }
 }
 
-const storage =
-  typeof window === 'undefined' ? createNoopStorage() : persistStorage
+const storage = !isClient ? createNoopStorage() : persistStorage
 
 export { reducer, actions, filterCart, formatCurrencyString }
 export function createShoppingCartStore(options) {
