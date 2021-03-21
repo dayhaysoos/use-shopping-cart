@@ -7,7 +7,8 @@ import App from './App'
 
 ReactDOM.render(
   <CartProvider
-    mode="checkout-session"
+    mode="payment"
+    cartMode="checkout-session"
     stripe={process.env.REACT_APP_STRIPE_API_PUBLIC}
     billingAddressCollection={false}
     successUrl="https://stripe.com"

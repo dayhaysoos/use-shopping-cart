@@ -4,8 +4,9 @@ import { isClient } from '../utilities/SSR'
 import { v4 as uuidv4 } from 'uuid'
 
 export const initialState = {
-  mode: 'checkout-session',
-  currency: 'usd',
+  cartMode: 'checkout-session',
+  mode: 'payment',
+  currency: 'USD',
   language: isClient ? navigator.language : 'en-US',
   lastClicked: '',
   shouldDisplayCart: false,
@@ -181,6 +182,9 @@ const slice = createSlice({
     checkoutSingleItem: {
       reducer: (state) => {
         return state
+      },
+      prepare: (productId) => {
+        return { payload: { productId } }
       }
     },
     handleCartHover: (state) => {
