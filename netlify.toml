@@ -3,11 +3,14 @@
   publish = "documentation/public"
   functions = "examples/cra/functions"
 
+# Manually start your application (CRA or other) on port 3000 before
+# running `netlify dev` or `yarn dev`.
 [dev]
   port = 8888
-  command = "yarn cra-dev"
+  command = "yarn workspace use-shopping-cart build:watch"
   targetPort = 3000
   framework = "#custom"
+  autoLaunch = true
 
 [[redirects]]
   from = "https://use-shopping-cart.netlify.app"

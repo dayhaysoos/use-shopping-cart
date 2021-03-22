@@ -7,7 +7,7 @@
   ],
   "scripts": {
     "dev": "netlify dev",
-    "cra-dev": "yarn workspace use-shopping-cart build:watch & cross-env BROWSER=none yarn workspace use-shopping-cart-cra start & open-cli http://localhost:8888",
+    "dev:cra": "cross-env BROWSER=none yarn workspace use-shopping-cart-cra start",
     "test": "yarn workspace use-shopping-cart test:watch",
     "dev:gatsby": "yarn workspace ecommerce-gatsby-tutorial start",
     "build:gatsby": "yarn workspace use-shopping-cart build && yarn workspace ecommerce-gatsby-tutorial build",
