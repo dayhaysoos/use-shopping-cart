@@ -24,7 +24,6 @@ function Entry({
   price_metadata,
   product_metadata
 }) {
-  quantity = parseInt(quantity, 10)
   return {
     ...product,
     id,
@@ -73,7 +72,6 @@ export function updateEntry({
   price_metadata,
   product_metadata
 }) {
-  count = parseInt(count, 10)
   const entry = state.cartDetails[id]
   if (entry.quantity + count <= 0) return removeEntry({ state, id })
 
@@ -100,7 +98,6 @@ export function removeEntry({ state, id }) {
 }
 
 export function updateQuantity({ state, id, quantity }) {
-  quantity = parseInt(quantity, 10)
   const entry = state.cartDetails[id]
   updateEntry({
     state,

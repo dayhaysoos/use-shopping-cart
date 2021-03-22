@@ -11,7 +11,7 @@
     "test": "yarn workspace use-shopping-cart test:watch",
     "dev:gatsby": "yarn workspace ecommerce-gatsby-tutorial start",
     "build:gatsby": "yarn workspace use-shopping-cart build && yarn workspace ecommerce-gatsby-tutorial build",
-    "dev:docs": "yarn workspace use-shopping-cart build && yarn workspace documentation start"
+    "dev:docs": "yarn workspace use-shopping-cart build:watch & yarn workspace documentation start"
   },
   "dependencies": {
     "cross-env": "^7.0.3",
