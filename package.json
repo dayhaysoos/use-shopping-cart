@@ -6,17 +6,19 @@
     "documentation"
   ],
   "scripts": {
-    "dev": "yarn workspace use-shopping-cart dev",
+    "dev": "netlify dev",
+    "cra-dev": "yarn workspace use-shopping-cart build:watch & cross-env BROWSER=none yarn workspace use-shopping-cart-cra start & open-cli http://localhost:8888",
     "test": "yarn workspace use-shopping-cart test:watch",
     "dev:gatsby": "yarn workspace ecommerce-gatsby-tutorial start",
     "build:gatsby": "yarn workspace use-shopping-cart build && yarn workspace ecommerce-gatsby-tutorial build",
     "dev:docs": "yarn workspace use-shopping-cart build && yarn workspace documentation start"
   },
   "dependencies": {
+    "cross-env": "^7.0.3",
     "husky": "^4.2.5",
     "lint-staged": "^10.2.0",
-    "prettier": "^2.0.5",
-    "shx": "^0.3.2"
+    "open-cli": "^6.0.1",
+    "prettier": "^2.0.5"
   },
   "husky": {
     "hooks": {
