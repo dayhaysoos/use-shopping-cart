@@ -1,7 +1,7 @@
 import { createSlice } from '@reduxjs/toolkit'
 import { createEntry, updateEntry, removeEntry, updateQuantity } from './Entry'
 import { isClient } from '../utilities/SSR'
-import { v4 as uuidv4 } from 'uuid'
+import { v4 as uuidv4 } from 'uuid/dist/esm-browser/index.js'
 
 export const initialState = {
   cartMode: 'checkout-session',
