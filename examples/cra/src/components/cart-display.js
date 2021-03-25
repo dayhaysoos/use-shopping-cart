@@ -22,9 +22,7 @@ const CartDisplay = () => {
       },
       body: JSON.stringify(cartDetails)
     })
-      .then((res) => {
-        return res.json()
-      })
+      .then((res) => res.json())
       .catch((error) => console.log(error))
 
     redirectToCheckout({ sessionId: response.sessionId })
@@ -47,12 +45,11 @@ const CartDisplay = () => {
         }}
       >
         <h2>Shopping Cart Display Panel</h2>
-        {Object.keys(cartDetails).map((item) => {
-          const cartItem = cartDetails[item]
-          const { name, sku, quantity } = cartItem
+        {Object.keys(cartDetails).map((sku) => {
+          const { name, quantity, image } = cartDetails[sku]
           return (
             <Flex
-              key={cartItem.sku}
+              key={sku}
               sx={{
                 justifyContent: 'space-around',
                 alignItems: 'center',
@@ -60,7 +57,7 @@ const CartDisplay = () => {
               }}
             >
               <Flex sx={{ flexDirection: 'column', alignItems: 'center' }}>
-                <Image sx={{ width: 100 }} src={cartItem.image} />
+                <Image sx={{ width: 100 }} src={image} />
                 <p>{name}</p>
               </Flex>
               <Input
@@ -68,9 +65,8 @@ const CartDisplay = () => {
                 max={99}
                 sx={{ width: 60 }}
                 value={quantity}
-                onChange={(e) => {
-                  const { value } = e.target
-                  setItemQuantity(sku, value)
+                onChange={(event) => {
+                  setItemQuantity(sku, event.target.valueAsNumber)
                 }}
               />
             </Flex>

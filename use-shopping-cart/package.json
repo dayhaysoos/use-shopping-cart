@@ -37,10 +37,9 @@
     "test": "jest",
     "test:watch": "jest --watch",
     "build": "rollup -c",
-    "start": "rollup -c -w & (yarn workspace use-shopping-cart-cra start)",
+    "build:watch": "rollup -c -w",
     "prepare": "yarn run build",
-    "predeploy": "yarn workspace install && yarn run build",
-    "dev": "ntl dev"
+    "predeploy": "yarn workspace install && yarn run build"
   },
   "peerDependencies": {
     "react": ">=16.8.0"

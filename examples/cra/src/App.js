@@ -40,6 +40,7 @@ const App = () => {
   return (
     <Flex sx={{ justifyContent: 'space-evenly' }}>
       <Box>
+        <h1>Store</h1>
         <h2>Products not created in the Stripe Dashboard</h2>
         <Products products={fakeData} />
         <h2>Products made on Stripe Dashboard using Price API</h2>

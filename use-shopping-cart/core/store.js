@@ -1,8 +1,5 @@
 import { configureStore } from '@reduxjs/toolkit'
-import { reducer, actions, initialState } from './slice'
-import { filterCart, formatCurrencyString } from '../utilities/old-utils'
-import { handleStripe } from './stripe-middleware'
-import { handleWarnings } from './warning-middleware'
+
 import {
   persistStore,
   persistReducer,
@@ -13,21 +10,50 @@ import {
   PURGE,
   REGISTER
 } from 'redux-persist'
-import storage from 'redux-persist/lib/storage'
+import persistStorage from 'redux-persist/lib/storage'
+import { isClient } from '../utilities/SSR'
+
+import { updateFormattedTotalPrice } from './Entry'
+import { reducer, actions, initialState } from './slice'
+
+import { filterCart, formatCurrencyString } from '../utilities/old-utils'
+
+import { handleStripe } from './stripe-middleware'
+import { handleWarnings } from './warning-middleware'
+
+const createNoopStorage = () => {
+  return {
+    getItem(_key) {
+      return Promise.resolve(null)
+    },
+    setItem(_key, value) {
+      return Promise.resolve(value)
+    },
+    removeItem(_key) {
+      return Promise.resolve()
+    }
+  }
+}
+
+const storage = isClient ? persistStorage : createNoopStorage()
 
 export { reducer, actions, filterCart, formatCurrencyString }
+
 export function createShoppingCartStore(options) {
   const persistConfig = {
     key: 'root',
     version: 1,
-    storage
+    storage,
+    whitelist: ['cartCount', 'totalPrice', 'formattedTotalPrice', 'cartDetails']
   }
-
   const persistedReducer = persistReducer(persistConfig, reducer)
+
+  const newInitialState = { ...initialState, ...options }
+  updateFormattedTotalPrice(newInitialState)
 
   return configureStore({
     reducer: persistedReducer,
-    preloadedState: { ...initialState, ...options },
+    preloadedState: newInitialState,
     middleware: (getDefaultMiddleware) =>
       getDefaultMiddleware({
         serializableCheck: {
@@ -37,7 +63,7 @@ export function createShoppingCartStore(options) {
   })
 }
 
-// for non react apps
+// For non-React apps
 export function createPersistedStore(store) {
   return persistStore(store)
 }

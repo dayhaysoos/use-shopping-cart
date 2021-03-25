@@ -42,7 +42,7 @@ export function SetItemQuantity() {
             id="quantity-select"
             defaultValue={entry.quantity}
             onChange={(event) => {
-              setItemQuantity(sku, event.target.value)
+              setItemQuantity(sku, parseInt(event.target.value, 10))
             }}
           >
             {options}
