@@ -5,7 +5,6 @@ export const formatCurrencyString = ({
   currency,
   language = isClient ? navigator.language : 'en-US'
 }) => {
-  value = parseInt(value)
   const numberFormat = new Intl.NumberFormat(language, {
     style: 'currency',
     currency,

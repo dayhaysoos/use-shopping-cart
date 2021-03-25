@@ -24,10 +24,7 @@ export function CartProvider({ loading = null, children, ...props }) {
       <PersistGate
         persistor={persistor}
         children={(bootstrapped) => {
-          if (!bootstrapped) {
-            return loading
-          }
-
+          if (!bootstrapped) return loading
           return children
         }}
       />

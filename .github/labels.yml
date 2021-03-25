@@ -7,11 +7,10 @@ documentation:
 example: examples/**/*
 
 package:
-  - use-shopping-cart/src/*
-  - use-shopping-cart/src/**/*
+  - use-shopping-cart/*
+  - use-shopping-cart/**/*
 
 tests:
-  - use-shopping-cart/tests/*
-  - use-shopping-cart/tests/**/*
+  - use-shopping-cart/**/*.test.*
 
 

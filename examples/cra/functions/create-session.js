@@ -1,13 +1,7 @@
-/*
- * This function creates a Stripe Checkout session and returns the session ID
- * for use with Stripe.js (specifically the redirectToCheckout method).
- *
- * @see https://stripe.com/docs/payments/checkout/one-time
- */
-
 const stripe = require('stripe')(process.env.REACT_APP_STRIPE_API_SECRET)
 const validateCartItems = require('use-shopping-cart/utilities')
   .validateCartItems
+
 /*
  * Product data can be loaded from anywhere. In this case, we’re loading it from
  * a local JSON file, but this could also come from an async call to your
@@ -18,13 +12,42 @@ const validateCartItems = require('use-shopping-cart/utilities')
  */
 const inventory = require('./data/products.json')
 
+/*
+ * This function creates a Stripe Checkout session and returns the session ID
+ * for use with Stripe.js (specifically the redirectToCheckout method).
+ *
+ * @see https://stripe.com/docs/payments/checkout/one-time
+ */
 exports.handler = async (event) => {
+  let product
   try {
-    const productJSON = JSON.parse(event.body)
+    product = JSON.parse(event.body)
+  } catch (error) {
+    return {
+      statusCode: 400,
+      body: JSON.stringify({
+        message: 'Received malformed JSON.',
+        error: error.message
+      })
+    }
+  }
 
-    const line_items = validateCartItems(inventory, productJSON)
+  let line_items
+  try {
+    line_items = validateCartItems(inventory, product)
+  } catch (error) {
+    return {
+      statusCode: 422,
+      body: JSON.stringify({
+        message: 'Some of the items in your cart are invalid.',
+        error: error.message
+      })
+    }
+  }
 
-    const session = await stripe.checkout.sessions.create({
+  let session
+  try {
+    session = await stripe.checkout.sessions.create({
       payment_method_types: ['card'],
       billing_address_collection: 'auto',
       shipping_address_collection: {
@@ -41,12 +64,18 @@ exports.handler = async (event) => {
       cancel_url: process.env.URL,
       line_items
     })
-
-    return {
-      statusCode: 200,
-      body: JSON.stringify({ sessionId: session.id })
-    }
   } catch (error) {
-    console.error(error)
+    return {
+      statusCode: 500,
+      body: JSON.stringify({
+        message: 'While communicating with Stripe, we encountered an error.',
+        error: error.message
+      })
+    }
+  }
+
+  return {
+    statusCode: 200,
+    body: JSON.stringify({ sessionId: session.id })
   }
 }

@@ -12,7 +12,7 @@ export const initialState = {
   shouldDisplayCart: false,
   cartCount: 0,
   totalPrice: 0,
-  formattedTotalPrice: '$0.00',
+  formattedTotalPrice: '',
   cartDetails: {},
   stripe: ''
 }
@@ -22,11 +22,8 @@ const slice = createSlice({
   initialState,
   reducers: {
     addItem: {
-      reducer: (state, action) => {
-        const {
-          product,
-          options: { count, price_metadata, product_metadata }
-        } = action.payload
+      reducer: (state, { payload: { product, options } }) => {
+        const { count, price_metadata, product_metadata } = options
 
         const id =
           product.id ||
@@ -35,34 +32,22 @@ const slice = createSlice({
           product.sku ||
           uuidv4()
 
-        if (count <= 0) {
-          console.warn(
-            'addItem requires the count to be greater than zero.',
-            action
-          )
-          return
-        }
-
         if (id in state.cartDetails) {
-          return updateEntry({
+          updateEntry({
             state,
             id,
             count,
             price_metadata,
-            product_metadata,
-            currency: state.currency,
-            language: state.language
+            product_metadata
           })
         } else {
-          return createEntry({
-            ...state,
+          createEntry({
             state,
+            id,
             product,
             count,
             price_metadata,
-            product_metadata,
-            currency: state.currency,
-            language: state.language
+            product_metadata
           })
         }
       },
@@ -74,18 +59,11 @@ const slice = createSlice({
       }
     },
     incrementItem: {
-      reducer: (state, { payload }) => {
-        const {
-          id,
-          options: { count }
-        } = payload
-
-        return updateEntry({
+      reducer: (state, { payload: { id, options } }) => {
+        updateEntry({
           state,
           id,
-          count,
-          currency: state.currency,
-          language: state.language
+          count: options.count
         })
       },
       prepare: (id, options = { count: 1 }) => {
@@ -93,22 +71,14 @@ const slice = createSlice({
       }
     },
     decrementItem: {
-      reducer: (state, { payload }) => {
-        const {
-          id,
-          options: { count }
-        } = payload
-
-        if (state.cartDetails[id].quantity - count <= 0) {
+      reducer: (state, { payload: { id, options } }) => {
+        if (state.cartDetails[id].quantity - options.count <= 0)
           return removeEntry({ state, id })
-        }
 
-        return updateEntry({
+        updateEntry({
           state,
           id,
-          count: -count,
-          currency: state.currency,
-          language: state.language
+          count: -options.count
         })
       },
       prepare: (id, options = { count: 1 }) => {
@@ -123,18 +93,10 @@ const slice = createSlice({
       }
     },
     setItemQuantity: {
-      reducer: (state, action) => {
-        const { id, quantity } = action.payload
-        if (quantity < 0) {
-          console.warn(
-            'setItemQuantity requires the quantity to be greater than or equal to zero.',
-            action
-          )
-          return
-        }
-
+      reducer: (state, { payload: { id, quantity } }) => {
         if (quantity <= 0) return removeEntry({ state, id })
 
+        // TODO: add warning to warning-middleware if id is not in cartDetails, then we can remove this if-statement
         if (id in state.cartDetails)
           return updateQuantity({ ...state, state, id, quantity })
       },
@@ -144,15 +106,14 @@ const slice = createSlice({
     },
     removeItem: {
       reducer: (state, { payload }) => {
-        return removeEntry({ state, id: payload })
+        removeEntry({ state, id: payload })
       }
     },
     loadCart: {
-      reducer: (state, { payload }) => {
+      reducer: (state, { payload: { cartDetails, shouldMerge } }) => {
         // TODO: Figure out how `loadCart` should work when merging.
         // Right now, if you were to `useEffect(() => loadCart(cartDetailsFromServer), [])`,
         // your cart would just keep getting bigger on every reload. Also, is merging a good idea?
-        const { cartDetails, shouldMerge } = payload
         if (!shouldMerge) {
           state.cartCount = 0
           state.totalPrice = 0
@@ -161,30 +122,16 @@ const slice = createSlice({
 
         for (const id in cartDetails) {
           const entry = cartDetails[id]
-          state = createEntry({
-            ...state,
+          createEntry({
             state,
+            id: entry.id,
             product: entry,
             count: entry.quantity
           })
         }
-        return state
       },
       prepare: (cartDetails, shouldMerge = true) => {
         return { payload: { cartDetails, shouldMerge } }
-      }
-    },
-    redirectToCheckout: {
-      reducer: (state) => {
-        return state
-      }
-    },
-    checkoutSingleItem: {
-      reducer: (state) => {
-        return state
-      },
-      prepare: (productId) => {
-        return { payload: { productId } }
       }
     },
     handleCartHover: (state) => {
@@ -199,10 +146,19 @@ const slice = createSlice({
     storeLastClicked: (state, { payload }) => {
       state.lastClicked = payload
     },
-    initializeStripe: (state, { payload }) => {
+    changeStripeKey: (state, { payload }) => {
       state.stripe = payload
     }
   }
+})
+
+slice.actions.redirectToCheckout = (sessionId) => ({
+  type: 'cart/redirectToCheckout',
+  payload: sessionId
+})
+slice.actions.checkoutSingleItem = (productId) => ({
+  type: 'cart/checkoutSingleItem',
+  payload: productId
 })
 
 export const { reducer, actions } = slice
