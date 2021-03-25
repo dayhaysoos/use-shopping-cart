@@ -7,12 +7,7 @@ function isValidCount(count, action) {
     )
     return false // Invalid count
   }
-  if (count <= 0) {
-    console.warn(
-      `Invalid count passed to action ${action.type}: Cannot be less than or equal to 0`
-    )
-    return false // Invalid count
-  }
+
   // Valid count
   return true
 }
