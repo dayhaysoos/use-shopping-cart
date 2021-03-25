@@ -26,7 +26,7 @@
     "react/prop-types": "off",
     "object-curly-spacing": ["error", "always"],
     "camelcase": ["error", {
-      "allow": ["price_metadata", "product_metadata"]
+      "allow": ["price_metadata", "product_metadata", "price_data", "product_data", "unit_amount"]
     }]
   },
   "ignorePatterns": ["*.d.ts"]

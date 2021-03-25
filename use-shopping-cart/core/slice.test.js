@@ -37,6 +37,8 @@ function mockCartDetails(overrides1, overrides2) {
       value: 800,
       quantity: 2,
       formattedValue: '$8.00',
+      price_data: {},
+      product_data: {},
       ...overrides1
     },
     [`id_efg${counter}`]: {
@@ -48,6 +50,8 @@ function mockCartDetails(overrides1, overrides2) {
       value: 1000,
       quantity: 4,
       formattedValue: '$10.00',
+      price_data: {},
+      product_data: {},
       ...overrides2
     }
   }

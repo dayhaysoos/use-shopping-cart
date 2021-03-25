@@ -1,13 +1,18 @@
 [build]
-  command="yarn workspace use-shopping-cart build && yarn workspace documentation build"
-  publish="documentation/public"
-  functions="examples/cra/functions"
+  command = "yarn workspace use-shopping-cart build && yarn workspace documentation build"
+  publish = "documentation/public"
+  functions = "examples/cra/functions"
 
-  [dev]
-  command="yarn workspace use-shopping-cart start"
+# Manually start your application (CRA or other) on port 3000 before
+# running `netlify dev` or `yarn dev`.
+[dev]
+  port = 8888
+  command = "yarn workspace use-shopping-cart build:watch"
+  targetPort = 3000
+  framework = "#custom"
+  autoLaunch = true
 
-  [[redirects]]
+[[redirects]]
   from = "https://use-shopping-cart.netlify.app"
   to = "https://useshoppingcart.com"
   status = 301
-

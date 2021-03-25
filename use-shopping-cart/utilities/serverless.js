@@ -1,4 +1,4 @@
-const validateCartItems = (inventorySrc, cartDetails) => {
+function validateCartItems(inventorySrc, cartDetails) {
   const validatedItems = []
 
   for (const itemId in cartDetails) {
@@ -7,7 +7,6 @@ const validateCartItems = (inventorySrc, cartDetails) => {
       (currentProduct) =>
         currentProduct.sku === itemId || currentProduct.id === itemId
     )
-
     if (!inventoryItem) throw new Error(`Product ${itemId} not found!`)
 
     const item = {
@@ -15,32 +14,27 @@ const validateCartItems = (inventorySrc, cartDetails) => {
         currency: inventoryItem.currency,
         unit_amount: inventoryItem.price,
         product_data: {
-          name: inventoryItem.name
-        }
+          name: inventoryItem.name,
+          ...inventoryItem.product_data
+        },
+        ...inventoryItem.price_data
       },
       quantity: product.quantity
     }
+
     if (inventoryItem.description)
       item.price_data.product_data.description = inventoryItem.description
+
     if (inventoryItem.image)
       item.price_data.product_data.images = [inventoryItem.image]
-    if (inventoryItem.price_data)
-      item.price_data = {
-        ...item.price_data,
-        ...inventoryItem.price_data
-      }
-    if (inventoryItem.product_data)
-      item.price_data.product_data = {
-        ...item.price_data.product_data,
-        ...inventoryItem.product_data
-      }
+
     validatedItems.push(item)
   }
 
   return validatedItems
 }
 
-const formatLineItems = (cartDetails) => {
+function formatLineItems(cartDetails) {
   const lineItems = []
 
   for (const itemId in cartDetails) {

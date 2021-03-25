@@ -5,7 +5,6 @@ export const formatCurrencyString = ({
   currency,
   language = isClient ? navigator.language : 'en-US'
 }) => {
-  value = parseInt(value)
   const numberFormat = new Intl.NumberFormat(language, {
     style: 'currency',
     currency,
@@ -56,7 +55,7 @@ export function checkoutHandler(cart, checkoutOptions) {
 
   const needsCheckoutData = cart.mode === 'client-only'
 
-  return async function (parameters) {
+  return async function(parameters) {
     if (!serviceProperty) {
       throw new Error(
         'No compatible API has been defined, your options are: Stripe'
