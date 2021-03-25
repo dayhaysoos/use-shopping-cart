@@ -43,7 +43,8 @@ export function createShoppingCartStore(options) {
   const persistConfig = {
     key: 'root',
     version: 1,
-    storage
+    storage,
+    whitelist: ['cartCount', 'totalPrice', 'formattedTotalPrice', 'cartDetails']
   }
   const persistedReducer = persistReducer(persistConfig, reducer)
 
