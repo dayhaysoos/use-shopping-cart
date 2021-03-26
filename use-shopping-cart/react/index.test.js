@@ -54,8 +54,6 @@ function mockCartDetails(overrides1, overrides2) {
   }
 }
 
-afterEach(() => window.localStorage.clear())
-
 const stripeMock = {
   redirectToCheckout: jest.fn().mockReturnValue(() => Promise.resolve())
 }
@@ -73,20 +71,22 @@ const createWrapper = (overrides = {}) => ({ children }) => (
   </CartProvider>
 )
 
-describe.skip('useShoppingCart()', () => {
+describe('useShoppingCart()', () => {
   const wrapper = createWrapper()
   let cart
   function reload() {
+    window.localStorage.clear()
     cart = renderHook(() => useShoppingCart((state) => state), { wrapper })
       .result
   }
   beforeEach(() => reload())
+  afterEach(() => window.localStorage.clear())
 
   it('initial state', () => {
     expect(cart.current).toMatchObject(expectedInitialCartState)
   })
 
-  describe.skip('shouldDisplayCart', () => {
+  describe('shouldDisplayCart', () => {
     it('shouldDisplayCart should be false by default', () => {
       expect(cart.current.shouldDisplayCart).toBeFalsy()
     })
@@ -121,7 +121,7 @@ describe.skip('useShoppingCart()', () => {
     })
   })
 
-  describe.skip('addItem()', () => {
+  describe('addItem()', () => {
     it('adds an item to the cart', () => {
       const product = mockProduct({ price: 200 })
 
@@ -280,7 +280,7 @@ describe.skip('useShoppingCart()', () => {
     })
   })
 
-  describe.skip('removeItem()', () => {
+  describe('removeItem()', () => {
     it('removes the item from the cart', () => {
       const product = mockProduct()
 
@@ -307,7 +307,7 @@ describe.skip('useShoppingCart()', () => {
     })
   })
 
-  describe.skip('incrementItem()', () => {
+  describe('incrementItem()', () => {
     it('adds one more of that product to the cart', () => {
       const product = mockProduct()
 
@@ -325,7 +325,7 @@ describe.skip('useShoppingCart()', () => {
     })
   })
 
-  describe.skip('decrementItem()', () => {
+  describe('decrementItem()', () => {
     it('removes one of that item from the cart', () => {
       const product = mockProduct({ price: 256 })
 
@@ -390,7 +390,7 @@ describe.skip('useShoppingCart()', () => {
     })
   })
 
-  describe.skip('setItemQuantity()', () => {
+  describe('setItemQuantity()', () => {
     it('updates the quantity correctly', () => {
       const product = mockProduct()
 
@@ -414,10 +414,6 @@ describe.skip('useShoppingCart()', () => {
 
       expect(cart.current.cartDetails).not.toHaveProperty(product.id)
     })
-  })
-
-  describe.skip('persistence', () => {
-    it.todo('Actually do persistance things')
   })
 
   describe.skip('loadCart()', () => {
@@ -486,7 +482,7 @@ describe.skip('useShoppingCart()', () => {
     })
   })
 
-  describe.skip('storeLastClicked()', () => {
+  describe('storeLastClicked()', () => {
     it(' updates lastClicked', () => {
       const product = mockProduct()
       act(() => {
@@ -497,54 +493,47 @@ describe.skip('useShoppingCart()', () => {
   })
 })
 
-describe.skip('useShoppingCart()', () => {
+describe.skip('persistence', () => {
   const wrapper = createWrapper()
   let cart
   function reload() {
     cart = renderHook(() => useShoppingCart((state) => state), { wrapper })
       .result
   }
-  beforeEach(() => reload())
 
-  it('initial state', () => {
-    expect(cart.current).toMatchObject(expectedInitialCartState)
+  it('data should persist past reload', () => {
+    const product = mockProduct()
+    act(() => {
+      cart.current.addItem(product)
+    })
+
+    const snapshot = {
+      cartDetails: cart.current.cartDetails,
+      cartCount: cart.current.cartCount,
+      totalPrice: cart.current.totalPrice
+    }
+
+    reload()
+    expect(cart.current).toMatchObject(snapshot)
   })
 
-  describe.skip('persistence', () => {
-    it('data should persist past reload', () => {
-      const product = mockProduct()
-      act(() => {
-        cart.current.addItem(product)
-      })
+  it('clearCart() should empty the cart even after reload', () => {
+    const product = mockProduct()
 
-      const snapshot = {
-        cartDetails: cart.current.cartDetails,
-        cartCount: cart.current.cartCount,
-        totalPrice: cart.current.totalPrice
-      }
-
-      reload()
-      expect(cart.current).toMatchObject(snapshot)
+    act(() => {
+      cart.current.addItem(product)
+      cart.current.clearCart()
     })
 
-    it('clearCart() should empty the cart even after reload', () => {
-      const product = mockProduct()
+    const emptyCart = {
+      cartDetails: {},
+      cartCount: 0,
+      totalPrice: 0
+    }
 
-      act(() => {
-        cart.current.addItem(product)
-        cart.current.clearCart()
-      })
-
-      const emptyCart = {
-        cartDetails: {},
-        cartCount: 0,
-        totalPrice: 0
-      }
-
-      expect(cart.current).toMatchObject(emptyCart)
-      reload()
-      expect(cart.current).toMatchObject(emptyCart)
-    })
+    expect(cart.current).toMatchObject(emptyCart)
+    reload()
+    expect(cart.current).toMatchObject(emptyCart)
   })
 })
 
@@ -752,7 +741,7 @@ describe.skip('stripe handling', () => {
 //   }
 // }
 
-describe.skip('<DebugCart>', () => {
+describe('<DebugCart>', () => {
   beforeAll(() => {
     const Wrapper = createWrapper()
     render(
