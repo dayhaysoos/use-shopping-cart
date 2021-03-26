@@ -8,7 +8,7 @@ import pkg from './package.json'
 export default [
   {
     input: './react/index.js',
-    external: ['react', 'crypto'],
+    external: ['react'],
     output: [
       {
         file: pkg.exports['.'].require,
@@ -25,7 +25,7 @@ export default [
         file: pkg.exports['.'].browser,
         format: 'umd',
         sourcemap: true,
-        globals: { react: 'React', crypto: 'crypto' }
+        globals: { react: 'React' }
       }
     ],
     plugins: [
@@ -40,7 +40,6 @@ export default [
   },
   {
     input: './core/store.js',
-    external: ['uuid'],
     output: [
       {
         file: pkg.exports['./core'].require,
@@ -60,8 +59,7 @@ export default [
         format: 'umd',
         sourcemap: true,
         globals: {
-          react: 'React',
-          uuid: 'uuid'
+          react: 'React'
         }
       }
     ],

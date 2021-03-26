@@ -1,4 +1,5 @@
 import { formatCurrencyString } from '../utilities/old-utils'
+import { v4 as uuidv4 } from 'uuid/dist/esm-browser/index.js'
 
 export function updateFormattedTotalPrice(state) {
   state.formattedTotalPrice = formatCurrencyString({
