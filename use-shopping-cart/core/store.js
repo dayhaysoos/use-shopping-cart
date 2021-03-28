@@ -10,7 +10,6 @@ import {
   PURGE,
   REGISTER
 } from 'redux-persist'
-import persistStorage from 'redux-persist/lib/storage'
 import { isClient } from '../utilities/SSR'
 
 import { updateFormattedTotalPrice } from './Entry'
@@ -21,25 +20,37 @@ import { filterCart, formatCurrencyString } from '../utilities/old-utils'
 import { handleStripe } from './stripe-middleware'
 import { handleWarnings } from './warning-middleware'
 
-const createNoopStorage = () => {
+function noop() {}
+function createNoopStorage() {
   return {
-    getItem(_key) {
-      return Promise.resolve(null)
+    getItem: noop,
+    setItem: noop,
+    removeItem: noop
+  }
+}
+
+function createLocalStorage() {
+  return {
+    async getItem(key) {
+      return window.localStorage.getItem(key)
     },
-    setItem(_key, value) {
-      return Promise.resolve(value)
+    async setItem(key, value) {
+      return window.localStorage.setItem(key, value)
     },
-    removeItem(_key) {
-      return Promise.resolve()
+    async removeItem(key) {
+      return window.localStorage.removeItem(key)
     }
   }
 }
 
-const storage = isClient ? persistStorage : createNoopStorage()
-
 export { reducer, actions, filterCart, formatCurrencyString }
 
 export function createShoppingCartStore(options) {
+  let storage
+  if (isClient) storage = options.storage || createLocalStorage()
+  else storage = createNoopStorage()
+  delete options.storage
+
   const persistConfig = {
     key: 'root',
     version: 1,
