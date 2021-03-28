@@ -39,7 +39,8 @@
     "build": "rollup -c",
     "build:watch": "rollup -c -w",
     "prepare": "yarn run build",
-    "predeploy": "yarn workspace install && yarn run build"
+    "predeploy": "yarn workspace install && yarn run build",
+    "lint": "eslint --fix '**/*.js'"
   },
   "peerDependencies": {
     "react": ">=16.8.0"

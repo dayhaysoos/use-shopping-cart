@@ -29,5 +29,5 @@
       "allow": ["price_metadata", "product_metadata", "price_data", "product_data", "unit_amount"]
     }]
   },
-  "ignorePatterns": ["*.d.ts"]
+  "ignorePatterns": ["*.d.ts", "node_modules", "dist"]
 }
