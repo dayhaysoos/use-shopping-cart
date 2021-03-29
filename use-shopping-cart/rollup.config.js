@@ -24,17 +24,14 @@ const common = {
     }),
     externals({ deps: true }),
     resolve(),
-    commonjs(),
-    visualizer()
+    commonjs()
   ],
-  get pluginsWithAliases() {
-    return this.plugins.concat(
-      alias({
-        entries: {
-          uuid: 'uuid/dist/esm-browser/index.js'
-        }
-      })
-    )
+  get aliases() {
+    return alias({
+      entries: {
+        uuid: 'uuid/dist/esm-browser/index.js'
+      }
+    })
   }
 }
 
@@ -59,7 +56,10 @@ export default [
   },
   {
     ...common.react,
-    plugins: common.pluginsWithAliases,
+    plugins: common.plugins.concat(
+      common.aliases,
+      visualizer({ filename: 'stats/react.html' })
+    ),
     output: {
       file: pkg.exports['.'].import,
       format: 'es',
@@ -89,7 +89,10 @@ export default [
   },
   {
     ...common.core,
-    plugins: common.pluginsWithAliases,
+    plugins: common.plugins.concat(
+      common.aliases,
+      visualizer({ filename: 'stats/core.html' })
+    ),
     output: {
       file: pkg.exports['./core'].import,
       format: 'es',
