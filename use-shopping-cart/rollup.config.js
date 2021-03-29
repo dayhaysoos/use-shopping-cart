@@ -3,46 +3,43 @@ import commonjs from '@rollup/plugin-commonjs'
 import resolve from '@rollup/plugin-node-resolve'
 import url from '@rollup/plugin-url'
 import alias from '@rollup/plugin-alias'
+import externals from 'rollup-plugin-node-externals'
 
 import pkg from './package.json'
 
-const reactCommonConfig = {
-  input: './react/index.js',
-  external: ['react'],
+const common = {
+  react: {
+    input: './react/index.js',
+    external: ['react']
+  },
+  core: {
+    input: './core/store.js'
+  },
   plugins: [
     url({ exclude: ['**/*.svg'] }),
     sucrase({
       exclude: 'node_modules/**/*',
       transforms: ['jsx']
     }),
+    externals({ deps: true }),
     resolve(),
     commonjs()
-  ]
+  ],
+  get pluginsWithAliases() {
+    return this.plugins.concat(
+      alias({
+        entries: {
+          uuid: 'uuid/dist/esm-browser/index.js'
+        }
+      })
+    )
+  }
 }
-
-const coreCommonConfig = {
-  input: './core/store.js',
-  plugins: [
-    url({ exclude: ['**/*.svg'] }),
-    sucrase({
-      exclude: 'node_modules/**/*',
-      transforms: ['jsx']
-    }),
-    resolve(),
-    commonjs()
-  ]
-}
-
-const aliases = () =>
-  alias({
-    entries: {
-      uuid: 'uuid/dist/esm-browser/index.js'
-    }
-  })
 
 export default [
   {
-    ...reactCommonConfig,
+    ...common.react,
+    plugins: common.plugins,
     output: [
       {
         file: pkg.exports['.'].require,
@@ -59,16 +56,17 @@ export default [
     ]
   },
   {
-    ...reactCommonConfig,
+    ...common.react,
+    plugins: common.pluginsWithAliases,
     output: {
       file: pkg.exports['.'].import,
       format: 'es',
       sourcemap: true
-    },
-    plugins: reactCommonConfig.plugins.concat(aliases())
+    }
   },
   {
-    ...coreCommonConfig,
+    ...common.core,
+    plugins: common.plugins,
     output: [
       {
         file: pkg.exports['./core'].require,
@@ -76,7 +74,6 @@ export default [
         sourcemap: true,
         exports: 'named'
       },
-
       {
         name: 'UseShoppingCartCore',
         file: pkg.exports['./core'].browser,
@@ -89,13 +86,13 @@ export default [
     ]
   },
   {
-    ...coreCommonConfig,
+    ...common.core,
+    plugins: common.pluginsWithAliases,
     output: {
       file: pkg.exports['./core'].import,
       format: 'es',
       sourcemap: true,
       exports: 'named'
-    },
-    plugins: coreCommonConfig.plugins.concat(aliases())
+    }
   }
 ]
