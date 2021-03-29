@@ -4,6 +4,7 @@ import resolve from '@rollup/plugin-node-resolve'
 import url from '@rollup/plugin-url'
 import alias from '@rollup/plugin-alias'
 import externals from 'rollup-plugin-node-externals'
+import visualizer from 'rollup-plugin-visualizer'
 
 import pkg from './package.json'
 
@@ -23,7 +24,8 @@ const common = {
     }),
     externals({ deps: true }),
     resolve(),
-    commonjs()
+    commonjs(),
+    visualizer()
   ],
   get pluginsWithAliases() {
     return this.plugins.concat(

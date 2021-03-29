@@ -6,6 +6,9 @@ dist/
 build/
 public/
 
+# rollup-plugin-visualizer
+use-shopping-cart/stats.html
+
 # Private environment variables
 !.env.example
 .env*
