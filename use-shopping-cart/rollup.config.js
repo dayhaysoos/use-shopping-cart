@@ -50,7 +50,15 @@ export default [
         file: pkg.exports['.'].browser,
         format: 'umd',
         sourcemap: true,
-        globals: { react: 'React' }
+        globals: {
+          react: 'React',
+          'react-redux': 'react-redux',
+          'redux-persist/integration/react': 'redux-persist/integration/react',
+          '@reduxjs/toolkit': '@reduxjs/toolkit',
+          'redux-persist': 'redux-persist',
+          uuid: 'uuid',
+          '@stripe/stripe-js': '@stripe/stripe-js'
+        }
       }
     ]
   },
@@ -82,7 +90,11 @@ export default [
         format: 'umd',
         sourcemap: true,
         globals: {
-          react: 'React'
+          react: 'React',
+          ['@reduxjs/toolkit']: '@reduxjs/toolkit',
+          ['redux-persist']: 'redux-persist',
+          uuid: 'uuid',
+          '@stripe/stripe-js': '@stripe/stripe-js'
         }
       }
     ]
