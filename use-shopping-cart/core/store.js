@@ -46,6 +46,12 @@ function createLocalStorage() {
 export { reducer, actions, filterCart, formatCurrencyString }
 
 export function createShoppingCartStore(options) {
+  if (!isClient) {
+    return configureStore({
+      reducer,
+      preloadedState: { ...initialState, ...options }
+    })
+  }
   let storage
   if (isClient) storage = options.storage || createLocalStorage()
   else storage = createNoopStorage()
