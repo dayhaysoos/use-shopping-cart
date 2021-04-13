@@ -21,7 +21,7 @@ export function CartDisplayWrapper({ children }) {
             marginBottom: 10,
             fontSize: 12,
             padding: 10,
-            height: 200,
+            height: 500,
             overflow: 'scroll',
             color: 'black'
           }}

@@ -52,6 +52,32 @@ export function AddItem({ product }) {
           Add 10 to cart
         </button>
       </section>
+      <section
+        style={{
+          display: 'flex',
+          justifyContent: 'space-evenly',
+          width: '100%'
+        }}
+      >
+        <button
+          onClick={() =>
+            addItem(product, { price_metadata: { type: 'fruit' } })
+          }
+          aria-label={`Add ${product.name} to your cart with price metadata`}
+          style={{ height: 50, width: 100, marginBottom: 30 }}
+        >
+          Add to Cart with price metadata
+        </button>
+        <button
+          onClick={() =>
+            addItem(product, { product_metadata: { type: 'fruit' } })
+          }
+          aria-label={`Add ${product.name} to your cart with product metadata`}
+          style={{ height: 50, width: 100, marginBottom: 30 }}
+        >
+          Add to Cart with product metadata
+        </button>
+      </section>
     </article>
   )
 }
