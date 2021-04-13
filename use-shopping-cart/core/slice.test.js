@@ -297,7 +297,8 @@ describe('clearCart', () => {
         ...initialState,
         cartDetails: mockCartDetails(),
         cartCount: 6,
-        totalPrice: 1800
+        totalPrice: 1800,
+        formattedTotalPrice: '$18.00'
       },
       {
         type: ACTION_TYPES.clearCart,
@@ -305,7 +306,13 @@ describe('clearCart', () => {
       }
     )
 
-    expect(result).toEqual({ ...initialState, cartDetails: {} })
+    expect(result).toEqual({
+      ...initialState,
+      cartDetails: {},
+      cartCount: 0,
+      totalPrice: 0,
+      formattedTotalPrice: ''
+    })
   })
 })
 

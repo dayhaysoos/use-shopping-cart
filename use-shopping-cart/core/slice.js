@@ -90,6 +90,7 @@ const slice = createSlice({
         state.cartCount = 0
         state.totalPrice = 0
         state.cartDetails = {}
+        state.formattedTotalPrice = ''
       }
     },
     setItemQuantity: {
