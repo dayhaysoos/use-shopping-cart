@@ -5,7 +5,8 @@ function Root({ children }) {
   return (
     <>
       <CartProvider
-        mode="checkout-session"
+        cartMode="checkout-session"
+        mode="payment"
         stripe={'pk_test_MAQ6vJsaQH6lTjJQc07plIB000QCr569IB'}
         billingAddressCollection={false}
         successUrl="https://stripe.com"
