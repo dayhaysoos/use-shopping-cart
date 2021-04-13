@@ -1,4 +1,4 @@
-import { validateCartItems, formatLineItems } from './serverUtil'
+import { validateCartItems, formatLineItems } from './serverless'
 
 const inventory = [
   {

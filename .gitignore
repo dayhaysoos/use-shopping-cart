@@ -6,6 +6,10 @@ dist/
 build/
 public/
 
+# rollup-plugin-visualizer
+use-shopping-cart/stats/core.html
+use-shopping-cart/stats/react.html
+
 # Private environment variables
 !.env.example
 .env*

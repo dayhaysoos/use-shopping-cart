@@ -35,7 +35,7 @@ const SkuCard = ({ sku }) => {
       <p>
         Price:{' '}
         {formatCurrencyString({
-          value: parseInt(sku.price),
+          value: parseInt(sku.price, 10),
           currency: sku.currency,
         })}
       </p>
