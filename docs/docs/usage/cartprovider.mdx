@@ -12,16 +12,20 @@ At the root level of your app, wrap your Root app in the `<CartProvider />`
 ```jsx
 import ReactDOM from 'react-dom'
 
-import { loadStripe } from '@stripe/stripe-js'
 import { CartProvider } from 'use-shopping-cart'
 
 import App from './App'
 
 // Remember to add your public Stripe key
-const stripePromise = loadStripe(process.env.REACT_APP_STRIPE_API_PUBLIC)
+const stripeKey = process.env.YOUR_STRIPE_PUBLIC_KEY
 
 ReactDOM.render(
-  <CartProvider mode="checkout-session" stripe={stripePromise} currency="USD">
+  <CartProvider
+    mode="payment"
+    cartMode="checkout-session"
+    stripe={stripeKey}
+    currency="USD"
+  >
     <App />
   </CartProvider>,
   document.getElementById('root')
@@ -62,19 +66,20 @@ At the root level of your app, wrap your Root app in the `<CartProvider />`
 ```jsx
 import ReactDOM from 'react-dom'
 
-import { loadStripe } from '@stripe/stripe-js'
 import { CartProvider } from 'use-shopping-cart'
 
 import App from './App'
 
 // Remember to add your public Stripe key
-const stripePromise = loadStripe(process.env.REACT_APP_STRIPE_API_PUBLIC)
+const stripeKey = process.env.YOUR_STRIPE_PUBLIC_KEY
 
 ReactDOM.render(
   <CartProvider
+    // Mode configuration for Stripe: payment or subscription
+    mode="payment"
     // The mode for how you want to use the hooks. 'client-only' and 'checkout-session' are the options
-    mode="client-only"
-    stripe={stripePromise}
+    cartMode="client-only"
+    stripe={stripeKey}
     // The URL to which Stripe should send customers when payment is complete.
     successUrl="http://localhost:3000/success"
     // The URL to which Stripe should send customers when payment is canceled.

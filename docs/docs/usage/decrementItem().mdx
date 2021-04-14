@@ -54,22 +54,22 @@ function Cart(product) {
             justifyContent: 'space-evenly'
           }}
         >
-          {/* Decreases the quantity of the item */}
+          {/* Increases the quantity of the item */}
           <button
-            onClick={() => decrementItem(sku)}
-            aria-label={`Remove one ${entry.name} from your cart`}
+            onClick={() => incrementItem(sku)}
+            aria-label={`Add one ${entry.name} to your cart`}
             style={{ height: 50, width: 100, marginBottom: 30 }}
           >
-            Remove one {entry.name} to your cart
+            Add one {entry.name} to your cart
           </button>
 
-          {/* Decreases the item quantity by 10 */}
+          {/* Increases the item quantity by 10 */}
           <button
-            onClick={() => decrementItem(sku, 10)}
-            aria-label={`Remove ten ${entry.name} from your cart`}
+            onClick={() => incrementItem(sku, { count: 10 })}
+            aria-label={`Add ten ${entry.name} to your cart`}
             style={{ height: 50, width: 100, marginBottom: 30 }}
           >
-            Remove 10 {entry.name} to your cart
+            Add 10 {entry.name} to your cart
           </button>
         </section>
       </article>

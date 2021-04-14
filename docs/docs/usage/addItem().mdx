@@ -57,7 +57,7 @@ You can add an optional quantity param, to add by that number. `addItem(product,
 </CartDisplayWrapper>
 
 ```jsx
-export function Product({ product }) {
+function Product({ product }) {
   const { addItem } = useShoppingCart()
 
   /* A helper function that turns the price into a readable format */
@@ -101,14 +101,53 @@ export function Product({ product }) {
           Add to cart
         </button>
         <button
-          onClick={() => addItem(product, 10)}
+          onClick={() => addItem(product, { count: 10 })}
           aria-label={`Add 10 ${product.name} to your cart`}
           style={{ height: 50, width: 100, marginBottom: 30 }}
         >
           Add 10 to cart
         </button>
       </section>
+      <section
+        style={{
+          display: 'flex',
+          justifyContent: 'space-evenly',
+          width: '100%'
+        }}
+      >
+        <button
+          onClick={() =>
+            addItem(product, { price_metadata: { type: 'fruit' } })
+          }
+          aria-label={`Add ${product.name} to your cart with price metadata`}
+          style={{ height: 50, width: 100, marginBottom: 30 }}
+        >
+          Add to Cart with price metadata
+        </button>
+        <button
+          onClick={() =>
+            addItem(product, { product_metadata: { type: 'fruit' } })
+          }
+          aria-label={`Add ${product.name} to your cart with product metadata`}
+          style={{ height: 50, width: 100, marginBottom: 30 }}
+        >
+          Add to Cart with product metadata
+        </button>
+      </section>
     </article>
   )
 }
+```
+
+## Dynamic metadata
+
+Stripe's API allows for room to add metadata to either product_metadata or price_metadata.
+use-shopping-cart allows you to add metadata through the second param.
+
+```jsx
+addItem(product, {
+  count: 1,
+  product_metadata: { type: 'fruit' },
+  price_metadata: { someKey: 'a value' }
+})
 ```

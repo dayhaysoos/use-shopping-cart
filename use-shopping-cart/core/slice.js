@@ -91,6 +91,9 @@ const slice = createSlice({
         state.totalPrice = 0
         state.cartDetails = {}
         state.formattedTotalPrice = ''
+      },
+      prepare: () => {
+        return { payload: undefined }
       }
     },
     setItemQuantity: {
@@ -135,11 +138,22 @@ const slice = createSlice({
         return { payload: { cartDetails, shouldMerge } }
       }
     },
-    handleCartHover: (state) => {
-      state.shouldDisplayCart = true
+    handleCartHover: {
+      reducer: (state) => {
+        state.shouldDisplayCart = true
+      },
+      prepare: () => {
+        return { payload: undefined }
+      }
     },
-    handleCartClick: (state) => {
-      state.shouldDisplayCart = !state.shouldDisplayCart
+
+    handleCartClick: {
+      reducer: (state) => {
+        state.shouldDisplayCart = !state.shouldDisplayCart
+      },
+      prepare: () => {
+        return { payload: undefined }
+      }
     },
     handleCloseCart: (state) => {
       state.shouldDisplayCart = false

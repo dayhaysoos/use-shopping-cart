@@ -6,11 +6,11 @@ id: increment-item
 import CartDisplayWrapper from '../../src/components/cart-display-wrapper'
 import IncrementItem from '../../src/components/increment-item'
 
-`incrementItem(sku, quantity = 1)` takes a sku of a product in the cart and increments the quantity by 1 by default.
+`incrementItem(sku)` takes a sku of a product in the cart and increments the quantity by 1 by default.
 
 You can pass an optional quantity for the second param to increase by that number. For example:
 
-`incrementItem(sku, 10)` would increase by 10.
+`incrementItem(sku, { count: 10 } )` would increase by 10.
 
 <CartDisplayWrapper>
   <IncrementItem />
@@ -61,7 +61,9 @@ function Cart() {
 
           {/* Increases the item quantity by 10 */}
           <button
-            onClick={() => incrementItem(sku, 10)}
+            onClick={() => {
+              incrementItem(sku, { count: 10 })
+            }}
             aria-label={`Add ten ${entry.name} to your cart`}
             style={{ height: 50, width: 100, marginBottom: 30 }}
           >
