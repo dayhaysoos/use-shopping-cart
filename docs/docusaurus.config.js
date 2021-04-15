@@ -8,6 +8,18 @@ module.exports = {
   organizationName: 'dayhaysoos', // Usually your GitHub org/user name.
   projectName: 'use-shopping-cart', // Usually your repo name.
   themeConfig: {
+    colorMode: {
+      // "light" | "dark"
+      defaultMode: 'light',
+
+      // Hides the switch in the navbar
+      // Useful if you want to support a single color mode
+      disableSwitch: true,
+
+      // Should we use the prefers-color-scheme media-query,
+      // using user system preferences, instead of the hardcoded defaultMode
+      respectPrefersColorScheme: false
+    },
     navbar: {
       title: 'Use Shopping Cart',
       logo: {
