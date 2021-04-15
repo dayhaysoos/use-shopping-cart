@@ -5,8 +5,9 @@ function Root({ children }) {
   return (
     <>
       <CartProvider
-        mode="checkout-session"
-        stripe={'pk_test_MAQ6vJsaQH6lTjJQc07plIB000QCr569IB'}
+        mode="payment"
+        cartMode="checkout-session"
+        stripe={process.env.REACT_APP_STRIPE_API_PUBLIC}
         billingAddressCollection={false}
         successUrl="https://stripe.com"
         cancelUrl="https://twitter.com/dayhaysoos"
@@ -14,6 +15,7 @@ function Root({ children }) {
       >
         {children}
       </CartProvider>
+      ,
     </>
   )
 }

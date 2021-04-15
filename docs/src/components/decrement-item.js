@@ -46,7 +46,9 @@ export function DecrementItem() {
 
           {/* Decreases the item quantity by 10 */}
           <button
-            onClick={() => decrementItem(sku, 10)}
+            onClick={() => {
+              decrementItem(sku, { count: 10 })
+            }}
             aria-label={`Remove ten ${entry.name} from your cart`}
             style={{ height: 50, width: 100, marginBottom: 30 }}
           >

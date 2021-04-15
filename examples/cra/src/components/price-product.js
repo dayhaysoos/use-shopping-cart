@@ -1,6 +1,7 @@
 /**@jsx jsx */
 import { jsx, Box, Image, Button, Flex } from 'theme-ui'
-import { useShoppingCart, formatCurrencyString } from 'use-shopping-cart'
+import { useShoppingCart } from 'use-shopping-cart'
+import { formatCurrencyString } from 'use-shopping-cart/utilities/old-utils'
 
 // for products that are made in the stripe dashboard
 

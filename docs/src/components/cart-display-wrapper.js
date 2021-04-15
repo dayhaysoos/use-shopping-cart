@@ -21,8 +21,9 @@ export function CartDisplayWrapper({ children }) {
             marginBottom: 10,
             fontSize: 12,
             padding: 10,
-            height: 200,
-            overflow: 'scroll'
+            height: 500,
+            overflow: 'scroll',
+            color: 'black'
           }}
         >
           {JSON.stringify(cartDetails, null, 2)}

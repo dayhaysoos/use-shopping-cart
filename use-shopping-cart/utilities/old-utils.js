@@ -1,13 +1,10 @@
-import { useStorageReducer } from 'react-storage-hooks'
-
-export const isClient = typeof window === 'object'
+import { isClient } from './SSR'
 
 export const formatCurrencyString = ({
   value,
   currency,
   language = isClient ? navigator.language : 'en-US'
 }) => {
-  value = parseInt(value)
   const numberFormat = new Intl.NumberFormat(language, {
     style: 'currency',
     currency,
@@ -27,47 +24,29 @@ export const formatCurrencyString = ({
   return numberFormat.format(value.toFixed(2))
 }
 
-export function useLocalStorageReducer(key, reducer, initialState) {
-  const dummyStorage = {
-    getItem() {
-      return null
-    },
-    setItem() {},
-    removeItem() {}
+export const getCheckoutData = (cart) => {
+  const lineItems = []
+  for (const sku in cart.cartDetails)
+    lineItems.push({ price: sku, quantity: cart.cartDetails[sku].quantity })
+
+  const options = {
+    mode: 'payment',
+    lineItems,
+    successUrl: cart.successUrl,
+    cancelUrl: cart.cancelUrl,
+    billingAddressCollection: cart.billingAddressCollection
+      ? 'required'
+      : 'auto',
+    submitType: 'auto'
   }
-  return useStorageReducer(
-    isClient ? window.localStorage : dummyStorage,
-    key,
-    reducer,
-    initialState
-  )
-}
 
-export const getCheckoutData = {
-  stripe(cart) {
-    const lineItems = []
-    for (const sku in cart.cartDetails)
-      lineItems.push({ price: sku, quantity: cart.cartDetails[sku].quantity })
-
-    const options = {
-      mode: 'payment',
-      lineItems,
-      successUrl: cart.successUrl,
-      cancelUrl: cart.cancelUrl,
-      billingAddressCollection: cart.billingAddressCollection
-        ? 'required'
-        : 'auto',
-      submitType: 'auto'
+  if (cart.allowedCountries?.length) {
+    options.shippingAddressCollection = {
+      allowedCountries: cart.allowedCountries
     }
-
-    if (cart.allowedCountries?.length) {
-      options.shippingAddressCollection = {
-        allowedCountries: cart.allowedCountries
-      }
-    }
-
-    return options
   }
+
+  return options
 }
 
 export function checkoutHandler(cart, checkoutOptions) {

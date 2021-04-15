@@ -1,16 +1,16 @@
 ---
-title: 'Getting started'
+title: 'Getting started (Client Only Mode)'
 id: getting-started
 ---
 
 ## Installation
 
 ```bash
-npm install --save @stripe/stripe-js use-shopping-cart
+npm install --save use-shopping-cart
 
 or
 
-yarn add @stripe/stripe-js use-shopping-cart
+yarn add use-shopping-cart
 ```
 
 The package needs to be configured with your account's secret key, which is available in the [Stripe Dashboard](https://dashboard.stripe.com/apikeys). Require it with the key's value.
@@ -19,19 +19,15 @@ At the root level of your app, wrap your root component in the `<CartProvider />
 
 ```jsx
 import ReactDOM from 'react-dom'
-
-import { loadStripe } from '@stripe/stripe-js'
 import { CartProvider } from 'use-shopping-cart'
 
 import App from './App'
 
-// Remember to add your public Stripe key
-const stripePromise = loadStripe(process.env.REACT_APP_STRIPE_API_PUBLIC)
-
 ReactDOM.render(
   <CartProvider
-    mode="client-only"
-    stripe={stripePromise}
+    mode="payment"
+    cartMode="client-only"
+    stripe={YOUR_STRIPE_API_KEY_GOES_HERE}
     successUrl="stripe.com"
     cancelUrl="twitter.com/dayhaysoos"
     currency="USD"

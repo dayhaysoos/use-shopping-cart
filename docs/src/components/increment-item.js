@@ -46,7 +46,7 @@ export function IncrementItem() {
 
           {/* Increases the item quantity by 10 */}
           <button
-            onClick={() => incrementItem(sku, 10)}
+            onClick={() => incrementItem(sku, { count: 10 })}
             aria-label={`Add ten ${entry.name} to your cart`}
             style={{ height: 50, width: 100, marginBottom: 30 }}
           >
