@@ -8,16 +8,16 @@ import Hero from '../components/landing-page/hero'
 import Feature from '../components/landing-page/feature'
 import Explainer from '../components/landing-page/explainer'
 import Credits from '../components/landing-page/credits'
+import {
+  exampleServerless,
+  exampleFrontend,
+  exampleProducts,
+  exampleCartProvider
+} from '../components/landing-page/codeExamples'
 
 const Home = () => {
   const context = useDocusaurusContext()
   const { siteConfig = {} } = context
-
-  const exampleCode = `
-(function someDemo() {
-  var test = "Hello World!";
-  console.log(test);
-})`
 
   return (
     <Layout
@@ -68,23 +68,23 @@ const Home = () => {
           <Explainer
             title="Wrap your app"
             description="Use the <CartProvider> component to provide global shopping cart state."
-            code={exampleCode}
+            code={exampleCartProvider}
           />
           <Explainer
             title="Get your products"
             description="Product data can come from any source; a headless CMS, pure JSON, the Stripe dashboard."
-            code={exampleCode}
+            code={exampleProducts}
           />
           <Explainer
             title="Create your frontend"
             description="Setup your cart, buy button, and connect with Stripe."
-            code={exampleCode}
+            code={exampleFrontend}
           />
           <Explainer
             title="Validate the purchase"
             description="Securely handle the transaction in a serverless function to
                 validate the products and redirect to Stripe checkout."
-            code={exampleCode}
+            code={exampleServerless}
           />
           <div className={styles.explainersCta}>
             <Link
