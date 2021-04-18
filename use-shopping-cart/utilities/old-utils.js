@@ -55,7 +55,7 @@ export function checkoutHandler(cart, checkoutOptions) {
 
   const needsCheckoutData = cart.mode === 'client-only'
 
-  return async function(parameters) {
+  return async function (parameters) {
     if (!serviceProperty) {
       throw new Error(
         'No compatible API has been defined, your options are: Stripe'
