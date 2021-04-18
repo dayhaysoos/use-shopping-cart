@@ -23,7 +23,7 @@ const featuresRowOne = [
     description: (
       <>
         Abstract away the complexity of working with Stripe so that you can
-        focus on products your customers will love!
+        focus the products your customers love!
       </>
     )
   },
@@ -55,7 +55,7 @@ const featuresRowTwo = [
     imageUrl: 'img/music.svg',
     description: (
       <>
-        We love stacking jam on our toast! Gatsby, NextJs, and raspberry
+        We love stacking jam on our toast! Next.js, Gatsby and raspberry
         flavours!
       </>
     )
@@ -66,7 +66,7 @@ const featuresRowTwo = [
     description: (
       <>
         Handle product validation and webhooks securely in the cloud with first
-        class support for serverless integrations.
+        class support for serverless functions.
       </>
     )
   }
