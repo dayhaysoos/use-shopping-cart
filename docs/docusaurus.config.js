@@ -1,6 +1,6 @@
 module.exports = {
   title: 'USE-SHOPPING-CART',
-  tagline: 'Shopping cart state and logic for Stripe checkout',
+  tagline: 'Shopping cart state and logic for Stripe Checkout',
   url: 'https://useshoppingcart.com/',
   baseUrl: '/',
   onBrokenLinks: 'throw',
