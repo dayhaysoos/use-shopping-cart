@@ -1,0 +1,11 @@
+/* stylelint-disable docusaurus/copyright-header */
+
+/**
+ * CSS files with the .module.css suffix will be treated as CSS modules
+ * and scoped locally.
+ */
+
+.creditText {
+  font-size: 1.25rem;
+  color: var(--usc-blue-dark);
+}
