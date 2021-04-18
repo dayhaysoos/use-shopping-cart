@@ -4,7 +4,7 @@ module.exports = {
   url: 'https://useshoppingcart.com/',
   baseUrl: '/',
   onBrokenLinks: 'throw',
-  favicon: 'img/favicon.ico',
+  favicon: 'img/favicon.png',
   organizationName: 'dayhaysoos', // Usually your GitHub org/user name.
   projectName: 'use-shopping-cart', // Usually your repo name.
   themeConfig: {

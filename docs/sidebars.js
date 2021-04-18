@@ -1,6 +1,12 @@
 module.exports = {
   docs: {
-    Welcome: ['introduction', 'getting-started', 'discord', 'contributors'],
+    Welcome: [
+      'introduction',
+      'getting-started-client-mode',
+      'getting-started-serverless',
+      'discord',
+      'contributors'
+    ],
     Usage: [
       'usage/add-item',
       'usage/api',
