@@ -259,7 +259,7 @@ describe('decrementItem', () => {
     expect(cartDetails[product0.id].quantity).toEqual(1)
   })
 
-  it('should remove an item when it an item by 2', () => {
+  it('should remove an item when it hits 0 an item by 2', () => {
     const mockDetails = mockCartDetails()
     const mockState = {
       ...initialState,

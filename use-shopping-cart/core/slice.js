@@ -135,22 +135,11 @@ const slice = createSlice({
         return { payload: { cartDetails, shouldMerge } }
       }
     },
-    handleCartHover: {
-      reducer: (state) => {
-        state.shouldDisplayCart = true
-      },
-      prepare: () => {
-        return { payload: undefined }
-      }
+    handleCartHover: (state) => {
+      state.shouldDisplayCart = true
     },
-
-    handleCartClick: {
-      reducer: (state) => {
-        state.shouldDisplayCart = !state.shouldDisplayCart
-      },
-      prepare: () => {
-        return { payload: undefined }
-      }
+    handleCartClick: (state) => {
+      state.shouldDisplayCart = !state.shouldDisplayCart
     },
     handleCloseCart: (state) => {
       state.shouldDisplayCart = false
