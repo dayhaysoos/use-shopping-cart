@@ -1,7 +1,7 @@
 [build]
-  command = "yarn workspace use-shopping-cart build && yarn workspace documentation build"
-  publish = "documentation/public"
-  functions = "examples/cra/functions"
+  command = "yarn workspace docs build"
+  publish = "docs/build"
+  # functions = "examples/cra/functions"
 
 # Manually start your application (CRA or other) on port 3000 before
 # running `netlify dev` or `yarn dev`.
