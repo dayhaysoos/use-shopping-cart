@@ -2,6 +2,7 @@ module.exports = {
   docs: {
     Welcome: [
       'introduction',
+      `getting-started`,
       'getting-started-client-mode',
       'getting-started-serverless',
       'discord',
