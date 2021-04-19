@@ -3,8 +3,7 @@
   "workspaces": [
     "examples/*",
     "use-shopping-cart",
-    "documentation",
-    "docs"
+    "documentation"
   ],
   "scripts": {
     "dev": "netlify dev",
