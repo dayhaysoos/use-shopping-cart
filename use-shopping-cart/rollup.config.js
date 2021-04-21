@@ -55,7 +55,7 @@ export default [
           'react-redux': 'react-redux',
           'redux-persist/integration/react': 'redux-persist/integration/react',
           '@reduxjs/toolkit': 'RTK',
-          'redux-persist': 'redux-persist',
+          'redux-persist': 'ReduxPersist',
           uuid: 'uuid',
           '@stripe/stripe-js': '@stripe/stripe-js'
         }
@@ -92,7 +92,7 @@ export default [
         globals: {
           react: 'React',
           ['@reduxjs/toolkit']: 'RTK',
-          ['redux-persist']: 'redux-persist',
+          'redux-persist': 'ReduxPersist',
           uuid: 'uuid',
           '@stripe/stripe-js': '@stripe/stripe-js'
         }
