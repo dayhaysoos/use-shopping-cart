@@ -1,5 +1,11 @@
 import { createSlice } from '@reduxjs/toolkit'
-import { createEntry, updateEntry, removeEntry, updateQuantity } from './Entry'
+import {
+  createEntry,
+  updateEntry,
+  removeEntry,
+  updateQuantity,
+  updateFormattedTotalPrice
+} from './Entry'
 import { isClient } from '../utilities/SSR'
 import { v4 as uuidv4 } from 'uuid'
 

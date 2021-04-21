@@ -78,6 +78,7 @@ export function updateEntry({
 
   state.cartDetails[id] = Entry({
     state,
+    id,
     product: entry,
     quantity: entry.quantity + count,
     price_metadata,
