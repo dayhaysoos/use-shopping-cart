@@ -17,6 +17,14 @@ export function updateFormattedValue(state, id) {
   })
 }
 
+export function updateFormattedPrice(state, id) {
+  state.cartDetails[id].formattedPrice = formatCurrencyString({
+    value: state.cartDetails[id].price,
+    currency: state.currency,
+    language: state.language
+  })
+}
+
 function Entry({
   state,
   id,
@@ -60,6 +68,7 @@ export function createEntry({
 
   state.cartDetails[id] = entry
   updateFormattedValue(state, id)
+  updateFormattedPrice(state, id)
 
   state.totalPrice += entry.value
   state.cartCount += count
