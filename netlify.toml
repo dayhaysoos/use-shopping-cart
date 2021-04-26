@@ -11,6 +11,7 @@
   targetPort = 3000
   framework = "#custom"
   autoLaunch = true
+  functions = "examples/cra/functions"
 
 [[redirects]]
   from = "https://use-shopping-cart.netlify.app"

@@ -1,4 +1,4 @@
-const stripe = require('stripe')(process.env.REACT_APP_STRIPE_API_SECRET)
+const stripe = require('stripe')(process.env.STRIPE_API_SECRET)
 const validateCartItems = require('use-shopping-cart/utilities')
   .validateCartItems
 
