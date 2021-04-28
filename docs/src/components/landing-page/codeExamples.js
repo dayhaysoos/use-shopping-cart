@@ -21,7 +21,7 @@ ReactDOM.render(
   <CartProvider
     mode="payment"
     cartMode="client-only"
-    stripe={YOUR_STRIPE_API_KEY_GOES_HERE}
+    stripe={YOUR_STRIPE_PUBLISHABLE_KEY_HERE}
     successUrl="stripe.com"
     cancelUrl="twitter.com/dayhaysoos"
     currency="USD"
@@ -68,8 +68,9 @@ function Product({ product }) {
 `
 
 export const exampleServerless = `
-const stripe = require('stripe')(process.env.REACT_APP_STRIPE_API_SECRET)
-const { validateCartItems } = require('use-shopping-cart/src/serverUtil')
+const stripe = require('stripe')(process.env.STRIPE_API_SECRET)
+const validateCartItems = require('use-shopping-cart/utilities')
+  .validateCartItems
 const inventory = require('./data/products.json')
 
 exports.handler = async (event) => {
