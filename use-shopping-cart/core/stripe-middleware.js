@@ -1,5 +1,5 @@
-import { loadStripe } from '@stripe/stripe-js'
 import { getCheckoutData } from '../utilities/old-utils'
+import '@stripe/stripe-js'
 
 export const handleStripe = (store) => (next) => async (action) => {
   const stripePublicKey = store.getState().stripe
@@ -8,7 +8,7 @@ export const handleStripe = (store) => (next) => async (action) => {
 
   if (action.type === 'cart/redirectToCheckout') {
     try {
-      stripe = await loadStripe(stripePublicKey)
+      stripe = await Stripe(stripePublicKey)
     } catch (error) {
       console.log('error', error)
     }
@@ -28,7 +28,7 @@ export const handleStripe = (store) => (next) => async (action) => {
 
   if (action.type === 'cart/checkoutSingleItem') {
     try {
-      stripe = await loadStripe(stripePublicKey)
+      stripe = await Stripe(stripePublicKey)
     } catch (error) {
       console.log('error', error)
     }
