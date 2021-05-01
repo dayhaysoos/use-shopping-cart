@@ -163,7 +163,7 @@ describe('validateCartItems', () => {
     })
   })
 
-  it("should combine the entry's product_data with the line item's product_data", () => {
+  it("should pass the entry's product_data.metadata through to the line item's product_data", () => {
     expect(lineItems[3]).toStrictEqual({
       price_data: {
         currency: 'USD',
