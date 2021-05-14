@@ -2,9 +2,9 @@ function validateCartItems(inventorySrc, cartDetails) {
   const validatedItems = []
 
   for (const id in cartDetails) {
-    const inventoryItem = inventorySrc.find(
-      (currentProduct) => currentProduct.id === id
-    )
+    const inventoryItem = inventorySrc.find((currentProduct) => {
+      return currentProduct.id === id || currentProduct.sku === id
+    })
     if (inventoryItem === undefined) {
       throw new Error(
         `Invalid Cart: product with id "${id}" is not in your inventory.`

@@ -1,6 +1,6 @@
 {
   "name": "use-shopping-cart",
-  "version": "3.0.0-beta.14",
+  "version": "3.0.0-beta.15",
   "description": "Shopping cart state and logic for Stripe",
   "author": "dayhaysoos",
   "license": "MIT",
@@ -99,9 +99,9 @@
   },
   "dependencies": {
     "@reduxjs/toolkit": "^1.5.0",
-    "@stripe/stripe-js": "^1.13.2",
-    "redux-persist": "^6.0.0",
+    "@stripe/stripe-js": "^1.14.0",
     "react-redux": "^7.2.2",
+    "redux-persist": "^6.0.0",
     "uuid": "^8.3.1"
   }
 }
