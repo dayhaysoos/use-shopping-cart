@@ -5,8 +5,7 @@ import url from '@rollup/plugin-url'
 import alias from '@rollup/plugin-alias'
 import externals from 'rollup-plugin-node-externals'
 import visualizer from 'rollup-plugin-visualizer'
-import typescript from '@rollup/plugin-typescript'
-// import tsconfig from './tsconfig.json'
+import copy from 'rollup-plugin-copy'
 
 import pkg from './package.json'
 
@@ -23,6 +22,9 @@ const common = {
     sucrase({
       exclude: 'node_modules/**/*',
       transforms: ['jsx']
+    }),
+    copy({
+      targets: [{ src: './core/index.d.ts', dest: './dist' }]
     }),
     externals({ deps: true }),
     resolve(),
@@ -100,15 +102,6 @@ export default [
         }
       }
     ]
-  },
-  {
-    input: './core/index.d.ts',
-    output: {
-      file: './core/index.d.ts',
-      dir: './dist',
-      format: 'cjs'
-    },
-    plugins: [typescript()]
   },
   {
     ...common.core,
