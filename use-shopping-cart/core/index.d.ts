@@ -192,7 +192,7 @@ declare module 'use-shopping-cart' {
      * @param cartDetails cartDetails: [product.id]: {...}
      * @param shouldMerge Boolean, defaults to true. If false, it would replace cartDetails
      */
-    loadCart: (cartDetails: Object<CartDetails>, shouldMerge?: Boolean) => void
+    loadCart: (cartDetails: CartDetails, shouldMerge?: Boolean) => void
   }
 
   /**
@@ -203,7 +203,7 @@ declare module 'use-shopping-cart' {
   /**
    * Displays the values returned by `useShoppingCart()` in a table format.
    */
-  export declare const DebugCart: React.FunctionComponent<React.DetailedHTMLProps<
+  export const DebugCart: React.FunctionComponent<React.DetailedHTMLProps<
     React.TableHTMLAttributes<HTMLTableElement>,
     HTMLTableElement
   >>
@@ -232,7 +232,7 @@ declare module 'use-shopping-cart' {
    * Utitlity for validating that the prices are what they should be server-side
    * */
   export function validateCartItems(
-    inventorySrc: array,
+    inventorySrc: [Product],
     cartDetails: CartDetails
-  ): array
+  )
 }

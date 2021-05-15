@@ -5,6 +5,8 @@ import url from '@rollup/plugin-url'
 import alias from '@rollup/plugin-alias'
 import externals from 'rollup-plugin-node-externals'
 import visualizer from 'rollup-plugin-visualizer'
+import typescript from '@rollup/plugin-typescript'
+// import tsconfig from './tsconfig.json'
 
 import pkg from './package.json'
 
@@ -98,6 +100,15 @@ export default [
         }
       }
     ]
+  },
+  {
+    input: './core/index.d.ts',
+    output: {
+      file: './core/index.d.ts',
+      dir: './dist',
+      format: 'cjs'
+    },
+    plugins: [typescript()]
   },
   {
     ...common.core,
