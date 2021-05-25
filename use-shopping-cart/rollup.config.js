@@ -24,7 +24,14 @@ const common = {
       transforms: ['jsx']
     }),
     copy({
-      targets: [{ src: './core/index.d.ts', dest: './dist' }]
+      targets: [
+        { src: './core/index.d.ts', dest: './dist' },
+        { src: './utilities/serverless.d.ts', dest: './dist' },
+        { src: './core/', dest: './dist' },
+        { src: './react/index.d.ts', dest: './dist', rename: 'react.d.ts' },
+        { src: './react/index.d.ts', dest: './dist', rename: 'react.es.d.ts' },
+        { src: './react/index.d.ts', dest: './dist', rename: 'react.umd.d.ts' }
+      ]
     }),
     externals({ deps: true }),
     resolve(),

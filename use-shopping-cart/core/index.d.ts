@@ -1,6 +1,5 @@
 declare module 'use-shopping-cart' {
   interface CommonProviderProps {
-    children: JSX.Element
     /**
      * Your Publishable Stripe API key
      */
@@ -13,6 +12,10 @@ declare module 'use-shopping-cart' {
      * The language to be used format price data
      */
     language?: string
+  }
+
+  interface ReactProviderProps extends CommonProviderProps {
+    children: JSX.Element
   }
   interface ClientOnlyProviderProps extends CommonProviderProps {
     /**
