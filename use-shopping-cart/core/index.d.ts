@@ -13,10 +13,6 @@ declare module 'use-shopping-cart' {
      */
     language?: string
   }
-
-  interface ReactProviderProps extends CommonProviderProps {
-    children: JSX.Element
-  }
   interface ClientOnlyProviderProps extends CommonProviderProps {
     /**
      * Determines Stripe mode. Options are subscription or payment
