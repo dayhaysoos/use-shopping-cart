@@ -15,7 +15,7 @@ const common = {
     external: ['react']
   },
   core: {
-    input: './core/store.js'
+    input: './core/index.js'
   },
   plugins: [
     url({ exclude: ['**/*.svg'] }),

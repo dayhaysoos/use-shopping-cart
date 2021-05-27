@@ -4,7 +4,7 @@ import {
   createShoppingCartStore,
   formatCurrencyString,
   filterCart
-} from '../core/store'
+} from '../core/index'
 import { bindActionCreators } from '@reduxjs/toolkit'
 import { createDispatchHook, createSelectorHook, Provider } from 'react-redux'
 import { PersistGate } from 'redux-persist/integration/react'

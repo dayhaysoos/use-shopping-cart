@@ -50,11 +50,6 @@ declare module 'use-shopping-cart' {
     | ClientOnlyProviderProps
     | CheckoutSessionProviderProps
 
-  /**
-   * Context provider to interact with Stripe API
-   */
-  export const CartProvider: (props: ProviderProps) => JSX.Element
-
   export interface Product {
     /**
      * The name of the product
@@ -234,4 +229,21 @@ declare module 'use-shopping-cart' {
     inventorySrc: [Product],
     cartDetails: CartDetails
   )
+
+  // should prob make it clear that it's returning a redux store?
+
+  /**
+   * @name createShoppingCartStore
+   * @param options {ProviderProps}
+   * @returns persisted redux store
+   */
+  export function createShoppingCartStore(options: ProviderProps): object
+
+  /**
+   * @name createPersistedStore
+   * @param store redux store
+   * @returns persisted redux store
+   * @description This is for persisted stores in non-react apps
+   */
+  export function createPersistedStore(store: object): object
 }
