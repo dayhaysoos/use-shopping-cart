@@ -24,7 +24,8 @@ function validateCartItems(inventorySrc, cartDetails) {
       quantity: cartDetails[id].quantity
     }
 
-    if (typeof cartDetails[id].product_data?.metadata === 'object') {
+
+    if (cartDetails[id].product_data && typeof cartDetails[id].product_data.metadata === 'object') {
       item.price_data.product_data.metadata = {
         ...item.price_data.product_data.metadata,
         ...cartDetails[id].product_data.metadata
