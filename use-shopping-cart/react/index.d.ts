@@ -46,4 +46,13 @@ declare module 'use-shopping-cart' {
      */
     mode: 'checkout-session'
   }
+
+  export type ProviderProps =
+    | ClientOnlyProviderProps
+    | CheckoutSessionProviderProps
+
+  /**
+   * Context provider to interact with Stripe API
+   */
+  export const CartProvider: (props: ProviderProps) => JSX.Element
 }

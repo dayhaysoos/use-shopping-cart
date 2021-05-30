@@ -1,5 +1,5 @@
 declare module 'use-shopping-cart' {
-  interface CommonProviderProps {
+  interface CommonConfig {
     /**
      * Your Publishable Stripe API key
      */
@@ -13,7 +13,7 @@ declare module 'use-shopping-cart' {
      */
     language?: string
   }
-  interface ClientOnlyProviderProps extends CommonProviderProps {
+  interface ClientOnlyConfig extends CommonConfig {
     /**
      * Determines Stripe mode. Options are subscription or payment
      */
@@ -39,16 +39,14 @@ declare module 'use-shopping-cart' {
      */
     allowedCountries?: null | string[]
   }
-  interface CheckoutSessionProviderProps extends CommonProviderProps {
+  interface CheckoutSessionConfig extends CommonConfig {
     /**
      * Determines checkout mode
      */
     mode: 'checkout-session'
   }
 
-  export type ProviderProps =
-    | ClientOnlyProviderProps
-    | CheckoutSessionProviderProps
+  export type Config = ClientOnlyConfig | CheckoutSessionConfig
 
   export interface Product {
     /**
@@ -234,10 +232,10 @@ declare module 'use-shopping-cart' {
 
   /**
    * @name createShoppingCartStore
-   * @param options {ProviderProps}
+   * @param options {Config}
    * @returns persisted redux store
    */
-  export function createShoppingCartStore(options: ProviderProps): object
+  export function createShoppingCartStore(options: Config): object
 
   /**
    * @name createPersistedStore
