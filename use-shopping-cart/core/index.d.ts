@@ -1,3 +1,6 @@
+import { Store } from '@reduxjs/toolkit'
+import { Persistor } from 'redux-persist/es/types'
+
 declare module 'use-shopping-cart' {
   interface CommonConfig {
     /**
@@ -235,7 +238,7 @@ declare module 'use-shopping-cart' {
    * @param options {Config}
    * @returns persisted redux store
    */
-  export function createShoppingCartStore(options: Config): object
+  export function createShoppingCartStore(options: Config): Store
 
   /**
    * @name createPersistedStore
@@ -243,5 +246,5 @@ declare module 'use-shopping-cart' {
    * @returns persisted redux store
    * @description This is for persisted stores in non-react apps
    */
-  export function createPersistedStore(store: object): object
+  export function createPersistedStore(store: Config): Persistor
 }
