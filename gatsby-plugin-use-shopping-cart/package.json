@@ -1,0 +1,24 @@
+{
+  "name": "gatsby-plugin-use-shopping-cart",
+  "version": "0.0.1",
+  "description": "A minimal boilerplate for the essential files Gatsby looks for in a plugin",
+  "author": "Eric Howey <ehowey@gmail.com>",
+  "main": "index.js",
+  "dependencies": {
+    "use-shopping-cart": "^3.0.0-beta.17"
+  },
+  "peerDependencies": {
+    "gatsby": "^3.6.0",
+    "react": "^17.0.2",
+    "react-dom": "^17.0.2"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "build": "echo \"No build script setup\""
+  },
+  "keywords": [
+    "gatsby",
+    "gatsby-plugin"
+  ],
+  "license": "MIT"
+}
