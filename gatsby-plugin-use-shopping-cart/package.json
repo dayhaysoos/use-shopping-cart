@@ -1,7 +1,7 @@
 {
   "name": "gatsby-plugin-use-shopping-cart",
   "version": "0.0.1",
-  "description": "A minimal boilerplate for the essential files Gatsby looks for in a plugin",
+  "description": "A plugin for use-shopping-cart to kickoff your ecommerce experience with Stripe.",
   "author": "Eric Howey <ehowey@gmail.com>",
   "main": "index.js",
   "dependencies": {
