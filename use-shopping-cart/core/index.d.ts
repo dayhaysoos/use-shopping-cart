@@ -1,4 +1,3 @@
-import { Store } from '@reduxjs/toolkit'
 import { Persistor } from 'redux-persist/es/types'
 
 declare module 'use-shopping-cart' {
@@ -231,14 +230,13 @@ declare module 'use-shopping-cart' {
     cartDetails: CartDetails
   )
 
-  // should prob make it clear that it's returning a redux store?
-
   /**
    * @name createShoppingCartStore
    * @param options {Config}
+   * @description Utility for creating redux store
    * @returns persisted redux store
    */
-  export function createShoppingCartStore(options: Config): Store
+  export function createShoppingCartStore(options: Config): Persistor
 
   /**
    * @name createPersistedStore

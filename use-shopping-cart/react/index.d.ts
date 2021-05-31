@@ -1,3 +1,4 @@
+import { Persistor } from 'redux-persist/es/types'
 declare module 'use-shopping-cart' {
   interface CommonProviderProps {
     children: JSX.Element
@@ -55,4 +56,12 @@ declare module 'use-shopping-cart' {
    * Context provider to interact with Stripe API
    */
   export const CartProvider: (props: ProviderProps) => JSX.Element
+
+  /**
+   * @name createShoppingCartStore
+   * @param options {Config}
+   * @description Utility for creating redux store
+   * @returns persisted redux store
+   */
+  export function createShoppingCartStore(options: Config): Persistor
 }
