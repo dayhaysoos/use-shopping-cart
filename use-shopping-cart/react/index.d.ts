@@ -63,5 +63,7 @@ declare module 'use-shopping-cart' {
    * @description Utility for creating redux store
    * @returns persisted redux store
    */
-  export function createShoppingCartStore(options: Config): Persistor
+  export function createShoppingCartStore(
+    options: CommonProviderProps
+  ): Persistor
 }
