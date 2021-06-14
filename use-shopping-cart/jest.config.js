@@ -1,4 +1,4 @@
 module.exports = {
-  env: 'jsdom',
+  testEnvironment: 'jest-environment-jsdom-fifteen',
   roots: ['react', 'core', 'utilities']
 }
