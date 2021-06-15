@@ -25,12 +25,23 @@ const common = {
     }),
     copy({
       targets: [
-        { src: './core/index.d.ts', dest: './dist' },
-        { src: './utilities/serverless.d.ts', dest: './dist' },
-        { src: './core/', dest: './dist' },
-        { src: './react/index.d.ts', dest: './dist', rename: 'react.d.ts' },
-        { src: './react/index.d.ts', dest: './dist', rename: 'react.es.d.ts' },
-        { src: './react/index.d.ts', dest: './dist', rename: 'react.umd.d.ts' }
+        { src: './core/index.d.ts', dest: './dist/types' },
+        { src: './utilities/serverless.d.ts', dest: './dist/types' },
+        { src: './core/', dest: './dist/' },
+        {
+          src: './react/index.d.ts',
+          dest: './dist/types'
+        },
+        {
+          src: './react/index.d.ts',
+          dest: './dist/types',
+          rename: 'index.es.d.ts'
+        },
+        {
+          src: './react/index.d.ts',
+          dest: './dist/types',
+          rename: 'index.umd.d.ts'
+        }
       ]
     }),
     externals({ deps: true }),
