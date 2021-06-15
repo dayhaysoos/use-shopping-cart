@@ -1,8 +1,10 @@
 import React from 'react'
 import { useShoppingCart, formatCurrencyString } from 'use-shopping-cart'
+import { useDocsState } from '../../context'
 
 export function AddItem({ product }) {
   const { addItem } = useShoppingCart()
+  const { framework } = useDocsState()
 
   /* A helper function that turns the price into a readable format */
   const price = formatCurrencyString({
@@ -10,6 +12,7 @@ export function AddItem({ product }) {
     currency: product.currency,
     language: 'en-US'
   })
+
   return (
     <article
       style={{
