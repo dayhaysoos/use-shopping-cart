@@ -77,11 +77,11 @@ declare module 'use-shopping-cart' {
     /**
      * Values that go into the price_metadata field
      */
-    price_data: object
+    price_data?: object
     /**
      * Values that go into the product_metadata field
      */
-    product_data: object
+    product_data?: object
     /**
      * Any additional properties
      */
@@ -292,7 +292,7 @@ declare module 'use-shopping-cart' {
     /**
      * Determines checkout mode
      */
-    mode: 'checkout-session'
+    cartMode: 'checkout-session'
   }
 
   export type ProviderProps =
