@@ -9,6 +9,13 @@ export const handleStripe = (store) => (next) => async (action) => {
   if (action.type === 'cart/redirectToCheckout') {
     try {
       stripe = await Stripe(stripePublicKey)
+      // new method provided to help Stripe keep track of usage.
+      stripe.registerAppInfo({
+        name: 'use-shopping-cart',
+        version: '3.0.0-beta.15',
+        url: 'https://useshoppingcart.com',
+        partner_id: 'pp_partner_H8MLmI3e9Oc3IK'
+      })
     } catch (error) {
       console.log('error', error)
     }

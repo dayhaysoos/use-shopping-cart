@@ -5,6 +5,7 @@ import url from '@rollup/plugin-url'
 import alias from '@rollup/plugin-alias'
 import externals from 'rollup-plugin-node-externals'
 import visualizer from 'rollup-plugin-visualizer'
+import copy from 'rollup-plugin-copy'
 
 import pkg from './package.json'
 
@@ -14,13 +15,34 @@ const common = {
     external: ['react']
   },
   core: {
-    input: './core/store.js'
+    input: './core/index.js'
   },
   plugins: [
     url({ exclude: ['**/*.svg'] }),
     sucrase({
       exclude: 'node_modules/**/*',
       transforms: ['jsx']
+    }),
+    copy({
+      targets: [
+        { src: './core/index.d.ts', dest: './dist/types' },
+        { src: './utilities/serverless.d.ts', dest: './dist/types' },
+        { src: './core/', dest: './dist/' }
+        // {
+        //   src: './react/index.d.ts',
+        //   dest: './dist/types'
+        // },
+        // {
+        //   src: './react/index.d.ts',
+        //   dest: './dist/types',
+        //   rename: 'index.es.d.ts'
+        // },
+        // {
+        //   src: './react/index.d.ts',
+        //   dest: './dist/types',
+        //   rename: 'index.umd.d.ts'
+        // }
+      ]
     }),
     externals({ deps: true }),
     resolve(),
