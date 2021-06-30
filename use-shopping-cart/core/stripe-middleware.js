@@ -6,7 +6,7 @@ export const handleStripe = (store) => (next) => async (action) => {
   const cart = store.getState()
 
   if (action.type === 'cart/redirectToCheckout') {
-    const stripe = await initializeStripe(stripePublicKey)
+    const stripe = initializeStripe(stripePublicKey)
     if (cart.cartMode === 'checkout-session') {
       return stripe.redirectToCheckout({
         sessionId: action.payload.sessionId
@@ -22,7 +22,7 @@ export const handleStripe = (store) => (next) => async (action) => {
   }
 
   if (action.type === 'cart/checkoutSingleItem') {
-    const stripe = await initializeStripe(stripePublicKey)
+    const stripe = initializeStripe(stripePublicKey)
 
     if (cart.cartMode === 'client-only') {
       const productId = action.payload.productId
@@ -45,7 +45,15 @@ export const handleStripe = (store) => (next) => async (action) => {
 function initializeStripe(publicKey) {
   try {
     // eslint-disable-next-line no-undef
-    return Stripe(publicKey)
+    const stripe = Stripe(publicKey)
+    stripe.registerAppInfo({
+      name: 'use-shopping-cart',
+      version: '3.0.0-beta.15',
+      url: 'https://useshoppingcart.com',
+      // eslint-disable-next-line camelcase
+      partner_id: 'pp_partner_H8MLmI3e9Oc3IK'
+    })
+    return stripe
   } catch (error) {
     console.log('error', error)
   }

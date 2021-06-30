@@ -53,7 +53,8 @@ function mockCartDetails(overrides1, overrides2) {
 }
 
 const stripeMock = {
-  redirectToCheckout: jest.fn().mockReturnValue(() => Promise.resolve())
+  redirectToCheckout: jest.fn().mockReturnValue(() => Promise.resolve()),
+  registerAppInfo: jest.fn()
 }
 
 const createWrapper = (overrides = {}) => ({ children }) => (
