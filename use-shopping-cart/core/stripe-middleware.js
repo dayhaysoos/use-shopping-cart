@@ -42,10 +42,10 @@ export const handleStripe = (store) => (next) => async (action) => {
   return next(action)
 }
 
-async function initializeStripe(publicKey) {
+function initializeStripe(publicKey) {
   try {
     // eslint-disable-next-line no-undef
-    return await Stripe(publicKey)
+    return Stripe(publicKey)
   } catch (error) {
     console.log('error', error)
   }
