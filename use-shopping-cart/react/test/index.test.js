@@ -1,17 +1,8 @@
-import React from 'react'
-
 import { act, renderHook } from '@testing-library/react-hooks'
-import { render, screen, findByRole, getByRole } from '@testing-library/react'
-import '@testing-library/jest-dom/extend-expect'
-import { CartProvider, useShoppingCart, DebugCart } from '../index'
 
-const expectedInitialCartState = {
-  cartDetails: {},
-  totalPrice: 0,
-  formattedTotalPrice: '$0.00',
-  cartCount: 0,
-  shouldDisplayCart: false
-}
+import '@testing-library/jest-dom/extend-expect'
+import { useShoppingCart } from '../index'
+import { createWrapper, expectedInitialCartState } from './testHelpers'
 
 let counter = 0
 
@@ -56,20 +47,6 @@ const stripeMock = {
   redirectToCheckout: jest.fn().mockReturnValue(() => Promise.resolve()),
   registerAppInfo: jest.fn()
 }
-
-const createWrapper = (overrides = {}) => ({ children }) => (
-  <CartProvider
-    mode="payment"
-    cartMode="client-only"
-    successUrl="https://egghead.io/success"
-    cancelUrl="https://egghead.io/cancel"
-    stripe={null}
-    currency="USD"
-    {...overrides}
-  >
-    {children}
-  </CartProvider>
-)
 
 let cart
 
@@ -464,49 +441,6 @@ describe('useShoppingCart()', () => {
         cart.current.storeLastClicked(product.id)
       })
       expect(cart.current.lastClicked).toBe(product.id)
-    })
-  })
-
-  describe.skip('<DebugCart>', () => {
-    beforeEach(() => {
-      const Wrapper = createWrapper()
-      act(() => render(
-        <Wrapper>
-          <DebugCart />
-        </Wrapper>
-      ))
-    })
-
-    it('should make a table of properties and values from the cart', async () => {
-      const { cartDetails, ...remainingState } = expectedInitialCartState
-
-      const tableElement = await screen.findByRole('table')
-      expect(tableElement).toBeVisible()
-      const cartDetailsCell = await screen.findByRole('cell', { name: 'cartDetails' })
-      expect(cartDetailsCell).toBeVisible()
-
-      const logButton = await findByRole(cartDetailsCell.parentElement, 'button', { name: /log value/i })
-      expect(logButton).toBeVisible()
-
-      console.log('REMAINING STATE')
-      console.log(remainingState)
-      for (const key of Object.entries(window.localStorage)) {
-        console.log('******KEY******' + key)
-      }
-      for (const property in remainingState) {
-        console.log(property)
-        const keyCell = await screen.findByRole('cell', { name: property })
-        // console.log('**********KEY CELL: ' + property + '***********')
-        // console.log(keyCell)
-        const valueCell = await getByRole(keyCell.parentElement, 'cell', {
-          name: JSON.stringify(remainingState[property])
-        })
-        // console.log('**********VALUE CELL: ' + property + '***********')
-        // console.log(valueCell)
-
-        expect(keyCell).toBeVisible()
-        expect(valueCell).toBeVisible()
-      }
     })
   })
 })
