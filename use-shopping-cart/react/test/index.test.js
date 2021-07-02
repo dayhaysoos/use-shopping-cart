@@ -1,27 +1,18 @@
-import React from 'react'
-
 import { act, renderHook } from '@testing-library/react-hooks'
-import { render, screen, getByRole } from '@testing-library/react'
+
 import '@testing-library/jest-dom/extend-expect'
-
-import { CartProvider, useShoppingCart, DebugCart } from './index'
-
-const expectedInitialCartState = {
-  cartDetails: {},
-  totalPrice: 0,
-  formattedTotalPrice: '$0.00',
-  cartCount: 0,
-  shouldDisplayCart: false
-}
+import { useShoppingCart } from '../index'
+import { createWrapper, expectedInitialCartState } from './testHelpers'
 
 let counter = 0
+
 function mockProduct(overrides) {
   return {
-    id: `sku_abc${counter++}`,
-    name: 'blah bleh bloo',
+    id: `product-id-${counter++}`,
+    name: 'mock-product-name',
     price: Math.floor(Math.random() * 1000 + 1),
-    image: 'https://blah.com/bleh',
-    alt: 'a bleh glowing under a soft sunrise',
+    image: 'https://mock.product/url',
+    alt: 'mock-product-alt-text',
     currency: 'usd',
     ...overrides
   }
@@ -37,7 +28,6 @@ function mockCartDetails(overrides1, overrides2) {
       currency: 'USD',
       value: 800,
       quantity: 2,
-      formattedValue: '$8.00',
       ...overrides1
     },
     [`id_efg${counter}`]: {
@@ -48,50 +38,41 @@ function mockCartDetails(overrides1, overrides2) {
       price: 250,
       value: 1000,
       quantity: 4,
-      formattedValue: '$10.00',
       ...overrides2
     }
   }
 }
 
 const stripeMock = {
-  redirectToCheckout: jest.fn().mockReturnValue(() => Promise.resolve())
+  redirectToCheckout: jest.fn().mockReturnValue(() => Promise.resolve()),
+  registerAppInfo: jest.fn()
 }
 
-const createWrapper = (overrides = {}) => ({ children }) => (
-  <CartProvider
-    mode="client-only"
-    successUrl="https://egghead.io/success"
-    cancelUrl="https://egghead.io/cancel"
-    stripe={null}
-    currency="USD"
-    {...overrides}
-  >
-    {children}
-  </CartProvider>
-)
+let cart
+
+function reload(overrides) {
+  window.localStorage.clear()
+  const { result } = renderHook(() => useShoppingCart((state) => state), {
+    wrapper: createWrapper(overrides)
+  })
+  return result
+}
 
 describe('useShoppingCart()', () => {
-  const wrapper = createWrapper()
-  let cart
-  function reload() {
-    window.localStorage.clear()
-    cart = renderHook(() => useShoppingCart((state) => state), { wrapper })
-      .result
-  }
-  beforeEach(() => reload())
-  afterEach(() => window.localStorage.clear())
+  beforeEach(() => {
+    cart = reload()
+  })
 
-  it('initial state', () => {
+  it('has the expected initial state', () => {
     expect(cart.current).toMatchObject(expectedInitialCartState)
   })
 
   describe('shouldDisplayCart', () => {
-    it('shouldDisplayCart should be false by default', () => {
-      expect(cart.current.shouldDisplayCart).toBeFalsy()
+    it('is false by default', () => {
+      expect(cart.current.shouldDisplayCart).toBe(false)
     })
 
-    it('should set shouldDisplayCart to true after running handleCartClick() once', () => {
+    it('sets shouldDisplayCart to true after running handleCartClick() once', () => {
       act(() => {
         cart.current.handleCartClick()
       })
@@ -99,7 +80,7 @@ describe('useShoppingCart()', () => {
       expect(cart.current.shouldDisplayCart).toBe(true)
     })
 
-    it('handleCartClick() toggles value', () => {
+    it('is toggled by handleCartClick()', () => {
       act(() => {
         cart.current.handleCartClick()
       })
@@ -113,8 +94,9 @@ describe('useShoppingCart()', () => {
 
     it.todo('handleCartHover()')
 
-    it('handleCloseCart() closes cart', () => {
+    it('is set to false by handleCloseCart()', () => {
       act(() => {
+        cart.current.handleCartClick()
         cart.current.handleCloseCart()
       })
       expect(cart.current.shouldDisplayCart).toBe(false)
@@ -154,7 +136,6 @@ describe('useShoppingCart()', () => {
       }
 
       expect(cart.current.cartDetails).toHaveProperty(product.id)
-      const entry = cart.current.cartDetails[product.id]
 
       const totalValue = Object.keys(cart.current.cartDetails)
         .map((item) => cart.current.cartDetails[item].value)
@@ -364,8 +345,6 @@ describe('useShoppingCart()', () => {
       const product = mockProduct()
 
       act(() => {
-        // TODO: figure out why the default state has an actual value. Using clearCart as duct tape solution
-        cart.current.clearCart()
         cart.current.addItem(product)
         cart.current.decrementItem(product.id, { count: 5 })
       })
@@ -416,74 +395,47 @@ describe('useShoppingCart()', () => {
     })
   })
 
-  describe.skip('loadCart()', () => {
-    it('should add cartDetails to cart object', async () => {
-      const wrapper = createWrapper()
-      const cart = renderHook(() => useShoppingCart((state) => state), {
-        wrapper
-      }).result
-      const cartDetails = mockCartDetails()
-      const product = mockProduct({ price: 200 })
+  describe('loadCart()', () => {
+    let cartDetails, product
 
+    beforeEach(() => {
+      cartDetails = mockCartDetails()
+      product = mockProduct({ price: 200 })
+    })
+
+    it('should add cartDetails to cart object', async () => {
       act(() => {
         cart.current.addItem(product)
         cart.current.loadCart(cartDetails, false)
       })
 
-      const itemId1 = Object.keys(cartDetails)[0]
-      const itemId2 = Object.keys(cartDetails)[1]
-
-      expect(cart.current.cartDetails).toEqual({
-        [itemId1]: {
-          ...cartDetails[itemId1],
-          id: itemId1
-        },
-        [itemId2]: {
-          ...cartDetails[itemId2],
-          id: itemId2
-        }
+      expect(cart.current).toMatchObject({
+        cartDetails,
+        totalPrice: 1800,
+        cartCount: 6
       })
-      expect(cart.current.totalPrice).toEqual(1800)
-      expect(cart.current.cartCount).toEqual(6)
     })
 
     it('should merge two cart details items by default', async () => {
-      const wrapper = createWrapper()
-      const cart = renderHook(() => useShoppingCart((state) => state), {
-        wrapper
-      }).result
-
-      const cartDetails = mockCartDetails()
-      const product = mockProduct({ price: 200 })
-
       act(() => {
         cart.current.addItem(product)
         cart.current.incrementItem(product.id)
         cart.current.loadCart(cartDetails)
       })
 
-      const itemId1 = Object.keys(cartDetails)[0]
-      const itemId2 = Object.keys(cartDetails)[1]
-
-      const entry = cart.current.cartDetails[product.id]
-      expect(cart.current.cartDetails).toEqual({
-        [entry.id]: entry,
-        [itemId1]: {
-          ...cartDetails[itemId1],
-          id: itemId1
-        },
-        [itemId2]: {
-          ...cartDetails[itemId2],
-          id: itemId2
+      expect(cart.current).toMatchObject({
+        totalPrice: 2200,
+        cartCount: 8,
+        cartDetails: {
+          [product.id]: product,
+          ...cartDetails
         }
       })
-      expect(cart.current.totalPrice).toEqual(2200)
-      expect(cart.current.cartCount).toEqual(8)
     })
   })
 
   describe('storeLastClicked()', () => {
-    it(' updates lastClicked', () => {
+    it('updates lastClicked', () => {
       const product = mockProduct()
       act(() => {
         cart.current.storeLastClicked(product.id)
@@ -493,71 +445,33 @@ describe('useShoppingCart()', () => {
   })
 })
 
-describe.skip('persistence', () => {
-  const wrapper = createWrapper()
-  let cart
-  function reload() {
-    cart = renderHook(() => useShoppingCart((state) => state), { wrapper })
-      .result
-  }
-
-  it('data should persist past reload', () => {
-    const product = mockProduct()
-    act(() => {
-      cart.current.addItem(product)
-    })
-
-    const snapshot = {
-      cartDetails: cart.current.cartDetails,
-      cartCount: cart.current.cartCount,
-      totalPrice: cart.current.totalPrice
-    }
-
-    reload()
-    expect(cart.current).toMatchObject(snapshot)
+describe('redirectToCheckout()', () => {
+  const checkoutOptionsWithAnySessionId = expect.objectContaining({
+    sessionId: expect.anything()
   })
 
-  it('clearCart() should empty the cart even after reload', () => {
-    const product = mockProduct()
-
-    act(() => {
-      cart.current.addItem(product)
-      cart.current.clearCart()
-    })
-
-    const emptyCart = {
-      cartDetails: {},
-      cartCount: 0,
-      totalPrice: 0
-    }
-
-    expect(cart.current).toMatchObject(emptyCart)
-    reload()
-    expect(cart.current).toMatchObject(emptyCart)
-  })
-})
-
-describe.skip('redirectToCheckout()', () => {
   beforeEach(() => {
     stripeMock.redirectToCheckout.mockClear()
+    global.Stripe = () => stripeMock
+    cart = reload({ cartMode: 'client-only' })
   })
 
   it('should send the correct default values', async () => {
-    const wrapper = createWrapper()
-    const cart = renderHook(() => useShoppingCart((state) => state), {
-      wrapper
-    }).result
-
     const product = mockProduct()
-    act(() => {
-      cart.current.addItem(product)
-    })
-    await cart.current.redirectToCheckout()
 
-    expect(stripeMock.redirectToCheckout).toHaveBeenCalled()
-    expect(stripeMock.redirectToCheckout.mock.calls[0][0]).toEqual({
+    await act(async () => {
+      cart.current.addItem(product)
+      await cart.current.redirectToCheckout({ sessionId: 'session-id' })
+    })
+
+    expect(stripeMock.redirectToCheckout).toHaveBeenCalledWith({
       mode: 'payment',
-      lineItems: [{ price: product.id, quantity: 1 }],
+      lineItems: [
+        {
+          price: product.id,
+          quantity: 1
+        }
+      ],
       successUrl: 'https://egghead.io/success',
       cancelUrl: 'https://egghead.io/cancel',
       billingAddressCollection: 'auto',
@@ -565,211 +479,187 @@ describe.skip('redirectToCheckout()', () => {
     })
   })
 
-  it('should send all formatted items', async () => {
-    const wrapper = createWrapper()
-    const cart = renderHook(() => useShoppingCart((state) => state), {
-      wrapper
-    }).result
+  it('sends items added to the cart in the lineItems property', async () => {
+    const firstProduct = mockProduct()
+    const secondProduct = mockProduct()
 
-    const product1 = mockProduct()
-    const product2 = mockProduct()
-
-    act(() => {
-      cart.current.addItem(product1, 2)
-      cart.current.addItem(product2, 9)
+    await act(async () => {
+      cart.current.addItem(firstProduct, { count: 2 })
+      cart.current.addItem(secondProduct, { count: 9 })
+      await cart.current.redirectToCheckout({ sessionId: 'session-id' })
     })
-    await cart.current.redirectToCheckout()
 
-    const expectedItems = [
-      { price: product1.id, quantity: 2 },
-      { price: product2.id, quantity: 9 }
-    ]
+    const expectedCheckoutOptions = expect.objectContaining({
+      lineItems: [
+        {
+          price: firstProduct.id,
+          quantity: 2
+        },
+        {
+          price: secondProduct.id,
+          quantity: 9
+        }
+      ]
+    })
 
-    expect(stripeMock.redirectToCheckout).toHaveBeenCalled()
-    expect(stripeMock.redirectToCheckout.mock.calls[0][0].lineItems).toEqual(
-      expectedItems
-    )
+    expect(stripeMock.redirectToCheckout).toHaveBeenCalledWith(expectedCheckoutOptions)
+    expect(stripeMock.redirectToCheckout).not.toHaveBeenCalledWith(checkoutOptionsWithAnySessionId)
   })
 
-  it('should send correct billingAddressCollection', async () => {
-    const wrapper = createWrapper({ billingAddressCollection: true })
-    const cart = renderHook(() => useShoppingCart((state) => state), {
-      wrapper
-    }).result
+  describe('with billingAddressCollection set to true', () => {
+    // the nested describe/beforeEach is necessary to give it time to complete
+    beforeEach(() => {
+      cart = reload({
+        cartMode: 'client-only',
+        billingAddressCollection: true
+      })
+    })
 
-    await cart.current.redirectToCheckout()
+    it('set billingAddressCollection as "required"', async () => {
+      await act(async () => {
+        await cart.current.redirectToCheckout()
+      })
 
-    expect(stripeMock.redirectToCheckout).toHaveBeenCalled()
-    expect(
-      stripeMock.redirectToCheckout.mock.calls[0][0].billingAddressCollection
-    ).toBe('required')
+      const expectedCheckoutOptions = expect.objectContaining({
+        billingAddressCollection: 'required'
+      })
+
+      expect(stripeMock.redirectToCheckout).toHaveBeenCalledWith(expectedCheckoutOptions)
+      expect(stripeMock.redirectToCheckout).not.toHaveBeenCalledWith(checkoutOptionsWithAnySessionId)
+    })
   })
 
-  it('should send correct shippingAddressCollection', async () => {
-    const wrapper = createWrapper({ allowedCountries: ['US', 'CA'] })
-    const cart = renderHook(() => useShoppingCart((state) => state), {
-      wrapper
-    }).result
+  describe('passing allowedCountries', () => {
+    // the nested describe/beforeEach is necessary to give it time to complete
+    beforeEach(() => {
+      cart = reload({ cartMode: 'client-only', allowedCountries: ['US', 'CA'] })
+    })
 
-    await cart.current.redirectToCheckout()
+    it('sets the allowedCountries property of the shippingAddressCollection subobject', async () => {
+      await act(async () => {
+        await cart.current.redirectToCheckout()
+      })
 
-    expect(stripeMock.redirectToCheckout).toHaveBeenCalled()
-    expect(
-      stripeMock.redirectToCheckout.mock.calls[0][0].shippingAddressCollection
-        .allowedCountries
-    ).toEqual(['US', 'CA'])
+      const expectedCheckoutOptions = expect.objectContaining({
+        billingAddressCollection: 'auto',
+        shippingAddressCollection: {
+          allowedCountries: ['US', 'CA']
+        }
+      })
+
+      expect(stripeMock.redirectToCheckout).toHaveBeenCalledWith(expectedCheckoutOptions)
+      expect(stripeMock.redirectToCheckout).not.toHaveBeenCalledWith(checkoutOptionsWithAnySessionId)
+    })
   })
 
-  it('should send the sessionId if used in checkout-session mode', async () => {
-    const wrapper = createWrapper({ mode: 'checkout-session' })
-    const cart = renderHook(() => useShoppingCart((state) => state), {
-      wrapper
-    }).result
+  describe('checkout-session mode', () => {
+    beforeEach(() => {
+      cart = reload({ cartMode: 'checkout-session' })
+    })
 
-    const expectedSessionId = 'bloo-bleh-blah-1234'
-    await cart.current.redirectToCheckout({ sessionId: expectedSessionId })
+    it('sends the sessionId', async () => {
+      await cart.current.redirectToCheckout({ sessionId: 'my-session-id' })
 
-    expect(stripeMock.redirectToCheckout).toHaveBeenCalled()
-    expect(stripeMock.redirectToCheckout.mock.calls[0][0].sessionId).toBe(
-      expectedSessionId
-    )
+      const expectedCheckoutOptions = expect.objectContaining({
+        sessionId: 'my-session-id'
+      })
+
+      expect(stripeMock.redirectToCheckout).toHaveBeenCalledWith(expectedCheckoutOptions)
+    })
   })
 
-  it('invalid mode throws an error', () => {
-    const mode = 'bloo blah bleh'
-    const wrapper = createWrapper({ mode })
-    const cart = renderHook(() => useShoppingCart((state) => state), {
-      wrapper
-    }).result
+  describe('sending an invalid cartMode value', () => {
+    const invalidCartMode = 'invalid-cart-mode'
 
-    expect(cart.current.redirectToCheckout()).rejects.toThrow(
-      `Invalid checkout mode '${mode}' was chosen. The valid modes are client-only and checkout-session.`
-    )
-  })
-})
+    beforeEach(() => {
+      cart = reload({
+        cartMode: invalidCartMode
+      })
+    })
 
-describe.skip('checkoutSingleItem()', () => {
-  let cart
-  beforeEach(() => {
-    stripeMock.redirectToCheckout.mockClear()
-
-    const wrapper = createWrapper()
-    cart = renderHook(() => useShoppingCart((state) => state), { wrapper })
-      .result
-  })
-
-  it('should send the formatted item with no quantity parameter', async () => {
-    const product = mockProduct()
-    await cart.current.checkoutSingleItem({ sku: product.id })
-
-    expect(stripeMock.redirectToCheckout).toHaveBeenCalled()
-    expect(stripeMock.redirectToCheckout.mock.calls[0][0].lineItems).toEqual([
-      { price: product.id, quantity: 1 }
-    ])
-  })
-
-  it('should send the formatted item with a custom quantity parameter', async () => {
-    const product = mockProduct()
-    await cart.current.checkoutSingleItem({ sku: product.id, quantity: 47 })
-
-    expect(stripeMock.redirectToCheckout).toHaveBeenCalled()
-    expect(stripeMock.redirectToCheckout.mock.calls[0][0].lineItems).toEqual([
-      { price: product.id, quantity: 47 }
-    ])
-  })
-
-  it('does not support checkout-session mode', async () => {
-    const wrapper = createWrapper({ mode: 'checkout-session' })
-    cart = renderHook(() => useShoppingCart((state) => state), { wrapper })
-      .result
-
-    const product = mockProduct()
-    expect(
-      cart.current.checkoutSingleItem({ sku: product.id })
-    ).rejects.toThrow(
-      "Invalid checkout mode 'checkout-session' was chosen. The valid modes are client-only."
-    )
-  })
-})
-
-describe.skip('stripe handling', () => {
-  it('if stripe is defined, redirectToCheckout can be called', async () => {
-    const wrapper = createWrapper()
-    const cart = renderHook(() => useShoppingCart((state) => state), {
-      wrapper
-    }).result
-    await cart.current.redirectToCheckout()
-    expect(stripeMock.redirectToCheckout).toHaveBeenCalled()
-  })
-
-  it('if stripe is undefined, redirectToCheckout throws an error', () => {
-    const wrapper = createWrapper({ stripe: null })
-    const cart = renderHook(() => useShoppingCart((state) => state), {
-      wrapper
-    }).result
-
-    expect(cart.current.redirectToCheckout()).rejects.toThrow(
-      'No compatible API has been defined, your options are: Stripe'
-    )
-  })
-})
-
-// function mockCartDetails(overrides) {
-//   return {
-//     [`sku_abc${counter}`]: {
-//       sku: `sku_abc${counter++}`,
-//       name: 'Bananas',
-//       image: 'https://blah.com/banana.avif',
-//       price: 400,
-//       currency: 'USD',
-//       value: 800,
-//       quantity: 2,
-//       formattedValue: '$8.00',
-//       ...overrides
-//     },
-//     [`sku_efg${counter}`]: {
-//       sku: `sku_efg${counter++}`,
-//       name: 'Oranges',
-//       image: 'https://blah.com/orange.avif',
-//       currency: 'USD',
-//       price: 250,
-//       value: 1000,
-//       quantity: 4,
-//       formattedValue: '$10.00',
-//       ...overrides
-//     }
-//   }
-// }
-
-describe('<DebugCart>', () => {
-  beforeAll(() => {
-    const Wrapper = createWrapper()
-    render(
-      <Wrapper>
-        <DebugCart />
-      </Wrapper>
-    )
-  })
-
-  it('should make a table of properties and values from the cart', () => {
-    expect(screen.getByRole('table')).toBeVisible()
-
-    const { cartDetails, ...others } = expectedInitialCartState
-
-    let cell = screen.getByRole('cell', { name: 'cartDetails' })
-    expect(cell).toBeVisible()
-    expect(
-      getByRole(cell.parentElement, 'button', { name: /log value/i })
-    ).toBeVisible()
-
-    for (const name in others) {
-      cell = screen.getByRole('cell', { name })
-      expect(cell).toBeVisible()
-      expect(
-        getByRole(cell.parentElement, 'cell', {
-          name: JSON.stringify(others[name])
-        })
+    it('invalid mode throws an error', () => {
+      expect(cart.current.redirectToCheckout()).rejects.toThrow(
+        `Invalid checkout mode '${invalidCartMode}' was chosen. Valid modes are: 'client-only' or 'checkout-session'.`
       )
-    }
+    })
+  })
+
+  // TODO : check on bug for sending product.id as price in stripe-middleware?
+  describe.skip('checkoutSingleItem()', () => {
+    const product = mockProduct()
+
+    it('should send the formatted item with no quantity parameter', async () => {
+      await act(async () => {
+        await cart.current.checkoutSingleItem({
+          sku: product.id
+        })
+      })
+
+      const expectedCheckoutOptions = expect.objectContaining({
+        lineItems: {
+          price: product.id,
+          quantity: 1
+        }
+      })
+
+      expect(stripeMock.redirectToCheckout).toHaveBeenCalledWith(expectedCheckoutOptions)
+    })
+
+    it('should send the formatted item with a custom quantity parameter', async () => {
+      await act(async () => {
+        await cart.current.checkoutSingleItem({
+          sku: product.id,
+          quantity: 47
+        })
+      })
+
+      const expectedCheckoutOptions = expect.objectContaining({
+        lineItems: {
+          sku: product.id,
+          quantity: 47
+        }
+      })
+      expect(stripeMock.redirectToCheckout).toHaveBeenCalledWith(expectedCheckoutOptions)
+    })
+
+    describe('with a checkout-session cartMode', () => {
+      beforeEach(() => {
+        cart = reload({ mode: 'checkout-session' })
+      })
+
+      it('throws an error', async () => {
+        expect(
+          cart.current.checkoutSingleItem({ sku: product.id })
+        ).rejects.toThrow(
+          "Invalid checkout mode 'checkout-session' was chosen. Valid modes are: 'client-only.'"
+        )
+      })
+    })
+  })
+
+  // TODO : this seems outdated?
+  describe.skip('stripe handling', () => {
+    describe('when stripe is defined', () => {
+      beforeEach(() => {
+        cart = reload()
+      })
+      it('redirectToCheckout can be called', async () => {
+        await act(async () => {
+          await cart.current.redirectToCheckout()
+        })
+
+        expect(stripeMock.redirectToCheckout).toHaveBeenCalled()
+      })
+    })
+    it('if stripe is undefined, redirectToCheckout throws an error', () => {
+      const wrapper = createWrapper({ stripe: null })
+      const cart = renderHook(() => useShoppingCart((state) => state), {
+        wrapper
+      }).result
+
+      expect(cart.current.redirectToCheckout()).rejects.toThrow(
+        'No compatible API has been defined, your options are: Stripe'
+      )
+    })
   })
 })
