@@ -31,7 +31,7 @@ const CartDisplay = () => {
   const handleCheckout = async (event) => {
     event.preventDefault()
 
-    const response = await fetch('./netlify/functions/redirect-to-checkout', {
+    const response = await fetch('/.netlify/functions/redirect-to-checkout', {
       method: 'post',
       headers: {
         'Content-Type': 'application/json'
