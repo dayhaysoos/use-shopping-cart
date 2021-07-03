@@ -1,5 +1,4 @@
-/**@jsx jsx */
-import { jsx } from 'theme-ui'
+import React from 'react'
 import { Flex, Box } from 'theme-ui'
 import Products from './components/products'
 import PriceProducts from './components/price-products'

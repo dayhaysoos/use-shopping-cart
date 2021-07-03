@@ -29,6 +29,6 @@
     "*.{js,jsx,.d.ts,ts,tsx,mdx}": "prettier --write"
   },
   "devDependencies": {
-    "webpack-dev-server": "3.10.3"
+    "webpack-dev-server": "3.11.1"
   }
 }
