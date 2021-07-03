@@ -28,6 +28,22 @@ const CartDisplay = () => {
     redirectToCheckout({ sessionId: response.sessionId })
   }
 
+  const handleCheckout = async (event) => {
+    event.preventDefault()
+
+    const response = await fetch('./netlify/functions/redirect-to-checkout', {
+      method: 'post',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify(cartDetails)
+    })
+      .then((res) => res.json())
+      .catch((error) => console.log(error))
+
+    console.log('???', response)
+  }
+
   if (cartCount === 0) {
     return (
       <Box sx={{ textAlign: 'center' }}>
@@ -85,6 +101,9 @@ const CartDisplay = () => {
         </Box>
         <Button sx={{ backgroundColor: 'black' }} onClick={() => clearCart()}>
           Clear Cart Items
+        </Button>
+        <Button sx={{ backgroundColor: 'black' }} onClick={handleCheckout}>
+          Redirect To Checkout
         </Button>
       </Flex>
     )
