@@ -1,5 +1,5 @@
-/**@jsx jsx */
-import { jsx, Box, Flex, Image, Button, Input } from 'theme-ui'
+import React from 'react'
+import { Box, Flex, Image, Button, Input } from 'theme-ui'
 import { useShoppingCart } from 'use-shopping-cart'
 
 const CartDisplay = () => {
@@ -26,6 +26,22 @@ const CartDisplay = () => {
       .catch((error) => console.log(error))
 
     redirectToCheckout({ sessionId: response.sessionId })
+  }
+
+  const handleCheckout = async (event) => {
+    event.preventDefault()
+
+    const response = await fetch('/.netlify/functions/redirect-to-checkout', {
+      method: 'post',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify(cartDetails)
+    })
+      .then((res) => res.json())
+      .catch((error) => console.log(error))
+
+    console.log('???', response)
   }
 
   if (cartCount === 0) {
@@ -85,6 +101,9 @@ const CartDisplay = () => {
         </Box>
         <Button sx={{ backgroundColor: 'black' }} onClick={() => clearCart()}>
           Clear Cart Items
+        </Button>
+        <Button sx={{ backgroundColor: 'black' }} onClick={handleCheckout}>
+          Redirect To Checkout
         </Button>
       </Flex>
     )

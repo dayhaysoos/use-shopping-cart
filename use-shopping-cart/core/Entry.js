@@ -85,8 +85,8 @@ export function updateEntry({
   if (entry.quantity + count <= 0) return removeEntry({ state, id })
 
   state.cartDetails[id] = Entry({
-    state,
     id,
+    state,
     product: entry,
     quantity: entry.quantity + count,
     price_metadata,
