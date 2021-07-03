@@ -1,5 +1,5 @@
-/**@jsx jsx */
-import { jsx, Box, Flex, Image, Button, Input } from 'theme-ui'
+import React from 'react'
+import { Box, Flex, Image, Button, Input } from 'theme-ui'
 import { useShoppingCart } from 'use-shopping-cart'
 
 const CartDisplay = () => {

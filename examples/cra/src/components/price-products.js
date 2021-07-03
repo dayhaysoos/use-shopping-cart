@@ -1,5 +1,5 @@
-/**@jsx jsx */
-import { jsx, Grid } from 'theme-ui'
+import React from 'react'
+import { Grid } from 'theme-ui'
 import PriceProduct from './price-product'
 
 // products created from the Stripe dashboard that have price ids

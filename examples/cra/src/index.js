@@ -1,5 +1,4 @@
-/** @jsx jsx */
-import { jsx } from 'theme-ui'
+import React from 'react'
 import ReactDOM from 'react-dom'
 import { CartProvider } from 'use-shopping-cart'
 import './index.css'
