@@ -4,9 +4,7 @@ import { useDocsState } from '../../context'
 function addItemExample() {
   const { framework } = useDocsState()
   if (framework === 'react') {
-    return ```jsx
-    Some React Code
-    ```
+    return 'react'
   }
 
   if (framework === 'html+js') {

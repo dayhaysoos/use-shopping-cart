@@ -40,6 +40,10 @@ ReactDOM.render(
 )
 ```
 
+### Note: `mode` refers to Stripe's payment modes. Refer to the link below:
+
+https://stripe.com/docs/api/checkout/sessions/object#checkout_session_object-mode
+
 ## Using the hook
 
 The hook `useShoppingCart()` provides several utilities and pieces of data for you to use in your application. The examples below won't cover every part of the `useShoppingCart()` API but you can [look at the API](#API) below.
@@ -93,58 +97,3 @@ export function App() {
   )
 }
 ```
-
-### Server(less) implementation
-
-If you're data source isn't coming from Stripe's dashboard, you can still make products and make payments happen from them.
-
-You're product data should look like this:
-
-```jsx
-const productData = [
-  {
-    name: 'Bananas',
-    id: 'some_unique_id_1',
-    price: 400,
-    image: 'https://www.fillmurray.com/300/300',
-    currency: 'USD'
-    product_data: {
-      metadata: {
-        type: 'fruit'
-      }
-    },
-    price_data: {
-      recurring: {
-        interval: 'week'
-      }
-    }
-  },
-  {
-    name: 'Tangerines',
-    id: 'some_unique_id_2',
-    price: 100,
-    image: 'https://www.fillmurray.com/300/300',
-    currency: 'USD',
-    product_data: {
-      metadata: {
-        type: 'fruit'
-      }
-    },
-    price_data: {
-      recurring: {
-        interval: 'week'
-      }
-    }
-  }
-]
-```
-
-_NOTE_: `price_data` and `product_data` are not required for use-shopping-cart to work, but they are required for creating Sessions with Stripe.
-
-This library manages `price_data` and `product_data` for you, but if you need to pass extra data to your Sessions, you can add them directly to your
-product objects.
-
-Also keep in mind that `product_data` is a child of `price_data` when being sent to Stripe, but you don't need to nest for use-shopping-cart. Learn more about
-creating Sessions here: https://stripe.com/docs/api/checkout/sessions/create
-
-Once you have successfully installed `stripe`, `use-shopping-cart`, and wrapped your root component with `<CartProvider>`, you are ready to go! 🚀

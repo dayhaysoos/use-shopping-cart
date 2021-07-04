@@ -5,8 +5,6 @@ title: addItem()
 
 import CartDisplayWrapper from '../../src/components/docs/cart-display-wrapper'
 import AddItem from '../../src/components/docs/add-item'
-import FrameworkSwitch from '../../src/components/docs/framework-switch'
-import AddItemExample from '../../src/components/examples/add-item-example'
 
 To add a product to the cart, use `useShoppingCart()`'s `addItem(product)` method. It takes in your product object which must be in the following shape:
 
@@ -57,9 +55,6 @@ You can add an optional quantity param, to add by that number. `addItem(product,
     }}
   />
 </CartDisplayWrapper>
-
-<FrameworkSwitch>
-
 
 ```jsx
 function Product({ product }) {
@@ -143,11 +138,6 @@ function Product({ product }) {
   )
 }
 ```
-
-</FrameworkSwitch>
-
-
-<AddItemExample />
 
 ## Dynamic metadata
 
