@@ -1,31 +1,53 @@
-function isValidCount(count, action) {
-  if (typeof count !== 'number') {
+export const handleWarnings = (store) => (next) => async (action) => {
+  const count = ['cart/addItem', 'cart/incrementItem', 'cart/decrementItem']
+  if (
+    count.includes(action.type) &&
+    typeof action.payload.options.count !== 'number'
+  ) {
     console.warn(
-      `Invalid count passed to action ${
+      `Invalid count used with action ${
         action.type
-      }: count must be type number. The current type is ${typeof count}`
+      }: count must be a number. The current type is '${typeof action.payload
+        .options.count}'.`,
+      action
     )
-    return false // Invalid count
   }
 
-  // Valid count
-  return true
-}
+  const quantity = ['cart/setItemQuantity']
+  if (quantity.includes(action.type)) {
+    if (typeof action.payload.quantity !== 'number') {
+      console.warn(
+        `Invalid quantity used with action ${
+          action.type
+        }: quantity must be a number. The current type is '${typeof action
+          .payload.quantity}'.`,
+        action
+      )
+    } else if (action.payload.quantity < 0) {
+      console.warn(
+        `Invalid quantity used with action ${
+          action.type
+        }: quantity must be greater than zero. The current value is ${JSON.stringify(
+          action.payload.quantity
+        )}.`,
+        action
+      )
+    }
+  }
 
-export const handleWarnings = (store) => (next) => async (action) => {
-  switch (action.type) {
-    // These have `count`
-    case 'cart/addItem':
-    case 'cart/incrementItem':
-    case 'cart/decrementItem':
-      if (!isValidCount(action.payload?.options?.count, action)) return
-      break
-    // This one has `quantity`
-    case 'cart/setItemQuantity':
-      if (!isValidCount(action.payload?.quantity, action)) return
-      break
-    default:
-      break
+  const id = ['cart/incrementItem', 'cart/decrementItem', 'cart/removeItem']
+  if (
+    id.includes(action.type) &&
+    !(action.payload.id in store.getState().cartDetails)
+  ) {
+    console.warn(
+      `Invalid product ID used with action ${
+        action.type
+      }: the ID must already be in the cart. The current value is ${JSON.stringify(
+        action.payload.id
+      )}.`,
+      action
+    )
   }
 
   return next(action)

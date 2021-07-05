@@ -1,13 +1,76 @@
 import sucrase from '@rollup/plugin-sucrase'
 import commonjs from '@rollup/plugin-commonjs'
 import resolve from '@rollup/plugin-node-resolve'
-import url from '@rollup/plugin-url'
 import alias from '@rollup/plugin-alias'
 import externals from 'rollup-plugin-node-externals'
 import visualizer from 'rollup-plugin-visualizer'
-import copy from 'rollup-plugin-copy'
+import json from '@rollup/plugin-json'
+
+import { promises as fs } from 'fs'
+import path from 'path'
 
 import pkg from './package.json'
+
+/**
+ * Copying over the .d.ts type definition files to match each build file.
+ * If we modify the names of the .js files, we need to modify the names that
+ * these .d.ts files are copied to as well.
+ *
+ * react/index.d.ts -> dist/react.d.ts, dist/react.es.d.ts, dist/react.umd.d.ts
+ * core/index.d.ts -> dist/core.d.ts, dist/core.es.d.ts, dist/core.umd.d.ts
+ */
+function copyTypes() {
+  let copied = false
+  return {
+    async buildEnd() {
+      if (copied) return
+      copied = true
+
+      for (const build of ['react', 'core']) {
+        console.log(
+          `./${build}/index.d.ts → ./dist/${build}.d.ts, ./dist/${build}.es.d.ts, ./dist/${build}.umd.d.ts`
+        )
+        for (const infix of ['', '.es', '.umd']) {
+          try {
+            await fs.copyFile(
+              path.join(process.cwd(), build, 'index.d.ts'),
+              path.join(process.cwd(), 'dist', `${build}${infix}.d.ts`)
+            )
+          } catch (error) {
+            console.log(
+              `Unable to copy ./${build}/index.d.ts to ./dist/${build}${infix}.d.ts`
+            )
+            console.error(error)
+          }
+        }
+      }
+    }
+  }
+}
+
+/**
+ * Deletes the dist/ folder and then makes a new directory.
+ * Equivalent to `rm -r dist && mkdir dist`
+ */
+function clearDist() {
+  let cleared = false
+
+  return {
+    async buildStart() {
+      if (cleared) return
+      cleared = true
+
+      try {
+        await fs.rm(path.resolve('dist'), { recursive: true })
+        await fs.mkdir(path.resolve('dist'))
+        console.log('Cleared dist/ folder.')
+      } catch (error) {
+        console.error('Unable to clear dist/ folder.')
+        console.error(error)
+      }
+    }
+  }
+}
 
 const common = {
   react: {
@@ -18,36 +81,19 @@ const common = {
     input: './core/index.js'
   },
   plugins: [
-    url({ exclude: ['**/*.svg'] }),
+    clearDist(),
+    json({ compact: true }), // Allows importing of json
+    // We are using Sucrase to compile our JSX
     sucrase({
       exclude: 'node_modules/**/*',
       transforms: ['jsx']
     }),
-    copy({
-      targets: [
-        { src: './core/index.d.ts', dest: './dist/types' },
-        { src: './utilities/serverless.d.ts', dest: './dist/types' },
-        { src: './core/', dest: './dist/' }
-        // {
-        //   src: './react/index.d.ts',
-        //   dest: './dist/types'
-        // },
-        // {
-        //   src: './react/index.d.ts',
-        //   dest: './dist/types',
-        //   rename: 'index.es.d.ts'
-        // },
-        // {
-        //   src: './react/index.d.ts',
-        //   dest: './dist/types',
-        //   rename: 'index.umd.d.ts'
-        // }
-      ]
-    }),
-    externals({ deps: true }),
+    copyTypes(), // Copies the types to dist/
+    externals({ deps: true }), // automatically externalizes dependencies in package.json
     resolve(),
     commonjs()
   ],
+  // fixes an issue with uuid
   get aliases() {
     return alias({
       entries: {
@@ -113,7 +159,7 @@ export default [
         sourcemap: true,
         globals: {
           react: 'React',
-          ['@reduxjs/toolkit']: 'RTK',
+          '@reduxjs/toolkit': 'RTK',
           'redux-persist': 'ReduxPersist',
           uuid: 'uuid',
           '@stripe/stripe-js': '@stripe/stripe-js'

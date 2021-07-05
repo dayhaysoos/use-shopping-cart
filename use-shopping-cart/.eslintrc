@@ -21,7 +21,7 @@
     // allow specifying true explicitly for boolean props
     "react/jsx-boolean-value": 0,
     "jsx-quotes": ["warn", "prefer-double"],
-    "curly": ["warn", "multi-or-nest"],
+    "curly": ["warn", "multi-or-nest", "consistent"],
     "arrow-parens": "warn",
     "react/prop-types": "off",
     "object-curly-spacing": ["error", "always"],

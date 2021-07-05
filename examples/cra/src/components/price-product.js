@@ -1,7 +1,6 @@
 import React from 'react'
 import { Box, Image, Button, Flex } from 'theme-ui'
-import { useShoppingCart } from 'use-shopping-cart'
-import { formatCurrencyString } from 'use-shopping-cart/utilities/old-utils'
+import { useShoppingCart, formatCurrencyString } from 'use-shopping-cart'
 
 // for products that are made in the stripe dashboard
 

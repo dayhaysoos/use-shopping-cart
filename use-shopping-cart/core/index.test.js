@@ -1,8 +1,4 @@
-import { formatCurrencyString, getCheckoutData, filterCart } from './old-utils'
-
-describe('getCheckoutData', () => {
-  it.todo('Write tests for getCheckoutData')
-})
+import { formatCurrencyString, filterCart } from './index'
 
 describe('formatCurrencyString()', () => {
   it('whole dollar', () => {

@@ -12,13 +12,22 @@ import {
 } from 'redux-persist'
 import { isClient } from '../utilities/SSR'
 
-import { updateFormattedTotalPrice } from './Entry'
+import { updateFormattedTotalPrice, formatCurrencyString } from './Entry'
 import { reducer, actions, initialState } from './slice'
-
-import { filterCart, formatCurrencyString } from '../utilities/old-utils'
 
 import { handleStripe } from './stripe-middleware'
 import { handleWarnings } from './warning-middleware'
+
+export async function filterCart(cartDetails, filter) {
+  const filteredCart = {}
+
+  for (const sku in cartDetails) {
+    const entry = cartDetails[sku]
+    if (await filter(entry)) filteredCart[sku] = entry
+  }
+
+  return filteredCart
+}
 
 function noop() {}
 function createNoopStorage() {
@@ -43,7 +52,7 @@ function createLocalStorage() {
   }
 }
 
-export { reducer, actions, filterCart, formatCurrencyString }
+export { reducer, actions, formatCurrencyString }
 
 export function createShoppingCartStore(options) {
   if (!isClient) {

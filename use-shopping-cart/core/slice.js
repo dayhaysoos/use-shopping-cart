@@ -28,7 +28,7 @@ const slice = createSlice({
   initialState,
   reducers: {
     addItem: {
-      reducer: (state, { payload: { product, options } }) => {
+      reducer(state, { payload: { product, options } }) {
         const { count, price_metadata, product_metadata } = options
 
         const id =
@@ -57,7 +57,7 @@ const slice = createSlice({
           })
         }
       },
-      prepare: (product, options = { count: 1 }) => {
+      prepare(product, options = { count: 1 }) {
         if (!options.price_metadata) options.price_metadata = {}
         if (!options.product_metadata) options.product_metadata = {}
         if (!options.count) options.count = 1
@@ -65,19 +65,19 @@ const slice = createSlice({
       }
     },
     incrementItem: {
-      reducer: (state, { payload: { id, options } }) => {
+      reducer(state, { payload: { id, options } }) {
         updateEntry({
           state,
           id,
           count: options.count
         })
       },
-      prepare: (id, options = { count: 1 }) => {
+      prepare(id, options = { count: 1 }) {
         return { payload: { id, options } }
       }
     },
     decrementItem: {
-      reducer: (state, { payload: { id, options } }) => {
+      reducer(state, { payload: { id, options } }) {
         if (state.cartDetails[id].quantity - options.count <= 0)
           return removeEntry({ state, id })
 
@@ -87,12 +87,12 @@ const slice = createSlice({
           count: -options.count
         })
       },
-      prepare: (id, options = { count: 1 }) => {
+      prepare(id, options = { count: 1 }) {
         return { payload: { id, options } }
       }
     },
     clearCart: {
-      reducer: (state) => {
+      reducer(state) {
         state.cartCount = 0
         state.totalPrice = 0
         state.cartDetails = {}
@@ -100,27 +100,25 @@ const slice = createSlice({
       }
     },
     setItemQuantity: {
-      reducer: (state, { payload: { id, quantity } }) => {
-        if (quantity <= 0) return removeEntry({ state, id })
-
-        // TODO: add warning to warning-middleware if id is not in cartDetails, then we can remove this if-statement
-        if (id in state.cartDetails)
+      reducer(state, { payload: { id, quantity } }) {
+        if (quantity > 0 && id in state.cartDetails)
           return updateQuantity({ ...state, state, id, quantity })
+        else if (quantity === 0) return removeEntry({ state, id })
       },
-      prepare: (id, quantity = 1) => {
+      prepare(id, quantity) {
         return { payload: { id, quantity } }
       }
     },
     removeItem: {
-      reducer: (state, { payload }) => {
-        removeEntry({ state, id: payload })
+      reducer(state, { payload: { id } }) {
+        removeEntry({ state, id })
+      },
+      prepare(id) {
+        return { payload: { id } }
       }
     },
     loadCart: {
-      reducer: (state, { payload: { cartDetails, shouldMerge } }) => {
-        // TODO: Figure out how `loadCart` should work when merging.
-        // Right now, if you were to `useEffect(() => loadCart(cartDetailsFromServer), [])`,
-        // your cart would just keep getting bigger on every reload. Also, is merging a good idea?
+      reducer(state, { payload: { cartDetails, shouldMerge } }) {
         if (!shouldMerge) {
           state.cartCount = 0
           state.totalPrice = 0
@@ -137,24 +135,30 @@ const slice = createSlice({
           })
         }
       },
-      prepare: (cartDetails, shouldMerge = true) => {
+      prepare(cartDetails, shouldMerge = true) {
         return { payload: { cartDetails, shouldMerge } }
       }
     },
-    handleCartHover: (state) => {
+    handleCartHover(state) {
       state.shouldDisplayCart = true
     },
-    handleCartClick: (state) => {
+    handleCartClick(state) {
       state.shouldDisplayCart = !state.shouldDisplayCart
     },
-    handleCloseCart: (state) => {
+    handleCloseCart(state) {
       state.shouldDisplayCart = false
     },
-    storeLastClicked: (state, { payload }) => {
+    storeLastClicked(state, { payload }) {
       state.lastClicked = payload
     },
-    changeStripeKey: (state, { payload }) => {
+    changeStripeKey(state, { payload }) {
       state.stripe = payload
+    },
+    changeLanguage(state, { payload }) {
+      state.language = payload
+    },
+    changeCurrency(state, { payload }) {
+      state.currency = payload
     }
   }
 })
