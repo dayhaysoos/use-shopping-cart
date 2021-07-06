@@ -1,3 +1,5 @@
+import { typeOf } from './helpers'
+
 export const handleWarnings = (store) => (next) => async (action) => {
   const count = ['cart/addItem', 'cart/incrementItem', 'cart/decrementItem']
   if (
@@ -7,8 +9,9 @@ export const handleWarnings = (store) => (next) => async (action) => {
     console.warn(
       `Invalid count used with action ${
         action.type
-      }: count must be a number. The current type is '${typeof action.payload
-        .options.count}'.`,
+      }: count must be a number. The current type is ${typeOf(
+        action.payload.options.count
+      )}.`,
       action
     )
   }
@@ -19,8 +22,9 @@ export const handleWarnings = (store) => (next) => async (action) => {
       console.warn(
         `Invalid quantity used with action ${
           action.type
-        }: quantity must be a number. The current type is '${typeof action
-          .payload.quantity}'.`,
+        }: quantity must be a number. The current type is ${typeOf(
+          action.payload.quantity
+        )}.`,
         action
       )
     } else if (action.payload.quantity < 0) {

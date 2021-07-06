@@ -15,8 +15,8 @@ import { isClient } from '../utilities/SSR'
 import { updateFormattedTotalPrice, formatCurrencyString } from './Entry'
 import { reducer, actions, initialState } from './slice'
 
-import { handleStripe } from './stripe-middleware'
-import { handleWarnings } from './warning-middleware'
+import { handleStripe } from './middleware/stripe'
+import { handleWarnings } from './middleware/warnings'
 
 export async function filterCart(cartDetails, filter) {
   const filteredCart = {}

@@ -39,9 +39,9 @@
     "test:types": "tsc --noEmit type-tests/* --jsx react-jsx",
     "build": "rollup -c",
     "build:watch": "rollup -c -w",
-    "prepare": "yarn run build",
-    "predeploy": "yarn workspace install && yarn run build",
-    "lint": "eslint --fix '**/*.js'"
+    "prepublishOnly": "yarn install --frozen-lockfile && yarn build",
+    "lint": "eslint '**/*.js'",
+    "lint:fix": "eslint --fix '**/*.js'"
   },
   "peerDependencies": {
     "react": ">=16.8.0"
