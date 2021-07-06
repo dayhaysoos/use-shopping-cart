@@ -3,6 +3,7 @@ import { act, renderHook } from '@testing-library/react-hooks'
 import '@testing-library/jest-dom/extend-expect'
 import { useShoppingCart } from '../index'
 import { createWrapper, expectedInitialCartState } from './testHelpers'
+import { PropertyValueError } from '../../core/middleware/helpers'
 
 let counter = 0
 
@@ -502,8 +503,12 @@ describe('redirectToCheckout()', () => {
       ]
     })
 
-    expect(stripeMock.redirectToCheckout).toHaveBeenCalledWith(expectedCheckoutOptions)
-    expect(stripeMock.redirectToCheckout).not.toHaveBeenCalledWith(checkoutOptionsWithAnySessionId)
+    expect(stripeMock.redirectToCheckout).toHaveBeenCalledWith(
+      expectedCheckoutOptions
+    )
+    expect(stripeMock.redirectToCheckout).not.toHaveBeenCalledWith(
+      checkoutOptionsWithAnySessionId
+    )
   })
 
   describe('with billingAddressCollection set to true', () => {
@@ -524,8 +529,12 @@ describe('redirectToCheckout()', () => {
         billingAddressCollection: 'required'
       })
 
-      expect(stripeMock.redirectToCheckout).toHaveBeenCalledWith(expectedCheckoutOptions)
-      expect(stripeMock.redirectToCheckout).not.toHaveBeenCalledWith(checkoutOptionsWithAnySessionId)
+      expect(stripeMock.redirectToCheckout).toHaveBeenCalledWith(
+        expectedCheckoutOptions
+      )
+      expect(stripeMock.redirectToCheckout).not.toHaveBeenCalledWith(
+        checkoutOptionsWithAnySessionId
+      )
     })
   })
 
@@ -547,8 +556,12 @@ describe('redirectToCheckout()', () => {
         }
       })
 
-      expect(stripeMock.redirectToCheckout).toHaveBeenCalledWith(expectedCheckoutOptions)
-      expect(stripeMock.redirectToCheckout).not.toHaveBeenCalledWith(checkoutOptionsWithAnySessionId)
+      expect(stripeMock.redirectToCheckout).toHaveBeenCalledWith(
+        expectedCheckoutOptions
+      )
+      expect(stripeMock.redirectToCheckout).not.toHaveBeenCalledWith(
+        checkoutOptionsWithAnySessionId
+      )
     })
   })
 
@@ -564,7 +577,9 @@ describe('redirectToCheckout()', () => {
         sessionId: 'my-session-id'
       })
 
-      expect(stripeMock.redirectToCheckout).toHaveBeenCalledWith(expectedCheckoutOptions)
+      expect(stripeMock.redirectToCheckout).toHaveBeenCalledWith(
+        expectedCheckoutOptions
+      )
     })
   })
 
@@ -579,7 +594,7 @@ describe('redirectToCheckout()', () => {
 
     it('invalid mode throws an error', () => {
       expect(cart.current.redirectToCheckout()).rejects.toThrow(
-        `Invalid checkout mode '${invalidCartMode}' was chosen. Valid modes are: 'client-only' or 'checkout-session'.`
+        PropertyValueError
       )
     })
   })
@@ -602,7 +617,9 @@ describe('redirectToCheckout()', () => {
         }
       })
 
-      expect(stripeMock.redirectToCheckout).toHaveBeenCalledWith(expectedCheckoutOptions)
+      expect(stripeMock.redirectToCheckout).toHaveBeenCalledWith(
+        expectedCheckoutOptions
+      )
     })
 
     it('should send the formatted item with a custom quantity parameter', async () => {
@@ -619,7 +636,9 @@ describe('redirectToCheckout()', () => {
           quantity: 47
         }
       })
-      expect(stripeMock.redirectToCheckout).toHaveBeenCalledWith(expectedCheckoutOptions)
+      expect(stripeMock.redirectToCheckout).toHaveBeenCalledWith(
+        expectedCheckoutOptions
+      )
     })
 
     describe('with a checkout-session cartMode', () => {
@@ -630,36 +649,8 @@ describe('redirectToCheckout()', () => {
       it('throws an error', async () => {
         expect(
           cart.current.checkoutSingleItem({ sku: product.id })
-        ).rejects.toThrow(
-          "Invalid checkout mode 'checkout-session' was chosen. Valid modes are: 'client-only.'"
-        )
+        ).rejects.toThrow(PropertyValueError)
       })
-    })
-  })
-
-  // TODO : this seems outdated?
-  describe.skip('stripe handling', () => {
-    describe('when stripe is defined', () => {
-      beforeEach(() => {
-        cart = reload()
-      })
-      it('redirectToCheckout can be called', async () => {
-        await act(async () => {
-          await cart.current.redirectToCheckout()
-        })
-
-        expect(stripeMock.redirectToCheckout).toHaveBeenCalled()
-      })
-    })
-    it('if stripe is undefined, redirectToCheckout throws an error', () => {
-      const wrapper = createWrapper({ stripe: null })
-      const cart = renderHook(() => useShoppingCart((state) => state), {
-        wrapper
-      }).result
-
-      expect(cart.current.redirectToCheckout()).rejects.toThrow(
-        'No compatible API has been defined, your options are: Stripe'
-      )
     })
   })
 })

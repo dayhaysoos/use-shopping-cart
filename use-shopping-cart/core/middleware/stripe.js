@@ -1,5 +1,11 @@
 import '@stripe/stripe-js'
-import pkg from '../package.json'
+import {
+  typeOf,
+  PropertyTypeError,
+  PropertyValueError,
+  PropertyRangeError
+} from './helpers'
+import pkg from '../../package.json'
 
 export function getCheckoutData(cart) {
   const lineItems = []
@@ -28,15 +34,24 @@ export function getCheckoutData(cart) {
 
 export const handleStripe = (store) => (next) => async (action) => {
   const stripePublicKey = store.getState().stripe
-  if (typeof stripePublicKey !== 'string') {
-    throw new TypeError(
-      `The Stripe public key must be a string, a '${typeof stripePublicKey}' was passed instead.`
-    )
-  } else if (stripePublicKey.length === 0) {
-    throw new TypeError('The Stripe public key cannot be empty.')
-  }
-
   const cart = store.getState()
+
+  const checkout = ['cart/redirectToCheckout', 'cart/checkoutSingleItem']
+  if (checkout.includes(action.type)) {
+    if (typeof stripePublicKey !== 'string') {
+      throw new PropertyTypeError({
+        property: 'stripe',
+        expected: 'string',
+        received: typeOf(stripePublicKey)
+      })
+    } else if (stripePublicKey.length === 0) {
+      throw new PropertyRangeError({
+        property: 'stripe.length',
+        above: 0,
+        received: stripePublicKey.length
+      })
+    }
+  }
 
   if (action.type === 'cart/redirectToCheckout') {
     const stripe = initializeStripe(stripePublicKey)
@@ -48,13 +63,14 @@ export const handleStripe = (store) => (next) => async (action) => {
       const checkoutData = getCheckoutData(cart)
       return stripe.redirectToCheckout(checkoutData)
     } else {
-      throw new TypeError(
-        `Invalid checkout mode '${cart.cartMode}' was chosen. Valid modes are: 'client-only' or 'checkout-session'.`
-      )
+      throw new PropertyValueError({
+        property: 'cartMode',
+        method: 'redirectToCheckout',
+        expected: ['client-only', 'checkout-session'],
+        received: cart.cartMode
+      })
     }
-  }
-
-  if (action.type === 'cart/checkoutSingleItem') {
+  } else if (action.type === 'cart/checkoutSingleItem') {
     const stripe = initializeStripe(stripePublicKey)
 
     if (cart.cartMode === 'client-only') {
@@ -67,9 +83,12 @@ export const handleStripe = (store) => (next) => async (action) => {
       }
       return stripe.redirectToCheckout(options)
     } else {
-      throw new TypeError(
-        `Invalid checkout mode '${cart.cartMode}' was chosen. Valid modes are: 'client-only'.`
-      )
+      throw new PropertyValueError({
+        property: 'cartMode',
+        method: 'checkoutSingleItem',
+        expected: 'client-only',
+        received: cart.cartMode
+      })
     }
   }
 
