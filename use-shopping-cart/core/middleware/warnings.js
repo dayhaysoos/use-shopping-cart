@@ -14,6 +14,7 @@ export const handleWarnings = (store) => (next) => async (action) => {
       )}.`,
       action
     )
+    return
   }
 
   const quantity = ['cart/setItemQuantity']
@@ -27,6 +28,7 @@ export const handleWarnings = (store) => (next) => async (action) => {
         )}.`,
         action
       )
+      return
     } else if (action.payload.quantity < 0) {
       console.warn(
         `Invalid quantity used with action ${
@@ -36,6 +38,7 @@ export const handleWarnings = (store) => (next) => async (action) => {
         )}.`,
         action
       )
+      return
     }
   }
 
@@ -52,6 +55,7 @@ export const handleWarnings = (store) => (next) => async (action) => {
       )}.`,
       action
     )
+    return
   }
 
   return next(action)
