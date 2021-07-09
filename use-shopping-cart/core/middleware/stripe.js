@@ -5,7 +5,6 @@ import {
   PropertyValueError,
   PropertyRangeError
 } from './helpers'
-import pkg from '../../package.json'
 
 export function getCheckoutData(cart) {
   const lineItems = []
@@ -101,7 +100,7 @@ function initializeStripe(publicKey) {
     const stripe = Stripe(publicKey)
     stripe.registerAppInfo({
       name: 'use-shopping-cart',
-      version: pkg.version,
+      version: process.env.__buildVersion__,
       url: 'https://useshoppingcart.com',
       // eslint-disable-next-line camelcase
       partner_id: 'pp_partner_H8MLmI3e9Oc3IK'

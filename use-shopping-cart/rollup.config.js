@@ -2,9 +2,9 @@ import sucrase from '@rollup/plugin-sucrase'
 import commonjs from '@rollup/plugin-commonjs'
 import resolve from '@rollup/plugin-node-resolve'
 import alias from '@rollup/plugin-alias'
+import replace from '@rollup/plugin-replace'
 import externals from 'rollup-plugin-node-externals'
 import visualizer from 'rollup-plugin-visualizer'
-import json from '@rollup/plugin-json'
 
 import { promises as fs } from 'fs'
 import path from 'path'
@@ -82,7 +82,12 @@ const common = {
   },
   plugins: [
     clearDist(),
-    json({ compact: true }), // Allows importing of json
+    replace({
+      preventAssignment: true,
+      values: {
+        'process.env.__buildVersion__': JSON.stringify(pkg.version)
+      }
+    }),
     // We are using Sucrase to compile our JSX
     sucrase({
       exclude: 'node_modules/**/*',
