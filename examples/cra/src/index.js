@@ -1,8 +1,8 @@
 import React from 'react'
 import ReactDOM from 'react-dom'
 import { CartProvider } from 'use-shopping-cart'
-import './index.css'
 import App from './App'
+import './index.css'
 
 ReactDOM.render(
   <CartProvider

@@ -1,4 +1,4 @@
-import * as useShoppingCart from 'use-shopping-cart'
+import * as useShoppingCart from '../core/index'
 
 interface ValidatedItem {
   price_data: {
