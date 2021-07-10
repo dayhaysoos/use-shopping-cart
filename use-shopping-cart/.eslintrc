@@ -5,7 +5,8 @@
     "standard-react"
   ],
   "env": {
-    "es6": true
+    "es6": true,
+    "jest": true
   },
   "plugins": [
     "react"
@@ -20,9 +21,13 @@
     // allow specifying true explicitly for boolean props
     "react/jsx-boolean-value": 0,
     "jsx-quotes": ["warn", "prefer-double"],
-    "curly": ["warn", "multi-or-nest"],
+    "curly": ["warn", "multi-or-nest", "consistent"],
     "arrow-parens": "warn",
-    "react/prop-types": "off"
+    "react/prop-types": "off",
+    "object-curly-spacing": ["error", "always"],
+    "camelcase": ["error", {
+      "allow": ["price_metadata", "product_metadata", "price_data", "product_data", "unit_amount"]
+    }]
   },
-  "ignorePatterns": ["*.d.ts"]
+  "ignorePatterns": ["*.d.ts", "node_modules", "dist"]
 }

@@ -1,0 +1,14 @@
+/* stylelint-disable docusaurus/copyright-header */
+
+/**
+ * CSS files with the .module.css suffix will be treated as CSS modules
+ * and scoped locally.
+ */
+
+.featureImage {
+  height: 80px;
+  width: 80px;
+  border-radius: 50%;
+  padding: 1rem;
+  background-color: var(--usc-green-light);
+}

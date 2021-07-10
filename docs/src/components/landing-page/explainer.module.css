@@ -1,0 +1,44 @@
+/* stylelint-disable docusaurus/copyright-header */
+
+/**
+ * CSS files with the .module.css suffix will be treated as CSS modules
+ * and scoped locally.
+ */
+
+.explainerWrapper {
+  display: grid;
+  place-items: center;
+  margin-bottom: 6rem;
+}
+
+.explainerText {
+  text-align: center;
+  margin-bottom: 2rem;
+}
+
+.explainerText h2 {
+  font-size: 2.5rem;
+  text-transform: uppercase;
+  color: var(--usc-blue-dark);
+}
+
+.explainerText h2:after {
+  display: block;
+  content: '';
+  width: 80px;
+  padding-top: 0.5rem;
+  border-bottom-style: solid;
+  border-bottom-color: green;
+  border-bottom-width: 6px;
+  margin: 0 auto;
+}
+
+.explainerText p {
+  max-width: 450px;
+  margin: 0 auto;
+}
+
+pre {
+  max-width: 80ch;
+  width: 100%;
+}

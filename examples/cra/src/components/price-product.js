@@ -1,5 +1,5 @@
-/**@jsx jsx */
-import { jsx, Box, Image, Button, Flex } from 'theme-ui'
+import React from 'react'
+import { Box, Image, Button, Flex } from 'theme-ui'
 import { useShoppingCart, formatCurrencyString } from 'use-shopping-cart'
 
 // for products that are made in the stripe dashboard

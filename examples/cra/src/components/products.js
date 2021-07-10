@@ -1,5 +1,5 @@
-/**@jsx jsx */
-import { jsx, Grid } from 'theme-ui'
+import React from 'react'
+import { Grid } from 'theme-ui'
 import Product from './product'
 
 const Products = ({ products }) => {
