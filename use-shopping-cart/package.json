@@ -1,6 +1,6 @@
 {
   "name": "use-shopping-cart",
-  "version": "3.0.0-beta.19",
+  "version": "3.0.0-beta.20",
   "description": "Shopping cart state and logic for Stripe",
   "author": "dayhaysoos",
   "license": "MIT",
@@ -36,12 +36,12 @@
   "scripts": {
     "test": "jest --runInBand",
     "test:watch": "jest --watch",
-    "test:types": "tsc --noEmit type-tests/*",
+    "test:types": "tsc --noEmit type-tests/* --jsx react-jsx",
     "build": "rollup -c",
     "build:watch": "rollup -c -w",
-    "prepare": "yarn run build",
-    "predeploy": "yarn workspace install && yarn run build",
-    "lint": "eslint --fix '**/*.js'"
+    "prepublishOnly": "yarn install --frozen-lockfile && yarn build",
+    "lint": "eslint '**/*.js'",
+    "lint:fix": "eslint --fix '**/*.js'"
   },
   "peerDependencies": {
     "react": ">=16.8.0"
@@ -97,12 +97,12 @@
     "react-test-renderer": "16.13.1",
     "redux-mock-store": "^1.5.4",
     "rollup": "^2.3.3",
-    "rollup-plugin-copy": "^3.4.0",
     "rollup-plugin-node-externals": "^2.2.0",
     "rollup-plugin-visualizer": "^4.2.2"
   },
   "dependencies": {
     "@reduxjs/toolkit": "^1.5.0",
+    "@rollup/plugin-replace": "^2.4.2",
     "@stripe/stripe-js": "^1.14.0",
     "react-redux": "^7.2.2",
     "redux-persist": "^6.0.0",

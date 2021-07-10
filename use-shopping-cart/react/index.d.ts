@@ -1,70 +1,27 @@
-// might not need this
-// import { Persistor } from 'redux-persist/es/types'
-// declare module 'use-shopping-cart' {
-//   interface CommonProviderProps {
-//     children: JSX.Element
-//     /**
-//      * Your Publishable Stripe API key
-//      */
-//     stripe: string
-//     /**
-//      * The preferred currency used to format price data
-//      */
-//     currency: string
-//     /**
-//      * The language to be used format price data
-//      */
-//     language?: string
-//   }
-//   interface ClientOnlyProviderProps extends CommonProviderProps {
-//     /**
-//      * Determines Stripe mode. Options are subscription or payment
-//      */
-//     mode: 'payment'
-//     /**
-//      * Determines cart mode. Options are client-only or checkout-session
-//      */
-//     cartMode: 'client-only'
-//     /**
-//      * The redirect url for a successful sale
-//      */
-//     successUrl: string
-//     /**
-//      * The redirect url for a cancelled sale
-//      */
-//     cancelUrl: string
-//     /**
-//      * Should the billing address be collected at the checkout. Defaults to false
-//      */
-//     billingAddressCollection?: boolean
-//     /**
-//      * The allowed countries
-//      */
-//     allowedCountries?: null | string[]
-//   }
-//   interface CheckoutSessionProviderProps extends CommonProviderProps {
-//     /**
-//      * Determines checkout mode
-//      */
-//     mode: 'checkout-session'
-//   }
+import { CartActions, CartState, Config, Product } from '../core'
+import * as React from 'react'
 
-//   export type ProviderProps =
-//     | ClientOnlyProviderProps
-//     | CheckoutSessionProviderProps
+export { actions, filterCart, formatCurrencyString } from '../core/index.d';
 
-//   /**
-//    * Context provider to interact with Stripe API
-//    */
-//   export const CartProvider: (props: ProviderProps) => JSX.Element
+type ProviderProps = Config & {
+	children: React.ReactNode
+	loading?: React.ReactNode
+}
 
-//   /**
-//    * @name createShoppingCartStore
-//    * @param options {Config}
-//    * @description Utility for creating redux store
-//    * @returns persisted redux store
-//    */
-//   export function createShoppingCartStore(
-//     options: CommonProviderProps
-//   ): Persistor
-// }
+/**
+ * Context provider to interact with Stripe API
+ */
+export const CartProvider: (props: ProviderProps) => JSX.Element
+
+/**
+ * Provides several utilities and pieces of data for you to use in your application.
+ */
+export function useShoppingCart<SelectorResult extends Partial<CartState>>(selector?: (state: CartState) => SelectorResult): SelectorResult & CartActions
+
+/**
+ * Displays the values returned by `useShoppingCart()` in a table format.
+ */
+export const DebugCart: React.FunctionComponent<React.DetailedHTMLProps<
+	React.TableHTMLAttributes<HTMLTableElement>,
+	HTMLTableElement
+>>

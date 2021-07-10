@@ -7,7 +7,7 @@ export const createWrapper = (overrides = {}) => ({ children }) => (
     cartMode="client-only"
     successUrl="https://egghead.io/success"
     cancelUrl="https://egghead.io/cancel"
-    stripe={null}
+    stripe="FAKE-KEY"
     currency="USD"
     {...overrides}
   >

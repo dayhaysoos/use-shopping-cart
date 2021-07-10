@@ -1,7 +1,7 @@
 import React from 'react'
 import { Box, Image, Button, Flex } from 'theme-ui'
-import { useShoppingCart } from 'use-shopping-cart'
-import { formatCurrencyString } from 'use-shopping-cart'
+import { useShoppingCart, formatCurrencyString } from 'use-shopping-cart'
+
 const Product = (product) => {
   const { addItem, redirectToCheckout } = useShoppingCart()
   const { name, price, image, currency } = product
