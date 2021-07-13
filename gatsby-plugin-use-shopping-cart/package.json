@@ -5,10 +5,10 @@
   "author": "Eric Howey <ehowey@gmail.com>",
   "main": "index.js",
   "dependencies": {
-    "use-shopping-cart": "^3.0.0-beta.17"
+    "use-shopping-cart": "^3.0.0"
   },
   "peerDependencies": {
-    "gatsby": "^3.6.0",
+    "gatsby": "^3.0.0",
     "react": "^17.0.2",
     "react-dom": "^17.0.2"
   },

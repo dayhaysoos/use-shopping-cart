@@ -1,5 +1,6 @@
 //     Current API
 //     mode,
+//     cartMode,
 //     stripePublicKey,
 //     successUrl,
 //     cancelUrl,

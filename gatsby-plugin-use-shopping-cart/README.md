@@ -1,8 +1,8 @@
 # Gatsby Plugin Use-Shopping-Cart
 
-_This is a WIP and not stable yet, use at your own risk._
+_This plugin is in early release, please test and provide any feedback._
 
-This plugin simplifies the use of [use-shopping-cart](https://useshoppingcart.com/) with your existing Gatsby site by handling the integration of the `<CartProvider>` for you. Use-shopping-cart is an API layer to manage shopping cart logic and handle integration with Stripe payments for secure transactions.
+This plugin simplifies the use of [Use-Shopping-Cart](https://useshoppingcart.com/) with your existing Gatsby site by handling the integration of the `<CartProvider>` for you. Use-Shopping-Cart is an API layer to manage shopping cart logic and handle integration with Stripe payments for secure transactions. Plugin options allow you to configure Use-Shopping-Cart according to their docs.
 
 ## Install
 
@@ -36,7 +36,9 @@ plugins: [
 ]
 ```
 
-## Options
+## Plugin Options
+
+The following options are taken directly from the standard use-shopping-cart API. Default values are provided where possible using Gatsby's plugin configuration.
 
 mode - String
 cartMode - String
