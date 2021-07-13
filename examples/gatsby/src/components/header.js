@@ -1,42 +1,45 @@
-import { Link } from 'gatsby'
-import PropTypes from 'prop-types'
-import React from 'react'
+import * as React from "react"
+import { Link } from "gatsby"
+import { StaticImage } from "gatsby-plugin-image"
+import { useShoppingCart } from "use-shopping-cart"
+import { useSiteMetadata } from "../hooks/use-site-metadata"
 
-const Header = ({ siteTitle }) => (
-  <div
-    style={{
-      background: `rebeccapurple`,
-      marginBottom: `1.45rem`,
-    }}
-  >
-    <div
-      style={{
-        margin: `0 auto`,
-        maxWidth: 960,
-        padding: `1.45rem 1.0875rem`,
-      }}
-    >
-      <h1 style={{ margin: 0 }}>
-        <Link
-          to="/"
-          style={{
-            color: `white`,
-            textDecoration: `none`,
-          }}
-        >
-          {siteTitle}
-        </Link>
-      </h1>
-    </div>
-  </div>
-)
+const Header = () => {
+  const { title, menuLinks } = useSiteMetadata()
+  const { cartCount, handleCartClick } = useShoppingCart()
 
-Header.propTypes = {
-  siteTitle: PropTypes.string,
-}
-
-Header.defaultProps = {
-  siteTitle: ``,
+  return (
+    <header>
+      <div className="branding">
+        <div className="logo">
+          <Link to="/">
+            <StaticImage
+              src="../images/usc-logo-512.png"
+              width={150}
+              quality={95}
+              formats={["AUTO", "WEBP", "AVIF"]}
+              alt="Use Shopping Cart logo"
+            />
+          </Link>
+        </div>
+        <span className="siteTitle">
+          <Link to="/">{title}</Link>
+        </span>
+      </div>
+      <nav>
+        <ul>
+          {menuLinks.map(link => (
+            <li key={link.link}>
+              <Link to={link.link}>{link.name}</Link>
+            </li>
+          ))}
+          <li>
+            <button onClick={() => handleCartClick()}>Cart({cartCount})</button>
+          </li>
+        </ul>
+      </nav>
+    </header>
+  )
 }
 
 export default Header

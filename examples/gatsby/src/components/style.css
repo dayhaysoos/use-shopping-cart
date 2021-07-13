@@ -1,0 +1,152 @@
+:root {
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica,
+    Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol";
+}
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+  color: #33325d;
+  margin-top: 1.5rem;
+}
+
+p {
+  margin-top: 1rem;
+  margin-bottom: 1rem;
+}
+
+button {
+  border: 0;
+  border-radius: 0.25rem;
+  background: #5e6bdf;
+  color: white;
+  font-family: system-ui, sans-serif;
+  font-size: 1rem;
+  line-height: 1.2;
+  white-space: nowrap;
+  text-decoration: none;
+  padding: 0.25rem 0.5rem;
+  margin: 0.25rem;
+  cursor: pointer;
+}
+
+header {
+  background-color: #b2f3d8;
+}
+
+main {
+  flex: 1;
+  width: 95%;
+  margin: 0 auto;
+}
+
+footer {
+  background-color: #b2f3d8;
+  padding: 24px;
+  margin-top: 32px;
+}
+
+nav {
+  max-width: 95%;
+  margin: 1rem auto;
+}
+
+nav ul {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+nav li {
+  margin-right: 1rem;
+}
+
+nav li:last-of-type {
+  margin-right: 0;
+}
+
+.siteContainer {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+}
+
+.cartWrapper {
+  margin: 2rem auto;
+  padding: 2rem;
+  background-color: #dddddd;
+}
+
+.productsWrapper {
+  margin: 2rem 0;
+  display: grid;
+  grid-gap: 1rem;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+}
+
+.productCardWrapper {
+  padding: 1rem;
+  background-color: #eee;
+  border-radius: 4px;
+}
+
+.productCardWrapper h3 {
+  margin-top: 0;
+}
+
+.cartProductName {
+  font-weight: 700;
+}
+
+.branding {
+  display: grid;
+  place-items: center;
+  max-width: 95%;
+  margin: 0 auto;
+}
+
+.logo {
+  width: 80px;
+}
+
+.siteTitle {
+  text-transform: uppercase;
+  font-weight: bold;
+  font-size: 1.5rem;
+  color: #33325d;
+  text-align: center;
+}
+
+.siteTitle a {
+  text-decoration: none;
+  color: inherit;
+}
+
+@media screen and (min-width: 480px) {
+  .logo {
+    width: 100px;
+  }
+  .siteTitle {
+    font-size: 1.8rem;
+  }
+}
+
+@media screen and (min-width: 768px) {
+  .logo {
+    width: 150px;
+  }
+
+  .siteTitle {
+    font-size: 2rem;
+  }
+
+  main {
+    width: 720px;
+  }
+}

@@ -51,11 +51,8 @@ typings/
 # Output of 'npm pack'
 *.tgz
 
-# dotenv environment variables file
-.env
-.env.development
-.env.production
-!.env.example
+# dotenv environment variable files
+.env*
 
 # gatsby files
 .cache/
