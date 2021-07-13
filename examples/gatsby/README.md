@@ -12,7 +12,7 @@ Styling is as minimal as possible.
 
 This assumes you have some familiarity with Gatsby. If you are brand new to Gatsby you should start with [their tutorial](https://www.gatsbyjs.com/docs/tutorial/) and then come back here.
 
-1. Copy and past this starter (clone or fork the repo, whatever is easier). Run `yarn install` or `npm install`.
+1. Copy and paste this starter (clone or fork the repo, whatever is easier). Run `yarn install` or `npm install`.
 
 1. Create a Stripe account and [add products to your product dashboard](https://support.stripe.com/questions/how-to-create-products-and-prices). Make sure you are in the "test" environment.
 
@@ -45,6 +45,7 @@ GATSBY_STRIPE_PUBLIC_KEY=pk_test_123abc
 
 ## To do
 
+- Add loading indicators after button click
 - Check a11y standards in case folks are copy pasting code
 - Make the cart an actual modal with proper a11y support for the modal
 - Implement an example of `setItemQuantity` in the cart
