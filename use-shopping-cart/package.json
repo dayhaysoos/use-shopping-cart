@@ -6,7 +6,7 @@
   "license": "MIT",
   "repository": "dayhaysoos/use-shopping-cart",
   "main": "dist/react.js",
-  "types": "dist/types/index.d.ts",
+  "types": "dist/index.d.ts",
   "module": "dist/react.es.js",
   "jsnext:main": "dist/react.es.js",
   "unpkg": "dist/react.umd.js",
