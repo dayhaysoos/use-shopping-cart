@@ -6,7 +6,8 @@ import replace from '@rollup/plugin-replace'
 import externals from 'rollup-plugin-node-externals'
 import visualizer from 'rollup-plugin-visualizer'
 
-import { promises as fs } from 'fs'
+import { promises as fs, existsSync } from 'fs'
+
 import path from 'path'
 
 import pkg from './package.json'
@@ -42,6 +43,23 @@ function copyTypes() {
             )
             console.error(error)
           }
+
+          try {
+            await fs.copyFile(
+              path.join(process.cwd(), 'core', 'index.d.ts'),
+              path.join(process.cwd(), 'dist', 'index.d.ts')
+            )
+          } catch (error) {
+            console.log(
+              `Unable to copy ${path.join(
+                process.cwd(),
+                'core',
+                'index.d.ts'
+              )} ${path.join(process.cwd(), 'dist', 'index.d.ts')}`
+            )
+
+            console.error(error)
+          }
         }
       }
     }
@@ -59,6 +77,13 @@ function clearDist() {
     async buildStart() {
       if (cleared) return
       cleared = true
+
+      if (existsSync(path.resolve('dist'))) {
+        console.log('dist folder exists')
+      } else {
+        console.log('dist folder unavailable, creating one...')
+        fs.mkdir('dist')
+      }
 
       try {
         await fs.rm(path.resolve('dist'), { recursive: true })

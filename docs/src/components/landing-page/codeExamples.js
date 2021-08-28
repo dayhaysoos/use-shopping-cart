@@ -35,7 +35,7 @@ ReactDOM.render(
 `
 
 export const exampleFrontend = `
-import { useShoppingCart, formatCurrencyString } 'use-shopping-cart'
+import { useShoppingCart, formatCurrencyString } from 'use-shopping-cart'
 
 function Product({ product }) {
   const { redirectToCheckout } = useShoppingCart()
