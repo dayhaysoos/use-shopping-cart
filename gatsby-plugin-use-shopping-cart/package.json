@@ -5,7 +5,7 @@
   "author": "Eric Howey <ehowey@gmail.com>",
   "main": "index.js",
   "dependencies": {
-    "use-shopping-cart": "^3.0.0"
+    "use-shopping-cart": "^3.0.3"
   },
   "peerDependencies": {
     "gatsby": "^3.0.0",
