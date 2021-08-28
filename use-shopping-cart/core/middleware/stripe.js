@@ -12,7 +12,7 @@ export function getCheckoutData(cart) {
     lineItems.push({ price: sku, quantity: cart.cartDetails[sku].quantity })
 
   const options = {
-    mode: 'payment',
+    mode: cart.mode,
     lineItems,
     successUrl: cart.successUrl,
     cancelUrl: cart.cancelUrl,
