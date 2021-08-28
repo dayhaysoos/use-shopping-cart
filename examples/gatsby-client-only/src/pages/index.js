@@ -3,7 +3,7 @@ import Layout from "../components/layout"
 import Seo from "../components/seo"
 import DebugCart from "../components/debugCart"
 import Product from "../components/product"
-import { useStripeProducts } from "../hooks/use-stripe-products"
+import { useStripeProducts } from "../hooks/useStripeProducts"
 
 const Store = () => {
   const products = useStripeProducts()

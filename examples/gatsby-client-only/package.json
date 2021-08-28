@@ -1,27 +1,27 @@
 {
-  "name": "gatsby-usc-clientside-example",
+  "name": "gatsby-usc-clientonly-example",
   "private": true,
   "description": "A simple starter to get up and developing quickly with Gatsby, Use-Shopping-Cart, and Stripe. Client side product validation.",
   "version": "0.0.1",
   "author": "Eric Howey <ehowey@gmail.com>",
   "dependencies": {
-    "gatsby": "^3.9.1",
-    "gatsby-plugin-image": "^1.9.0",
-    "gatsby-plugin-manifest": "^3.9.0",
-    "gatsby-plugin-react-helmet": "^4.9.0",
-    "gatsby-plugin-sharp": "^3.9.0",
-    "gatsby-source-filesystem": "^3.9.0",
-    "gatsby-transformer-sharp": "^3.9.0",
+    "gatsby": "^3.12.1",
+    "gatsby-plugin-image": "^1.12.0",
+    "gatsby-plugin-manifest": "^3.12.0",
+    "gatsby-plugin-react-helmet": "^4.12.0",
+    "gatsby-plugin-sharp": "^3.12.0",
+    "gatsby-source-filesystem": "^3.12.0",
+    "gatsby-transformer-sharp": "^3.12.0",
     "prop-types": "^15.7.2",
     "react": "^17.0.2",
     "react-dom": "^17.0.2",
     "react-helmet": "^6.1.0",
-    "use-shopping-cart": "^3.0.0",
+    "use-shopping-cart": "^3.0.3",
     "gatsby-plugin-use-shopping-cart": "^0.0.1",
     "gatsby-source-stripe": "^3.2.2"
   },
   "devDependencies": {
-    "prettier": "2.3.0"
+    "prettier": "2.3.2"
   },
   "keywords": [
     "gatsby"

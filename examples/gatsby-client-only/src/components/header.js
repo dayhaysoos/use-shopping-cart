@@ -2,7 +2,7 @@ import * as React from "react"
 import { Link } from "gatsby"
 import { StaticImage } from "gatsby-plugin-image"
 import { useShoppingCart } from "use-shopping-cart"
-import { useSiteMetadata } from "../hooks/use-site-metadata"
+import { useSiteMetadata } from "../hooks/useSiteMetadata"
 
 const Header = () => {
   const { title, menuLinks } = useSiteMetadata()
