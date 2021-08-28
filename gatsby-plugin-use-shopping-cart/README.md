@@ -38,7 +38,7 @@ plugins: [
 
 ## Plugin Options
 
-The following options are taken directly from the standard use-shopping-cart API. Default values are provided where possible using Gatsby's plugin configuration.
+The following options are taken directly from the standard use-shopping-cart API. Default values are provided where possible using Gatsby's plugin configuration API.
 
 mode - String
 cartMode - String
