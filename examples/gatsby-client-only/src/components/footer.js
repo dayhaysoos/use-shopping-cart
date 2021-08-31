@@ -5,7 +5,7 @@ const Footer = () => (
     Built with
     {` `}
     <a href="https://useshoppingcart.com/">Use-Shopping-Cart</a>,{" "}
-    <a href="https://www.stripe.com">Stripe</a>,{" "}
+    <a href="https://www.stripe.com">Stripe</a>, and{" "}
     <a href="https://www.gatsbyjs.com">Gatsby</a>
   </footer>
 )

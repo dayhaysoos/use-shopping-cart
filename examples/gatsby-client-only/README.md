@@ -49,3 +49,4 @@ GATSBY_STRIPE_PUBLIC_KEY=pk_test_123abc
 - Check a11y standards in case folks are copy pasting code
 - Make the cart an actual modal with proper a11y support for the modal
 - Implement an example of `setItemQuantity` in the cart
+- Make it look just a bit better!

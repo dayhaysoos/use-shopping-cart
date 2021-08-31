@@ -11,6 +11,12 @@ const Store = () => {
     <Layout>
       <Seo title="Store" />
       <h1>Store</h1>
+      <p>
+        This is an example of a "client-only" implementation of
+        use-shopping-cart where products are stored directly in Stripe and
+        Stripe handles the price validation when the user attempts to make a
+        purchase.
+      </p>
       <div className="productsWrapper">
         {products.map(product => (
           <Product product={product} key={product.name} />

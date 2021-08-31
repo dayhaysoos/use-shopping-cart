@@ -9,12 +9,6 @@ module.exports = {
     author: `@erchwy`,
     keywords: [`use-shopping-cart`, "stripe", "gatsby", "ecommerce"],
     siteUrl: `https://www.myawesomesite.com`,
-    menuLinks: [
-      {
-        name: "Store",
-        link: "/",
-      },
-    ],
   },
   plugins: [
     `gatsby-plugin-react-helmet`,

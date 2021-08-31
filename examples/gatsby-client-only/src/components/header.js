@@ -5,7 +5,7 @@ import { useShoppingCart } from "use-shopping-cart"
 import { useSiteMetadata } from "../hooks/useSiteMetadata"
 
 const Header = () => {
-  const { title, menuLinks } = useSiteMetadata()
+  const { title } = useSiteMetadata()
   const { cartCount, handleCartClick } = useShoppingCart()
 
   return (
@@ -26,18 +26,9 @@ const Header = () => {
           <Link to="/">{title}</Link>
         </span>
       </div>
-      <nav>
-        <ul>
-          {menuLinks.map(link => (
-            <li key={link.link}>
-              <Link to={link.link}>{link.name}</Link>
-            </li>
-          ))}
-          <li>
-            <button onClick={() => handleCartClick()}>Cart({cartCount})</button>
-          </li>
-        </ul>
-      </nav>
+      <div className="cartButtonWrapper">
+        <button onClick={() => handleCartClick()}>Cart({cartCount})</button>
+      </div>
     </header>
   )
 }

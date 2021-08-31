@@ -10,10 +10,6 @@ export const useSiteMetadata = () => {
             keywords
             author
             siteUrl
-            menuLinks {
-              name
-              link
-            }
           }
         }
       }
