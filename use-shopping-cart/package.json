@@ -16,17 +16,20 @@
       "require": "./dist/react.js",
       "node": "./dist/react.js",
       "import": "./dist/react.es.js",
-      "browser": "./dist/react.umd.js"
+      "browser": "./dist/react.umd.js",
+      "types": "./react/index.d.ts"
     },
     "./core": {
       "require": "./dist/core.js",
       "node": "./dist/core.js",
       "import": "./dist/core.es.js",
-      "browser": "./dist/core.umd.js"
+      "browser": "./dist/core.umd.js",
+      "types": "./core/index.d.ts"
     },
     "./utilities": {
       "require": "./utilities/serverless.js",
-      "node": "./utilities/serverless.js"
+      "node": "./utilities/serverless.js",
+      "types": "./utilities/serverless.d.ts"
     }
   },
   "engines": {

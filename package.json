@@ -29,6 +29,7 @@
     "*.{js,jsx,.d.ts,ts,tsx,mdx}": "prettier --write"
   },
   "devDependencies": {
+    "typescript": "^4.4.3",
     "webpack-dev-server": "3.11.1"
   }
 }
