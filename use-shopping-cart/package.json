@@ -27,7 +27,8 @@
     "./utilities": {
       "require": "./utilities/serverless.js",
       "node": "./utilities/serverless.js"
-    }
+    },
+    "./*": "./*.js"
   },
   "engines": {
     "node": ">=8",
