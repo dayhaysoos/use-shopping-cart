@@ -6,9 +6,7 @@ import * as React from 'react'
 import { CartProvider, useShoppingCart } from '../react/index'
 
 function UscWithSelector() {
-  const cart = useShoppingCart(
-    ({ totalPrice }) => ({ totalPrice })
-  )
+  const cart = useShoppingCart(({ totalPrice }) => ({ totalPrice }))
 
   cart.totalPrice
   // Can't access anything outside of totalPrice and the cart actions.
@@ -81,6 +79,7 @@ function UscActions() {
   cart.storeLastClicked('id_banana001')
   cart.handleCartHover()
   cart.handleCloseCart()
+  cart.handleOpenCart()
   cart.handleCartClick()
 
   cart.redirectToCheckout()
@@ -95,11 +94,7 @@ function UscActions() {
 function App() {
   return (
     <>
-      <CartProvider
-        cartMode="checkout-session"
-        stripe="KEY"
-        currency="USD"
-      >
+      <CartProvider cartMode="checkout-session" stripe="KEY" currency="USD">
         <UscWithSelector />
       </CartProvider>
 

@@ -102,6 +102,15 @@ describe('useShoppingCart()', () => {
       })
       expect(cart.current.shouldDisplayCart).toBe(false)
     })
+
+    it('is set to true by handleOpenCart()', () => {
+      act(() => {
+        cart.current.handleCartClick()
+        cart.current.handleCloseCart()
+        cart.current.handleOpenCart()
+      })
+      expect(cart.current.shouldDisplayCart).toBe(true)
+    })
   })
 
   describe('addItem()', () => {

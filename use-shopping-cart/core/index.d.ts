@@ -176,11 +176,14 @@ export interface CartActions {
    * @param product The product to add to the cart
    * @param count The quantity of the product to add
    */
-  addItem: (product: Product, options?: {
-    count: number
-    price_metadata?: { [propName: string]: any }
-    product_metadata?: { [propName: string]: any }
-  }) => void
+  addItem: (
+    product: Product,
+    options?: {
+      count: number
+      price_metadata?: { [propName: string]: any }
+      product_metadata?: { [propName: string]: any }
+    }
+  ) => void
 
   /**
    * Remove an item from the cart by its product ID
@@ -252,6 +255,11 @@ export interface CartActions {
    * Sets `shouldDisplayCart` to `false`.
    */
   handleCloseCart: () => void
+
+  /**
+   * Sets `shouldDisplayCart` to `true`.
+   */
+  handleOpenCart: () => void
 
   /**
    * Given a product ID, it sets `lastClicked` to that value.

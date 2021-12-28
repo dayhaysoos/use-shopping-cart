@@ -264,6 +264,16 @@ describe('handleCloseCart', () => {
   })
 })
 
+describe('handleOpenCart', () => {
+  it('should set the cart to be displayed', () => {
+    const result = reducer(
+      { ...initialState, shouldDisplayCart: false },
+      actions.handleOpenCart()
+    )
+    expect(result.shouldDisplayCart).toBe(true)
+  })
+})
+
 describe('storeLastClicked', () => {
   it('should store id of last clicked item', () => {
     const cart = mockCart()
