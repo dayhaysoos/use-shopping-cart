@@ -7,11 +7,11 @@ This plugin simplifies the use of [Use-Shopping-Cart](https://useshoppingcart.co
 ## Install
 
 ```sh
-npm install gatsby-plugin-use-shopping-cart use-shopping-cart
+npm install gatsby-plugin-use-shopping-cart use-shopping-cart @stripe/stripe-js
 ```
 
 ```sh
-yarn add gatsby-plugin-use-shopping-cart use-shopping-cart
+yarn add gatsby-plugin-use-shopping-cart use-shopping-cart @stripe/stripe-js
 ```
 
 ## How to use
@@ -40,11 +40,50 @@ plugins: [
 
 The following options are taken directly from the standard use-shopping-cart API. Default values are provided where possible using Gatsby's plugin configuration API.
 
-mode - String
-cartMode - String
-stripePublicKey - String
-successUrl - String
-cancelUrl - String
-currency - String
-allowedCountries - Array of strings
-billingAddressCollection - Boolean
+| Plugin Option            | Type             | Default Value                   |
+| ------------------------ | ---------------- | ------------------------------- |
+| mode                     | string           | payment                         |
+| cartMode                 | string           | client-only                     |
+| stripePublicKey          | string           | null                            |
+| successUrl               | string           | https://www.useshoppingcart.com |
+| cancelUrl                | string           | https://www.stripe.com          |
+| currency                 | string           | USD                             |
+| allowedCountries         | array of strings | ["US", "GB", "CA"]              |
+| billingAddressCollection | boolean          | true                            |
+
+## How it works
+
+The core part of this plugin is wrapping the root app provider in `gatsby-ssr.js` and `gatsby-browser.js` so that the shopping cart state is available across your Gatsby site. For those that are curious this is what that code looks like.
+
+```js
+import React from "react"
+import { CartProvider } from "use-shopping-cart"
+
+export const wrapRootElement = ({ element }, pluginOptions) => {
+  const {
+    mode,
+    cartMode,
+    stripePublicKey,
+    successUrl,
+    cancelUrl,
+    currency,
+    allowedCountries,
+    billingAddressCollection,
+  } = pluginOptions
+
+  return (
+    <CartProvider
+      mode={mode}
+      cartMode={cartMode}
+      stripe={stripePublicKey}
+      successUrl={successUrl}
+      cancelUrl={cancelUrl}
+      currency={currency}
+      allowedCountries={allowedCountries}
+      billingAddressCollection={billingAddressCollection}
+    >
+      {element}
+    </CartProvider>
+  )
+}
+```

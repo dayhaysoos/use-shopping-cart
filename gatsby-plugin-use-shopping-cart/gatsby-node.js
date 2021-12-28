@@ -8,6 +8,9 @@
 //     allowedCountries,
 //     billingAddressCollection
 
+// The following code helps provide some more relevant defaults and error messages.
+// https://www.gatsbyjs.com/docs/how-to/plugins-and-themes/configuring-usage-with-plugin-options/
+
 exports.pluginOptionsSchema = ({ Joi }) => {
   return Joi.object({
     mode: Joi.string()
@@ -20,7 +23,6 @@ exports.pluginOptionsSchema = ({ Joi }) => {
       .required()
       .description(`Public key from your Stripe dashboard.`)
       .messages({
-        // Override the error message if the .required() call fails
         "any.required": `"Stripe Public Key" needs to be provided. Get the correct value from your Stripe dashboard`,
       }),
     successUrl: Joi.string()
@@ -29,7 +31,6 @@ exports.pluginOptionsSchema = ({ Joi }) => {
     cancelUrl: Joi.string()
       .default(`https://stripe.com/`)
       .description(`Url redirect on a cancelled purchase.`),
-    // allowedCountries: ["US", "GB", "CA"],
     allowedCountries: Joi.array()
       .items(Joi.string())
       .default(["US", "GB", "CA"])
