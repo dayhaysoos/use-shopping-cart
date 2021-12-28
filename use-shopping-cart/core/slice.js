@@ -148,6 +148,9 @@ const slice = createSlice({
     handleCloseCart(state) {
       state.shouldDisplayCart = false
     },
+    handleOpenCart(state) {
+      state.shouldDisplayCart = true
+    },
     storeLastClicked(state, { payload }) {
       state.lastClicked = payload
     },
