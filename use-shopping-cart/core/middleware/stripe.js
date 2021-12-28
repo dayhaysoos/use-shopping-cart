@@ -78,7 +78,15 @@ export const handleStripe = (store) => (next) => async (action) => {
         mode: cart.mode,
         successUrl: cart.successUrl,
         cancelUrl: cart.cancelUrl,
-        lineItems: [{ price: productId, quantity: 1 }]
+        lineItems: [{ price: productId, quantity: 1 }],
+        billingAddressCollection: cart.billingAddressCollection
+          ? 'required'
+          : 'auto'
+      }
+      if (cart.allowedCountries?.length) {
+        options.shippingAddressCollection = {
+          allowedCountries: cart.allowedCountries
+        }
       }
       return stripe.redirectToCheckout(options)
     } else {
