@@ -711,11 +711,11 @@ describe('redirectToCheckout()', () => {
 
     describe('with a checkout-session cartMode', () => {
       beforeEach(() => {
-        cart = reload({ mode: 'checkout-session' })
+        cart = reload({ cartMode: 'checkout-session' })
       })
 
       it('throws an error', async () => {
-        expect(
+        await expect(
           cart.current.checkoutSingleItem({ sku: product.id })
         ).rejects.toThrow(PropertyValueError)
       })
