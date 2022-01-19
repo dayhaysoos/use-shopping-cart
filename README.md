@@ -63,11 +63,13 @@ Thanks goes to these wonderful people ([emoji key](https://allcontributors.org/d
     <td align="center"><a href="https://bdesigned.netlify.com/"><img src="https://avatars2.githubusercontent.com/u/45889730?v=4?s=100" width="100px;" alt=""/><br /><sub><b>Brittney Postma</b></sub></a><br /><a href="https://github.com/dayhaysoos/use-shopping-cart/commits?author=brittneypostma" title="Documentation">📖</a></td>
     <td align="center"><a href="https://prince.dev"><img src="https://avatars1.githubusercontent.com/u/8431042?v=4?s=100" width="100px;" alt=""/><br /><sub><b>Prince Wilson</b></sub></a><br /><a href="https://github.com/dayhaysoos/use-shopping-cart/commits?author=maxcell" title="Documentation">📖</a></td>
     <td align="center"><a href="https://www.erichowey.dev/"><img src="https://avatars.githubusercontent.com/u/204841?v=4?s=100" width="100px;" alt=""/><br /><sub><b>Eric Howey</b></sub></a><br /><a href="https://github.com/dayhaysoos/use-shopping-cart/commits?author=ehowey" title="Documentation">📖</a></td>
+    <td align="center"><a href="https://github.com/hideokamoto-stripe"><img src="https://avatars.githubusercontent.com/u/95597878?v=4?s=100" width="100px;" alt=""/><br /><sub><b>Hidetaka Okamoto</b></sub></a><br /><a href="https://github.com/dayhaysoos/use-shopping-cart/commits?author=hideokamoto-stripe" title="Code">💻</a></td>
   </tr>
 </table>
 
 <!-- markdownlint-restore -->
 <!-- prettier-ignore-end -->
+
 <!-- ALL-CONTRIBUTORS-LIST:END -->
 
 This project follows the [all-contributors](https://github.com/all-contributors/all-contributors) specification. Contributions of any kind welcome!
