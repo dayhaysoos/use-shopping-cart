@@ -167,9 +167,52 @@ slice.actions.redirectToCheckout = (sessionId) => ({
   type: 'cart/redirectToCheckout',
   payload: sessionId
 })
-slice.actions.checkoutSingleItem = (productId) => ({
-  type: 'cart/checkoutSingleItem',
-  payload: productId
-})
+slice.actions.checkoutSingleItem = (itemsOrPriceId) => {
+  const quantity = itemsOrPriceId.quantity || 1
+
+  const cartItems = (() => {
+    if (typeof itemsOrPriceId === 'string') {
+      return {
+        lineItems: [
+          {
+            price: itemsOrPriceId,
+            quantity
+          }
+        ]
+      }
+    }
+    if (Object.prototype.hasOwnProperty.call(itemsOrPriceId, 'price')) {
+      return {
+        lineItems: [
+          {
+            price: itemsOrPriceId.price,
+            quantity
+          }
+        ]
+      }
+    }
+    /**
+     * Backward compatibility (SKU)
+     */
+    if (Object.prototype.hasOwnProperty.call(itemsOrPriceId, 'sku')) {
+      return {
+        items: [
+          {
+            sku: itemsOrPriceId.sku,
+            quantity
+          }
+        ]
+      }
+    }
+    return []
+  })()
+
+  return {
+    type: 'cart/checkoutSingleItem',
+    payload: {
+      cartItems
+    }
+  }
+}
 
 export const { reducer, actions } = slice

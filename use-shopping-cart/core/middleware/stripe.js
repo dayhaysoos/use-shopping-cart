@@ -73,12 +73,11 @@ export const handleStripe = (store) => (next) => async (action) => {
     const stripe = initializeStripe(stripePublicKey)
 
     if (cart.cartMode === 'client-only') {
-      const productId = action.payload.productId
       const options = {
         mode: cart.mode,
         successUrl: cart.successUrl,
         cancelUrl: cart.cancelUrl,
-        lineItems: [{ price: productId, quantity: 1 }]
+        ...action.payload.cartItems
       }
       return stripe.redirectToCheckout(options)
     } else {

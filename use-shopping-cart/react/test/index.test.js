@@ -599,55 +599,123 @@ describe('redirectToCheckout()', () => {
     })
   })
 
-  // TODO : check on bug for sending product.id as price in stripe-middleware?
-  describe.skip('checkoutSingleItem()', () => {
+  describe('checkoutSingleItem()', () => {
     const product = mockProduct()
 
-    it('should send the formatted item with no quantity parameter', async () => {
-      await act(async () => {
-        await cart.current.checkoutSingleItem({
-          sku: product.id
+    describe('priceId', () => {
+      it('should send the formatted item', async () => {
+        await act(async () => {
+          await cart.current.checkoutSingleItem(product.id)
         })
-      })
 
-      const expectedCheckoutOptions = expect.objectContaining({
-        lineItems: {
-          price: product.id,
-          quantity: 1
-        }
-      })
+        const expectedCheckoutOptions = expect.objectContaining({
+          lineItems: [
+            {
+              price: product.id,
+              quantity: 1
+            }
+          ]
+        })
 
-      expect(stripeMock.redirectToCheckout).toHaveBeenCalledWith(
-        expectedCheckoutOptions
-      )
+        expect(stripeMock.redirectToCheckout).toHaveBeenCalledWith(
+          expectedCheckoutOptions
+        )
+      })
     })
-
-    it('should send the formatted item with a custom quantity parameter', async () => {
-      await act(async () => {
-        await cart.current.checkoutSingleItem({
-          sku: product.id,
-          quantity: 47
+    describe('price(object)', () => {
+      it('should send the formatted item with no quantity parameter', async () => {
+        await act(async () => {
+          await cart.current.checkoutSingleItem({
+            price: product.id
+          })
         })
+
+        const expectedCheckoutOptions = expect.objectContaining({
+          lineItems: [
+            {
+              price: product.id,
+              quantity: 1
+            }
+          ]
+        })
+
+        expect(stripeMock.redirectToCheckout).toHaveBeenCalledWith(
+          expectedCheckoutOptions
+        )
       })
 
-      const expectedCheckoutOptions = expect.objectContaining({
-        lineItems: {
-          sku: product.id,
-          quantity: 47
-        }
+      it('should send the formatted item with a custom quantity parameter', async () => {
+        await act(async () => {
+          await cart.current.checkoutSingleItem({
+            price: product.id,
+            quantity: 47
+          })
+        })
+
+        const expectedCheckoutOptions = expect.objectContaining({
+          lineItems: [
+            {
+              price: product.id,
+              quantity: 47
+            }
+          ]
+        })
+        expect(stripeMock.redirectToCheckout).toHaveBeenCalledWith(
+          expectedCheckoutOptions
+        )
       })
-      expect(stripeMock.redirectToCheckout).toHaveBeenCalledWith(
-        expectedCheckoutOptions
-      )
+    })
+    describe('sku (Deprecated)', () => {
+      it('should send the formatted item with no quantity parameter', async () => {
+        await act(async () => {
+          await cart.current.checkoutSingleItem({
+            sku: product.id
+          })
+        })
+
+        const expectedCheckoutOptions = expect.objectContaining({
+          items: [
+            {
+              sku: product.id,
+              quantity: 1
+            }
+          ]
+        })
+
+        expect(stripeMock.redirectToCheckout).toHaveBeenCalledWith(
+          expectedCheckoutOptions
+        )
+      })
+
+      it('should send the formatted item with a custom quantity parameter', async () => {
+        await act(async () => {
+          await cart.current.checkoutSingleItem({
+            sku: product.id,
+            quantity: 47
+          })
+        })
+
+        const expectedCheckoutOptions = expect.objectContaining({
+          items: [
+            {
+              sku: product.id,
+              quantity: 47
+            }
+          ]
+        })
+        expect(stripeMock.redirectToCheckout).toHaveBeenCalledWith(
+          expectedCheckoutOptions
+        )
+      })
     })
 
     describe('with a checkout-session cartMode', () => {
       beforeEach(() => {
-        cart = reload({ mode: 'checkout-session' })
+        cart = reload({ cartMode: 'checkout-session' })
       })
 
       it('throws an error', async () => {
-        expect(
+        await expect(
           cart.current.checkoutSingleItem({ sku: product.id })
         ).rejects.toThrow(PropertyValueError)
       })
