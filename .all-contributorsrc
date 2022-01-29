@@ -127,6 +127,15 @@
       "contributions": [
         "doc"
       ]
+    },
+    {
+      "login": "hideokamoto-stripe",
+      "name": "Hidetaka Okamoto",
+      "avatar_url": "https://avatars.githubusercontent.com/u/95597878?v=4",
+      "profile": "https://github.com/hideokamoto-stripe",
+      "contributions": [
+        "code"
+      ]
     }
   ],
   "contributorsPerLine": 7,

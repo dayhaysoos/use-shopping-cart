@@ -280,3 +280,104 @@ describe('storeLastClicked', () => {
     expect(result.lastClicked).toEqual(product.id)
   })
 })
+
+describe('checkoutSingleItem', () => {
+  it('should return lineItems when given string', () => {
+    const product = mockProduct()
+    expect(actions.checkoutSingleItem(product.id)).toEqual({
+      payload: {
+        cartItems: {
+          lineItems: [
+            {
+              price: product.id,
+              quantity: 1
+            }
+          ]
+        }
+      },
+      type: 'cart/checkoutSingleItem'
+    })
+  })
+  it('should return lineItems when given price object', () => {
+    const product = mockProduct()
+    expect(
+      actions.checkoutSingleItem({
+        price: product.id
+      })
+    ).toEqual({
+      payload: {
+        cartItems: {
+          lineItems: [
+            {
+              price: product.id,
+              quantity: 1
+            }
+          ]
+        }
+      },
+      type: 'cart/checkoutSingleItem'
+    })
+  })
+  it('should return lineItems when given price object with quantity', () => {
+    const product = mockProduct()
+    expect(
+      actions.checkoutSingleItem({
+        price: product.id,
+        quantity: 2
+      })
+    ).toEqual({
+      payload: {
+        cartItems: {
+          lineItems: [
+            {
+              price: product.id,
+              quantity: 2
+            }
+          ]
+        }
+      },
+      type: 'cart/checkoutSingleItem'
+    })
+  })
+  it('should return items when given sku object', () => {
+    const product = mockProduct()
+    expect(
+      actions.checkoutSingleItem({
+        sku: product.id
+      })
+    ).toEqual({
+      payload: {
+        cartItems: {
+          items: [
+            {
+              sku: product.id,
+              quantity: 1
+            }
+          ]
+        }
+      },
+      type: 'cart/checkoutSingleItem'
+    })
+  })
+  it('should return items when given sku object with quantity', () => {
+    const product = mockProduct()
+    expect(
+      actions.checkoutSingleItem({
+        sku: product.id,
+        quantity: 2
+      })
+    ).toEqual({
+      payload: {
+        cartItems: {
+          items: [
+            {
+              sku: product.id,
+              quantity: 2
+            }
+          ]
+        }
+      },
+      type: 'cart/checkoutSingleItem'
+    })
+  })
+})

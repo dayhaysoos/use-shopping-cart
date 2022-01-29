@@ -1,6 +1,6 @@
 {
   "name": "use-shopping-cart",
-  "version": "3.0.3",
+  "version": "3.0.4",
   "description": "Shopping cart state and logic for Stripe",
   "author": "dayhaysoos",
   "license": "MIT",
@@ -30,7 +30,9 @@
       "require": "./utilities/serverless.js",
       "node": "./utilities/serverless.js",
       "types": "./utilities/serverless.d.ts"
-    }
+    },
+    "./utilities/*": "./utilities/*.js",
+    "./*": "./dist/*.js"
   },
   "engines": {
     "node": ">=8",
