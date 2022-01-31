@@ -43,23 +43,6 @@ function copyTypes() {
             )
             console.error(error)
           }
-
-          try {
-            await fs.copyFile(
-              path.join(process.cwd(), 'core', 'index.d.ts'),
-              path.join(process.cwd(), 'dist', 'index.d.ts')
-            )
-          } catch (error) {
-            console.log(
-              `Unable to copy ${path.join(
-                process.cwd(),
-                'core',
-                'index.d.ts'
-              )} ${path.join(process.cwd(), 'dist', 'index.d.ts')}`
-            )
-
-            console.error(error)
-          }
         }
       }
     }
@@ -78,15 +61,10 @@ function clearDist() {
       if (cleared) return
       cleared = true
 
-      if (existsSync(path.resolve('dist'))) {
-        console.log('dist folder exists')
-      } else {
-        console.log('dist folder unavailable, creating one...')
-        fs.mkdir('dist')
-      }
-
       try {
-        await fs.rm(path.resolve('dist'), { recursive: true })
+        if (existsSync(path.resolve('dist')))
+          await fs.rm(path.resolve('dist'), { recursive: true })
+
         await fs.mkdir(path.resolve('dist'))
         console.log('Cleared dist/ folder.')
       } catch (error) {

@@ -6,11 +6,17 @@
   "license": "MIT",
   "repository": "dayhaysoos/use-shopping-cart",
   "main": "dist/react.js",
-  "types": "dist/index.d.ts",
+  "types": "dist/react.d.ts",
   "module": "dist/react.es.js",
   "jsnext:main": "dist/react.es.js",
   "unpkg": "dist/react.umd.js",
   "umd": "dist/react.umd.js",
+  "files": [
+    "dist",
+    "react/index.d.ts",
+    "core/index.d.ts",
+    "utilities"
+  ],
   "exports": {
     ".": {
       "require": "./dist/react.js",
@@ -30,9 +36,7 @@
       "require": "./utilities/serverless.js",
       "node": "./utilities/serverless.js",
       "types": "./utilities/serverless.d.ts"
-    },
-    "./utilities/*": "./utilities/*.js",
-    "./*": "./dist/*.js"
+    }
   },
   "engines": {
     "node": ">=8",

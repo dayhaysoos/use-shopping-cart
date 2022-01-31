@@ -1,0 +1,60 @@
+{
+  "pro": true,
+  "babel": {
+    "presets": [
+      [
+        "@babel/preset-env",
+        {
+          "targets": {
+            "esmodules": true
+          },
+          "shippedProposals": true
+        }
+      ],
+      [
+        "@babel/preset-react",
+        {
+          "runtime": "automatic"
+        }
+      ]
+    ]
+  },
+  "plugins": [
+    "jsdom-quokka-plugin"
+  ],
+  "useWsl": true,
+  "jsdom": {
+    "html": "<div id=\"root\"></div>"
+  },
+  "env": {
+    "params": {
+      "runner": "--experimental-specifier-resolution=node"
+    }
+  },
+  "ts": {
+    "compilerOptions": {
+      "module": "esnext",
+      "target": "ES2019",
+      "lib": [
+        "dom",
+        "dom.iterable",
+        "esnext"
+      ],
+      "allowJs": true,
+      "skipLibCheck": true,
+      "esModuleInterop": true,
+      "allowSyntheticDefaultImports": true,
+      "strict": true,
+      "forceConsistentCasingInFileNames": true,
+      "noFallthroughCasesInSwitch": true,
+      "moduleResolution": "node",
+      "resolveJsonModule": true,
+      "isolatedModules": true,
+      "noEmit": true,
+      "jsx": "react-jsx"
+    },
+    "include": [
+      "src"
+    ]
+  }
+}
