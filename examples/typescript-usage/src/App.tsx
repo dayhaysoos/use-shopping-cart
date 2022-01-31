@@ -2,12 +2,12 @@ import {
   useShoppingCart,
   DebugCart,
   formatCurrencyString
-} from 'use-shopping-cart/dist/react'
+} from 'use-shopping-cart'
 import {
   Product,
   CartActions,
   CartEntry as ICartEntry
-} from 'use-shopping-cart/dist/core'
+} from 'use-shopping-cart/core'
 
 function CartEntry({
   entry,
