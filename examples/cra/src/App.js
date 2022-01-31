@@ -33,15 +33,27 @@ const priceProducts = [
 
 const App = () => {
   return (
-    <Flex sx={{ justifyContent: 'space-evenly' }}>
-      <Box>
-        <h1>Store</h1>
-        <h2>Products not created in the Stripe Dashboard</h2>
-        <Products products={fakeData} />
-        <h2>Products made on Stripe Dashboard using Price API</h2>
-        <PriceProducts products={priceProducts} />
-      </Box>
-      <CartDisplay />
+    <Flex
+      sx={{
+        maxWidth: 1400,
+        margin: 'auto',
+        flexDirection: 'column',
+        alignItems: 'center',
+        paddingBottom: 20
+      }}
+    >
+      <h1>Store</h1>
+      <Flex sx={{ justifyContent: 'space-evenly', gap: 80 }}>
+        <Box>
+          <h2>Products not created in the Stripe Dashboard</h2>
+          <Products products={fakeData} />
+          <br />
+          <br />
+          <h2>Products made on Stripe Dashboard using Price API</h2>
+          <PriceProducts products={priceProducts} />
+        </Box>
+        <CartDisplay />
+      </Flex>
     </Flex>
   )
 }

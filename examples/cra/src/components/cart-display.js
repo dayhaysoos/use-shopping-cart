@@ -12,7 +12,7 @@ const CartDisplay = () => {
     setItemQuantity
   } = useShoppingCart()
 
-  const handleSubmit = async (event) => {
+  async function handleSubmit(event) {
     event.preventDefault()
 
     const response = await fetch('/.netlify/functions/create-session', {
@@ -28,7 +28,7 @@ const CartDisplay = () => {
     redirectToCheckout({ sessionId: response.sessionId })
   }
 
-  const handleCheckout = async (event) => {
+  async function handleCheckout(event) {
     event.preventDefault()
 
     const response = await fetch('/.netlify/functions/redirect-to-checkout', {
@@ -41,39 +41,49 @@ const CartDisplay = () => {
       .then((res) => res.json())
       .catch((error) => console.log(error))
 
-    console.log('???', response)
+    console.log('Checkout result:', response)
   }
 
   if (cartCount === 0) {
     return (
-      <Box sx={{ textAlign: 'center' }}>
+      <Flex
+        sx={{
+          textAlign: 'center',
+          flexDirection: 'column',
+          alignItems: 'center'
+        }}
+      >
         <h2>Shopping Cart Display Panel</h2>
-        <h3>No items in cart</h3>
-      </Box>
+        <p style={{ maxWidth: 300 }}>
+          You haven't added any items to your cart yet. That's a shame.
+        </p>
+      </Flex>
     )
   } else {
     return (
       <Flex
         sx={{
-          flexDirection: 'column',
-          justifyContent: 'center',
-          alignItems: 'center'
+          flexDirection: 'column'
         }}
       >
         <h2>Shopping Cart Display Panel</h2>
-        {Object.keys(cartDetails).map((sku) => {
+        {Object.keys(cartDetails).map((sku, index) => {
           const { name, quantity, image } = cartDetails[sku]
           return (
             <Flex
               key={sku}
               sx={{
-                justifyContent: 'space-around',
-                alignItems: 'center',
-                width: '100%'
+                flexDirection: 'column',
+                width: '100%',
+                marginBottom: 25,
+                paddingLeft: 20
               }}
             >
-              <Flex sx={{ flexDirection: 'column', alignItems: 'center' }}>
-                <Image sx={{ width: 100 }} src={image} />
+              <Flex sx={{ alignItems: 'center' }}>
+                <Image
+                  sx={{ width: 50, height: 'auto', marginRight: 10 }}
+                  src={image}
+                />
                 <p>{name}</p>
               </Flex>
               <Input
@@ -88,18 +98,26 @@ const CartDisplay = () => {
             </Flex>
           )
         })}
-        <h3>Total Items in Cart: {cartCount}</h3>
-        <h3>Total Price: {formattedTotalPrice}</h3>
-        <Box
-          as={'form'}
-          action={'/.netlify/functions/create-session'}
-          method="POST"
-        >
-          <Button sx={{ backgroundColor: 'black' }} onClick={handleSubmit}>
-            Checkout
-          </Button>
+        <Box>
+          <p aria-live="polite" aria-atomic="true">
+            Total Item Count: {cartCount}
+          </p>
+          <p aria-live="polite" aria-atomic="true">
+            Total Price: {formattedTotalPrice}
+          </p>
         </Box>
-        <Button sx={{ backgroundColor: 'black' }} onClick={() => clearCart()}>
+        <Button
+          sx={{ backgroundColor: 'black' }}
+          marginBottom={10}
+          onClick={handleSubmit}
+        >
+          Checkout
+        </Button>
+        <Button
+          sx={{ backgroundColor: 'black' }}
+          marginBottom={10}
+          onClick={() => clearCart()}
+        >
           Clear Cart Items
         </Button>
         <Button sx={{ backgroundColor: 'black' }} onClick={handleCheckout}>

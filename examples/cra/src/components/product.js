@@ -30,17 +30,26 @@ const Product = (product) => {
         alignItems: 'center'
       }}
     >
-      <Image src={image} />
+      <Image
+        src={image}
+        sx={{ width: 200, height: 200, objectFit: 'contain' }}
+      />
       <Box>
-        <p>{name}</p>
+        <h3>{name}</h3>
         <p>{formatCurrencyString({ value: price, currency })}</p>
       </Box>
-      <Button onClick={() => addItem(product)} backgroundColor={'black'}>
-        Add To Cart
-      </Button>
-      <Button onClick={handleCheckout} backgroundColor={'black'}>
-        Buy Now
-      </Button>
+      <Flex sx={{ flexDirection: 'column' }}>
+        <Button
+          onClick={() => addItem(product)}
+          backgroundColor={'black'}
+          marginBottom={10}
+        >
+          Add To Cart
+        </Button>
+        <Button onClick={handleCheckout} backgroundColor={'black'}>
+          Buy Now
+        </Button>
+      </Flex>
     </Flex>
   )
 }
