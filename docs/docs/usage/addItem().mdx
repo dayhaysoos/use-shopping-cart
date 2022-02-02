@@ -41,7 +41,7 @@ When this library was made, it was done with Stripe's SKU API in mind. SKU is de
 of the Price API. This is why `sku` and `id` are interchangable. You can use `sku` if you want, but it's preferred
 that you use `id` instead.
 
-You can add an optional quantity param, to add by that number. `addItem(product, 10)` for example would add by 10.
+You can add an optional quantity param, to add by that number. `addItem(product, { count: 10 })` for example would add by 10.
 
 <CartDisplayWrapper>
   <AddItem
