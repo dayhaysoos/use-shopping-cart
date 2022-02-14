@@ -105,7 +105,7 @@ Create a functions directory in your project. Create a file called `create-sessi
 
 _Note_: You should have a way to reference products from a backend. In this small example we're just referencing from a JSON file.
 
-```
+```js
 const stripe = require('stripe')(process.env.REACT_APP_STRIPE_API_SECRET)
 const validateCartItems = require('use-shopping-cart/utilities')
   .validateCartItems
