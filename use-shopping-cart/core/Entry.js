@@ -20,8 +20,8 @@ export const formatCurrencyString = ({
     }
   }
 
-  value = zeroDecimalCurrency ? value : value / 100
-  return numberFormat.format(value.toFixed(2))
+  value = zeroDecimalCurrency ? value : parseFloat((value / 100).toFixed(2))
+  return numberFormat.format(value)
 }
 
 export function updateFormattedTotalPrice(state) {
@@ -48,14 +48,7 @@ export function updateFormattedPrice(state, id) {
   })
 }
 
-function Entry({
-  state,
-  id,
-  product,
-  quantity,
-  price_metadata,
-  product_metadata
-}) {
+function Entry({ id, product, quantity, price_metadata, product_metadata }) {
   return {
     ...product,
     id,
@@ -81,7 +74,6 @@ export function createEntry({
   product_metadata
 }) {
   const entry = Entry({
-    state,
     id,
     product,
     quantity: count,
