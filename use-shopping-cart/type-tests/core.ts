@@ -1,19 +1,12 @@
 /* eslint-disable camelcase */
 import {
-  Config,
-  Product,
-  CartEntry,
-  CartDetails,
-  CartReducer,
-  CartActions,
-  CartAction,
   CartState,
-  reducer,
   actions,
   filterCart,
   formatCurrencyString,
   createShoppingCartStore,
-  createPersistedStore
+  createPersistedStore,
+  CartEntry
 } from '../core/index'
 
 const store = createShoppingCartStore({
@@ -27,6 +20,7 @@ const store = createShoppingCartStore({
 })
 
 createPersistedStore(store)
+/* eslint-disable no-unused-vars */
 let state: CartState = store.getState()
 store.subscribe(() => {
   state = store.getState()
@@ -102,3 +96,8 @@ store.dispatch(actions.handleCartClick())
 store.dispatch(actions.handleCloseCart())
 
 console.log(store.getState())
+filterCart(store.getState().cartDetails, async (entry: CartEntry) => {
+  // sold out of watermelon
+  if (entry.id === 'id_watermelon') return false
+  return true
+})

@@ -24,20 +24,20 @@ formatCurrencyString formats the prices of the products. It takes an object shap
   </tr>
 </table>
 
-```json5
+```json
 {
-  value: 400,
-  currency: 'USD',
-  language: 'EN' //optional
+  "value": 400,
+  "currency": "USD",
+  "language": "EN"
 }
 ```
 
 If you don't pass a value to language, it will choose language based on the browsers settings
 
 ```jsx
-import { formatCurrencyString } from 'use-shopping-cart/src/util'
+import { formatCurrencyString } from 'use-shopping-cart' // or
+import { formatCurrencyString } from 'use-shopping-cart/core'
 
-formatCurrencyString({ value, currency })
-
-// returns $4.00
+formatCurrencyString({ value: 400, currency: 'USD' })
+// returns '$4.00'
 ```

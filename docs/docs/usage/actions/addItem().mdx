@@ -3,8 +3,8 @@ id: add-item
 title: addItem()
 ---
 
-import CartDisplayWrapper from '../../src/components/docs/cart-display-wrapper'
-import AddItem from '../../src/components/docs/add-item'
+import CartDisplayWrapper from '../../../src/components/docs/cart-display-wrapper'
+import AddItem from '../../../src/components/docs/add-item'
 
 To add a product to the cart, use `useShoppingCart()`'s `addItem(product)` method. It takes in your product object which must be in the following shape:
 
@@ -41,7 +41,7 @@ When this library was made, it was done with Stripe's SKU API in mind. SKU is de
 of the Price API. This is why `sku` and `id` are interchangable. You can use `sku` if you want, but it's preferred
 that you use `id` instead.
 
-You can add an optional quantity param, to add by that number. `addItem(product, 10)` for example would add by 10.
+You can add an optional quantity param, to add by that number. `addItem(product, { count: 10 })` for example would add by 10.
 
 <CartDisplayWrapper>
   <AddItem
@@ -80,7 +80,7 @@ function Product({ product }) {
         <img
           style={{ height: 200, width: 250 }}
           src={product.image}
-          alt={` ${product.name}`}
+          alt={product.name}
         />
         <figcaption>{product.name}</figcaption>
       </figure>

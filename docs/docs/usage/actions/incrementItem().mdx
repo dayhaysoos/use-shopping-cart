@@ -1,32 +1,24 @@
 ---
-title: decrementItem()
-id: decrement-item
+title: incrementItem()
+id: increment-item
 ---
 
-`decrementItem(sku, quantity = 1)`reduces the quantity of an item based on the sku. By default, it decreases by one.
+import CartDisplayWrapper from '../../../src/components/docs/cart-display-wrapper'
+import IncrementItem from '../../../src/components/docs/increment-item'
 
-If you'd like to decrease by more than one, there is an optional quantity param:
-
-`decrementItem(sku, 10)`
-
-This decreases by 10
-
-import CartDisplayWrapper from '../../src/components/docs/cart-display-wrapper'
-import DecrementItem from '../../src/components/docs/decrement-item'
+`incrementItem(id)` takes the ID of a product in the cart and increments the quantity by 1 by default. You can pass an optional quantity for the second argument to increase by that number. For example, `incrementItem(id, { count: 10 } )` would increase the quantity by 10.
 
 <CartDisplayWrapper>
-  <DecrementItem />
+  <IncrementItem />
 </CartDisplayWrapper>
 
 ```jsx
-import { useShoppingCart } from 'use-shopping-cart'
-
-function Cart(product) {
-  const { decrementItem, cartDetails } = useShoppingCart()
+function Cart() {
+  const { incrementItem, cartDetails } = useShoppingCart()
 
   const entries = []
-  for (const sku in cartDetails) {
-    const entry = cartDetails[sku]
+  for (const id in cartDetails) {
+    const entry = cartDetails[id]
     entries.push(
       <article
         style={{
@@ -56,7 +48,7 @@ function Cart(product) {
         >
           {/* Increases the quantity of the item */}
           <button
-            onClick={() => incrementItem(sku)}
+            onClick={() => incrementItem(id)}
             aria-label={`Add one ${entry.name} to your cart`}
             style={{ height: 50, width: 100, marginBottom: 30 }}
           >
@@ -65,7 +57,9 @@ function Cart(product) {
 
           {/* Increases the item quantity by 10 */}
           <button
-            onClick={() => incrementItem(sku, { count: 10 })}
+            onClick={() => {
+              incrementItem(id, { count: 10 })
+            }}
             aria-label={`Add ten ${entry.name} to your cart`}
             style={{ height: 50, width: 100, marginBottom: 30 }}
           >

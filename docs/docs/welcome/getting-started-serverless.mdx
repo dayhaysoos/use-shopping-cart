@@ -50,7 +50,7 @@ If you're data source isn't coming from Stripe's dashboard, you can still make p
 
 You're product data should look like this:
 
-```jsx
+```js
 const productData = [
   {
     name: 'Bananas',
@@ -105,10 +105,10 @@ Create a functions directory in your project. Create a file called `create-sessi
 
 _Note_: You should have a way to reference products from a backend. In this small example we're just referencing from a JSON file.
 
-```
+```js
 const stripe = require('stripe')(process.env.REACT_APP_STRIPE_API_SECRET)
-const validateCartItems = require('use-shopping-cart/utilities')
-  .validateCartItems
+const validateCartItems =
+  require('use-shopping-cart/utilities').validateCartItems
 
 const inventory = require('./data/products.json')
 

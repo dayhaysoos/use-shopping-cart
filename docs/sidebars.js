@@ -1,30 +1,73 @@
 module.exports = {
   docs: {
     Welcome: [
-      'introduction',
-      `getting-started`,
-      'getting-started-client-mode',
-      'getting-started-serverless',
-      'discord',
-      'contributors'
+      'welcome/introduction',
+      'welcome/getting-started',
+      'welcome/getting-started-client-mode',
+      'welcome/getting-started-serverless',
+      'welcome/getting-started-with-typescript',
+      'welcome/discord',
+      'welcome/contributors'
     ],
     Usage: [
-      'usage/add-item',
-      'usage/api',
-      'usage/cart-provider',
-      'usage/checkout-single-item',
-      'usage/clear-cart',
-      'usage/debug-cart',
-      'usage/decrement-item',
-      'usage/format-line-items',
-      'usage/increment-item',
-      'usage/load-cart',
-      'usage/redirect-to-checkout',
-      'usage/remove-cart-item',
-      'usage/set-item-quantity',
-      'usage/validate-cart-items'
-    ],
-    Util: ['util/format-currency-string']
+      {
+        type: 'category',
+        label: 'Components',
+        collapsed: false,
+        items: ['usage/components/cart-provider', 'usage/components/debug-cart']
+      },
+      {
+        type: 'category',
+        label: 'Properties',
+        collapsed: false,
+        items: [
+          'usage/properties/cart-details',
+          'usage/properties/cart-count',
+          'usage/properties/total-price',
+          'usage/properties/formatted-total-price',
+          'usage/properties/should-display-cart',
+          'usage/properties/last-clicked'
+        ]
+      },
+      {
+        type: 'category',
+        label: 'Actions',
+        collapsed: false,
+        items: [
+          'usage/actions/add-item',
+          'usage/actions/remove-item',
+          'usage/actions/increment-item',
+          'usage/actions/decrement-item',
+          'usage/actions/set-item-quantity',
+          'usage/actions/load-cart',
+          'usage/actions/clear-cart',
+          'usage/actions/handle-cart-click',
+          'usage/actions/handle-cart-hover',
+          'usage/actions/handle-close-cart',
+          'usage/actions/store-last-clicked',
+          'usage/actions/redirect-to-checkout',
+          'usage/actions/checkout-single-item'
+        ]
+      },
+      {
+        type: 'category',
+        label: 'Client-Side Helpers',
+        collapsed: false,
+        items: [
+          'usage/helpers/format-currency-string',
+          'usage/helpers/filter-cart'
+        ]
+      },
+      {
+        type: 'category',
+        label: 'Server-Side Helpers',
+        collapsed: false,
+        items: [
+          'usage/serverless/validate-cart-items',
+          'usage/serverless/format-line-items'
+        ]
+      }
+    ]
     // Docusaurus: ['doc1', 'doc2', 'doc3'],
     // Features: ['mdx']
   }

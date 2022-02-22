@@ -5,6 +5,7 @@
 import * as React from 'react'
 import { render } from 'react-dom'
 import { CartProvider, useShoppingCart } from '../react/index'
+import { AddItem } from '../../docs/src/components/docs/add-item'
 
 function UscWithSelector() {
   const cart = useShoppingCart(({ totalPrice }) => ({ totalPrice }))

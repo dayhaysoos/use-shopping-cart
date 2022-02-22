@@ -1,12 +1,12 @@
 ---
-title: removeCartItem()
-id: remove-cart-item
+title: removeItem()
+id: remove-item
 ---
 
-Completely removes a product and quantity that comes with it from the removeCartItem
+Completely removes a product's entry from the cart by ID.
 
-import CartDisplayWrapper from '../../src/components/docs/cart-display-wrapper'
-import RemoveCartItem from '../../src/components/docs/remove-item'
+import CartDisplayWrapper from '../../../src/components/docs/cart-display-wrapper'
+import RemoveCartItem from '../../../src/components/docs/remove-item'
 
 <CartDisplayWrapper>
   <RemoveCartItem />
@@ -20,8 +20,8 @@ export function Cart() {
   const { removeItem, cartDetails } = useShoppingCart()
 
   const entries = []
-  for (const sku in cartDetails) {
-    const entry = cartDetails[sku]
+  for (const id in cartDetails) {
+    const entry = cartDetails[id]
     entries.push(
       <article
         style={{
@@ -51,7 +51,7 @@ export function Cart() {
         >
           {/* Removes the item from the cart */}
           <button
-            onClick={() => removeItem(sku)}
+            onClick={() => removeItem(id)}
             aria-label={`Remove ${entry.name} from your cart`}
             style={{ height: 50, width: 100, marginBottom: 30 }}
           >

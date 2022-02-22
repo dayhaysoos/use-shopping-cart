@@ -1,0 +1,11 @@
+---
+title: cartDetails
+id: cart-details
+---
+
+This is an object with key-value pairs where the keys are IDs (i.e. SKUs) of the products in the cart and the values are details of each entry in the cart. Each entry consists of the `quantity`, `value`, and `formattedValue` along with all of the properties from the product itself. As you add more items to the cart, each key-value pair in this object will have their `quantity`, `value`, and `formattedValue` properties updated.
+
+import CartDetails from '../../../src/components/docs/cart-details'
+import CartCountPrice from '../../../src/components/docs/cart-count-price'
+
+<CartDetails />

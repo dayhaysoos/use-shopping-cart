@@ -32,7 +32,7 @@ const Hero = () => {
               'button button--primary button--lg',
               styles.getStarted
             )}
-            to={useBaseUrl('docs/getting-started')}
+            to={useBaseUrl('docs/')}
           >
             Get Started
           </Link>

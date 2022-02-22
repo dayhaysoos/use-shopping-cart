@@ -281,11 +281,10 @@ export interface CartActions {
 
 export const reducer: CartReducer
 export const actions: CartActions
-export function filterCart(options: {
-  value: number
-  currency: string
-  language: string
-}): string
+export function filterCart(
+  cartDetails: CartDetails,
+  filter: (entry: CartEntry) => Promise<boolean> | boolean
+): Promise<CartDetails>
 
 interface FormatCurrencyStringProps {
   /**
