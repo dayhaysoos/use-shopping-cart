@@ -30,6 +30,7 @@
     "*.{js,jsx,.d.ts,ts,tsx,mdx}": "prettier --write"
   },
   "devDependencies": {
+    "babel-preset-jest": "^27.5.1",
     "typescript": "^4.4.3",
     "webpack-dev-server": "3.11.1"
   }
