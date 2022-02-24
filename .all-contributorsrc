@@ -1,9 +1,15 @@
 {
+  "projectName": "use-shopping-cart",
+  "projectOwner": "dayhaysoos",
+  "repoType": "github",
+  "repoHost": "https://github.com",
   "files": [
-    "README.md"
+    "README.md",
+    "docs/docs/welcome/contributors.mdx"
   ],
   "imageSize": 100,
-  "commit": false,
+  "commit": true,
+  "commitConvention": "none",
   "contributors": [
     {
       "login": "doingandlearning",
@@ -25,24 +31,23 @@
       ]
     },
     {
-      "login": "ChrisBrownie55",
-      "name": "Chris Brown",
-      "avatar_url": "https://avatars2.githubusercontent.com/u/19195374?v=4",
-      "profile": "https://chrisbrownie.dev/",
-      "contributions": [
-        "test",
-        "code",
-        "doc"
-      ]
-    },
-    {
       "login": "dayhaysoos",
       "name": "Nick DeJesus",
       "avatar_url": "https://avatars3.githubusercontent.com/u/1852675?v=4",
       "profile": "https://github.com/dayhaysoos",
       "contributions": [
-        "code",
-        "test"
+        "test",
+        "blog",
+        "business",
+        "bug",
+        "data",
+        "doc",
+        "fundingFinding",
+        "infra",
+        "projectManagement",
+        "question",
+        "review",
+        "security"
       ]
     },
     {
@@ -125,7 +130,8 @@
       "avatar_url": "https://avatars.githubusercontent.com/u/204841?v=4",
       "profile": "https://www.erichowey.dev/",
       "contributions": [
-        "doc"
+        "doc",
+        "plugin"
       ]
     },
     {
@@ -136,12 +142,25 @@
       "contributions": [
         "code"
       ]
+    },
+    {
+      "login": "andria-dev",
+      "name": "Andria Brown",
+      "avatar_url": "https://avatars.githubusercontent.com/u/19195374?v=4",
+      "profile": "https://github.com/andria-dev",
+      "contributions": [
+        "test",
+        "code",
+        "doc",
+        "bug",
+        "example",
+        "infra",
+        "maintenance",
+        "ideas",
+        "question",
+        "review"
+      ]
     }
   ],
-  "contributorsPerLine": 7,
-  "projectName": "use-shopping-cart",
-  "projectOwner": "dayhaysoos",
-  "repoType": "github",
-  "repoHost": "https://github.com",
-  "skipCi": true
+  "contributorsPerLine": 7
 }
