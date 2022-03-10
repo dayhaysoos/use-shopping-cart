@@ -28,14 +28,14 @@ module.exports = {
       },
       items: [
         {
-          to: 'docs/getting-started',
-          activeBasePath: 'docs/getting-started',
+          to: 'docs/',
+          activeBasePath: 'docs/',
           label: 'Get Started',
           position: 'left'
         },
         {
-          to: 'docs/',
-          activeBasePath: 'docs/',
+          to: 'docs/usage/components/cart-provider',
+          activeBasePath: 'docs/usage/components/cart-provider',
           label: 'Docs',
           position: 'left'
         },

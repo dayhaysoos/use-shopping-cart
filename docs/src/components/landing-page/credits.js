@@ -5,7 +5,8 @@ const Credits = () => {
   return (
     <p className={styles.creditText}>
       Built with ❤️ by <a href="https://github.com/dayhaysoos">Nick DeJesus</a>{' '}
-      and <a href="/docs/contributors">a team of amazing contributors</a>
+      and{' '}
+      <a href="/docs/welcome/contributors">a team of amazing contributors</a>
     </p>
   )
 }

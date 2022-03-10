@@ -1,5 +1,5 @@
 import React from 'react'
-// import { Link } from 'gatsby'
+import { Link } from '@docusaurus/Link'
 
 export function AddMoreItems() {
   return (
@@ -8,8 +8,11 @@ export function AddMoreItems() {
       <p>
         You currently don't have any items in your cart.
         <br />
-        {/* Come back after you <Link to="/usage/addItem()">add more items</Link> to */}
-        your cart.
+        Come back after you{' '}
+        <Link to="/docs/usage/actions/add-item">
+          add more items to your cart
+        </Link>
+        .
       </p>
     </div>
   )

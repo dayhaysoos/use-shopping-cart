@@ -1,7 +1,6 @@
 import { configureStore } from '@reduxjs/toolkit'
 
 import {
-  persistStore,
   persistReducer,
   FLUSH,
   REHYDRATE,
@@ -90,6 +89,4 @@ export function createShoppingCartStore(options) {
 }
 
 // For non-React apps
-export function createPersistedStore(store) {
-  return persistStore(store)
-}
+export { persistStore as createPersistedStore } from 'redux-persist'

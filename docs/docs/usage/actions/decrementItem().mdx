@@ -1,24 +1,22 @@
 ---
-title: incrementItem()
-id: increment-item
+title: decrementItem()
+id: decrement-item
 ---
 
-import CartDisplayWrapper from '../../src/components/docs/cart-display-wrapper'
-import IncrementItem from '../../src/components/docs/increment-item'
+`decrementItem(id)` takes the ID of a product in the cart and decrements the quantity by 1 by default. You can pass an optional quantity for the second argument to decrease by that number. For example, `decrementItem(id, { count: 10 } )` would decrease the quantity by 10. If the quantity of an entry in the cart goes below one, it will be automatically removed from the cart.
 
-`incrementItem(sku)` takes a sku of a product in the cart and increments the quantity by 1 by default.
-
-You can pass an optional quantity for the second param to increase by that number. For example:
-
-`incrementItem(sku, { count: 10 } )` would increase by 10.
+import CartDisplayWrapper from '../../../src/components/docs/cart-display-wrapper'
+import DecrementItem from '../../../src/components/docs/decrement-item'
 
 <CartDisplayWrapper>
-  <IncrementItem />
+  <DecrementItem />
 </CartDisplayWrapper>
 
 ```jsx
-function Cart() {
-  const { incrementItem, cartDetails } = useShoppingCart()
+import { useShoppingCart } from 'use-shopping-cart'
+
+function Cart(product) {
+  const { decrementItem, cartDetails } = useShoppingCart()
 
   const entries = []
   for (const sku in cartDetails) {
@@ -50,24 +48,22 @@ function Cart() {
             justifyContent: 'space-evenly'
           }}
         >
-          {/* Increases the quantity of the item */}
+          {/* decreases the quantity of the item */}
           <button
-            onClick={() => incrementItem(sku)}
-            aria-label={`Add one ${entry.name} to your cart`}
+            onClick={() => decrementItem(sku)}
+            aria-label={`Remove one ${entry.name} from your cart`}
             style={{ height: 50, width: 100, marginBottom: 30 }}
           >
-            Add one {entry.name} to your cart
+            Remove one {entry.name} to your cart
           </button>
 
-          {/* Increases the item quantity by 10 */}
+          {/* decreases the item quantity by 10 */}
           <button
-            onClick={() => {
-              incrementItem(sku, { count: 10 })
-            }}
-            aria-label={`Add ten ${entry.name} to your cart`}
+            onClick={() => decrementItem(sku, { count: 10 })}
+            aria-label={`Remove ten ${entry.name} from your cart`}
             style={{ height: 50, width: 100, marginBottom: 30 }}
           >
-            Add 10 {entry.name} to your cart
+            Remove 10 {entry.name} to your cart
           </button>
         </section>
       </article>

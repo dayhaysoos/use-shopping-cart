@@ -1,5 +1,6 @@
 import React, { useState } from 'react'
 import { useShoppingCart } from 'use-shopping-cart'
+import { AddMoreItems } from './utilities'
 
 export function RedirectToCheckout() {
   const [status, setStatus] = useState('idle')
@@ -10,8 +11,16 @@ export function RedirectToCheckout() {
 
     if (cartCount > 0) {
       setStatus('idle')
-      const error = await redirectToCheckout()
-      if (error) setStatus('redirect-error')
+      try {
+        const result = await redirectToCheckout()
+        if (result?.error) {
+          console.error(result)
+          setStatus('redirect-error')
+        }
+      } catch (error) {
+        console.error(error)
+        setStatus('redirect-error')
+      }
     } else {
       setStatus('missing-items')
     }
@@ -27,13 +36,7 @@ export function RedirectToCheckout() {
         width: '50%'
       }}
     >
-      {status === 'missing-items' && (
-        <p>
-          Your cart is empty. Please go to{' '}
-          {/* <Link to={'/usage/addItem()'}>addItem()</Link> and add an item to the */}
-          cart
-        </p>
-      )}
+      {status === 'missing-items' && <AddMoreItems />}
 
       {status === 'redirect-error' && (
         <p>Unable to redirect to Stripe checkout page.</p>

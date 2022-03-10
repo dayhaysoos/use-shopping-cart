@@ -1,0 +1,47 @@
+---
+title: loadCart()
+id: load-cart
+---
+
+`loadCart(cartDetails, shouldMerge=true)` allows you to load in a previously created cart allowing the you to persist your user's shopping session across devices when logged in. `cartDetails` is the previously created `cartDetails`. `shouldMerge` is a boolean that is by default set to `true` that will try to join the current cart's details with the one you're passing in right now. If it is set to `false` it simply replaces the current cart's details with the one you're passing in.
+
+It is recommended to set `shouldMerge` to false to avoid accidental repeated merging.
+
+import CartDisplayWrapper from '../../../src/components/docs/cart-display-wrapper'
+import LoadCart from '../../../src/components/docs/load-cart'
+
+<CartDisplayWrapper>
+  <LoadCart />
+</CartDisplayWrapper>
+
+```jsx
+import React, { useEffect } from 'react'
+import { useShoppingCart } from 'use-shopping-cart'
+
+export function App() {
+  const { loadCart } = useShoppingCart()
+  const user = useUser()
+
+  // Make an API request to your backend in a useEffect() to retrieve your user's previous cart
+  useEffect(() => {
+    let cancelled = false
+    async function handler() {
+      const userCartDetails = await getData(user.id)
+      if (!cancelled && userCartDetails) loadCart(userCartDetails, false)
+    }
+
+    if (user?.id) {
+      handler()
+      return () => {
+        cancelled = true
+      }
+    }
+  }, [user])
+
+  return <DebugCart />
+}
+
+export default App
+```
+
+The above example is the ideal use-case for `loadCart()`.

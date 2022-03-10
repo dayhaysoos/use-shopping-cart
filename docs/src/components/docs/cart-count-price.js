@@ -1,7 +1,7 @@
 import React from 'react'
 import { useShoppingCart } from 'use-shopping-cart'
 
-export function API() {
+export function CartCountPrice() {
   const { cartCount, totalPrice, formattedTotalPrice } = useShoppingCart()
 
   return (
@@ -14,4 +14,4 @@ export function API() {
   )
 }
 
-export default API
+export default CartCountPrice

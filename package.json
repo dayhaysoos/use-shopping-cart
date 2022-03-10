@@ -3,7 +3,8 @@
   "workspaces": [
     "examples/*",
     "use-shopping-cart",
-    "documentation"
+    "documentation",
+    "docs"
   ],
   "scripts": {
     "dev": "netlify dev",
@@ -29,6 +30,8 @@
     "*.{js,jsx,.d.ts,ts,tsx,mdx}": "prettier --write"
   },
   "devDependencies": {
+    "all-contributors-cli": "^6.20.0",
+    "typescript": "^4.4.3",
     "webpack-dev-server": "3.11.1"
   }
 }

@@ -3,10 +3,10 @@ title: setItemQuantity()
 id: set-item-quantity
 ---
 
-import CartDisplayWrapper from '../../src/components/docs/cart-display-wrapper'
-import SetItemQuantity from '../../src/components/docs/set-item-quantity'
+import CartDisplayWrapper from '../../../src/components/docs/cart-display-wrapper'
+import SetItemQuantity from '../../../src/components/docs/set-item-quantity'
 
-`setItemQuantity(sku, quantity = 1)` allows you to update the
+`setItemQuantity(id, quantity)` allows you to update the quantity of an entry in the cart by the ID of the product.
 
 <CartDisplayWrapper>
   <SetItemQuantity />
@@ -20,8 +20,8 @@ export function Cart() {
   const { setItemQuantity, cartDetails } = useShoppingCart()
 
   const entries = []
-  for (const sku in cartDetails) {
-    const entry = cartDetails[sku]
+  for (const id in cartDetails) {
+    const entry = cartDetails[id]
 
     const options = []
     for (let quantity = 1; quantity <= 20; ++quantity)
@@ -56,7 +56,7 @@ export function Cart() {
             id="quantity-select"
             defaultValue={entry.quantity}
             onChange={(event) => {
-              setItemQuantity(sku, event.target.value)
+              setItemQuantity(id, parseInt(event.target.value, 10))
             }}
           >
             {options}

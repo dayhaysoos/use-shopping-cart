@@ -6,8 +6,8 @@ export function SetItemQuantity() {
   const { setItemQuantity, cartDetails } = useShoppingCart()
 
   const entries = []
-  for (const sku in cartDetails) {
-    const entry = cartDetails[sku]
+  for (const id in cartDetails) {
+    const entry = cartDetails[id]
 
     const options = []
     for (let quantity = 1; quantity <= 20; ++quantity)
@@ -42,7 +42,7 @@ export function SetItemQuantity() {
             id="quantity-select"
             defaultValue={entry.quantity}
             onChange={(event) => {
-              setItemQuantity(sku, event.target.value)
+              setItemQuantity(id, parseInt(event.target.value, 10))
             }}
           >
             {options}

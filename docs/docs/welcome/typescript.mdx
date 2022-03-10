@@ -1,3 +1,34 @@
+---
+title: Getting Started with TypeScript
+id: getting-started-with-typescript
+---
+
+This library now works with TypeScript! You can use `use-shopping-cart` just the same as before but now with types. Take for example these two files from our very own `typescript-usage` example workspace.
+
+```tsx
+import * as React from 'react'
+import ReactDOM from 'react-dom'
+import App from './App'
+import { CartProvider } from 'use-shopping-cart'
+
+ReactDOM.render(
+  <React.StrictMode>
+    <CartProvider
+      cartMode="checkout-session"
+      stripe=""
+      currency="USD"
+      loading={<p aria-live="polite">Loading redux-persist...</p>}
+    >
+      <App />
+    </CartProvider>
+  </React.StrictMode>,
+  document.getElementById('root')
+)
+```
+
+The above file didn't really use types yet but it is type-safe. Let's get into some more TypeScript specific use cases.
+
+```tsx
 import {
   useShoppingCart,
   DebugCart,
@@ -135,3 +166,4 @@ function App() {
 }
 
 export default App
+```

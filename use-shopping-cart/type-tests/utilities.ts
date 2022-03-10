@@ -20,18 +20,20 @@ const line_items1: ValidatedItem[] = validateCartItems(
     }
   ],
   {
-    id_GBJ2Ep8246qeeT: {
+    id_banana001: {
       name: 'Bananas',
-      id: 'id_GBJ2Ep8246qeeT',
+      id: 'id_banana001',
       price: 400,
       image: 'https://my-image.com/banana.jpg',
       currency: 'USD',
       quantity: 10,
-      value: 4000,
+      value: 400,
       formattedValue: '$40.00'
     }
   }
 )
+console.log(line_items1)
+
 line_items1[0].price_data
 line_items1[0].price_data.currency
 line_items1[0].price_data.product_data
@@ -55,3 +57,32 @@ const line_items2: LineItem[] = formatLineItems({
 })
 line_items2[0].price
 line_items2[0].quantity
+
+try {
+  validateCartItems(
+    [
+      {
+        name: 'Bananas',
+        description: 'Yummy yellow fruit',
+        id: 'id_banana001',
+        price: 400,
+        currency: 'USD',
+        image: 'https://my-image.com/banana.jpg'
+      }
+    ],
+    {
+      id_not_bannana_01: {
+        name: 'Not Bananas',
+        id: 'id_not_bannana_01',
+        price: 400,
+        image: 'https://my-image.com/not-banana.jpg',
+        currency: 'USD',
+        quantity: 10,
+        value: 200,
+        formattedValue: '$4.00'
+      }
+    }
+  )
+} catch (error) {
+  console.log(error)
+}
