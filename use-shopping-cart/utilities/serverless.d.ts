@@ -1,4 +1,4 @@
-import * as useShoppingCart from '../core/index'
+import { Product, CartDetails } from '../core/index'
 
 interface ValidatedItem {
   price_data: {
@@ -16,10 +16,8 @@ interface LineItem {
 }
 
 export function validateCartItems(
-  inventory: useShoppingCart.Product[],
-  cartDetails: useShoppingCart.CartDetails
+  inventory: Product[],
+  cartDetails: CartDetails
 ): ValidatedItem[]
 
-export function formatLineItems(
-  cartDetails: useShoppingCart.CartDetails
-): LineItem[]
+export function formatLineItems(cartDetails: CartDetails): LineItem[]

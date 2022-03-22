@@ -55,7 +55,7 @@ interface CheckoutSessionConfig extends CommonConfig {
 
 export type Config = ClientOnlyConfig | CheckoutSessionConfig
 
-export interface Product {
+interface ProductAttributes {
   /**
    * The name of the product
    */
@@ -64,10 +64,6 @@ export interface Product {
    * The description of the product
    */
   description?: string
-  /**
-   * A unique product ID
-   */
-  id: string
   /**
    * The price of the product
    */
@@ -90,8 +86,15 @@ export interface Product {
   product_data?: object
   [extraProperties: string]: any
 }
+export type Product = (
+  | { id: string }
+  | { price_id: string }
+  | { sku_id: string }
+  | { sku: string }
+) &
+  ProductAttributes
 
-export interface CartEntry extends Product {
+interface CartEntryAttributes extends ProductAttributes {
   /**
    * Amount of this product in the cart
    */
@@ -105,6 +108,7 @@ export interface CartEntry extends Product {
    */
   readonly formattedValue: string
 }
+export type CartEntry = { id: string } & CartEntryAttributes
 
 export type CartDetails = {
   [id: string]: CartEntry
@@ -376,7 +380,7 @@ interface ChangeCurrencyAction extends Action {
 
 interface RedirectToCheckoutAction extends Action {
   type: 'cart/redirectToCheckout'
-  payload: string
+  payload: { sessionId: string }
 }
 
 interface CheckoutSingleItemAction extends Action {

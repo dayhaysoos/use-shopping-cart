@@ -165,7 +165,7 @@ const slice = createSlice({
 
 slice.actions.redirectToCheckout = (sessionId) => ({
   type: 'cart/redirectToCheckout',
-  payload: sessionId
+  payload: { sessionId }
 })
 slice.actions.checkoutSingleItem = (itemsOrPriceId) => {
   const quantity = itemsOrPriceId.quantity || 1

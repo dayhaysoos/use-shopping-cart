@@ -1,13 +1,12 @@
+import { useEffect, useState } from 'react'
 import {
   useShoppingCart,
   DebugCart,
-  formatCurrencyString
+  formatCurrencyString,
+  CartActions
 } from 'use-shopping-cart'
-import {
-  Product,
-  CartActions,
-  CartEntry as ICartEntry
-} from 'use-shopping-cart/core'
+import { Product, CartEntry as ICartEntry } from 'use-shopping-cart/core'
+import products from './data/products.json'
 
 function CartEntry({
   entry,
@@ -34,47 +33,87 @@ function CartEntry({
 
 function Cart() {
   const cart = useShoppingCart()
-  const { removeItem, cartDetails, clearCart, formattedTotalPrice } = cart
+  const {
+    removeItem,
+    cartDetails,
+    clearCart,
+    formattedTotalPrice,
+    redirectToCheckout
+  } = cart
+  const [state, setState] = useState<{
+    status: 'idle' | 'fetching' | 'redirecting'
+    error: null | number | Error
+  }>({ status: 'idle', error: null })
+
+  useEffect(() => {
+    if (state.status !== 'fetching') return
+
+    const abortController = new AbortController()
+    fetch('/.netlify/functions/checkout', {
+      method: 'post',
+      signal: abortController.signal,
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(cartDetails)
+    })
+      .then((response) => {
+        if (response.status === 200) {
+          response.text().then((sessionId) => {
+            console.log(sessionId)
+            setState({ status: 'redirecting', error: null })
+            redirectToCheckout(sessionId)
+          })
+        } else {
+          setState({ status: 'idle', error: response.status })
+          console.error(response.status, response)
+        }
+      })
+      .catch((error) => {
+        setState({ status: 'idle', error })
+        console.error(error)
+      })
+
+    return () => {
+      abortController.abort()
+    }
+  }, [state.status, cartDetails, redirectToCheckout])
 
   const cartEntries = Object.values(cartDetails ?? {}).map((entry) => (
     <CartEntry key={entry.id} entry={entry} removeItem={removeItem} />
   ))
 
+  const cartDisplay =
+    cartEntries.length > 0 ? (
+      <>
+        <button onClick={clearCart}>Clear cart</button>
+        <button onClick={() => setState({ status: 'fetching', error: null })}>
+          Checkout
+        </button>
+        {state.error !== null ? (
+          <p aria-live="polite">
+            An error occurred.{' '}
+            {state.error instanceof Error ? state.error.message : state.error}
+          </p>
+        ) : null}
+        {cartEntries}
+      </>
+    ) : (
+      <p aria-live="polite">Cart is empty.</p>
+    )
+
   return (
     <div>
       <h2>Cart</h2>
       <p>Total: {formattedTotalPrice}</p>
-      {cartEntries.length === 0 ? <p>Cart is empty.</p> : null}
-      {cartEntries.length > 0 ? (
-        <>
-          <button onClick={() => clearCart()}>Clear cart</button>
-          {cartEntries}
-        </>
+      {state.status === 'idle' ? cartDisplay : null}
+      {state.status === 'fetching' ? (
+        <p aria-live="polite">Sending your cart to Stripe...</p>
+      ) : null}
+      {state.status === 'redirecting' ? (
+        <p aria-live="polite">Redirecting to Stripe...</p>
       ) : null}
     </div>
   )
 }
-
-const products: Product[] = [
-  {
-    name: 'Sunglasses',
-    id: 'price_1GwzfVCNNrtKkPVCh2MVxRkO',
-    price: 15_00,
-    image: 'https://files.stripe.com/links/fl_test_FR8EZTS7UDXE0uljMfT7hwmH',
-    currency: 'USD',
-    description: 'A pair of average black sunglasses.'
-  },
-  {
-    name: '3 Stripe Streak Scoop Neck Flowy T-Shirt',
-    id: 'price_OkRxVM2hCVPkKtrNNCVfzwG1',
-    price: 30_00,
-    image:
-      'https://static.musictoday.com/store/bands/4806/product_600/5QCTBL052.jpg',
-    description:
-      'A black scoop neck flowy t-shirt with 3 bright yellow strips behind the words Black Lives Matter.',
-    currency: 'USD'
-  }
-]
 
 function ProductListing({
   product,
