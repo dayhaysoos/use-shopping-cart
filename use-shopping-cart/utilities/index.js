@@ -1,3 +1,1 @@
-import { validateCartItems, formatLineItems } from "use-shopping-cart/utilities/serverless"
-
-export {validateCartItems, formatLineItems}
+export * from './serverless.js'
