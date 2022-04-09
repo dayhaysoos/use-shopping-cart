@@ -16266,9 +16266,9 @@ moize@^6.0.0:
     micro-memoize "^4.0.9"
 
 moment@^2.27.0:
-  version "2.29.1"
-  resolved "https://registry.yarnpkg.com/moment/-/moment-2.29.1.tgz#b2be769fa31940be9eeea6469c075e35006fa3d3"
-  integrity sha512-kHmoybcPV8Sqy59DwNDY3Jefr64lK/by/da0ViFcuA4DH0vQg5Q6Ze5VimxkfQNSC+Mls/Kx53s7TjP1RhFEDQ==
+  version "2.29.2"
+  resolved "https://registry.yarnpkg.com/moment/-/moment-2.29.2.tgz#00910c60b20843bcba52d37d58c628b47b1f20e4"
+  integrity sha512-UgzG4rvxYpN15jgCmVJwac49h9ly9NurikMWGPdVxm8GZD6XjkKPxDTjQQ43gtGgnV3X0cAyWDdP2Wexoquifg==
 
 move-concurrently@^1.0.1:
   version "1.0.1"
@@ -23213,6 +23213,18 @@ use-latest@^1.0.0:
   integrity sha512-d2TEuG6nSLKQLAfW3By8mKr8HurOlTkul0sOpxbClIv4SQ4iOd7BYr7VIzdbktUCnv7dua/60xzd8igMU6jmyw==
   dependencies:
     use-isomorphic-layout-effect "^1.0.0"
+
+use-shopping-cart@3.1.0:
+  version "3.1.0"
+  resolved "https://registry.yarnpkg.com/use-shopping-cart/-/use-shopping-cart-3.1.0.tgz#7a83629e145851b3959e8c2ccebd62ec9ba6e75d"
+  integrity sha512-vQ1+f5BZO1Dfgr7YAtti01jgtDzynLLQblYXVJl135htGLO7zSouheUWxwpNrAodpG6I+fm2X6BXAI716olhlg==
+  dependencies:
+    "@reduxjs/toolkit" "^1.5.0"
+    "@stripe/stripe-js" "^1.14.0"
+    react-redux "^7.2.2"
+    redux-persist "^6.0.0"
+    typescript "^4.3.4"
+    uuid "^8.3.1"
 
 use@^3.1.0:
   version "3.1.1"
