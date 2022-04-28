@@ -16807,9 +16807,9 @@ minimist-options@^4.0.2:
     kind-of "^6.0.3"
 
 minimist@^1.1.0, minimist@^1.1.1, minimist@^1.2.0, minimist@^1.2.3, minimist@^1.2.5:
-  version "1.2.5"
-  resolved "https://registry.yarnpkg.com/minimist/-/minimist-1.2.5.tgz#67d66014b66a6a8aaa0c083c5fd58df4e4e97602"
-  integrity sha512-FM9nNUYrRBAELZQT3xeZQ7fmMOBg6nWNmJKTcgsJeaLstP/UODVpGsr5OhXhhXg6f+qtJ8uiZ+PUxkDWcgIXLw==
+  version "1.2.6"
+  resolved "https://registry.yarnpkg.com/minimist/-/minimist-1.2.6.tgz#8637a5b759ea0d6e98702cfb3a9283323c93af44"
+  integrity sha512-Jsjnk4bw3YJqYzbdyBiNsPWHPfO++UGG749Cxs6peCu5Xg4nrena6OVxOYxrQTqww0Jmwt+Ref8rggumkTLz9Q==
 
 minipass-collect@^1.0.2:
   version "1.0.2"
@@ -24030,6 +24030,18 @@ use-latest@^1.0.0:
   integrity sha512-d2TEuG6nSLKQLAfW3By8mKr8HurOlTkul0sOpxbClIv4SQ4iOd7BYr7VIzdbktUCnv7dua/60xzd8igMU6jmyw==
   dependencies:
     use-isomorphic-layout-effect "^1.0.0"
+
+use-shopping-cart@3.1.0:
+  version "3.1.0"
+  resolved "https://registry.yarnpkg.com/use-shopping-cart/-/use-shopping-cart-3.1.0.tgz#7a83629e145851b3959e8c2ccebd62ec9ba6e75d"
+  integrity sha512-vQ1+f5BZO1Dfgr7YAtti01jgtDzynLLQblYXVJl135htGLO7zSouheUWxwpNrAodpG6I+fm2X6BXAI716olhlg==
+  dependencies:
+    "@reduxjs/toolkit" "^1.5.0"
+    "@stripe/stripe-js" "^1.14.0"
+    react-redux "^7.2.2"
+    redux-persist "^6.0.0"
+    typescript "^4.3.4"
+    uuid "^8.3.1"
 
 use@^3.1.0:
   version "3.1.1"
