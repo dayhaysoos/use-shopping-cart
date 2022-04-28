@@ -571,7 +571,7 @@ describe('redirectToCheckout()', () => {
     })
 
     it('sends the sessionId', async () => {
-      await cart.current.redirectToCheckout({ sessionId: 'my-session-id' })
+      await cart.current.redirectToCheckout('my-session-id')
 
       const expectedCheckoutOptions = expect.objectContaining({
         sessionId: 'my-session-id'

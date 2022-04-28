@@ -66,26 +66,29 @@ export function DebugCart(props) {
     ))
 
   return (
-    <table
+    <div
       style={{
         position: 'fixed',
         top: 50,
         right: 50,
         backgroundColor: '#eee',
         textAlign: 'left',
-        maxWidth: 500,
+        maxWidth: 300,
         padding: 20,
-        borderSpacing: '25px 5px'
+        borderSpacing: '25px 5px',
+        overflow: 'auto'
       }}
       {...props}
     >
-      <thead>
-        <tr>
-          <th>Key</th>
-          <th>Value</th>
-        </tr>
-      </thead>
-      <tbody>{cartPropertyRows}</tbody>
-    </table>
+      <table>
+        <thead>
+          <tr>
+            <th>Key</th>
+            <th>Value</th>
+          </tr>
+        </thead>
+        <tbody>{cartPropertyRows}</tbody>
+      </table>
+    </div>
   )
 }

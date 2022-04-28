@@ -7,7 +7,7 @@ ReactDOM.render(
   <React.StrictMode>
     <CartProvider
       cartMode="checkout-session"
-      stripe=""
+      stripe={process.env.REACT_APP_STRIPE_API_PUBLIC ?? ''}
       currency="USD"
       loading={<p aria-live="polite">Loading redux-persist...</p>}
     >
