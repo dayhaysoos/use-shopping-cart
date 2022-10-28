@@ -24031,6 +24031,40 @@ use-latest@^1.0.0:
   dependencies:
     use-isomorphic-layout-effect "^1.0.0"
 
+use-shopping-cart@*:
+  version "3.1.2"
+  resolved "https://registry.yarnpkg.com/use-shopping-cart/-/use-shopping-cart-3.1.2.tgz#92295cc538aae36bc613bcecd568397da9bad126"
+  integrity sha512-TxagEZ8jlExzIETsDcqyQZ+WpPSwWCIOqSFaE66vdV7SvxBUNNVXmpjo2jSaOdDdjXvPHQcK/9hNo2kbP1ro9Q==
+  dependencies:
+    "@reduxjs/toolkit" "^1.5.0"
+    "@stripe/stripe-js" "^1.14.0"
+    react-redux "^7.2.2"
+    redux-persist "^6.0.0"
+    typescript "^4.3.4"
+    uuid "^8.3.1"
+
+use-shopping-cart@3.1.0:
+  version "3.1.0"
+  resolved "https://registry.yarnpkg.com/use-shopping-cart/-/use-shopping-cart-3.1.0.tgz#7a83629e145851b3959e8c2ccebd62ec9ba6e75d"
+  integrity sha512-vQ1+f5BZO1Dfgr7YAtti01jgtDzynLLQblYXVJl135htGLO7zSouheUWxwpNrAodpG6I+fm2X6BXAI716olhlg==
+  dependencies:
+    "@reduxjs/toolkit" "^1.5.0"
+    "@stripe/stripe-js" "^1.14.0"
+    react-redux "^7.2.2"
+    redux-persist "^6.0.0"
+    typescript "^4.3.4"
+    uuid "^8.3.1"
+
+"use-shopping-cart@file:use-shopping-cart":
+  version "3.1.2-alpha.6"
+  dependencies:
+    "@reduxjs/toolkit" "^1.5.0"
+    "@stripe/stripe-js" "^1.14.0"
+    react-redux "^7.2.2"
+    redux-persist "^6.0.0"
+    typescript "^4.3.4"
+    uuid "^8.3.1"
+
 use@^3.1.0:
   version "3.1.1"
   resolved "https://registry.yarnpkg.com/use/-/use-3.1.1.tgz#d50c8cac79a19fbc20f2911f56eb973f4e10070f"
