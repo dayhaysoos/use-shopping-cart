@@ -15,6 +15,10 @@ interface CommonConfig {
    * used format price data.
    */
   language?: string
+  /**
+   * Determines if cart data should be persisted in local storage or not
+   */
+  shouldPersist: boolean
 }
 
 interface ClientOnlyConfig extends CommonConfig {
