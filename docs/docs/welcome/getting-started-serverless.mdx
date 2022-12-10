@@ -13,7 +13,7 @@ or
 yarn add use-shopping-cart
 ```
 
-The package needs to be configured with your account's secret key, which is available in the [Stripe Dashboard](https://dashboard.stripe.com/apikeys). Require it with the key's value.
+The package needs to be configured with your account's publishable key, which is available in the [Stripe Dashboard](https://dashboard.stripe.com/apikeys). Require it with the key's value.
 
 At the root level of your app, wrap your root component in the `<CartProvider />`
 
@@ -26,13 +26,9 @@ import App from './App'
 ReactDOM.render(
   <CartProvider
     mode="payment"
-    cartMode="client-only"
-    stripe={YOUR_STRIPE_API_KEY_GOES_HERE}
-    successUrl="stripe.com"
-    cancelUrl="twitter.com/dayhaysoos"
+    cartMode="checkout-session"
+    stripe={YOUR_STRIPE_API_PUBLISHABLE_KEY_GOES_HERE}
     currency="USD"
-    allowedCountries={['US', 'GB', 'CA']}
-    billingAddressCollection={true}
   >
     <App />
   </CartProvider>,
