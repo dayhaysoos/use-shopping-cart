@@ -63,6 +63,12 @@ module.exports = {
         },
         {
           type: 'category',
+          label: 'Configuration',
+          collapsed: false,
+          items: ['usage/configuration/shouldPersist']
+        },
+        {
+          type: 'category',
           label: 'Client-Side Helpers',
           collapsed: false,
           items: [
