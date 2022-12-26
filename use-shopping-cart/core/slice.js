@@ -20,7 +20,8 @@ export const initialState = {
   totalPrice: 0,
   formattedTotalPrice: '',
   cartDetails: {},
-  stripe: ''
+  stripe: '',
+  shouldPersist: true
 }
 
 const slice = createSlice({

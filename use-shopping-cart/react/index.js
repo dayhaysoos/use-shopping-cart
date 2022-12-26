@@ -19,17 +19,25 @@ export function CartProvider({ loading = null, children, ...props }) {
   const store = React.useMemo(() => createShoppingCartStore(props), [props])
   const persistor = persistStore(store)
 
-  return (
-    <Provider context={CartContext} store={store}>
-      <PersistGate
-        persistor={persistor}
-        children={(bootstrapped) => {
-          if (!bootstrapped) return loading
-          return children
-        }}
-      />
-    </Provider>
-  )
+  if (props?.shouldPersist || props.shouldPersist === undefined) {
+    return (
+      <Provider context={CartContext} store={store}>
+        <PersistGate
+          persistor={persistor}
+          children={(bootstrapped) => {
+            if (!bootstrapped) return loading
+            return children
+          }}
+        />
+      </Provider>
+    )
+  } else {
+    return (
+      <Provider context={CartContext} store={store}>
+        {children}
+      </Provider>
+    )
+  }
 }
 
 export function useShoppingCart(

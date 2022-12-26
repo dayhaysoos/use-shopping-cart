@@ -54,6 +54,8 @@ function createLocalStorage() {
 export { reducer, actions, formatCurrencyString }
 
 export function createShoppingCartStore(options) {
+  options.shouldPersist = options.shouldPersist ?? true
+
   if (!isClient) {
     return configureStore({
       reducer,
@@ -77,12 +79,14 @@ export function createShoppingCartStore(options) {
   updateFormattedTotalPrice(newInitialState)
 
   return configureStore({
-    reducer: persistedReducer,
+    reducer: options.shouldPersist ? persistedReducer : reducer,
     preloadedState: newInitialState,
     middleware: (getDefaultMiddleware) =>
       getDefaultMiddleware({
         serializableCheck: {
-          ignoredActions: [FLUSH, REHYDRATE, PAUSE, PERSIST, PURGE, REGISTER]
+          ignoredActions: options.shouldPersist
+            ? [FLUSH, REHYDRATE, PAUSE, PERSIST, PURGE, REGISTER]
+            : ['persist/PERSIST']
         }
       }).concat(handleStripe, handleWarnings)
   })

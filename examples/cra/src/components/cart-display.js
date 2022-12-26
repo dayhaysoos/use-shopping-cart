@@ -25,7 +25,7 @@ const CartDisplay = () => {
       .then((res) => res.json())
       .catch((error) => console.log(error))
 
-    redirectToCheckout({ sessionId: response.sessionId })
+    redirectToCheckout(response.sessionId)
   }
 
   async function handleCheckout(event) {

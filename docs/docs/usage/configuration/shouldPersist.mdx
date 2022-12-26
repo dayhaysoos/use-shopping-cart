@@ -1,0 +1,29 @@
+---
+title: shouldPersist
+id: shouldPersist
+---
+
+This prop is used to determine if the cart should be persisted to local storage. If you don't want to persist the cart to local storage, you can set this prop to `false`. The default value is `true`.
+
+```js
+import ReactDOM from 'react-dom'
+import { CartProvider } from 'use-shopping-cart/react'
+
+import App from './App'
+
+ReactDOM.render(
+  <CartProvider
+    mode="payment"
+    cartMode="checkout-session"
+    stripe={process.env.REACT_APP_STRIPE_API_PUBLIC}
+    billingAddressCollection={false}
+    successUrl="https://stripe.com"
+    cancelUrl="https://twitter.com/dayhaysoos"
+    currency="USD"
+    shouldPersist={false}
+  >
+    <App />
+  </CartProvider>,
+  document.getElementById('root')
+)
+```
