@@ -19,6 +19,11 @@ interface CommonConfig {
    * Determines if cart data should be persisted in local storage or not
    */
   shouldPersist: boolean
+  /**
+   * String value to append after 'persist:' as the storage key when cart persistence is enabled. defaults to 'root'
+   * (thus creating the full storage key 'persist:root')
+   */
+  persistKey?: string
 }
 
 interface ClientOnlyConfig extends CommonConfig {
