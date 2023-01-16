@@ -68,7 +68,7 @@ export function createShoppingCartStore(options) {
   delete options.storage
 
   const persistConfig = {
-    key: 'root',
+    key: options.persistKey ?? 'root',
     version: 1,
     storage,
     whitelist: ['cartCount', 'totalPrice', 'formattedTotalPrice', 'cartDetails']
