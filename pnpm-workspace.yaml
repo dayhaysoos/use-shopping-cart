@@ -1,3 +1,4 @@
 packages:
-  - "use-shopping-cart/**"
-  - "examples/**"
+  - 'use-shopping-cart/**'
+  - 'examples/**'
+  - 'docs'
