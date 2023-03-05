@@ -39,9 +39,9 @@ jobs:
             ${{ runner.os }}-yarn-
 
       # Install dependencies
-      - run: pnpm --filter use-shopping-cart install --frozen-lockfile
+      - run: pnpm install --frozen-lockfile
       # Run integration and unit tests
-      - run: pnpm --filter use-shopping-cart run test:watch
+      - run: pnpm --filter use-shopping-cart run test
       # Run TypeScript type definition tests
       - run: pnpm --filter use-shopping-cart run test:types
 
@@ -67,9 +67,9 @@ jobs:
             ${{ runner.os }}-yarn-
 
       # Install dependencies
-      - run: yarn workspace use-shopping-cart install --frozen-lockfile
+      - run: pnpm install
       # Build package
-      - run: yarn workspace use-shopping-cart build
+      - run: pnpm --filter use-shopping-cart run build
 
   lint-package:
     continue-on-error: true
@@ -94,6 +94,6 @@ jobs:
             ${{ runner.os }}-yarn-
 
       # Install dependencies
-      - run: yarn workspace use-shopping-cart install --frozen-lockfile
+      - run: pnpm install --frozen-lockfile
       # Lint soure code
-      - run: yarn workspace use-shopping-cart lint
+      - run: pnpm --filter use-shopping-cart run lint
