@@ -4,8 +4,7 @@
   "devDependencies": {
     "koa": "^2.13.0",
     "serve": "^11.3.2",
-    "stream-replace": "^1.0.0",
-    "use-shopping-cart": "*"
+    "stream-replace": "^1.0.0"
   },
   "scripts": {
     "copy": "node scripts/copy.js",
@@ -13,6 +12,7 @@
   },
   "dependencies": {
     "clipboardy": "^2.3.0",
-    "dotenv": "^8.2.0"
+    "dotenv": "^8.2.0",
+    "use-shopping-cart": "workspace:^3.1.4"
   }
 }

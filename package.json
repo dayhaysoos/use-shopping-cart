@@ -2,7 +2,11 @@
   "scripts": {
     "dev": "netlify dev",
     "preinstall": "npx only-allow pnpm",
-    "prepare": "husky install"
+    "prepare": "husky install",
+    "dev:nextjs": "pnpm --filter nextjs run dev",
+    "dev:cra": "pnpm --filter use-shopping-cart-cra run start",
+    "dev:gatsby": "pnpm --filter ecommerce-gatsby-tutorial run start",
+    "dev:typescript-cra": "pnpm --filter typescript-usage run start"
   },
   "dependencies": {
     "cross-env": "^7.0.3",
@@ -31,3 +35,4 @@
     }
   ]
 }
+

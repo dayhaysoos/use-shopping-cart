@@ -6,7 +6,7 @@ importers:
     specifiers:
       all-contributors-cli: ^6.24.0
       cross-env: ^7.0.3
-      husky: ^8.0.3
+      husky: ^8.0.0
       lint-staged: ^10.5.4
       open-cli: ^6.0.1
       prettier: ^2.8.4
@@ -33,7 +33,7 @@ importers:
       react-dom: ^17.0.2
       react-scripts: ^4.0.3
       theme-ui: ^0.10.0
-      use-shopping-cart: file:../../use-shopping-cart
+      use-shopping-cart: workspace:^3.1.4
       web-vitals: ^1.0.1
     dependencies:
       '@testing-library/jest-dom': 5.16.5
@@ -43,7 +43,7 @@ importers:
       react-dom: 17.0.2_react@17.0.2
       react-scripts: 4.0.3_react@17.0.2
       theme-ui: 0.10.0_react@17.0.2
-      use-shopping-cart: file:use-shopping-cart_sfoxds7t5ydpegc3knd667wn6m
+      use-shopping-cart: link:../../use-shopping-cart
       web-vitals: 1.1.2
     devDependencies:
       eslint-config-react-app: 6.0.0
@@ -65,7 +65,7 @@ importers:
       react: ^17.0.2
       react-dom: ^17.0.2
       react-helmet: ^5.2.1
-      use-shopping-cart: '*'
+      use-shopping-cart: workspace:^3.1.4
     dependencies:
       '@stripe/stripe-js': 1.25.0
       gatsby: 2.32.13_sfoxds7t5ydpegc3knd667wn6m
@@ -127,6 +127,7 @@ importers:
       react-dom: ^17.0.2
       react-scripts: 4.0.3
       typescript: ^4.1.2
+      use-shopping-cart: workspace:^3.1.4
       web-vitals: ^1.0.1
     dependencies:
       '@netlify/functions': 1.4.0
@@ -141,6 +142,7 @@ importers:
       react-dom: 17.0.2_react@17.0.2
       react-scripts: 4.0.3_oatgdhaahtizs2uezdzbohxvne
       typescript: 4.9.5
+      use-shopping-cart: link:../../use-shopping-cart
       web-vitals: 1.1.2
     devDependencies:
       '@babel/plugin-syntax-jsx': 7.16.7
@@ -156,15 +158,15 @@ importers:
       koa: ^2.13.0
       serve: ^11.3.2
       stream-replace: ^1.0.0
-      use-shopping-cart: '*'
+      use-shopping-cart: workspace:^3.1.4
     dependencies:
       clipboardy: 2.3.0
       dotenv: 8.6.0
+      use-shopping-cart: link:../../use-shopping-cart
     devDependencies:
       koa: 2.14.1
       serve: 11.3.2
       stream-replace: 1.0.0
-      use-shopping-cart: link:../../use-shopping-cart
 
   use-shopping-cart:
     specifiers:
@@ -9153,6 +9155,7 @@ packages:
   /chokidar/3.5.3:
     resolution: {integrity: sha512-Dr3sfKRP6oTcjf2JmUmFJfeVMvXBdegxB0iVQ5eb2V10uFJUCAS8OByZdVAyVb8xXNz3GjjTgj9kLWsZTqE6kw==}
     engines: {node: '>= 8.10.0'}
+    requiresBuild: true
     dependencies:
       anymatch: 3.1.2
       braces: 3.0.2
@@ -21655,28 +21658,6 @@ packages:
       react-is: 17.0.2
     dev: false
 
-  /react-redux/7.2.6_sfoxds7t5ydpegc3knd667wn6m:
-    resolution: {integrity: sha512-10RPdsz0UUrRL1NZE0ejTkucnclYSgXp5q+tB5SWx2qeG2ZJQJyymgAhwKy73yiL/13btfB6fPr+rgbMAaZIAQ==}
-    peerDependencies:
-      react: ^16.8.3 || ^17
-      react-dom: '*'
-      react-native: '*'
-    peerDependenciesMeta:
-      react-dom:
-        optional: true
-      react-native:
-        optional: true
-    dependencies:
-      '@babel/runtime': 7.21.0
-      '@types/react-redux': 7.1.23
-      hoist-non-react-statics: 3.3.2
-      loose-envify: 1.4.0
-      prop-types: 15.8.1
-      react: 17.0.2
-      react-dom: 17.0.2_react@17.0.2
-      react-is: 17.0.2
-    dev: false
-
   /react-refresh/0.8.3:
     resolution: {integrity: sha512-X8jZHc7nCMjaCqoU+V2I0cOhNW+QMBwSUkeXnTi8IPe6zaRWfn60ZzvFDZqWPfmSJfjub7dDW1SP0jaHWLu/hg==}
     engines: {node: '>=0.10.0'}
@@ -26304,26 +26285,4 @@ packages:
 
   /zwitch/2.0.4:
     resolution: {integrity: sha512-bXE4cR/kVZhKZX/RjPEflHaKVhUVl85noU3v6b8apfQEc1x4A+zBxjZ4lN8LqGd6WZ3dl98pY4o717VFmoPp+A==}
-    dev: false
-
-  file:use-shopping-cart_sfoxds7t5ydpegc3knd667wn6m:
-    resolution: {directory: use-shopping-cart, type: directory}
-    id: file:use-shopping-cart
-    name: use-shopping-cart
-    version: 3.1.4
-    engines: {node: '>=8', npm: '>=5'}
-    peerDependencies:
-      react: '>=16.8.0'
-    dependencies:
-      '@reduxjs/toolkit': 1.8.0_g7iv2n2puphpvmcbz4lgg4le54
-      '@stripe/stripe-js': 1.25.0
-      react: 17.0.2
-      react-redux: 7.2.6_sfoxds7t5ydpegc3knd667wn6m
-      redux-persist: 6.0.0_react@17.0.2
-      typescript: 4.9.5
-      uuid: 8.3.2
-    transitivePeerDependencies:
-      - react-dom
-      - react-native
-      - redux
     dev: false
