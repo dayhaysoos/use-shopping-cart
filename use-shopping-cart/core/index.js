@@ -57,6 +57,7 @@ export function createShoppingCartStore(options) {
   options.shouldPersist = options.shouldPersist ?? true
 
   if (!isClient) {
+    console.log('not client')
     return configureStore({
       reducer,
       preloadedState: { ...initialState, ...options }
@@ -84,9 +85,8 @@ export function createShoppingCartStore(options) {
     middleware: (getDefaultMiddleware) =>
       getDefaultMiddleware({
         serializableCheck: {
-          ignoredActions: options.shouldPersist
-            ? [FLUSH, REHYDRATE, PAUSE, PERSIST, PURGE, REGISTER]
-            : ['persist/PERSIST']
+          ignoredActions: [FLUSH, REHYDRATE, PAUSE, PERSIST, PURGE, REGISTER],
+          ignoredActionPaths: ['persist']
         }
       }).concat(handleStripe, handleWarnings)
   })

@@ -48,7 +48,7 @@
     "test:types": "tsc --noEmit type-tests/* --jsx react-jsx",
     "build": "rollup -c",
     "build:watch": "rollup -c -w",
-    "prepublishOnly": "yarn install --frozen-lockfile && yarn build",
+    "prepublishOnly": "pnpm build",
     "lint": "eslint '**/*.js'",
     "lint:fix": "eslint --fix '**/*.js'"
   },

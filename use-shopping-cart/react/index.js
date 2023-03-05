@@ -17,9 +17,9 @@ export const useDispatch = createDispatchHook(CartContext)
 
 export function CartProvider({ loading = null, children, ...props }) {
   const store = React.useMemo(() => createShoppingCartStore(props), [props])
-  const persistor = persistStore(store)
 
   if (props?.shouldPersist || props.shouldPersist === undefined) {
+    const persistor = persistStore(store)
     return (
       <Provider context={CartContext} store={store}>
         <PersistGate
