@@ -6,7 +6,7 @@ name: Tests
 
 on:
   pull_request:
-    branches: [ master, next, dev ]
+    branches: [master, next, dev]
 
 jobs:
   test-package:
@@ -16,86 +16,84 @@ jobs:
       - macos-latest
     strategy:
       matrix:
-        node_version: [ '12', '14', '16' ]
+        node_version: ['12', '14', '16']
     steps:
-    - uses: actions/checkout@v2
-    # Set up Node and Yarn
-    - uses: actions/setup-node@v2.2.0
-      with:
-        # Version Spec of the version to use.  Examples: 12.x, 10.15.1, >=10.15.0
-        node-version: ${{ matrix.node-version }}
-        # Used to specify a package manager for caching in the default directory. Supported values: npm, yarn
-        cache: yarn
+      - uses: actions/checkout@v2
+      # Set up Node and Yarn
+      - uses: actions/setup-node@v2.2.0
+        with:
+          # Version Spec of the version to use.  Examples: 12.x, 10.15.1, >=10.15.0
+          node-version: ${{ matrix.node-version }}
+          # Used to specify a package manager for caching in the default directory. Supported values: npm, yarn
+          cache: yarn
 
-    # Caching for Yarn
-    - id: yarn-cache-dir-path
-      run: echo "::set-output name=dir::$(yarn cache dir)"
-    - uses: actions/cache@v2
-      id: yarn-cache # use this to check for `cache-hit` (`steps.yarn-cache.outputs.cache-hit != 'true'`)
-      with:
-        path: ${{ steps.yarn-cache-dir-path.outputs.dir }}
-        key: ${{ runner.os }}-yarn-${{ hashFiles('**/yarn.lock') }}
-        restore-keys: |
-          ${{ runner.os }}-yarn-
+      # Caching for Yarn
+      - id: yarn-cache-dir-path
+        run: echo "::set-output name=dir::$(yarn cache dir)"
+      - uses: actions/cache@v2
+        id: yarn-cache # use this to check for `cache-hit` (`steps.yarn-cache.outputs.cache-hit != 'true'`)
+        with:
+          path: ${{ steps.yarn-cache-dir-path.outputs.dir }}
+          key: ${{ runner.os }}-yarn-${{ hashFiles('**/yarn.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-yarn-
 
-    # Install dependencies
-    - run: yarn workspace use-shopping-cart install --frozen-lockfile
-    # Run integration and unit tests
-    - run: yarn workspace use-shopping-cart test
-    # Run TypeScript type definition tests
-    - run: yarn workspace use-shopping-cart test:types
+      # Install dependencies
+      - run: pnpm --filter use-shopping-cart install --frozen-lockfile
+      # Run integration and unit tests
+      - run: pnpm --filter use-shopping-cart run test:watch
+      # Run TypeScript type definition tests
+      - run: pnpm --filter use-shopping-cart run test:types
 
   build-package:
     name: Build
-    runs-on:
-      ubuntu-latest
+    runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v2
-    - uses: actions/setup-node@v2
-      with:
-        node-version: 16
-        cache: yarn
+      - uses: actions/checkout@v2
+      - uses: actions/setup-node@v2
+        with:
+          node-version: 16
+          cache: yarn
 
-    # Caching for Yarn
-    - id: yarn-cache-dir-path
-      run: echo "::set-output name=dir::$(yarn cache dir)"
-    - uses: actions/cache@v2
-      id: yarn-cache # use this to check for `cache-hit` (`steps.yarn-cache.outputs.cache-hit != 'true'`)
-      with:
-        path: ${{ steps.yarn-cache-dir-path.outputs.dir }}
-        key: ${{ runner.os }}-yarn-${{ hashFiles('**/yarn.lock') }}
-        restore-keys: |
-          ${{ runner.os }}-yarn-
+      # Caching for Yarn
+      - id: yarn-cache-dir-path
+        run: echo "::set-output name=dir::$(yarn cache dir)"
+      - uses: actions/cache@v2
+        id: yarn-cache # use this to check for `cache-hit` (`steps.yarn-cache.outputs.cache-hit != 'true'`)
+        with:
+          path: ${{ steps.yarn-cache-dir-path.outputs.dir }}
+          key: ${{ runner.os }}-yarn-${{ hashFiles('**/yarn.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-yarn-
 
-    # Install dependencies
-    - run: yarn workspace use-shopping-cart install --frozen-lockfile
-    # Build package
-    - run: yarn workspace use-shopping-cart build
-  
+      # Install dependencies
+      - run: yarn workspace use-shopping-cart install --frozen-lockfile
+      # Build package
+      - run: yarn workspace use-shopping-cart build
+
   lint-package:
     continue-on-error: true
     name: Lint
-    runs-on:
-      ubuntu-latest
+    runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v2
-    - uses: actions/setup-node@v2
-      with:
-        node-version: 16
-        cache: yarn
+      - uses: actions/checkout@v2
+      - uses: actions/setup-node@v2
+        with:
+          node-version: 16
+          cache: yarn
 
-    # Caching for Yarn
-    - id: yarn-cache-dir-path
-      run: echo "::set-output name=dir::$(yarn cache dir)"
-    - uses: actions/cache@v2
-      id: yarn-cache # use this to check for `cache-hit` (`steps.yarn-cache.outputs.cache-hit != 'true'`)
-      with:
-        path: ${{ steps.yarn-cache-dir-path.outputs.dir }}
-        key: ${{ runner.os }}-yarn-${{ hashFiles('**/yarn.lock') }}
-        restore-keys: |
-          ${{ runner.os }}-yarn-
+      # Caching for Yarn
+      - id: yarn-cache-dir-path
+        run: echo "::set-output name=dir::$(yarn cache dir)"
+      - uses: actions/cache@v2
+        id: yarn-cache # use this to check for `cache-hit` (`steps.yarn-cache.outputs.cache-hit != 'true'`)
+        with:
+          path: ${{ steps.yarn-cache-dir-path.outputs.dir }}
+          key: ${{ runner.os }}-yarn-${{ hashFiles('**/yarn.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-yarn-
 
-    # Install dependencies
-    - run: yarn workspace use-shopping-cart install --frozen-lockfile
-    # Lint soure code
-    - run: yarn workspace use-shopping-cart lint
+      # Install dependencies
+      - run: yarn workspace use-shopping-cart install --frozen-lockfile
+      # Lint soure code
+      - run: yarn workspace use-shopping-cart lint

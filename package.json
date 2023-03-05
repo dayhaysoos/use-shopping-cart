@@ -6,7 +6,9 @@
     "dev:nextjs": "pnpm --filter nextjs run dev",
     "dev:cra": "pnpm --filter use-shopping-cart-cra run start",
     "dev:gatsby": "pnpm --filter ecommerce-gatsby-tutorial run start",
-    "dev:typescript-cra": "pnpm --filter typescript-usage run start"
+    "dev:typescript-cra": "pnpm --filter typescript-usage run start",
+    "test": "pnpm --filter use-shopping-cart run test",
+    "test:watch": "pnpm --filter use-shopping-cart run test:watch"
   },
   "dependencies": {
     "cross-env": "^7.0.3",
