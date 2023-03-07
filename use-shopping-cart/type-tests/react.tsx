@@ -3,7 +3,7 @@
 /* eslint-disable no-unused-vars */
 /* eslint-disable camelcase */
 import * as React from 'react'
-import { render } from 'react-dom'
+import { createRoot } from 'react-dom'
 import { CartProvider, useShoppingCart } from '../react/index'
 
 function UscWithSelector() {
@@ -139,7 +139,7 @@ function App() {
   )
 }
 
-render(<App />, document.getElementById('root'))
+createRoot(<App />, document.getElementById('root'))
 ;(async () => {
   await new Promise<void>((resolve) => {
     setTimeout(() => {

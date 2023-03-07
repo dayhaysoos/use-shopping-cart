@@ -9,7 +9,8 @@
     "dev:typescript-cra": "pnpm --filter typescript-usage run start",
     "dev:docs": "pnpm --filter docs run start",
     "test": "pnpm --filter use-shopping-cart run test",
-    "test:watch": "pnpm --filter use-shopping-cart run test:watch"
+    "test:watch": "pnpm --filter use-shopping-cart run test:watch",
+    "build": "pnpm --filter docs run build"
   },
   "dependencies": {
     "cross-env": "^7.0.3",
@@ -27,7 +28,7 @@
   },
   "devDependencies": {
     "all-contributors-cli": "^6.24.0",
-    "husky": "^8.0.0",
+    "husky": "^8.0.3",
     "typescript": "^4.9.5",
     "webpack-dev-server": "3.11.1"
   },
@@ -38,4 +39,3 @@
     }
   ]
 }
-

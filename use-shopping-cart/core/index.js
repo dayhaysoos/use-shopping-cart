@@ -57,7 +57,6 @@ export function createShoppingCartStore(options) {
   options.shouldPersist = options.shouldPersist ?? true
 
   if (!isClient) {
-    console.log('not client')
     return configureStore({
       reducer,
       preloadedState: { ...initialState, ...options }
