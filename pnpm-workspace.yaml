@@ -1,4 +1,5 @@
 packages:
   - 'use-shopping-cart/**'
   - 'examples/**'
+  - '!examples/gatsby'
   - 'docs'

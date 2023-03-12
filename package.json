@@ -3,14 +3,15 @@
     "dev": "netlify dev",
     "preinstall": "npx only-allow pnpm",
     "prepare": "husky install",
-    "dev:nextjs": "pnpm --filter nextjs run dev",
-    "dev:cra": "pnpm --filter use-shopping-cart-cra run start",
-    "dev:gatsby": "pnpm --filter ecommerce-gatsby-tutorial run start",
-    "dev:typescript-cra": "pnpm --filter typescript-usage run start",
-    "dev:docs": "pnpm --filter docs run start",
+    "dev:nextjs": "pnpm run bundle && pnpm --filter nextjs run dev",
+    "dev:cra": "pnpm run bundle && pnpm --filter use-shopping-cart-cra run start",
+    "dev:gatsby": "pnpm run bundle && pnpm --filter ecommerce-gatsby-tutorial run start",
+    "dev:typescript-cra": "pnpm run bundle && pnpm --filter typescript-usage run start",
+    "dev:docs": "pnpm run bundle && pnpm --filter docs run start",
     "test": "pnpm --filter use-shopping-cart run test",
     "test:watch": "pnpm --filter use-shopping-cart run test:watch",
-    "build": "pnpm --filter docs run build"
+    "build": "pnpm --filter docs run build",
+    "bundle": "pnpm --filter use-shopping-cart run build"
   },
   "dependencies": {
     "cross-env": "^7.0.3",
@@ -32,6 +33,12 @@
     "typescript": "^4.9.5",
     "webpack-dev-server": "4.11.1"
   },
+  "resolutions": {
+    "babel-loader": "8.1.0",
+    "jest": "26.6.0",
+    "webpack": "4.44.2",
+    "webpack-dev-server": "3.11.1"
+  },
   "funding": [
     {
       "type": "sponsors",
@@ -39,4 +46,3 @@
     }
   ]
 }
-
