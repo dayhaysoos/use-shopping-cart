@@ -9,7 +9,7 @@ function Root({ children }) {
         <CartProvider
           mode="payment"
           cartMode="checkout-session"
-          stripe={process.env.REACT_APP_STRIPE_API_PUBLIC}
+          stripe={''}
           billingAddressCollection={false}
           successUrl="https://stripe.com"
           cancelUrl="https://twitter.com/dayhaysoos"

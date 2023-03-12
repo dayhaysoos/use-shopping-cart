@@ -1,3 +1,9 @@
+const process = {
+  env: {
+    URL: 'https://useshoppingcart.com'
+  }
+}
+
 export const exampleProducts = `
 [
   {
