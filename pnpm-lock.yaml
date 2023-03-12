@@ -29,8 +29,6 @@ importers:
       '@docusaurus/preset-classic': 2.3.1
       '@mdx-js/react': ^1.6.22
       clsx: ^1.1.1
-      docusaurus2-dotenv: ^1.4.0
-      dotenv: ^8.2.0
       prism-react-renderer: ^1.3.5
       react: ^17.0.2
       react-dom: ^17.0.2
@@ -40,8 +38,6 @@ importers:
       '@docusaurus/preset-classic': 2.3.1_vphgvkepqxhslqfs2temy3edu4
       '@mdx-js/react': 1.6.22_react@17.0.2
       clsx: 1.2.1
-      docusaurus2-dotenv: 1.4.0_webpack@4.44.2
-      dotenv: 8.6.0
       prism-react-renderer: 1.3.5_react@17.0.2
       react: 17.0.2
       react-dom: 17.0.2_react@17.0.2
@@ -5961,7 +5957,7 @@ packages:
     peerDependencies:
       react: '*'
     dependencies:
-      '@types/react': 18.0.28
+      '@types/react': 17.0.41
       prop-types: 15.8.1
       react: 17.0.2
     dev: false
@@ -12929,7 +12925,6 @@ packages:
 
   /chokidar/2.1.8:
     resolution: {integrity: sha512-ZmZUazfOzf0Nve7duiCKD23PFSCs4JPoYyccjUFF3aQkQadqBhfzhjkwBH2mNOG9cTBwhamM37EIsIkZw3nRgg==}
-    deprecated: Chokidar 2 does not receive security updates since 2019. Upgrade to chokidar 3 with 15x fewer dependencies
     dependencies:
       anymatch: 2.0.0
       async-each: 1.0.6
@@ -15123,14 +15118,6 @@ packages:
     dependencies:
       esutils: 2.0.3
 
-  /docusaurus2-dotenv/1.4.0_webpack@4.44.2:
-    resolution: {integrity: sha512-iWqem5fnBAyeBBtX75Fxp71uUAnwFaXzOmade8zAhN4vL3RG9m27sLSRwjJGVVgIkEo3esjGyCcTGTiCjfi+sg==}
-    dependencies:
-      dotenv-webpack: 1.7.0_webpack@4.44.2
-    transitivePeerDependencies:
-      - webpack
-    dev: false
-
   /dom-accessibility-api/0.5.13:
     resolution: {integrity: sha512-R305kwb5CcMDIpSHUnLyIAp7SrSPBx6F0VfQFB3M75xVMHhXJJIdePYgbPPh1o57vCHNu5QztokWUPsLjWzFqw==}
     dev: false
@@ -15240,28 +15227,8 @@ packages:
     dependencies:
       is-obj: 2.0.0
 
-  /dotenv-defaults/1.1.1:
-    resolution: {integrity: sha512-6fPRo9o/3MxKvmRZBD3oNFdxODdhJtIy1zcJeUSCs6HCy4tarUpd+G67UTU9tF6OWXeSPqsm4fPAB+2eY9Rt9Q==}
-    dependencies:
-      dotenv: 6.2.0
-    dev: false
-
   /dotenv-expand/5.1.0:
     resolution: {integrity: sha512-YXQl1DSa4/PQyRfgrv6aoNjhasp/p4qs9FjJ4q4cQk+8m4r6k4ZSiEyytKG8f8W9gi8WsQtIObNmKd+tMzNTmA==}
-
-  /dotenv-webpack/1.7.0_webpack@4.44.2:
-    resolution: {integrity: sha512-wwNtOBW/6gLQSkb8p43y0Wts970A3xtNiG/mpwj9MLUhtPCQG6i+/DSXXoNN7fbPCU/vQ7JjwGmgOeGZSSZnsw==}
-    peerDependencies:
-      webpack: ^1 || ^2 || ^3 || ^4
-    dependencies:
-      dotenv-defaults: 1.1.1
-      webpack: 4.44.2
-    dev: false
-
-  /dotenv/6.2.0:
-    resolution: {integrity: sha512-HygQCKUBSFl8wKQZBSemMywRWcEDNidvNbjGVyZu3nbZ8qq9ubiPoGLMdRDpfSrpkkm9BXYFkpKxxFX38o/76w==}
-    engines: {node: '>=6'}
-    dev: false
 
   /dotenv/8.2.0:
     resolution: {integrity: sha512-8sJ78ElpbDJBHNeBzUbUVLsqKdccaa/BXF1uPTw3GrvQTBgrQrtObr2mUrE38vzYd8cEv+m/JBfDLioYcfXoaw==}
@@ -18259,6 +18226,7 @@ packages:
   /gatsby/2.32.13_jgxnvbe4faw3ohf4h6p42qq6oy:
     resolution: {integrity: sha512-BYfiI/k+t8m/IzSkWZH8Cc0v7rJw6giSjG5sX25LWdfkQMqUvg/Gn6OC8BWwRPXnEwe7x0n5jbH+peO0p34ZHQ==}
     engines: {node: '>=10.13.0'}
+    hasBin: true
     requiresBuild: true
     peerDependencies:
       react: ^16.4.2 || ^17.0.0
@@ -23720,6 +23688,7 @@ packages:
   /next/13.1.6_biqbaboplfbrettd7655fr4n2y:
     resolution: {integrity: sha512-hHlbhKPj9pW+Cymvfzc15lvhaOZ54l+8sXDXJWm3OBNBzgrVj6hwGPmqqsXg40xO1Leq+kXpllzRPuncpC0Phw==}
     engines: {node: '>=14.6.0'}
+    hasBin: true
     peerDependencies:
       fibers: '>= 3.1.0'
       node-sass: ^6.0.0 || ^7.0.0
@@ -26996,6 +26965,7 @@ packages:
   /react-scripts/4.0.3_l5hyvwnnskx7g27xcaxotzm7m4:
     resolution: {integrity: sha512-S5eO4vjUzUisvkIPB7jVsKtuH2HhWcASREYWHAQ1FP5HyCv3xgn+wpILAEWkmy+A+tTNbSZClhxjT3qz6g4L1A==}
     engines: {node: ^10.12.0 || >=12.0.0}
+    hasBin: true
     peerDependencies:
       eslint: '*'
       react: '>= 16'
@@ -27962,6 +27932,7 @@ packages:
   /rollup-plugin-visualizer/4.2.2_rollup@2.79.1:
     resolution: {integrity: sha512-10/TsugsaQL5rdynl0lrklBngTtkRBESZdxUJy+3fN+xKqNdg5cr7JQU1OoPx4p5mhQ+nspa6EvX3qc8SsBvnA==}
     engines: {node: '>=10'}
+    hasBin: true
     peerDependencies:
       rollup: '>=1.20.0'
     dependencies:
@@ -29643,6 +29614,7 @@ packages:
   /tailwindcss/3.2.7_postcss@8.4.21:
     resolution: {integrity: sha512-B6DLqJzc21x7wntlH/GsZwEXTBttVSl1FtCzC8WP4oBc/NKef7kaax5jeihkkCEWc831/5NDJ9gRNDK6NEioQQ==}
     engines: {node: '>=12.13.0'}
+    hasBin: true
     peerDependencies:
       postcss: ^8.0.9
     dependencies:
@@ -30206,6 +30178,7 @@ packages:
   /ts-node/9.1.1_typescript@4.9.5:
     resolution: {integrity: sha512-hPlt7ZACERQGf03M253ytLY3dHbGNGrAq9qIHWUY9XHYl1z7wYngSr3OQ5xmui8o2AaxsONxIzjafLUiWBo1Fg==}
     engines: {node: '>=10.0.0'}
+    hasBin: true
     peerDependencies:
       typescript: '>=2.7'
     dependencies:
@@ -31257,6 +31230,7 @@ packages:
   /webpack-dev-server/3.11.1_webpack@4.44.2:
     resolution: {integrity: sha512-u4R3mRzZkbxQVa+MBWi2uVpB5W59H3ekZAJsQlKUTdl7Elcah2EhygTPLmeFXybQkf9i2+L0kn7ik9SnXa6ihQ==}
     engines: {node: '>= 6.11.5'}
+    hasBin: true
     peerDependencies:
       webpack: ^4.0.0 || ^5.0.0
       webpack-cli: '*'
@@ -31305,6 +31279,7 @@ packages:
   /webpack-dev-server/3.11.3_webpack@4.44.2:
     resolution: {integrity: sha512-3x31rjbEQWKMNzacUZRE6wXvUFuGpH7vr0lIEbYpMAG9BOxi0928QU1BBswOAP3kg3H1O4hiS+sq4YyAn6ANnA==}
     engines: {node: '>= 6.11.5'}
+    hasBin: true
     peerDependencies:
       webpack: ^4.0.0 || ^5.0.0
       webpack-cli: '*'
