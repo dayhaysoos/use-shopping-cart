@@ -9,7 +9,8 @@
     "test": "pnpm --filter use-shopping-cart run test",
     "test:watch": "pnpm --filter use-shopping-cart run test:watch",
     "build": "pnpm --filter docs run build",
-    "bundle": "pnpm --filter use-shopping-cart run build"
+    "bundle": "pnpm --filter use-shopping-cart run build",
+    "publish": "pnpm --filter use-shopping-cart publish"
   },
   "dependencies": {
     "cross-env": "^7.0.3",
