@@ -1,4 +1,6 @@
 /* eslint-disable camelcase */
+import type { Store } from '@reduxjs/toolkit'
+
 import {
   CartState,
   actions,
@@ -9,14 +11,15 @@ import {
   CartEntry
 } from '../core/index'
 
-const store = createShoppingCartStore({
+const store: Store<CartState> = createShoppingCartStore({
   cartMode: 'client-only',
   mode: 'payment',
   successUrl: 'https://www.example.com/success',
   cancelUrl: 'https://www.example.com/cancel',
   billingAddressCollection: true,
   stripe: '',
-  currency: 'USD'
+  currency: 'USD',
+  shouldPersist: true
 })
 
 createPersistedStore(store)

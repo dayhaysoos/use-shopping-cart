@@ -3,9 +3,8 @@
 /* eslint-disable no-unused-vars */
 /* eslint-disable camelcase */
 import * as React from 'react'
-import { render } from 'react-dom'
+import { createRoot } from 'react-dom'
 import { CartProvider, useShoppingCart } from '../react/index'
-import { AddItem } from '../../docs/src/components/docs/add-item'
 
 function UscWithSelector() {
   const cart = useShoppingCart(({ totalPrice }) => ({ totalPrice }))
@@ -25,9 +24,8 @@ function UscWithoutSelector() {
   cart.cartDetails
 
   React.useEffect(() => {
-    const cartEntry = cart.cartDetails['id_banana001']
-
-    if (cartEntry !== undefined) {
+    if (cart.cartDetails !== undefined) {
+      const cartEntry = cart.cartDetails['id_banana001']
       cartEntry.value
       cartEntry.description
       cartEntry.formattedValue
@@ -141,12 +139,13 @@ function App() {
   )
 }
 
-render(<App />, document.getElementById('root'))
+createRoot(<App />, document.getElementById('root'))
 ;(async () => {
   await new Promise<void>((resolve) => {
     setTimeout(() => {
       resolve()
     }, 1000)
   })
+  // @ts-ignore
   console.log(document.getElementById('root').innerHTML)
 })()

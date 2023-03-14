@@ -84,9 +84,8 @@ export function createShoppingCartStore(options) {
     middleware: (getDefaultMiddleware) =>
       getDefaultMiddleware({
         serializableCheck: {
-          ignoredActions: options.shouldPersist
-            ? [FLUSH, REHYDRATE, PAUSE, PERSIST, PURGE, REGISTER]
-            : ['persist/PERSIST']
+          ignoredActions: [FLUSH, REHYDRATE, PAUSE, PERSIST, PURGE, REGISTER],
+          ignoredActionPaths: ['persist']
         }
       }).concat(handleStripe, handleWarnings)
   })
