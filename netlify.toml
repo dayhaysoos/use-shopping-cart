@@ -1,0 +1,5 @@
+[[redirects]]
+  from = "/test/*"
+  to = "https://docs.useshoppingcart.com/:splat"
+  status = 200
+  force = true
