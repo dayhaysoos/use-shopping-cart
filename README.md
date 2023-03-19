@@ -1,6 +1,6 @@
 # use-shopping-cart
 <!-- ALL-CONTRIBUTORS-BADGE:START - Do not remove or modify this section -->
-[![All Contributors](https://img.shields.io/badge/all_contributors-16-orange.svg?style=flat-square)](#contributors-)
+[![All Contributors](https://img.shields.io/badge/all_contributors-17-orange.svg?style=flat-square)](#contributors-)
 <!-- ALL-CONTRIBUTORS-BADGE:END -->
 
 [![NPM](https://img.shields.io/npm/v/use-shopping-cart.svg?style=flat-square)](https://www.npmjs.com/package/use-shopping-cart)
@@ -66,6 +66,7 @@ Thanks goes to these wonderful people ([emoji key](https://allcontributors.org/d
     <tr>
       <td align="center" valign="top" width="14.28%"><a href="https://konnorrogers.com"><img src="https://avatars.githubusercontent.com/u/26425882?v=4?s=100" width="100px;" alt="Konnor Rogers"/><br /><sub><b>Konnor Rogers</b></sub></a><br /><a href="https://github.com/dayhaysoos/use-shopping-cart/commits?author=KonnorRogers" title="Code">💻</a></td>
       <td align="center" valign="top" width="14.28%"><a href="https://github.com/larissapissurno"><img src="https://avatars.githubusercontent.com/u/8760873?v=4?s=100" width="100px;" alt="Larissa Pissurno"/><br /><sub><b>Larissa Pissurno</b></sub></a><br /><a href="https://github.com/dayhaysoos/use-shopping-cart/commits?author=larissapissurno" title="Documentation">📖</a></td>
+      <td align="center" valign="top" width="14.28%"><a href="http://linkedin.com/in/lucymacartney"><img src="https://avatars.githubusercontent.com/u/64803272?v=4?s=100" width="100px;" alt="Lucy Mac"/><br /><sub><b>Lucy Mac</b></sub></a><br /><a href="https://github.com/dayhaysoos/use-shopping-cart/commits?author=lmac-1" title="Documentation">📖</a> <a href="#content-lmac-1" title="Content">🖋</a> <a href="#example-lmac-1" title="Examples">💡</a></td>
     </tr>
   </tbody>
 </table>
