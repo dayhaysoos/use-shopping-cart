@@ -169,6 +169,15 @@
       "contributions": [
         "code"
       ]
+    },
+    {
+      "login": "larissapissurno",
+      "name": "Larissa Pissurno",
+      "avatar_url": "https://avatars.githubusercontent.com/u/8760873?v=4",
+      "profile": "https://github.com/larissapissurno",
+      "contributions": [
+        "doc"
+      ]
     }
   ],
   "contributorsPerLine": 7
