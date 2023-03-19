@@ -10,12 +10,16 @@ import { createDispatchHook, createSelectorHook, Provider } from 'react-redux'
 import { PersistGate } from 'redux-persist/integration/react'
 import { persistStore } from 'redux-persist'
 
+import { isClient } from '../utilities/SSR'
+
 export { actions, filterCart, formatCurrencyString }
 export const CartContext = React.createContext(initialState)
 export const useSelector = createSelectorHook(CartContext)
 export const useDispatch = createDispatchHook(CartContext)
 
 export function CartProvider({ loading = null, children, ...props }) {
+  if (!isClient) return null
+
   const store = React.useMemo(() => createShoppingCartStore(props), [props])
 
   if (props?.shouldPersist || props.shouldPersist === undefined) {

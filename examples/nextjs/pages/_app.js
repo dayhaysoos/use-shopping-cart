@@ -18,7 +18,7 @@ export default function App({ Component, pageProps }) {
       // Having this setting means that we will capture shipping address
       allowedCountries={['GB']}
       // Enables local storage
-      shouldPersist={false}
+      shouldPersist={true}
     >
       <Layout>
         <Component {...pageProps} />
@@ -26,4 +26,3 @@ export default function App({ Component, pageProps }) {
     </CartProvider>
   )
 }
-
