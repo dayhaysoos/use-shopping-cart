@@ -37,7 +37,7 @@ const Home = () => {
               <Feature
                 title="Developer friendly API"
                 imageUrl="img/api.svg"
-                description="Abstract away the complexity of working with Stripe so that you can focus the products your customers love!"
+                description="Abstract away the complexity of working with Stripe so that you can focus on the products your customers love!"
               />
               <Feature
                 title="Framework agnostic"
