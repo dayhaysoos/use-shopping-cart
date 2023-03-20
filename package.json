@@ -3,6 +3,7 @@
     "dev": "netlify dev",
     "preinstall": "npx only-allow pnpm",
     "prepare": "husky install",
+    "dev:vite-react": "pnpm run bundle && pnpm --filter vite-react run dev",
     "dev:nextjs": "pnpm run bundle && pnpm --filter nextjs run dev",
     "dev:typescript-cra": "pnpm run bundle && pnpm --filter typescript-usage run start",
     "dev:docs": "pnpm run bundle && pnpm --filter docs run start",
