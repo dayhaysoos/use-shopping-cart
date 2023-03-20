@@ -6,6 +6,8 @@ const Product = (product) => {
   const { addItem, redirectToCheckout } = useShoppingCart()
   const { name, price, image, currency } = product
 
+  const imageUrl = new URL(image, import.meta.url).href
+
   async function handleCheckout() {
     const response = await fetch('/.netlify/functions/create-session', {
       method: 'post',
@@ -31,7 +33,7 @@ const Product = (product) => {
       }}
     >
       <Image
-        src={image}
+        src={imageUrl}
         sx={{ width: 200, height: 200, objectFit: 'contain' }}
       />
       <Box>

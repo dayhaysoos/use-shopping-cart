@@ -1,4 +1,0 @@
-[dev]
-  autoLaunch = true
-  functions = "functions"
-  port = 8888
