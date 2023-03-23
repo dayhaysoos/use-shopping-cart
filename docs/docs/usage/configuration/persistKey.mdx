@@ -1,0 +1,31 @@
+---
+title: persistKey
+id: persistKey
+---
+
+This property allows you to override the default key used to persist the cart in `localStorage`. By default, the cart is stored under the key `root`.
+
+```js
+import ReactDOM from 'react-dom'
+import { CartProvider } from 'use-shopping-cart/react'
+
+import App from './App'
+
+ReactDOM.render(
+  <CartProvider
+    mode="payment"
+    cartMode="checkout-session"
+    stripe={process.env.REACT_APP_STRIPE_API_PUBLIC}
+    billingAddressCollection={false}
+    successUrl="https://stripe.com"
+    cancelUrl="https://twitter.com/dayhaysoos"
+    currency="USD"
+    shouldPersist={false}
+    persistKey="my-redux-persist-key"
+  >
+    <App />
+  </CartProvider>,
+  document.getElementById('root')
+)
+```
+
