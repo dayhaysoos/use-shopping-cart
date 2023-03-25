@@ -65,7 +65,10 @@ module.exports = {
           type: 'category',
           label: 'Configuration',
           collapsed: false,
-          items: ['usage/configuration/shouldPersist']
+          items: [
+            'usage/configuration/shouldPersist',
+            'usage/configuration/persistKey'
+          ]
         },
         {
           type: 'category',
