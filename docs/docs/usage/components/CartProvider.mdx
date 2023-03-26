@@ -21,7 +21,6 @@ const stripeKey = process.env.YOUR_STRIPE_PUBLIC_KEY
 
 ReactDOM.render(
   <CartProvider
-    mode="payment"
     cartMode="checkout-session"
     stripe={stripeKey}
     currency="USD"
