@@ -46,11 +46,13 @@ https://stripe.com/docs/api/checkout/sessions/object#checkout_session_object-mod
 
 ## Using the hook
 
-The hook `useShoppingCart()` provides several utilities and pieces of data for you to use in your application. The examples below won't cover every part of the `useShoppingCart()` API but you can [look at the API](#API) below.
+The hook `useShoppingCart()` provides several utilities and pieces of data for you to use in your application. The examples below won't cover every part of the `useShoppingCart()` API but you can explore the documentation to find out more.
 
 ### Products Created on Stripe's Dashboard
 
-This is for products you created on the Stripe Dashboard. Stripe provides you with a Price ID String. You don't need a server(less)
+To use client only mode, you'll need to add some products on the Stripe Dashboard. Check out [Stripe's documentation](https://stripe.com/docs/products-prices/manage-prices) for more information on how to do this.
+
+Stripe provides you with a Price ID String. You don't need a server(less)
 set up to use this library this way unless you want more control over how the payments are handled.
 
 ```jsx
@@ -62,6 +64,7 @@ const productData = [
   {
     name: 'Bananas',
     price_id: 'price_GBJ2Ep8246qeeT',
+    // price in smallest currency unit (e.g. cent for USD)
     price: 400,
     image: 'https://www.fillmurray.com/300/300',
     currency: 'USD'
@@ -69,6 +72,7 @@ const productData = [
   {
     name: 'Tangerines',
     price_id: 'price_GBJ2WWfMaGNC2Z',
+    // price in smallest currency unit (e.g. cent for USD)
     price: 100,
     image: 'https://www.fillmurray.com/300/300',
     currency: 'USD'
@@ -76,7 +80,7 @@ const productData = [
 ]
 
 export function App() {
-  /* Gets the totalPrice and a method for redirecting to stripe */
+  /* Gets the totalPrice and a method for redirecting to Stripe */
   const { totalPrice, redirectToCheckout, cartCount } = useShoppingCart()
 
   return (
