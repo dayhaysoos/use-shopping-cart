@@ -75,6 +75,15 @@ function clearDist() {
   }
 }
 
+function addUseClientDirective() {
+  return {
+    name: 'add-use-client-directive',
+    banner() {
+      return "'use client';"
+    }
+  }
+}
+
 const common = {
   react: {
     input: './react/index.js',
@@ -99,7 +108,8 @@ const common = {
     copyTypes(), // Copies the types to dist/
     externals({ deps: true }), // automatically externalizes dependencies in package.json
     resolve(),
-    commonjs()
+    commonjs(),
+    addUseClientDirective()
   ],
   // fixes an issue with uuid
   get aliases() {
