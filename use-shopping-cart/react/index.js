@@ -1,3 +1,5 @@
+'use client'
+
 import * as React from 'react'
 import { actions, initialState } from '../core/slice'
 import {
@@ -18,12 +20,11 @@ export const useSelector = createSelectorHook(CartContext)
 export const useDispatch = createDispatchHook(CartContext)
 
 export function CartProvider({ loading = null, children, ...props }) {
-  if (!isClient) return null
-
   const store = React.useMemo(() => createShoppingCartStore(props), [props])
 
-  if (props?.shouldPersist || props.shouldPersist === undefined) {
+  if (isClient && props.shouldPersist) {
     const persistor = persistStore(store)
+
     return (
       <Provider context={CartContext} store={store}>
         <PersistGate
@@ -35,7 +36,7 @@ export function CartProvider({ loading = null, children, ...props }) {
         />
       </Provider>
     )
-  } else {
+  } else if (isClient && !props.shouldPersist) {
     return (
       <Provider context={CartContext} store={store}>
         {children}
