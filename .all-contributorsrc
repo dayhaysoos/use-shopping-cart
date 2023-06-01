@@ -198,7 +198,17 @@
       "contributions": [
         "code"
       ]
+    },
+    {
+      "login": "ciruz",
+      "name": "Tom",
+      "avatar_url": "https://avatars.githubusercontent.com/u/987947?v=4",
+      "profile": "https://www.floorz.at/",
+      "contributions": [
+        "code"
+      ]
     }
   ],
-  "contributorsPerLine": 7
+  "contributorsPerLine": 7,
+  "commitType": "docs"
 }
