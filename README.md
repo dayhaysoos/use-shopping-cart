@@ -1,6 +1,6 @@
 # use-shopping-cart
 <!-- ALL-CONTRIBUTORS-BADGE:START - Do not remove or modify this section -->
-[![All Contributors](https://img.shields.io/badge/all_contributors-19-orange.svg?style=flat-square)](#contributors-)
+[![All Contributors](https://img.shields.io/badge/all_contributors-20-orange.svg?style=flat-square)](#contributors-)
 <!-- ALL-CONTRIBUTORS-BADGE:END -->
 
 [![NPM](https://img.shields.io/npm/v/use-shopping-cart.svg?style=flat-square)](https://www.npmjs.com/package/use-shopping-cart)
@@ -69,6 +69,7 @@ Thanks goes to these wonderful people ([emoji key](https://allcontributors.org/d
       <td align="center" valign="top" width="14.28%"><a href="http://github.com/lmac-1"><img src="https://avatars.githubusercontent.com/u/64803272?v=4?s=100" width="100px;" alt="Lucy Macartney"/><br /><sub><b>Lucy Macartney</b></sub></a><br /><a href="https://github.com/dayhaysoos/use-shopping-cart/commits?author=lmac-1" title="Documentation">📖</a> <a href="#content-lmac-1" title="Content">🖋</a> <a href="#example-lmac-1" title="Examples">💡</a></td>
       <td align="center" valign="top" width="14.28%"><a href="https://github.com/brendanmorrell"><img src="https://avatars.githubusercontent.com/u/14864397?v=4?s=100" width="100px;" alt="brendanmorrell"/><br /><sub><b>brendanmorrell</b></sub></a><br /><a href="https://github.com/dayhaysoos/use-shopping-cart/commits?author=brendanmorrell" title="Code">💻</a></td>
       <td align="center" valign="top" width="14.28%"><a href="https://www.floorz.at/"><img src="https://avatars.githubusercontent.com/u/987947?v=4?s=100" width="100px;" alt="Tom"/><br /><sub><b>Tom</b></sub></a><br /><a href="https://github.com/dayhaysoos/use-shopping-cart/commits?author=ciruz" title="Code">💻</a></td>
+      <td align="center" valign="top" width="14.28%"><a href="https://milindgoel.vercel.app/"><img src="https://avatars.githubusercontent.com/u/45682747?v=4?s=100" width="100px;" alt="Milind Goel"/><br /><sub><b>Milind Goel</b></sub></a><br /><a href="https://github.com/dayhaysoos/use-shopping-cart/commits?author=milindgoel15" title="Documentation">📖</a></td>
     </tr>
   </tbody>
 </table>

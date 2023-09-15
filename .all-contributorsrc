@@ -207,6 +207,15 @@
       "contributions": [
         "code"
       ]
+    },
+    {
+      "login": "milindgoel15",
+      "name": "Milind Goel",
+      "avatar_url": "https://avatars.githubusercontent.com/u/45682747?v=4",
+      "profile": "https://milindgoel.vercel.app/",
+      "contributions": [
+        "doc"
+      ]
     }
   ],
   "contributorsPerLine": 7,
