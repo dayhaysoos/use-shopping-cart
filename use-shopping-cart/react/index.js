@@ -9,10 +9,9 @@ import {
 } from '../core/index'
 import { bindActionCreators } from '@reduxjs/toolkit'
 import { createDispatchHook, createSelectorHook, Provider } from 'react-redux'
-import { PersistGate } from 'redux-persist/integration/react'
 import { persistStore } from 'redux-persist'
 
-import { isClient } from '../utilities/SSR'
+import { PersistGate } from 'redux-persist/integration/react'
 
 export { actions, filterCart, formatCurrencyString }
 export const CartContext = React.createContext(initialState)
@@ -22,24 +21,20 @@ export const useDispatch = createDispatchHook(CartContext)
 export function CartProvider({ loading = null, children, ...props }) {
   const store = React.useMemo(() => createShoppingCartStore(props), [props])
 
-  if (isClient && props.shouldPersist) {
+  if (!props.shouldPersist) {
+    return (
+      <Provider context={CartContext} store={store}>
+        {children}
+      </Provider>
+    )
+  }
+
+  if (props.shouldPersist) {
     const persistor = persistStore(store)
 
     return (
       <Provider context={CartContext} store={store}>
-        <PersistGate
-          persistor={persistor}
-          children={(bootstrapped) => {
-            if (!bootstrapped) return loading
-            return children
-          }}
-        />
-      </Provider>
-    )
-  } else if (isClient && !props.shouldPersist) {
-    return (
-      <Provider context={CartContext} store={store}>
-        {children}
+        <PersistGate persistor={persistor}>{() => children}</PersistGate>
       </Provider>
     )
   }
