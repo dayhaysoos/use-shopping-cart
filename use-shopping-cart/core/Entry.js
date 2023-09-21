@@ -1,4 +1,5 @@
 import { isClient } from '../utilities/SSR'
+import { formatISO } from 'date-fns'
 
 export const formatCurrencyString = ({
   value,
@@ -78,7 +79,8 @@ export function createEntry({
     product,
     quantity: count,
     price_metadata,
-    product_metadata
+    product_metadata,
+    timeStamp: formatISO(new Date()) 
   })
 
   state.cartDetails[id] = entry
