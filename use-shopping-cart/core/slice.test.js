@@ -71,6 +71,7 @@ describe('addItem', () => {
     expect(result.cartDetails[product.id]).toMatchObject(product)
     expect(result.totalPrice).toBe(product.price)
     expect(result.cartCount).toBe(1)
+    expect(result.cartDetails.timeStamp).toBeDefined()
   })
 
   it('should retain entries when adding a product to a cart that already contains products', () => {
@@ -241,6 +242,7 @@ describe('loadCart', () => {
     })
     expect(result.totalPrice).toBe(3600)
     expect(result.cartCount).toBe(12)
+    expect(result.timeStamp).toBeDefined()
   })
 })
 

@@ -13,6 +13,6 @@
   "dependencies": {
     "clipboardy": "^2.3.0",
     "dotenv": "^8.2.0",
-    "use-shopping-cart": "workspace:^3.1.4"
+    "use-shopping-cart":"workspace:3.2.0-alpha.0"
   }
 }

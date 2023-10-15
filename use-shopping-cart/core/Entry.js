@@ -79,11 +79,11 @@ export function createEntry({
     product,
     quantity: count,
     price_metadata,
-    product_metadata,
-    timeStamp: formatISO(new Date()) 
+    product_metadata
   })
 
   state.cartDetails[id] = entry
+  state.cartDetails.timeStamp = formatISO(new Date())
   updateFormattedValue(state, id)
   updateFormattedPrice(state, id)
 
