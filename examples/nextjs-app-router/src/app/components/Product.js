@@ -1,8 +1,7 @@
 'use client'
 
 import { useState } from 'react'
-import { formatCurrencyString } from 'use-shopping-cart'
-import { useShoppingCart } from 'use-shopping-cart'
+import { formatCurrencyString, useShoppingCart } from 'use-shopping-cart'
 
 export default function Product({ product }) {
   const { addItem } = useShoppingCart()
@@ -25,7 +24,7 @@ export default function Product({ product }) {
   }
 
   return (
-    <article className="flex flex-col gap-3 bg-white p-8 rounded-xl shadow-md text-center mb-6">
+    <article className="flex text-black flex-col gap-3 bg-white p-8 rounded-xl shadow-md text-center mb-6">
       <div className="text-8xl cursor-default">{emoji}</div>
       <div className="text-lg">{name}</div>
       <div className="text-2xl font-semibold mt-auto">

@@ -7,10 +7,8 @@ function CartProvider({ children }) {
   return (
     <USCProvider
       mode="checkout-session"
-      stripe={'test'}
+      stripe={process.env.NEXT_PUBLIC_STRIPE_KEY}
       currency={'USD'}
-      successUrl={'https://example.com/success'}
-      cancelUrl={'https://example.com/cancel'}
       allowedCountries={['US', 'GB', 'CA']}
       billingAddressCollection={true}
     >
@@ -20,4 +18,3 @@ function CartProvider({ children }) {
 }
 
 export default CartProvider
-
