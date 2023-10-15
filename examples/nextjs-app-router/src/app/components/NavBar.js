@@ -9,10 +9,11 @@ export default function NavBar() {
   const { handleCartClick, cartCount } = useShoppingCart()
   return (
     <nav className="py-5 bg-white px-12 flex text-black justify-between">
-      <Link href="/">
-        <p className="bg-white text-3xl font-bold underline underline-offset-4 decoration-wavy decoration-2 decoration-emerald-500">
-          fresh
-        </p>
+      <Link
+        href="/"
+        className="bg-white text-3xl font-bold underline underline-offset-4 decoration-wavy decoration-2 decoration-emerald-500"
+      >
+        fresh
       </Link>
       <button className="relative" onClick={() => handleCartClick()}>
         <Image
