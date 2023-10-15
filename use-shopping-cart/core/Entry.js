@@ -1,4 +1,6 @@
 import { isClient } from '../utilities/SSR'
+// This is giving an error if I run any dev: script using pnpm
+// import { formatISO } from 'date-fns'
 
 export const formatCurrencyString = ({
   value,
@@ -79,6 +81,7 @@ export function createEntry({
     quantity: count,
     price_metadata,
     product_metadata
+    // timeStamp: formatISO(new Date())
   })
 
   state.cartDetails[id] = entry

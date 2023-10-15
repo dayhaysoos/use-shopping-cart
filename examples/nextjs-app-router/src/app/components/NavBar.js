@@ -8,7 +8,7 @@ import ShoppingCart from './ShoppingCart'
 export default function NavBar() {
   const { handleCartClick, cartCount } = useShoppingCart()
   return (
-    <nav className="py-5 px-12 flex justify-between">
+    <nav className="py-5 bg-white px-12 flex justify-between">
       <Link href="/">
         <p className="bg-white text-3xl font-bold underline underline-offset-4 decoration-wavy decoration-2 decoration-emerald-500">
           fresh
