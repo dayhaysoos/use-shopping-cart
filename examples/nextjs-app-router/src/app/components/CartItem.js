@@ -1,14 +1,14 @@
-import { useShoppingCart } from "use-shopping-cart";
-import { formatCurrencyString } from "use-shopping-cart";
-import Image from "next/image";
+'use client'
+import { useShoppingCart, formatCurrencyString } from 'use-shopping-cart'
+import Image from 'next/image'
 
 export default function CartItem({ item }) {
-  const { name, emoji, quantity, price } = item;
-  const { removeItem } = useShoppingCart();
+  const { name, emoji, quantity, price } = item
+  const { removeItem } = useShoppingCart()
 
   const removeItemFromCart = () => {
-    removeItem(item.id);
-  };
+    removeItem(item.id)
+  }
 
   return (
     <div className="flex items-center gap-4 mb-3">
@@ -17,7 +17,7 @@ export default function CartItem({ item }) {
         {name} <span className="text-xs">({quantity})</span>
       </div>
       <div className="ml-auto">
-        {formatCurrencyString({ value: price, currency: "GBP" })}
+        {formatCurrencyString({ value: price, currency: 'GBP' })}
       </div>
       <button
         onClick={() => removeItemFromCart()}
@@ -26,5 +26,5 @@ export default function CartItem({ item }) {
         <Image alt="delete icon" src="./trash.svg" width={20} height={20} />
       </button>
     </div>
-  );
+  )
 }

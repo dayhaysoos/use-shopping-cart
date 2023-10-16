@@ -5,7 +5,7 @@
     "prepare": "husky install",
     "dev:vite-react": "pnpm run bundle && pnpm --filter vite-react run dev",
     "dev:nextjs": "pnpm run bundle && pnpm --filter nextjs run dev",
-    "dev:nextjs-root-layout": "pnpm run bundle && pnpm --filter nextjs-root-layout run dev",
+    "dev:nextjs-app-router": "pnpm run bundle && pnpm --filter nextjs-app-router run dev",
     "dev:typescript-cra": "pnpm run bundle && pnpm --filter typescript-usage run start",
     "dev:docs": "pnpm run bundle && pnpm --filter docs run start",
     "test": "pnpm --filter use-shopping-cart run test",
@@ -16,7 +16,6 @@
   },
   "dependencies": {
     "cross-env": "^7.0.3",
-    "lint-staged": "^10.5.4",
     "open-cli": "^6.0.1",
     "prettier": "^2.8.4"
   },
@@ -30,7 +29,9 @@
   },
   "devDependencies": {
     "all-contributors-cli": "^6.24.0",
+    "eslint": "^8.51.0",
     "husky": "^8.0.3",
+    "lint-staged": "^10.5.4",
     "typescript": "^4.9.5",
     "webpack-dev-server": "4.11.1"
   },
@@ -45,4 +46,3 @@
     }
   ]
 }
-
