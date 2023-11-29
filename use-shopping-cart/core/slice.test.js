@@ -27,6 +27,7 @@ function mockCartDetails(overrides1, overrides2) {
       formattedValue: '$8.00',
       price_data: {},
       product_data: {},
+      timestamp: new Date().toISOString(),
       ...overrides1
     },
     [`id_efg${counter}`]: {
@@ -41,6 +42,7 @@ function mockCartDetails(overrides1, overrides2) {
       formattedValue: '$10.00',
       price_data: {},
       product_data: {},
+      timestamp: new Date().toISOString(),
       ...overrides2
     }
   }
