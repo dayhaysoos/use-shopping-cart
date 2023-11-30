@@ -8,8 +8,8 @@
     "dev:nextjs-app-router": "pnpm run bundle && pnpm --filter nextjs-app-router run dev",
     "dev:typescript-cra": "pnpm run bundle && pnpm --filter typescript-usage run start",
     "dev:docs": "pnpm run bundle && pnpm --filter docs run start",
-    "test": "pnpm --filter use-shopping-cart run test",
-    "test:watch": "pnpm --filter use-shopping-cart run test:watch",
+    "test": "pnpm --filter use-shopping-cart build && pnpm --filter use-shopping-cart run test",
+    "test:watch": "pnpm --filter use-shopping-cart build && pnpm --filter use-shopping-cart run test:watch",
     "build": "pnpm --filter docs run build",
     "bundle": "pnpm --filter use-shopping-cart run build",
     "publish": "pnpm --filter use-shopping-cart publish"
