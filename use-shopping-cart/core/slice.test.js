@@ -14,6 +14,7 @@ function mockProduct(overrides) {
 }
 
 function mockCartDetails(overrides1, overrides2) {
+  const timestamp = new Date().toISOString()
   return {
     [`id_abc${counter}`]: {
       id: `id_abc${counter++}`,
@@ -27,7 +28,7 @@ function mockCartDetails(overrides1, overrides2) {
       formattedValue: '$8.00',
       price_data: {},
       product_data: {},
-      timestamp: new Date().toISOString(),
+      timestamp,
       ...overrides1
     },
     [`id_efg${counter}`]: {
@@ -42,7 +43,7 @@ function mockCartDetails(overrides1, overrides2) {
       formattedValue: '$10.00',
       price_data: {},
       product_data: {},
-      timestamp: new Date().toISOString(),
+      timestamp,
       ...overrides2
     }
   }
@@ -233,11 +234,7 @@ describe('removeItem', () => {
 describe('loadCart', () => {
   it('properly merges a new cartDetails into the current cartDetails', () => {
     const cart1 = mockCart()
-    const cart2 = mockCart(
-      undefined,
-      { name: 'Carrots' },
-      { name: 'Broccoli', timestamp: new Date().toISOString() }
-    )
+    const cart2 = mockCart(undefined, { name: 'Carrots' }, { name: 'Broccoli' })
 
     const result = reducer(cart1, actions.loadCart(cart2.cartDetails))
 
