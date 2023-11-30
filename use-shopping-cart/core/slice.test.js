@@ -286,7 +286,6 @@ describe('storeLastClicked', () => {
     expect(result.lastClicked).toEqual(product.id)
   })
 })
-
 describe('checkoutSingleItem', () => {
   it('should return lineItems when given string', () => {
     const product = mockProduct()
