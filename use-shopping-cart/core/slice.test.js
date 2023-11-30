@@ -233,7 +233,11 @@ describe('removeItem', () => {
 describe('loadCart', () => {
   it('properly merges a new cartDetails into the current cartDetails', () => {
     const cart1 = mockCart()
-    const cart2 = mockCart(undefined, { name: 'Carrots' }, { name: 'Broccoli' })
+    const cart2 = mockCart(
+      undefined,
+      { name: 'Carrots' },
+      { name: 'Broccoli', timestamp: new Date().toISOString() }
+    )
 
     const result = reducer(cart1, actions.loadCart(cart2.cartDetails))
 

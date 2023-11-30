@@ -81,7 +81,7 @@ export function createEntry({
     quantity: count,
     price_metadata,
     product_metadata,
-    timeStamp: formatISO(new Date())
+    timestamp: formatISO(new Date())
   })
 
   state.cartDetails[id] = entry
