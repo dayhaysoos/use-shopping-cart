@@ -1,5 +1,9 @@
 import { reducer, initialState, actions } from './slice'
 
+function getCurrentTimestamp() {
+  return new Date().toISOString()
+}
+
 let counter = 0
 function mockProduct(overrides) {
   return {
@@ -14,7 +18,7 @@ function mockProduct(overrides) {
 }
 
 function mockCartDetails(overrides1, overrides2) {
-  const timestamp = new Date().toISOString()
+  const timestamp = getCurrentTimestamp()
   return {
     [`id_abc${counter}`]: {
       id: `id_abc${counter++}`,
