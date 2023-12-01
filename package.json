@@ -17,7 +17,7 @@
   "dependencies": {
     "cross-env": "^7.0.3",
     "open-cli": "^6.0.1",
-    "prettier": "^2.8.4"
+    "prettier": "^2.8.8"
   },
   "husky": {
     "hooks": {
@@ -28,8 +28,8 @@
     "*.{js,jsx,.d.ts,ts,tsx,mdx}": "prettier --write"
   },
   "devDependencies": {
-    "all-contributors-cli": "^6.24.0",
-    "eslint": "^8.51.0",
+    "all-contributors-cli": "^6.26.1",
+    "eslint": "^8.54.0",
     "husky": "^8.0.3",
     "lint-staged": "^10.5.4",
     "typescript": "^4.9.5",
