@@ -2,7 +2,7 @@
   "name": "use-shopping-cart-umd",
   "version": "1.0.0",
   "devDependencies": {
-    "koa": "^2.13.0",
+    "koa": "^2.14.2",
     "serve": "^11.3.2",
     "stream-replace": "^1.0.0"
   },
@@ -12,7 +12,7 @@
   },
   "dependencies": {
     "clipboardy": "^2.3.0",
-    "dotenv": "^8.2.0",
-    "use-shopping-cart": "workspace:^3.1.4"
+    "dotenv": "^8.6.0",
+    "use-shopping-cart": "workspace:3.2.0-alpha.1"
   }
 }

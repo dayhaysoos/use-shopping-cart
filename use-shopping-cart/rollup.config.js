@@ -143,7 +143,8 @@ export default [
           '@reduxjs/toolkit': 'RTK',
           'redux-persist': 'ReduxPersist',
           uuid: 'uuid',
-          '@stripe/stripe-js': '@stripe/stripe-js'
+          '@stripe/stripe-js': '@stripe/stripe-js',
+          'date-fns': 'dateFns'
         }
       }
     ]
@@ -180,7 +181,8 @@ export default [
           '@reduxjs/toolkit': 'RTK',
           'redux-persist': 'ReduxPersist',
           uuid: 'uuid',
-          '@stripe/stripe-js': '@stripe/stripe-js'
+          '@stripe/stripe-js': '@stripe/stripe-js',
+          'date-fns': 'dateFns'
         }
       }
     ]

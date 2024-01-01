@@ -116,6 +116,10 @@ interface CartEntryAttributes extends ProductAttributes {
    * Currency formatted version of `value`
    */
   readonly formattedValue: string
+  /**
+   * Timestamp of when entry was added to cart
+   */
+  readonly timestamp: string
 }
 export type CartEntry = { id: string } & CartEntryAttributes
 

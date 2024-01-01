@@ -19,7 +19,7 @@
     "react": "^17.0.2",
     "react-dom": "^17.0.2",
     "react-helmet": "^5.2.1",
-    "use-shopping-cart": "workspace:^3.1.4"
+    "use-shopping-cart": "3.2.0-alpha.1"
   },
   "keywords": [
     "gatsby"
