@@ -236,15 +236,21 @@ describe('removeItem', () => {
 })
 
 describe('loadCart', () => {
-  it('properly merges a new cartDetails into the current cartDetails', () => {
+  it('properly merges a new cartDetails into the current cartDetails excluding timestamp', () => {
     const cart1 = mockCart()
     const cart2 = mockCart(undefined, { name: 'Carrots' }, { name: 'Broccoli' })
+
+    // Destructure to exclude the timestamp from both cartDetails
+    const { timestamp: timestamp1, ...cart1DetailsWithoutTimestamp } =
+      cart1.cartDetails
+    const { timestamp: timestamp2, ...cart2DetailsWithoutTimestamp } =
+      cart2.cartDetails
 
     const result = reducer(cart1, actions.loadCart(cart2.cartDetails))
 
     expect(result.cartDetails).toEqual({
-      ...cart1.cartDetails,
-      ...cart2.cartDetails
+      ...cart1DetailsWithoutTimestamp,
+      ...cart2DetailsWithoutTimestamp
     })
     expect(result.totalPrice).toBe(3600)
     expect(result.cartCount).toBe(12)
