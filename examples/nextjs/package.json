@@ -13,7 +13,7 @@
     "next": "13.1.6",
     "react": "18.2.0",
     "react-dom": "18.2.0",
-    "use-shopping-cart": "workspace:3.2.0-alpha.1"
+    "use-shopping-cart": "workspace:*"
   },
   "devDependencies": {
     "autoprefixer": "^10.4.16",

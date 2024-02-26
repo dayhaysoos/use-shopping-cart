@@ -15,7 +15,7 @@
     "react-dom": "^17.0.2",
     "react-scripts": "4.0.3",
     "typescript": "^4.9.5",
-    "use-shopping-cart": "workspace:3.2.0-alpha.1",
+    "use-shopping-cart": "workspace:*",
     "web-vitals": "^1.1.2"
   },
   "scripts": {

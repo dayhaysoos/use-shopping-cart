@@ -65,8 +65,8 @@ importers:
         specifier: ^17.0.2
         version: 17.0.2(react@17.0.2)
       use-shopping-cart:
-        specifier: 3.1.0
-        version: 3.1.0(react-dom@17.0.2)(react@17.0.2)(redux@4.2.1)
+        specifier: 3.2.0
+        version: link:../use-shopping-cart
 
   examples/nextjs:
     dependencies:
@@ -83,7 +83,7 @@ importers:
         specifier: 18.2.0
         version: 18.2.0(react@18.2.0)
       use-shopping-cart:
-        specifier: workspace:3.2.0-alpha.1
+        specifier: workspace:*
         version: link:../../use-shopping-cart
     devDependencies:
       autoprefixer:
@@ -132,7 +132,7 @@ importers:
         specifier: 3.3.2
         version: 3.3.2
       use-shopping-cart:
-        specifier: workspace:3.2.0-alpha.1
+        specifier: workspace:*
         version: link:../../use-shopping-cart
 
   examples/typescript-usage:
@@ -174,7 +174,7 @@ importers:
         specifier: ^4.9.5
         version: 4.9.5
       use-shopping-cart:
-        specifier: workspace:3.2.0-alpha.1
+        specifier: workspace:*
         version: link:../../use-shopping-cart
       web-vitals:
         specifier: ^1.1.2
@@ -205,7 +205,7 @@ importers:
         specifier: ^8.6.0
         version: 8.6.0
       use-shopping-cart:
-        specifier: workspace:3.2.0-alpha.1
+        specifier: workspace:*
         version: link:../../use-shopping-cart
     devDependencies:
       koa:
@@ -230,7 +230,7 @@ importers:
         specifier: ^0.15.7
         version: 0.15.7(@emotion/react@11.11.1)(react@18.2.0)
       use-shopping-cart:
-        specifier: workspace:3.2.0-alpha.1
+        specifier: workspace:*
         version: link:../../use-shopping-cart
     devDependencies:
       '@types/react':
@@ -16624,7 +16624,7 @@ packages:
     resolution: {integrity: sha512-ITVnHhj3Jd/QkqQcTqZfRgjfyRhDFM/auzgVo2RKvSwi18YMvh0WvXDJFoFED6c7jd/5jxtu4kSOb9PTu2cPVg==}
     engines: {node: '>=10'}
     peerDependencies:
-      jest: ^26.0.0
+      jest: 26.6.0
     dependencies:
       ansi-escapes: 4.3.2
       chalk: 4.1.2
@@ -24553,25 +24553,6 @@ packages:
     dependencies:
       react: 17.0.2
       use-isomorphic-layout-effect: 1.1.2(react@17.0.2)
-    dev: false
-
-  /use-shopping-cart@3.1.0(react-dom@17.0.2)(react@17.0.2)(redux@4.2.1):
-    resolution: {integrity: sha512-vQ1+f5BZO1Dfgr7YAtti01jgtDzynLLQblYXVJl135htGLO7zSouheUWxwpNrAodpG6I+fm2X6BXAI716olhlg==}
-    engines: {node: '>=8', npm: '>=5'}
-    peerDependencies:
-      react: '>=16.8.0'
-    dependencies:
-      '@reduxjs/toolkit': 1.9.7(react-redux@7.2.9)(react@17.0.2)
-      '@stripe/stripe-js': 1.54.2
-      react: 17.0.2
-      react-redux: 7.2.9(react-dom@17.0.2)(react@17.0.2)
-      redux-persist: 6.0.0(react@17.0.2)(redux@4.2.1)
-      typescript: 4.9.5
-      uuid: 8.3.2
-    transitivePeerDependencies:
-      - react-dom
-      - react-native
-      - redux
     dev: false
 
   /use-sync-external-store@1.2.0(react@17.0.2):
