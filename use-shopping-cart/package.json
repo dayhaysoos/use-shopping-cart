@@ -115,6 +115,7 @@
   "dependencies": {
     "@reduxjs/toolkit": "^1.9.7",
     "@stripe/stripe-js": "^1.54.2",
+    "@types/jest": "^26.0.24",
     "date-fns": "^2.30.0",
     "react-dom": "^17.0.2",
     "react-redux": "^7.2.9",
@@ -123,4 +124,3 @@
     "uuid": "^8.3.2"
   }
 }
-

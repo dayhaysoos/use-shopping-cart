@@ -1,8 +1,12 @@
-import { act, renderHook } from '@testing-library/react-hooks'
-
 import '@testing-library/jest-dom/extend-expect'
-import { useShoppingCart } from '../index'
+
+import * as React from 'react'
+
+import { act, renderHook } from '@testing-library/react-hooks'
+import { render, waitFor } from '@testing-library/react'
 import { createWrapper, expectedInitialCartState } from './testHelpers'
+
+import { useShoppingCart } from '../index'
 import { PropertyValueError } from '../../core/middleware/helpers'
 
 let counter = 0
@@ -49,6 +53,11 @@ const stripeMock = {
   registerAppInfo: jest.fn()
 }
 
+/**
+ * @typedef {Object} CartResult
+ * @property {import('../../core').CartState | import('../index').CartActions} current
+ **/
+/** @type {CartResult} */
 let cart
 
 function reload(overrides) {
@@ -443,6 +452,39 @@ describe('useShoppingCart()', () => {
       })
       expect(cart.current.lastClicked).toBe(product.id)
     })
+  })
+})
+
+describe('clearCart()', () => {
+  beforeEach(() => {
+    // localStorage.clear()
+  })
+
+  it('should clear the cart in CSR', async () => {
+    localStorage.setItem(
+      'persist:root',
+      `{"cartCount":"10","totalPrice":"4000","formattedTotalPrice":"\\"$40.00\\"","cartDetails":"{\\"id_GBJ2Ep8246qeeT\\":{\\"name\\":\\"Bananas\\",\\"id\\":\\"id_GBJ2Ep8246qeeT\\",\\"price\\":400,\\"image\\":\\"https://images.unsplash.com/photo-1574226516831-e1dff420e562?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=1050&q=80\\",\\"currency\\":\\"USD\\",\\"quantity\\":10,\\"value\\":4000,\\"price_data\\":{},\\"product_data\\":{},\\"formattedValue\\":\\"$40.00\\",\\"formattedPrice\\":\\"$4.00\\"}}","_persist":"{\\"version\\":1,\\"rehydrated\\":true}"}`
+    )
+    const result = React.createRef()
+
+    function ClearCartCSR() {
+      const cart = useShoppingCart()
+      React.useEffect(() => {
+        cart.clearCart()
+      }, [])
+
+      result.current = cart
+      return null
+    }
+    render(<ClearCartCSR />, { wrapper: createWrapper() })
+
+    // Total starts as zero before cart loads from storage. Cart gets cleared before cart can load and persists the empty cart, so total stays zero.
+    expect(result.current.totalPrice).toBe(0)
+    await expect(
+      waitFor(() => expect(result.current.totalPrice).not.toBe(0), {
+        timeout: 200
+      })
+    ).rejects.toThrow()
   })
 })
 
