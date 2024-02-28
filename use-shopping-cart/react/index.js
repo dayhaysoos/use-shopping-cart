@@ -31,7 +31,7 @@ export function CartProvider({ loading = null, children, ...props }) {
 
     return (
       <Provider context={CartContext} store={store}>
-        <PersistGate persistor={persistor}>{() => children}</PersistGate>
+        <PersistGate persistor={persistor}>{children}</PersistGate>
       </Provider>
     )
   } else {
