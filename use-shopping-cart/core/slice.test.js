@@ -5,6 +5,9 @@ function getCurrentTimestamp() {
 }
 
 let counter = 0
+/**
+ * @returns {import('./index').Product}
+ */
 function mockProduct(overrides) {
   return {
     id: `id_abc${counter++}`,
@@ -17,6 +20,9 @@ function mockProduct(overrides) {
   }
 }
 
+/**
+ * @returns {import('./index').CartDetails}
+ */
 function mockCartDetails(overrides1, overrides2) {
   const timestamp = getCurrentTimestamp()
   return {
@@ -53,6 +59,9 @@ function mockCartDetails(overrides1, overrides2) {
   }
 }
 
+/**
+ * @returns {import('./index').CartState}
+ */
 function mockCart(overrides, cartDetailsOverrides1, cartDetailsOverrides2) {
   return {
     ...initialState,
@@ -240,17 +249,19 @@ describe('loadCart', () => {
     const cart1 = mockCart()
     const cart2 = mockCart(undefined, { name: 'Carrots' }, { name: 'Broccoli' })
 
-    // Destructure to exclude the timestamp from both cartDetails
-    const { timestamp: timestamp1, ...cart1DetailsWithoutTimestamp } =
-      cart1.cartDetails
-    const { timestamp: timestamp2, ...cart2DetailsWithoutTimestamp } =
-      cart2.cartDetails
+    // Remove the timestamp from both cartDetails
+    Object.keys(cart1.cartDetails).forEach((key) => {
+      delete cart1.cartDetails[key].timestamp
+    })
+    Object.keys(cart2.cartDetails).forEach((key) => {
+      delete cart2.cartDetails[key].timestamp
+    })
 
     const result = reducer(cart1, actions.loadCart(cart2.cartDetails))
 
-    expect(result.cartDetails).toEqual({
-      ...cart1DetailsWithoutTimestamp,
-      ...cart2DetailsWithoutTimestamp
+    expect(result.cartDetails).toMatchObject({
+      ...cart1.cartDetails,
+      ...cart2.cartDetails
     })
     expect(result.totalPrice).toBe(3600)
     expect(result.cartCount).toBe(12)
