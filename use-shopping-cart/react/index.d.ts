@@ -2,6 +2,12 @@ import { CartDetails, CartState, Config, Product } from '../core'
 import * as React from 'react'
 
 export { actions, filterCart, formatCurrencyString } from '../core/index.d'
+export {
+  useOptimisticCart,
+  type UseOptimisticCartReturn,
+  type OptimisticCartState,
+  type OptimisticCartActions
+} from './useOptimisticCart'
 
 type ProviderProps = Config & {
   children: React.ReactNode

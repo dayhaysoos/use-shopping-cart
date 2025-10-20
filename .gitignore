@@ -57,3 +57,6 @@ coverage
 # Build file for UMD
 examples/umd/src/use-shopping-cart.umd.js
 use-shopping-cart/use-shopping-cart-v*.tgz
+
+# Development notes and planning docs
+notes/
