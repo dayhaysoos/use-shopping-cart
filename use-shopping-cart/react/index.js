@@ -24,7 +24,12 @@ export function CartProvider({ loading = null, children, ...props }) {
     setIsClient(true)
   }, [])
 
-  const store = React.useMemo(() => createShoppingCartStore(props), [props])
+  // Create store only once, not on every prop change
+  const storeRef = React.useRef(null)
+  if (!storeRef.current) {
+    storeRef.current = createShoppingCartStore(props)
+  }
+  const store = storeRef.current
 
   if (props.shouldPersist && isClient) {
     const persistor = persistStore(store)

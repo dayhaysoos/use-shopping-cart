@@ -4,8 +4,14 @@
 <!-- ALL-CONTRIBUTORS-BADGE:END -->
 
 [![NPM](https://img.shields.io/npm/v/use-shopping-cart.svg?style=flat-square)](https://www.npmjs.com/package/use-shopping-cart)
+[![React 19](https://img.shields.io/badge/React-19-blue.svg?style=flat-square)](https://react.dev/)
+[![TypeScript](https://img.shields.io/badge/TypeScript-5.3-blue.svg?style=flat-square)](https://www.typescriptlang.org/)
 
 > A React Hook that handles shopping cart state and logic for Stripe.
+
+**⚠️ v4.0.0-alpha requires React 19** - If you're using React 18, please use [v3.x](https://github.com/dayhaysoos/use-shopping-cart/tree/v3.2.0). 
+
+> **Note:** v4.0.0 is under active development. The React 19 upgrade is complete, with Redux removal and TypeScript migration coming soon.
 
 https://useshoppingcart.com
 
@@ -16,9 +22,27 @@ https://useshoppingcart.com
 Click to open gist.
 ](https://gist.github.com/andria-dev/f4d395b104a06e8df44e009440247856)
 
+## Installation
+
+```bash
+npm install use-shopping-cart
+# or
+pnpm add use-shopping-cart
+# or
+yarn add use-shopping-cart
+```
+
+**Requirements:**
+- React 19.0.0 or higher
+- Node.js 18 or higher
+
 ## Documentation
 
 [View our comprehensive documentation website.](https://useshoppingcart.com) ✨📚
+
+## Migration Guide
+
+Upgrading from v3.x? Check out our [Migration Guide](./MIGRATION.md) for step-by-step instructions.
 
 ## Frequently Asked Questions
 
