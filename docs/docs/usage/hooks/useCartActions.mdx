@@ -1,0 +1,349 @@
+---
+title: useCartActions()
+sidebar_position: 3
+---
+
+# useCartActions()
+
+**New in v4.0.0** - Form-based cart actions using React 19's `useActionState` for progressive enhancement and better error handling.
+
+## Overview
+
+`useCartActions()` provides form-friendly cart operations that work with HTML forms and support progressive enhancement. Unlike `useShoppingCart()` which uses imperative methods (onClick), this hook returns actions designed for the `action` attribute of forms.
+
+## When to Use
+
+**Use `useCartActions()` when:**
+
+- Building forms for cart operations
+- You want progressive enhancement (works without JS)
+- You need built-in loading states
+- Working with Next.js App Router server actions
+
+**Use `useShoppingCart()` or `useOptimisticCart()` when:**
+
+- Using onClick handlers
+- Simple button interactions
+- Programmatic cart updates
+- You don't need form-based interactions
+
+## Requirements
+
+- React 19.0.0 or higher
+- use-shopping-cart v4.0.0 or higher
+
+## Basic Usage
+
+```jsx
+import { useCartActions } from 'use-shopping-cart'
+
+function ProductCard({ product }) {
+  const { addToCartAction, isAddingItem } = useCartActions()
+
+  return (
+    <form action={addToCartAction}>
+      <input type="hidden" name="product" value={JSON.stringify(product)} />
+      <button disabled={isAddingItem}>
+        {isAddingItem ? 'Adding...' : 'Add to Cart'}
+      </button>
+    </form>
+  )
+}
+```
+
+## API
+
+### Returned Values
+
+#### Add Item
+
+- **`addToCartAction`**: Form action for adding items
+- **`addItemState`**: `{ status, error, productId }`
+- **`isAddingItem`**: Boolean pending state
+
+**Form fields:**
+
+- `product` (required): JSON string of product object
+- `count` (optional): Number of items to add (default: 1)
+
+```jsx
+<form action={addToCartAction}>
+  <input type="hidden" name="product" value={JSON.stringify(product)} />
+  <input type="number" name="count" defaultValue="1" />
+  <button>Add to Cart</button>
+</form>
+```
+
+#### Remove Item
+
+- **`removeFromCartAction`**: Form action for removing items
+- **`removeItemState`**: `{ status, error, itemId }`
+- **`isRemovingItem`**: Boolean pending state
+
+**Form fields:**
+
+- `itemId` (required): ID of the item to remove
+
+```jsx
+<form action={removeFromCartAction}>
+  <input type="hidden" name="itemId" value={item.id} />
+  <button>Remove</button>
+</form>
+```
+
+#### Update Quantity
+
+- **`updateQuantityAction`**: Form action for setting quantity
+- **`updateQuantityState`**: `{ status, error, itemId, quantity }`
+- **`isUpdatingQuantity`**: Boolean pending state
+
+**Form fields:**
+
+- `itemId` (required): ID of the item
+- `quantity` (required): New quantity
+
+```jsx
+<form action={updateQuantityAction}>
+  <input type="hidden" name="itemId" value={item.id} />
+  <input type="number" name="quantity" defaultValue={item.quantity} />
+  <button>Update</button>
+</form>
+```
+
+#### Increment Item
+
+- **`incrementItemAction`**: Form action for incrementing
+- **`incrementItemState`**: `{ status, error, itemId }`
+- **`isIncrementingItem`**: Boolean pending state
+
+**Form fields:**
+
+- `itemId` (required): ID of the item
+- `count` (optional): Amount to increment (default: 1)
+
+#### Decrement Item
+
+- **`decrementItemAction`**: Form action for decrementing
+- **`decrementItemState`**: `{ status, error, itemId }`
+- **`isDecrementingItem`**: Boolean pending state
+
+**Form fields:**
+
+- `itemId` (required): ID of the item
+- `count` (optional): Amount to decrement (default: 1)
+
+#### Clear Cart
+
+- **`clearCartAction`**: Form action for clearing cart
+- **`clearCartState`**: `{ status, error }`
+- **`isClearingCart`**: Boolean pending state
+
+#### Global State
+
+- **`isPending`**: `true` if ANY action is in progress
+
+## Examples
+
+### Product Card with Form
+
+```jsx
+function ProductCard({ product }) {
+  const { addToCartAction, addItemState, isAddingItem } = useCartActions()
+
+  return (
+    <div className="product">
+      <h3>{product.name}</h3>
+      <p>${product.price / 100}</p>
+
+      <form action={addToCartAction}>
+        <input type="hidden" name="product" value={JSON.stringify(product)} />
+
+        <label>
+          Quantity:
+          <input type="number" name="count" min="1" defaultValue="1" />
+        </label>
+
+        <button disabled={isAddingItem}>
+          {isAddingItem ? 'Adding...' : 'Add to Cart'}
+        </button>
+
+        {addItemState.status === 'success' && (
+          <p className="success">✓ Added to cart!</p>
+        )}
+
+        {addItemState.error && <p className="error">{addItemState.error}</p>}
+      </form>
+    </div>
+  )
+}
+```
+
+### Quantity Controls
+
+```jsx
+function CartItem({ item }) {
+  const {
+    incrementItemAction,
+    decrementItemAction,
+    removeFromCartAction,
+    isPending
+  } = useCartActions()
+
+  return (
+    <div className="cart-item">
+      <h4>{item.name}</h4>
+
+      <div className="quantity-controls">
+        <form action={decrementItemAction}>
+          <input type="hidden" name="itemId" value={item.id} />
+          <button disabled={isPending}>-</button>
+        </form>
+
+        <span>{item.quantity}</span>
+
+        <form action={incrementItemAction}>
+          <input type="hidden" name="itemId" value={item.id} />
+          <button disabled={isPending}>+</button>
+        </form>
+      </div>
+
+      <form action={removeFromCartAction}>
+        <input type="hidden" name="itemId" value={item.id} />
+        <button disabled={isPending}>Remove</button>
+      </form>
+    </div>
+  )
+}
+```
+
+### Progressive Enhancement Example
+
+This form works even without JavaScript loaded!
+
+```jsx
+function ProductCard({ product }) {
+  const { addToCartAction, isAddingItem } = useCartActions()
+
+  return (
+    <form action={addToCartAction}>
+      <input type="hidden" name="product" value={JSON.stringify(product)} />
+
+      {/* Works without JS! */}
+      <button type="submit" disabled={isAddingItem}>
+        {isAddingItem ? 'Adding...' : 'Add to Cart'}
+      </button>
+    </form>
+  )
+}
+```
+
+## Comparison: Actions vs Methods
+
+### onClick Handler (use `useShoppingCart` or `useOptimisticCart`)
+
+```jsx
+function ProductCard({ product }) {
+  const { addItem } = useShoppingCart()
+
+  return <button onClick={() => addItem(product)}>Add to Cart</button>
+}
+```
+
+**Best for:**
+
+- Simple button clicks
+- Programmatic updates
+- Imperative code
+- Quick implementations
+
+### Form Action (use `useCartActions`)
+
+```jsx
+function ProductCard({ product }) {
+  const { addToCartAction, isAddingItem } = useCartActions()
+
+  return (
+    <form action={addToCartAction}>
+      <input type="hidden" name="product" value={JSON.stringify(product)} />
+      <button disabled={isAddingItem}>
+        {isAddingItem ? 'Adding...' : 'Add to Cart'}
+      </button>
+    </form>
+  )
+}
+```
+
+**Best for:**
+
+- Progressive enhancement
+- Next.js App Router
+- Accessibility
+- SEO-friendly interactions
+- Works without JavaScript
+
+## Error Handling
+
+All actions return state with error handling:
+
+```jsx
+function ProductCard({ product }) {
+  const { addToCartAction, addItemState, isAddingItem } = useCartActions()
+
+  return (
+    <form action={addToCartAction}>
+      <input type="hidden" name="product" value={JSON.stringify(product)} />
+
+      <button disabled={isAddingItem}>
+        {isAddingItem ? 'Adding...' : 'Add to Cart'}
+      </button>
+
+      {/* Error display */}
+      {addItemState.status === 'error' && (
+        <div className="error-message">
+          <strong>Error:</strong> {addItemState.error}
+        </div>
+      )}
+
+      {/* Success feedback */}
+      {addItemState.status === 'success' && (
+        <div className="success-message">Item added successfully!</div>
+      )}
+    </form>
+  )
+}
+```
+
+## TypeScript
+
+```typescript
+import { useCartActions } from 'use-shopping-cart'
+import type { Product } from 'use-shopping-cart/core'
+
+function ProductCard({ product }: { product: Product }) {
+  const { addToCartAction, addItemState, isAddingItem } = useCartActions()
+
+  return (
+    <form action={addToCartAction}>
+      <input type="hidden" name="product" value={JSON.stringify(product)} />
+      <button disabled={isAddingItem}>
+        {isAddingItem ? 'Adding...' : 'Add to Cart'}
+      </button>
+    </form>
+  )
+}
+```
+
+## Benefits
+
+✅ **Progressive Enhancement** - Works without JavaScript  
+✅ **Built-in Loading States** - No manual state management  
+✅ **Error Handling** - Automatic error capture and display  
+✅ **Accessibility** - Better keyboard and screen reader support  
+✅ **SEO Friendly** - Forms work before JS loads  
+✅ **Next.js Ready** - Integrates with App Router patterns
+
+## See Also
+
+- [useShoppingCart()](/docs/usage/hooks/useShoppingCart) - Imperative cart methods
+- [useOptimisticCart()](/docs/usage/hooks/useOptimisticCart) - Optimistic updates
+- [React 19 useActionState](https://react.dev/reference/react/useActionState) - Official docs

@@ -21,6 +21,12 @@ module.exports = {
       items: [
         {
           type: 'category',
+          label: 'Hooks',
+          collapsed: false,
+          items: ['usage/hooks/useOptimisticCart', 'usage/hooks/useCartActions']
+        },
+        {
+          type: 'category',
           label: 'Components',
           collapsed: false,
           items: [

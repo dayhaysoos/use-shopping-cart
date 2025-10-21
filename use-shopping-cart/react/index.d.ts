@@ -8,6 +8,7 @@ export {
   type OptimisticCartState,
   type OptimisticCartActions
 } from './useOptimisticCart'
+export { useCartActions } from './useCartActions.d'
 
 type ProviderProps = Config & {
   children: React.ReactNode

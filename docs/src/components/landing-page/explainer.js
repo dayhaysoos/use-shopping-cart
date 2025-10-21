@@ -1,5 +1,5 @@
 import React from 'react'
-import Highlight, { defaultProps } from 'prism-react-renderer'
+import { Highlight, themes } from 'prism-react-renderer'
 import styles from './explainer.module.css'
 
 const Explainer = ({ title, description, code }) => {
@@ -9,13 +9,13 @@ const Explainer = ({ title, description, code }) => {
         <h2>{title}</h2>
         <p>{description}</p>
       </div>
-      <Highlight {...defaultProps} code={code} language="jsx">
+      <Highlight theme={themes.github} code={code} language="jsx">
         {({ className, style, tokens, getLineProps, getTokenProps }) => (
           <pre className={className} style={style}>
             {tokens.map((line, i) => (
-              <div {...getLineProps({ line, key: i })}>
+              <div key={i} {...getLineProps({ line })}>
                 {line.map((token, key) => (
-                  <span {...getTokenProps({ token, key })} />
+                  <span key={key} {...getTokenProps({ token })} />
                 ))}
               </div>
             ))}

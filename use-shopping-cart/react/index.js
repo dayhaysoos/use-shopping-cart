@@ -14,6 +14,7 @@ import { persistStore } from 'redux-persist'
 
 export { actions, filterCart, formatCurrencyString }
 export { useOptimisticCart } from './useOptimisticCart'
+export { useCartActions } from './useCartActions'
 export const CartContext = React.createContext(initialState)
 export const useSelector = createSelectorHook(CartContext)
 export const useDispatch = createDispatchHook(CartContext)
