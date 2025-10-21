@@ -2,74 +2,6 @@
 
 import { useOptimistic, startTransition } from 'react'
 import { useShoppingCart } from './index'
-import type { CartDetails, CartEntry, Product } from '../core'
-
-/**
- * Extended cart entry type with optimistic update indicator
- */
-interface OptimisticCartEntry extends CartEntry {
-  _optimistic?: boolean
-}
-
-/**
- * Optimistic cart details with extended entries
- */
-type OptimisticCartDetails = {
-  [id: string]: OptimisticCartEntry
-}
-
-/**
- * Actions for optimistic cart updates
- */
-type OptimisticAction =
-  | {
-      type: 'ADD_ITEM'
-      product: Product
-      options: {
-        count?: number
-        price_metadata?: Record<string, any>
-        product_metadata?: Record<string, any>
-      }
-    }
-  | { type: 'REMOVE_ITEM'; id: string }
-  | { type: 'INCREMENT_ITEM'; id: string; count: number }
-  | { type: 'DECREMENT_ITEM'; id: string; count: number }
-  | { type: 'SET_QUANTITY'; id: string; quantity: number }
-  | { type: 'CLEAR_CART' }
-
-/**
- * Extended cart state with optimistic indicator
- */
-export interface OptimisticCartState {
-  /**
-   * True when cart is showing optimistic updates that haven't
-   * been confirmed by the underlying store yet
-   */
-  isOptimistic: boolean
-  cartDetails: OptimisticCartDetails
-  cartCount: number
-  totalPrice: number
-  formattedTotalPrice: string
-}
-
-/**
- * Optimistic cart actions
- */
-export interface OptimisticCartActions {
-  addItem: (
-    product: Product,
-    options?: {
-      count?: number
-      price_metadata?: Record<string, any>
-      product_metadata?: Record<string, any>
-    }
-  ) => void
-  removeItem: (id: string) => void
-  incrementItem: (id: string, options?: { count?: number }) => void
-  decrementItem: (id: string, options?: { count?: number }) => void
-  setItemQuantity: (id: string, quantity: number) => void
-  clearCart: () => void
-}
 
 /**
  * Optimistic version of useShoppingCart that provides instant UI feedback
@@ -96,20 +28,14 @@ export function useOptimisticCart() {
   const cart = useShoppingCart()
 
   // Create optimistic version of cartDetails
-  const [optimisticCartDetails, updateOptimisticCart] = useOptimistic<
-    OptimisticCartDetails,
-    OptimisticAction
-  >(
-    cart.cartDetails as OptimisticCartDetails,
-    (state, action): OptimisticCartDetails => {
+  const [optimisticCartDetails, updateOptimisticCart] = useOptimistic(
+    cart.cartDetails,
+    (state, action) => {
       switch (action.type) {
         case 'ADD_ITEM': {
           const { product, options } = action
           const id =
-            (product as any).id ||
-            (product as any).price_id ||
-            (product as any).sku_id ||
-            (product as any).sku
+            product.id || product.price_id || product.sku_id || product.sku
           const count = options?.count || 1
 
           // Item already exists - increment it
@@ -137,7 +63,7 @@ export function useOptimisticCart() {
               formattedPrice: formatPrice(product.price, cart.currency),
               timestamp: new Date().toISOString(),
               _optimistic: true
-            } as OptimisticCartEntry
+            }
           }
         }
 
@@ -236,7 +162,7 @@ export function useOptimisticCart() {
   )
 
   // Wrap addItem with optimistic update
-  const addItem: OptimisticCartActions['addItem'] = (product, options = {}) => {
+  const addItem = (product, options = {}) => {
     // Update optimistically first (instant)
     updateOptimisticCart({ type: 'ADD_ITEM', product, options })
 
@@ -247,7 +173,7 @@ export function useOptimisticCart() {
   }
 
   // Wrap removeItem
-  const removeItem: OptimisticCartActions['removeItem'] = (id) => {
+  const removeItem = (id) => {
     updateOptimisticCart({ type: 'REMOVE_ITEM', id })
     startTransition(() => {
       cart.removeItem(id)
@@ -255,10 +181,7 @@ export function useOptimisticCart() {
   }
 
   // Wrap incrementItem
-  const incrementItem: OptimisticCartActions['incrementItem'] = (
-    id,
-    options = {}
-  ) => {
+  const incrementItem = (id, options = {}) => {
     updateOptimisticCart({
       type: 'INCREMENT_ITEM',
       id,
@@ -270,10 +193,7 @@ export function useOptimisticCart() {
   }
 
   // Wrap decrementItem
-  const decrementItem: OptimisticCartActions['decrementItem'] = (
-    id,
-    options = {}
-  ) => {
+  const decrementItem = (id, options = {}) => {
     updateOptimisticCart({
       type: 'DECREMENT_ITEM',
       id,
@@ -285,10 +205,7 @@ export function useOptimisticCart() {
   }
 
   // Wrap setItemQuantity
-  const setItemQuantity: OptimisticCartActions['setItemQuantity'] = (
-    id,
-    quantity
-  ) => {
+  const setItemQuantity = (id, quantity) => {
     updateOptimisticCart({ type: 'SET_QUANTITY', id, quantity })
     startTransition(() => {
       cart.setItemQuantity(id, quantity)
@@ -296,7 +213,7 @@ export function useOptimisticCart() {
   }
 
   // Wrap clearCart
-  const clearCart: OptimisticCartActions['clearCart'] = () => {
+  const clearCart = () => {
     updateOptimisticCart({ type: 'CLEAR_CART' })
     startTransition(() => {
       cart.clearCart()
@@ -323,7 +240,7 @@ export function useOptimisticCart() {
 /**
  * Helper to format price (simplified version)
  */
-function formatPrice(value: number, currency: string): string {
+function formatPrice(value, currency) {
   try {
     const numberFormat = new Intl.NumberFormat('en-US', {
       style: 'currency',
@@ -340,8 +257,3 @@ function formatPrice(value: number, currency: string): string {
     return `${currency} ${value}`
   }
 }
-
-/**
- * Return type for useOptimisticCart hook
- */
-export type UseOptimisticCartReturn = ReturnType<typeof useOptimisticCart>
