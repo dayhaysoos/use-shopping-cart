@@ -1,7 +1,7 @@
 import * as React from 'react'
 import { render, screen, findByRole, getByRole } from '@testing-library/react'
-import '@testing-library/jest-dom/extend-expect'
-import { act } from '@testing-library/react-hooks'
+import '@testing-library/jest-dom'
+import { act } from 'react'
 import { DebugCart } from '../index'
 import { createWrapper, expectedInitialCartState } from './testHelpers'
 

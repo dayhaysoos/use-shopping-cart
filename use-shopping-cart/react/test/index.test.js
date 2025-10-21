@@ -1,6 +1,6 @@
-import { act, renderHook } from '@testing-library/react-hooks'
-
-import '@testing-library/jest-dom/extend-expect'
+import { renderHook } from '@testing-library/react'
+import { act } from 'react'
+import '@testing-library/jest-dom'
 import { useShoppingCart } from '../index'
 import { createWrapper, expectedInitialCartState } from './testHelpers'
 import { PropertyValueError } from '../../core/middleware/helpers'

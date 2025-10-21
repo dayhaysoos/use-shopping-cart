@@ -163,59 +163,59 @@ export function useOptimisticCart() {
 
   // Wrap addItem with optimistic update
   const addItem = (product, options = {}) => {
-    // Update optimistically first (instant)
-    updateOptimisticCart({ type: 'ADD_ITEM', product, options })
-
-    // Then perform real update in background
     startTransition(() => {
+      // Update optimistically and perform real update together
+      updateOptimisticCart({ type: 'ADD_ITEM', product, options })
       cart.addItem(product, options)
     })
   }
 
   // Wrap removeItem
   const removeItem = (id) => {
-    updateOptimisticCart({ type: 'REMOVE_ITEM', id })
     startTransition(() => {
+      updateOptimisticCart({ type: 'REMOVE_ITEM', id })
       cart.removeItem(id)
     })
   }
 
   // Wrap incrementItem
   const incrementItem = (id, options = {}) => {
-    updateOptimisticCart({
-      type: 'INCREMENT_ITEM',
-      id,
-      count: options.count || 1
-    })
+    const count = options.count || 1
     startTransition(() => {
-      cart.incrementItem(id, options)
+      updateOptimisticCart({
+        type: 'INCREMENT_ITEM',
+        id,
+        count
+      })
+      cart.incrementItem(id, { ...options, count })
     })
   }
 
   // Wrap decrementItem
   const decrementItem = (id, options = {}) => {
-    updateOptimisticCart({
-      type: 'DECREMENT_ITEM',
-      id,
-      count: options.count || 1
-    })
+    const count = options.count || 1
     startTransition(() => {
-      cart.decrementItem(id, options)
+      updateOptimisticCart({
+        type: 'DECREMENT_ITEM',
+        id,
+        count
+      })
+      cart.decrementItem(id, { ...options, count })
     })
   }
 
   // Wrap setItemQuantity
   const setItemQuantity = (id, quantity) => {
-    updateOptimisticCart({ type: 'SET_QUANTITY', id, quantity })
     startTransition(() => {
+      updateOptimisticCart({ type: 'SET_QUANTITY', id, quantity })
       cart.setItemQuantity(id, quantity)
     })
   }
 
   // Wrap clearCart
   const clearCart = () => {
-    updateOptimisticCart({ type: 'CLEAR_CART' })
     startTransition(() => {
+      updateOptimisticCart({ type: 'CLEAR_CART' })
       cart.clearCart()
     })
   }

@@ -7,7 +7,19 @@ import {
   updateFormattedTotalPrice
 } from './Entry'
 import { isClient } from '../utilities/SSR'
-import { v4 as uuidv4 } from 'uuid'
+
+// Native UUID generation (replaces uuid package)
+function generateUUID() {
+  if (typeof crypto !== 'undefined' && crypto.randomUUID) {
+    return crypto.randomUUID()
+  }
+  // Fallback for older environments
+  return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, (c) => {
+    const r = (Math.random() * 16) | 0
+    const v = c === 'x' ? r : (r & 0x3) | 0x8
+    return v.toString(16)
+  })
+}
 
 export const initialState = {
   cartMode: 'checkout-session',
@@ -37,7 +49,7 @@ const slice = createSlice({
           product.price_id ||
           product.sku_id ||
           product.sku ||
-          uuidv4()
+          generateUUID()
 
         if (id in state.cartDetails) {
           updateEntry({
