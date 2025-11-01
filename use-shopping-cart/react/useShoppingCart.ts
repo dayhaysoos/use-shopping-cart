@@ -22,6 +22,18 @@ export interface UseShoppingCartReturn extends CartState {
   changeCurrency: typeof ShoppingCart.prototype.changeCurrency
   redirectToCheckout: typeof ShoppingCart.prototype.redirectToCheckout
   checkoutSingleItem: typeof ShoppingCart.prototype.checkoutSingleItem
+  // New methods from Stripe API modernization
+  setCustomerEmail: typeof ShoppingCart.prototype.setCustomerEmail
+  toggleAutomaticTax: typeof ShoppingCart.prototype.toggleAutomaticTax
+  setCustomText: typeof ShoppingCart.prototype.setCustomText
+  setCustomFields: typeof ShoppingCart.prototype.setCustomFields
+  setShippingOptions: typeof ShoppingCart.prototype.setShippingOptions
+  setUIMode: typeof ShoppingCart.prototype.setUIMode
+  togglePhoneCollection: typeof ShoppingCart.prototype.togglePhoneCollection
+  togglePromotionCodes: typeof ShoppingCart.prototype.togglePromotionCodes
+  toggleTermsOfService: typeof ShoppingCart.prototype.toggleTermsOfService
+  setCreateSessionEndpoint: typeof ShoppingCart.prototype.setCreateSessionEndpoint
+  initEmbeddedCheckout: typeof ShoppingCart.prototype.initEmbeddedCheckout
 }
 
 export function useShoppingCart(): UseShoppingCartReturn {
@@ -51,7 +63,19 @@ export function useShoppingCart(): UseShoppingCartReturn {
       changeLanguage: cart.changeLanguage.bind(cart),
       changeCurrency: cart.changeCurrency.bind(cart),
       redirectToCheckout: cart.redirectToCheckout.bind(cart),
-      checkoutSingleItem: cart.checkoutSingleItem.bind(cart)
+      checkoutSingleItem: cart.checkoutSingleItem.bind(cart),
+      // New methods from Stripe API modernization
+      setCustomerEmail: cart.setCustomerEmail.bind(cart),
+      toggleAutomaticTax: cart.toggleAutomaticTax.bind(cart),
+      setCustomText: cart.setCustomText.bind(cart),
+      setCustomFields: cart.setCustomFields.bind(cart),
+      setShippingOptions: cart.setShippingOptions.bind(cart),
+      setUIMode: cart.setUIMode.bind(cart),
+      togglePhoneCollection: cart.togglePhoneCollection.bind(cart),
+      togglePromotionCodes: cart.togglePromotionCodes.bind(cart),
+      toggleTermsOfService: cart.toggleTermsOfService.bind(cart),
+      setCreateSessionEndpoint: cart.setCreateSessionEndpoint.bind(cart),
+      initEmbeddedCheckout: cart.initEmbeddedCheckout.bind(cart)
     }),
     [cart]
   )

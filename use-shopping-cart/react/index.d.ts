@@ -1,16 +1,11 @@
-import { CartDetails, CartState, Config, Product } from '../core'
+import type { CartDetails, CartState, CartConfig, Product } from '../core/types'
 import * as React from 'react'
 
-export { actions, filterCart, formatCurrencyString } from '../core/index.d'
-export {
-  useOptimisticCart,
-  type UseOptimisticCartReturn,
-  type OptimisticCartState,
-  type OptimisticCartActions
-} from './useOptimisticCart'
+export { filterCart, formatCurrencyString } from '../core'
+export { useOptimisticCart } from './useOptimisticCart'
 export { useCartActions } from './useCartActions.d'
 
-type ProviderProps = Config & {
+type ProviderProps = CartConfig & {
   children: React.ReactNode
   loading?: React.ReactNode
 }
@@ -125,6 +120,85 @@ export interface CartActions {
    * Given an ISO currency code (e.g. USD), it sets `currency` to that value.
    */
   changeCurrency: (currency: string) => undefined
+
+  /**
+   * Sets the customer email to pre-fill at checkout.
+   */
+  setCustomerEmail: (email: string) => undefined
+
+  /**
+   * Enables or disables automatic tax calculation.
+   */
+  toggleAutomaticTax: (enabled: boolean) => undefined
+
+  /**
+   * Sets custom text to display at checkout.
+   */
+  setCustomText: (customText?: {
+    shippingAddress?: string
+    submit?: string
+    termsOfService?: string
+  }) => undefined
+
+  /**
+   * Sets custom fields to collect at checkout.
+   */
+  setCustomFields: (
+    fields?: Array<{
+      key: string
+      label: string
+      type: 'text' | 'dropdown' | 'numeric'
+      optional?: boolean
+      dropdown?: { options: Array<{ label: string; value: string }> }
+    }>
+  ) => undefined
+
+  /**
+   * Sets shipping options for checkout.
+   */
+  setShippingOptions: (
+    options?: Array<{
+      shippingRateId?: string
+      displayName?: string
+      amount?: number
+      deliveryEstimate?: {
+        minimum: { unit: 'day' | 'week'; value: number }
+        maximum: { unit: 'day' | 'week'; value: number }
+      }
+    }>
+  ) => undefined
+
+  /**
+   * Sets the UI mode for checkout: 'hosted' (default) or 'embedded'.
+   */
+  setUIMode: (mode: 'hosted' | 'embedded') => undefined
+
+  /**
+   * Enables or disables phone number collection at checkout.
+   */
+  togglePhoneCollection: (enabled: boolean) => undefined
+
+  /**
+   * Enables or disables promotion code input at checkout.
+   */
+  togglePromotionCodes: (enabled: boolean) => undefined
+
+  /**
+   * Requires or makes optional terms of service acceptance at checkout.
+   */
+  toggleTermsOfService: (required: boolean) => undefined
+
+  /**
+   * Sets the server endpoint for creating checkout sessions (required for embedded checkout).
+   */
+  setCreateSessionEndpoint: (endpoint: string) => undefined
+
+  /**
+   * Initializes Stripe embedded checkout and mounts it to the specified DOM element.
+   * Requires uiMode to be set to 'embedded' and createSessionEndpoint to be configured.
+   * @param elementSelector CSS selector for the element to mount the checkout UI
+   */
+  initEmbeddedCheckout: (elementSelector: string) => Promise<void>
 }
 
 /**
