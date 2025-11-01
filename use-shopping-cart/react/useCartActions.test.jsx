@@ -1,4 +1,4 @@
-import { describe, test, expect, beforeAll, afterAll } from 'vitest'
+import { describe, test, expect, beforeAll, afterAll, vi } from 'vitest'
 import React from 'react'
 import { renderHook, waitFor } from '@testing-library/react'
 import { act } from 'react'
@@ -292,9 +292,22 @@ describe('useCartActions', () => {
     test('should default count to 1', async () => {
       const { result } = renderHook(() => useCartActions(), { wrapper })
 
+      // First, add an item to the cart
+      const addFormData = new FormData()
+      addFormData.append('product', JSON.stringify(mockProduct))
+
+      await act(async () => {
+        await result.current.addToCartAction(addFormData)
+      })
+
+      await waitFor(() => {
+        expect(result.current.addItemState.status).toBe('success')
+      })
+
+      // Now increment it without providing count (should default to 1)
       const formData = new FormData()
-      formData.append('itemId', 'test_id')
-      // No count provided
+      formData.append('itemId', mockProduct.id)
+      // No count provided - should default to 1
 
       await act(async () => {
         await result.current.incrementItemAction(formData)

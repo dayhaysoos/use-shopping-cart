@@ -1,7 +1,7 @@
 'use client'
 
 import { useOptimistic, startTransition } from 'react'
-import { useShoppingCart } from './index'
+import { useShoppingCart } from './useShoppingCart'
 
 /**
  * Optimistic version of useShoppingCart that provides instant UI feedback

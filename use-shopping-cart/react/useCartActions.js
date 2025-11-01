@@ -1,7 +1,7 @@
 'use client'
 
 import { useActionState } from 'react'
-import { useShoppingCart } from './index'
+import { useShoppingCart } from './useShoppingCart'
 
 /**
  * Form-friendly cart actions using React 19's useActionState.
