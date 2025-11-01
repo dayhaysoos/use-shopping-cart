@@ -86,11 +86,11 @@ function addUseClientDirective() {
 
 const common = {
   react: {
-    input: './react/index.js',
+    input: './react/index.ts',
     external: ['react']
   },
   core: {
-    input: './core/index.js'
+    input: './core/index.ts'
   },
   plugins: [
     clearDist(),
@@ -100,23 +100,20 @@ const common = {
         'process.env.__buildVersion__': JSON.stringify(pkg.version)
       }
     }),
-    // We are using Sucrase to compile our JSX
+    // We are using Sucrase to compile TypeScript and JSX
     sucrase({
       exclude: 'node_modules/**/*',
-      transforms: ['jsx']
+      transforms: ['typescript', 'jsx']
     }),
     copyTypes(), // Copies the types to dist/
     externals({ deps: true }), // automatically externalizes dependencies in package.json
-    resolve(),
+    resolve({ extensions: ['.ts', '.tsx', '.js', '.jsx'] }),
     commonjs(),
     addUseClientDirective()
   ],
-  // fixes an issue with uuid
   get aliases() {
     return alias({
-      entries: {
-        uuid: 'uuid/dist/esm-browser/index.js'
-      }
+      entries: {}
     })
   }
 }
@@ -133,16 +130,11 @@ export default [
       },
       {
         name: 'UseShoppingCart',
-        file: pkg.exports['.'].browser,
+        file: pkg.unpkg,
         format: 'umd',
         sourcemap: true,
         globals: {
           react: 'React',
-          'react-redux': 'react-redux',
-          'redux-persist/integration/react': 'redux-persist/integration/react',
-          '@reduxjs/toolkit': 'RTK',
-          'redux-persist': 'ReduxPersist',
-          uuid: 'uuid',
           '@stripe/stripe-js': '@stripe/stripe-js',
           'date-fns': 'dateFns'
         }
@@ -173,14 +165,11 @@ export default [
       },
       {
         name: 'UseShoppingCartCore',
-        file: pkg.exports['./core'].browser,
+        file: './dist/core.umd.js',
         format: 'umd',
         sourcemap: true,
         globals: {
           react: 'React',
-          '@reduxjs/toolkit': 'RTK',
-          'redux-persist': 'ReduxPersist',
-          uuid: 'uuid',
           '@stripe/stripe-js': '@stripe/stripe-js',
           'date-fns': 'dateFns'
         }

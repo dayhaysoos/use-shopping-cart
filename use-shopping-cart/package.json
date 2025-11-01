@@ -19,23 +19,21 @@
   ],
   "exports": {
     ".": {
-      "require": "./dist/react.js",
-      "node": "./dist/react.js",
+      "types": "./react/index.d.ts",
       "import": "./dist/react.es.js",
-      "browser": "./dist/react.umd.js",
-      "types": "./react/index.d.ts"
+      "require": "./dist/react.js",
+      "default": "./dist/react.es.js"
     },
     "./core": {
-      "require": "./dist/core.js",
-      "node": "./dist/core.js",
+      "types": "./core/index.d.ts",
       "import": "./dist/core.es.js",
-      "browser": "./dist/core.umd.js",
-      "types": "./core/index.d.ts"
+      "require": "./dist/core.js",
+      "default": "./dist/core.es.js"
     },
     "./utilities": {
+      "types": "./utilities/serverless.d.ts",
       "require": "./utilities/serverless.js",
-      "node": "./utilities/serverless.js",
-      "types": "./utilities/serverless.d.ts"
+      "default": "./utilities/serverless.js"
     }
   },
   "engines": {
@@ -43,8 +41,9 @@
     "pnpm": ">=8"
   },
   "scripts": {
-    "test": "jest --runInBand",
-    "test:watch": "jest --watch",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "test:ui": "vitest --ui",
     "test:types": "tsc --noEmit type-tests/* --jsx react-jsx",
     "build": "rollup -c",
     "build:watch": "rollup -c -w",
@@ -78,6 +77,8 @@
     "@babel/plugin-transform-runtime": "^7.23.4",
     "@babel/preset-env": "^7.23.5",
     "@babel/preset-react": "^7.23.3",
+    "@babel/preset-typescript": "^7.27.1",
+    "@eslint/js": "^9.0.0",
     "@rollup/plugin-alias": "^3.1.9",
     "@rollup/plugin-babel": "^5.3.1",
     "@rollup/plugin-commonjs": "^15.1.0",
@@ -87,14 +88,13 @@
     "@rollup/plugin-url": "^5.0.1",
     "@testing-library/jest-dom": "^6.1.5",
     "@testing-library/react": "^14.1.2",
+    "@types/react": "^19.0.0",
+    "@types/react-dom": "^19.0.0",
+    "@vitest/ui": "^4.0.5",
     "babel-eslint": "^10.1.0",
     "cross-env": "^7.0.3",
     "dom-storage": "^2.1.0",
-    "@types/react": "^19.0.0",
-    "@types/react-dom": "^19.0.0",
     "eslint": "^9.0.0",
-    "@eslint/js": "^9.0.0",
-    "globals": "^15.0.0",
     "eslint-config-standard": "^14.1.1",
     "eslint-config-standard-react": "^9.2.0",
     "eslint-plugin-import": "^2.29.0",
@@ -103,28 +103,25 @@
     "eslint-plugin-react": "^7.33.2",
     "eslint-plugin-standard": "^4.1.0",
     "gh-pages": "^2.2.0",
+    "globals": "^15.0.0",
     "jest": "^29.7.0",
     "jest-environment-jsdom": "^29.7.0",
+    "jsdom": "^27.0.1",
     "netlify-cli": "^2.71.0",
     "prettier": "^2.8.8",
     "react": "^19.0.0",
     "react-scripts": "^4.0.3",
     "react-test-renderer": "^19.0.0",
-    "redux-mock-store": "^1.5.4",
     "rollup": "^2.79.1",
     "rollup-plugin-node-externals": "^2.2.0",
     "rollup-plugin-preserve-directives": "^0.1.1",
-    "rollup-plugin-visualizer": "^4.2.2"
+    "rollup-plugin-visualizer": "^4.2.2",
+    "vitest": "^4.0.5"
   },
   "dependencies": {
-    "@reduxjs/toolkit": "^1.9.7",
     "@stripe/stripe-js": "^1.54.2",
     "date-fns": "^2.30.0",
     "react-dom": "^19.0.0",
-    "react-redux": "^7.2.9",
-    "redux-persist": "^6.0.0",
-    "typescript": "^5.3.3",
-    "uuid": "^8.3.2"
+    "typescript": "^5.3.3"
   }
 }
-
