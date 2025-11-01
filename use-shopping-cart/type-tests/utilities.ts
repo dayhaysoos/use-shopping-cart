@@ -28,7 +28,11 @@ const line_items1: ValidatedItem[] = validateCartItems(
       currency: 'USD',
       quantity: 10,
       value: 400,
-      formattedValue: '$40.00'
+      formattedValue: '$40.00',
+      formattedPrice: '$4.00',
+      timestamp: new Date().toISOString(),
+      price_data: {},
+      product_data: {}
     }
   }
 )
@@ -52,7 +56,11 @@ const line_items2: LineItem[] = formatLineItems({
     currency: 'USD',
     quantity: 10,
     value: 4000,
-    formattedValue: '$40.00'
+    formattedValue: '$40.00',
+    formattedPrice: '$4.00',
+    timestamp: new Date().toISOString(),
+    price_data: {},
+    product_data: {}
   }
 })
 line_items2[0].price
@@ -79,7 +87,11 @@ try {
         currency: 'USD',
         quantity: 10,
         value: 200,
-        formattedValue: '$4.00'
+        formattedValue: '$4.00',
+        formattedPrice: '$4.00',
+        timestamp: new Date().toISOString(),
+        price_data: {},
+        product_data: {}
       }
     }
   )

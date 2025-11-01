@@ -590,13 +590,15 @@ export class ShoppingCart {
   // STRIPE METHODS
   // ============================================================================
 
-  async redirectToCheckout(sessionId?: string): Promise<void> {
+  async redirectToCheckout(
+    sessionId?: string
+  ): Promise<{ error: any } | undefined> {
     return stripeRedirect(this._state, sessionId)
   }
 
   async checkoutSingleItem(
     itemOrPriceId: string | { price?: string; sku?: string; quantity?: number }
-  ): Promise<void> {
+  ): Promise<{ error: any } | undefined> {
     return stripeCheckoutSingle(this._state, itemOrPriceId)
   }
 }

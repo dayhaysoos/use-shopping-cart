@@ -1,4 +1,4 @@
-import { Product, CartDetails } from '../core/index'
+import type { Product, CartDetails } from '../core/types'
 
 interface ValidatedItem {
   price_data: {

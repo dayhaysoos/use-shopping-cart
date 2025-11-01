@@ -3,24 +3,15 @@
 /* eslint-disable no-unused-vars */
 /* eslint-disable camelcase */
 import * as React from 'react'
-import { createRoot } from 'react-dom'
+import { createRoot } from 'react-dom/client'
 import { CartProvider, useShoppingCart } from '../react/index'
-
-function UscWithSelector() {
-  const cart = useShoppingCart(({ totalPrice }) => ({ totalPrice }))
-
-  console.log(cart.totalPrice)
-  // Can't access anything outside of totalPrice and the cart actions.
-  // cart.cartCount
-
-  return null
-}
 
 function UscWithoutSelector() {
   const cart = useShoppingCart()
-  cart.totalPrice
-  cart.formattedTotalPrice
+
+  console.log(cart.totalPrice)
   cart.cartCount
+  cart.formattedTotalPrice
   cart.cartDetails
 
   React.useEffect(() => {
@@ -55,7 +46,7 @@ function UscWithoutSelector() {
 }
 
 function UscActions() {
-  const cart = useShoppingCart(() => ({}))
+  const cart = useShoppingCart()
 
   React.useEffect(() => {
     cart.loadCart({
@@ -67,7 +58,11 @@ function UscActions() {
         id: 'some_product',
         quantity: 5,
         value: 750,
-        formattedValue: '$7.50'
+        formattedValue: '$7.50',
+        formattedPrice: '$4.00',
+        timestamp: new Date().toISOString(),
+        price_data: {},
+        product_data: {}
       }
     })
 
@@ -107,7 +102,7 @@ function App() {
   return (
     <>
       <CartProvider cartMode="checkout-session" stripe="KEY" currency="USD">
-        <UscWithSelector />
+        <UscWithoutSelector />
       </CartProvider>
 
       <CartProvider
@@ -139,7 +134,11 @@ function App() {
   )
 }
 
-createRoot(<App />, document.getElementById('root'))
+const rootElement = document.getElementById('root')
+if (rootElement) {
+  const root = createRoot(rootElement)
+  root.render(<App />)
+}
 ;(async () => {
   await new Promise<void>((resolve) => {
     setTimeout(() => {

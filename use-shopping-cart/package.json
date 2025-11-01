@@ -112,7 +112,6 @@
     "react": "^19.0.0",
     "react-scripts": "^4.0.3",
     "react-test-renderer": "^19.0.0",
-    "redux-mock-store": "^1.5.4",
     "rollup": "^2.79.1",
     "rollup-plugin-node-externals": "^2.2.0",
     "rollup-plugin-preserve-directives": "^0.1.1",
