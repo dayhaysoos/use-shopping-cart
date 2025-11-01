@@ -3,6 +3,7 @@
 import * as React from 'react'
 import { ShoppingCart } from '../core/ShoppingCart'
 import type { CartConfig } from '../core/types'
+import { isClient } from '../utilities/SSR'
 
 const CartContext = React.createContext<ShoppingCart | null>(null)
 
@@ -22,13 +23,7 @@ export function CartProvider({
     cartRef.current = new ShoppingCart(config)
   }
 
-  // Server-side rendering guard
-  const [isClient, setIsClient] = React.useState(false)
-
-  React.useEffect(() => {
-    setIsClient(true)
-  }, [])
-
+  // Server-side rendering guard: use global isClient to match ShoppingCart's storage initialization
   if (config.shouldPersist !== false && !isClient) {
     return <>{loading}</>
   }
