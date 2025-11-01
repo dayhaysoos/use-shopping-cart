@@ -159,6 +159,8 @@ export class ShoppingCart {
           totalPrice: totalPrice ?? 0,
           formattedTotalPrice: formattedTotalPrice ?? '$0.00'
         }
+        // Notify subscribers so React components re-render with loaded cart data
+        this._notifySubscribers()
       }
     } catch (error) {
       console.warn('Failed to parse stored cart data:', error)
