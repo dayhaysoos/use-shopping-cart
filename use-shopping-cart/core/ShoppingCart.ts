@@ -589,6 +589,70 @@ export class ShoppingCart {
   }
 
   // ============================================================================
+  // NEW CONFIGURATION METHODS (Phase 6)
+  // ============================================================================
+
+  setCustomerEmail(email: string): void {
+    // ✅ IMMUTABLE - single state update
+    this._state = { ...this._state, customerEmail: email }
+    this._notifySubscribers()
+  }
+
+  toggleAutomaticTax(enabled: boolean): void {
+    // ✅ IMMUTABLE - single state update
+    this._state = { ...this._state, automaticTax: enabled }
+    this._notifySubscribers()
+  }
+
+  setCustomText(customText: CartState['customText']): void {
+    // ✅ IMMUTABLE - single state update
+    this._state = { ...this._state, customText }
+    this._notifySubscribers()
+  }
+
+  setCustomFields(fields: CartState['customFields']): void {
+    // ✅ IMMUTABLE - single state update
+    this._state = { ...this._state, customFields: fields }
+    this._notifySubscribers()
+  }
+
+  setShippingOptions(options: CartState['shippingOptions']): void {
+    // ✅ IMMUTABLE - single state update
+    this._state = { ...this._state, shippingOptions: options }
+    this._notifySubscribers()
+  }
+
+  setUIMode(mode: 'hosted' | 'embedded'): void {
+    // ✅ IMMUTABLE - single state update
+    this._state = { ...this._state, uiMode: mode }
+    this._notifySubscribers()
+  }
+
+  togglePhoneCollection(enabled: boolean): void {
+    // ✅ IMMUTABLE - single state update
+    this._state = { ...this._state, collectPhoneNumber: enabled }
+    this._notifySubscribers()
+  }
+
+  togglePromotionCodes(enabled: boolean): void {
+    // ✅ IMMUTABLE - single state update
+    this._state = { ...this._state, allowPromotionCodes: enabled }
+    this._notifySubscribers()
+  }
+
+  toggleTermsOfService(required: boolean): void {
+    // ✅ IMMUTABLE - single state update
+    this._state = { ...this._state, requireTermsOfService: required }
+    this._notifySubscribers()
+  }
+
+  setCreateSessionEndpoint(endpoint: string): void {
+    // ✅ IMMUTABLE - single state update
+    this._state = { ...this._state, createSessionEndpoint: endpoint }
+    this._notifySubscribers()
+  }
+
+  // ============================================================================
   // STRIPE METHODS
   // ============================================================================
 
@@ -602,5 +666,58 @@ export class ShoppingCart {
     itemOrPriceId: string | { price?: string; sku?: string; quantity?: number }
   ): Promise<{ error: any } | undefined> {
     return stripeCheckoutSingle(this._state, itemOrPriceId)
+  }
+
+  async initEmbeddedCheckout(elementSelector: string): Promise<void> {
+    if (this._state.uiMode !== 'embedded') {
+      throw new Error('uiMode must be "embedded" for embedded checkout')
+    }
+
+    if (!this._state.stripe) {
+      throw new Error('Stripe key required')
+    }
+
+    if (!this._state.createSessionEndpoint) {
+      throw new Error('createSessionEndpoint required for embedded checkout')
+    }
+
+    // Call server to create session
+    const response = await fetch(this._state.createSessionEndpoint, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        cartDetails: this._state.cartDetails,
+        mode: this._state.mode
+      })
+    })
+
+    if (!response.ok) {
+      throw new Error(
+        `Failed to create checkout session: ${response.statusText}`
+      )
+    }
+
+    const { clientSecret } = await response.json()
+
+    if (!clientSecret) {
+      throw new Error('No clientSecret returned from server')
+    }
+
+    // Initialize Stripe
+    if (typeof window === 'undefined') {
+      throw new Error('Embedded checkout can only be initialized on the client')
+    }
+
+    // @ts-ignore - Stripe is loaded via script tag
+    const stripe = window.Stripe(this._state.stripe)
+
+    // Initialize embedded checkout
+    // @ts-expect-error - initEmbeddedCheckout is available in Stripe.js but may not be in type definitions
+    const checkout = await stripe.initEmbeddedCheckout({
+      clientSecret
+    })
+
+    // Mount in page
+    checkout.mount(elementSelector)
   }
 }

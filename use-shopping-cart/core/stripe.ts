@@ -9,6 +9,17 @@ export interface CheckoutData {
   billingAddressCollection?: 'auto' | 'required'
   shippingAddressCollection?: { allowedCountries: string[] }
   submitType?: 'auto' | 'pay' | 'book' | 'donate'
+  phoneNumberCollection?: { enabled: boolean }
+  allowPromotionCodes?: boolean
+  automaticTax?: { enabled: boolean }
+  customerEmail?: string
+  consentCollection?: {
+    termsOfService?: 'required'
+    promotions?: 'auto'
+  }
+  customText?: Record<string, { message: string }>
+  customFields?: Array<any>
+  shippingOptions?: Array<any>
 }
 
 export function getCheckoutData(state: CartState): CheckoutData {
@@ -39,6 +50,84 @@ export function getCheckoutData(state: CartState): CheckoutData {
     options.shippingAddressCollection = {
       allowedCountries: state.allowedCountries
     }
+  }
+
+  // NEW - Phone number collection
+  if (state.collectPhoneNumber) {
+    options.phoneNumberCollection = { enabled: true }
+  }
+
+  // NEW - Promotion codes
+  if (state.allowPromotionCodes) {
+    options.allowPromotionCodes = true
+  }
+
+  // NEW - Automatic tax
+  if (state.automaticTax) {
+    options.automaticTax = { enabled: true }
+  }
+
+  // NEW - Customer email
+  if (state.customerEmail) {
+    options.customerEmail = state.customerEmail
+  }
+
+  // NEW - Terms of service
+  if (state.requireTermsOfService) {
+    options.consentCollection = {
+      termsOfService: 'required'
+    }
+  }
+
+  // NEW - Custom text
+  if (state.customText) {
+    const customText: Record<string, { message: string }> = {}
+    if (state.customText.shippingAddress) {
+      customText.shipping_address = {
+        message: state.customText.shippingAddress
+      }
+    }
+    if (state.customText.submit) {
+      customText.submit = { message: state.customText.submit }
+    }
+    if (state.customText.termsOfService) {
+      customText.terms_of_service_acceptance = {
+        message: state.customText.termsOfService
+      }
+    }
+    options.customText = customText
+  }
+
+  // NEW - Custom fields
+  if (state.customFields?.length) {
+    options.customFields = state.customFields.map((field) => ({
+      key: field.key,
+      label: { type: 'custom', custom: field.label },
+      type: field.type,
+      optional: field.optional ?? false,
+      ...(field.dropdown && { dropdown: field.dropdown })
+    }))
+  }
+
+  // NEW - Shipping options
+  if (state.shippingOptions?.length) {
+    options.shippingOptions = state.shippingOptions.map((opt) => {
+      if (opt.shippingRateId) {
+        return { shipping_rate: opt.shippingRateId }
+      } else {
+        return {
+          shipping_rate_data: {
+            display_name: opt.displayName!,
+            type: 'fixed_amount',
+            fixed_amount: {
+              amount: opt.amount!,
+              currency: state.currency
+            },
+            delivery_estimate: opt.deliveryEstimate
+          }
+        }
+      }
+    })
   }
 
   return options
@@ -94,13 +183,23 @@ export async function redirectToCheckout(
     )
   }
 
+  // Deprecation warning for client-only mode
+  if (state.cartMode === 'client-only') {
+    console.warn(
+      '⚠️ DEPRECATED: client-only mode is deprecated by Stripe. ' +
+        'Use checkout-session mode instead. ' +
+        'See: https://docs.stripe.com/payments/checkout/how-checkout-works'
+    )
+  }
+
   const stripe = initializeStripe(state.stripe)
 
   if (state.cartMode === 'checkout-session') {
     return stripe.redirectToCheckout({ sessionId: sessionId! })
   } else {
     const checkoutData = getCheckoutData(state)
-    return stripe.redirectToCheckout(checkoutData as any)
+    // @ts-expect-error - Our CheckoutData extends Stripe's types with additional modern fields
+    return stripe.redirectToCheckout(checkoutData)
   }
 }
 
@@ -120,7 +219,13 @@ export async function checkoutSingleItem(
   const quantity =
     typeof itemOrPriceId === 'object' ? itemOrPriceId.quantity ?? 1 : 1
 
-  const checkoutData: any = {
+  const checkoutData: {
+    mode: 'payment' | 'subscription' | 'setup'
+    successUrl?: string
+    cancelUrl?: string
+    lineItems?: Array<{ price: string; quantity: number }>
+    items?: Array<{ sku: string; quantity: number }>
+  } = {
     mode: state.mode,
     successUrl: state.successUrl,
     cancelUrl: state.cancelUrl
@@ -134,5 +239,6 @@ export async function checkoutSingleItem(
     checkoutData.items = [{ sku: itemOrPriceId.sku, quantity }]
   }
 
-  return stripe.redirectToCheckout(checkoutData as any)
+  // @ts-expect-error - Our checkout data is compatible with Stripe's RedirectToCheckoutOptions
+  return stripe.redirectToCheckout(checkoutData)
 }

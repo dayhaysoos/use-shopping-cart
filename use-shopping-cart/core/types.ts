@@ -124,6 +124,64 @@ export interface CartState {
    * Determines if cart data should be persisted in local storage or not
    */
   shouldPersist: boolean
+  /**
+   * Enable phone number collection at checkout
+   */
+  collectPhoneNumber?: boolean
+  /**
+   * Allow customers to enter promotion codes at checkout
+   */
+  allowPromotionCodes?: boolean
+  /**
+   * Enable automatic tax calculation
+   */
+  automaticTax?: boolean
+  /**
+   * Pre-fill customer email at checkout
+   */
+  customerEmail?: string
+  /**
+   * Require customers to accept terms of service
+   */
+  requireTermsOfService?: boolean
+  /**
+   * UI mode for checkout: 'hosted' (default) or 'embedded'
+   */
+  uiMode?: 'hosted' | 'embedded'
+  /**
+   * Custom text to display at checkout
+   */
+  customText?: {
+    shippingAddress?: string
+    submit?: string
+    termsOfService?: string
+  }
+  /**
+   * Custom fields to collect at checkout
+   */
+  customFields?: Array<{
+    key: string
+    label: string
+    type: 'text' | 'dropdown' | 'numeric'
+    optional?: boolean
+    dropdown?: { options: Array<{ label: string; value: string }> }
+  }>
+  /**
+   * Shipping options for checkout
+   */
+  shippingOptions?: Array<{
+    shippingRateId?: string
+    displayName?: string
+    amount?: number
+    deliveryEstimate?: {
+      minimum: { unit: 'day' | 'week'; value: number }
+      maximum: { unit: 'day' | 'week'; value: number }
+    }
+  }>
+  /**
+   * Endpoint for creating checkout session (required for embedded checkout)
+   */
+  createSessionEndpoint?: string
 }
 
 export interface CartConfig extends Partial<CartState> {
