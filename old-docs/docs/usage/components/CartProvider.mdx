@@ -20,11 +20,7 @@ import App from './App'
 const stripeKey = process.env.YOUR_STRIPE_PUBLIC_KEY
 
 ReactDOM.render(
-  <CartProvider
-    cartMode="checkout-session"
-    stripe={stripeKey}
-    currency="USD"
-  >
+  <CartProvider cartMode="checkout-session" stripe={stripeKey} currency="USD">
     <App />
   </CartProvider>,
   document.getElementById('root')

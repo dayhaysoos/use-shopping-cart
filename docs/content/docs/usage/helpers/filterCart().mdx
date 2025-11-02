@@ -1,0 +1,23 @@
+---
+title: filterCart()
+id: filter-cart
+---
+
+This is a function used to aid in filtering out cart entries. The first argument is your `cartDetails` and the second is a callback that takes an individual cart entry must either return a boolean or a Promise of a boolean (i.e. `Promise<boolean>`).
+
+This can potentially be very useful for determining which products in a user's cart are in-stock our out-of-stock and then displaying them differently based on that. Or even creating a button to remove out-of-stock items from the cart. Perhaps even to help find available discounts for the user.
+
+```js
+import { filterCart } from 'use-shopping-cart' // or
+import { filterCart } from 'use-shopping-cart/core'
+
+const inStockCart = filterCart(cartDetails, async (entry) => {
+  try {
+    const status = fetchProductInStock(entry.id)
+    return status === 'in-stock'
+  } catch (error) {
+    console.error(error)
+    return false
+  }
+})
+```

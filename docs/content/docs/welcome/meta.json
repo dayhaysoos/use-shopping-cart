@@ -1,0 +1,12 @@
+{
+  "title": "Welcome",
+  "pages": [
+    "introduction",
+    "getting-started",
+    "getting-started-serverless",
+    "getting-started-client-mode",
+    "typescript",
+    "discord"
+  ]
+}
+

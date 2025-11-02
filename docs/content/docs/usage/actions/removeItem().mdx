@@ -1,0 +1,61 @@
+---
+title: removeItem()
+id: remove-item
+---
+
+Completely removes a product's entry from the cart by ID.
+
+```jsx
+import React from 'react'
+import { useShoppingCart } from 'use-shopping-cart'
+
+export function Cart() {
+  const { removeItem, cartDetails } = useShoppingCart()
+
+  const entries = []
+  for (const id in cartDetails) {
+    const entry = cartDetails[id]
+    entries.push(
+      <article
+        style={{
+          display: 'flex',
+          flexDirection: 'column',
+          justifyContent: 'center',
+          alignItems: 'center',
+          width: '50%'
+        }}
+      >
+        <figure style={{ textAlign: 'center' }}>
+          <img
+            style={{ height: 200, width: 250 }}
+            src={entry.image}
+            alt={entry.name}
+          />
+          <figcaption>{entry.name}</figcaption>
+        </figure>
+        <p>{entry.formattedValue}</p>
+
+        <section
+          style={{
+            width: '100%',
+            display: 'flex',
+            justifyContent: 'space-evenly'
+          }}
+        >
+          {/* Removes the item from the cart */}
+          <button
+            onClick={() => removeItem(id)}
+            aria-label={`Remove ${entry.name} from your cart`}
+            style={{ height: 50, width: 100, marginBottom: 30 }}
+          >
+            Remove from cart
+          </button>
+        </section>
+      </article>
+    )
+  }
+
+  if (entries.length) return entries
+  return <p>You currently don't have any items in your cart.</p>
+}
+```

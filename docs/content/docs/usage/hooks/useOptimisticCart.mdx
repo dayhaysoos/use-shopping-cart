@@ -1,0 +1,236 @@
+---
+title: useOptimisticCart()
+sidebar_position: 2
+---
+
+# useOptimisticCart()
+
+**New in v4.0.0** - Optimistic version of `useShoppingCart()` that provides instant UI feedback using React 19's `useOptimistic` hook.
+
+## Overview
+
+`useOptimisticCart()` wraps `useShoppingCart()` and adds optimistic updates. When users perform cart operations (add, remove, update quantity), they see instant feedback in the UI while the actual cart operation completes in the background.
+
+## Benefits
+
+✅ **Instant UI feedback** - No waiting for cart updates  
+✅ **Better perceived performance** - Feels faster even if localStorage sync takes time  
+✅ **Automatic rollback** - If an operation fails, the UI automatically reverts  
+✅ **Drop-in replacement** - Same API as `useShoppingCart()`
+
+## Requirements
+
+- React 19.0.0 or higher
+- use-shopping-cart v4.0.0 or higher
+
+## Basic Usage
+
+```jsx
+import { useOptimisticCart } from 'use-shopping-cart'
+
+function ProductCard({ product }) {
+  const { addItem, isOptimistic } = useOptimisticCart()
+
+  return (
+    <button onClick={() => addItem(product)} disabled={isOptimistic}>
+      {isOptimistic ? 'Adding...' : 'Add to Cart'}
+    </button>
+  )
+}
+```
+
+## API
+
+`useOptimisticCart()` returns the same properties and methods as `useShoppingCart()`, plus:
+
+### Additional Properties
+
+#### `isOptimistic`
+
+- **Type:** `boolean`
+- **Description:** `true` when the cart is showing optimistic updates that haven't been confirmed yet
+
+```jsx
+const { isOptimistic } = useOptimisticCart()
+
+{
+  isOptimistic && <span>Syncing changes...</span>
+}
+```
+
+### Item-Level Optimistic Indicator
+
+Each cart item has an `_optimistic` property when it's being optimistically updated:
+
+```jsx
+const { cartDetails } = useOptimisticCart()
+
+Object.values(cartDetails).map((item) => (
+  <div key={item.id}>
+    {item.name} - Qty: {item.quantity}
+    {item._optimistic && <span> (updating...)</span>}
+  </div>
+))
+```
+
+## Examples
+
+### Cart with Loading States
+
+```jsx
+function ShoppingCart() {
+  const {
+    cartDetails,
+    cartCount,
+    formattedTotalPrice,
+    clearCart,
+    isOptimistic
+  } = useOptimisticCart()
+
+  return (
+    <div className="cart">
+      <h2>Your Cart ({cartCount} items)</h2>
+
+      {isOptimistic && (
+        <div className="syncing-indicator">🔄 Syncing changes...</div>
+      )}
+
+      {Object.values(cartDetails).map((item) => (
+        <CartItem key={item.id} item={item} />
+      ))}
+
+      <div className="cart-total">
+        Total:{' '}
+        <span className={isOptimistic ? 'updating' : ''}>
+          {formattedTotalPrice}
+        </span>
+      </div>
+
+      <button onClick={clearCart} disabled={isOptimistic}>
+        Clear Cart
+      </button>
+    </div>
+  )
+}
+```
+
+### Cart Item with Quantity Controls
+
+```jsx
+function CartItem({ item }) {
+  const { incrementItem, decrementItem, removeItem, isOptimistic } =
+    useOptimisticCart()
+
+  return (
+    <div className="cart-item">
+      <h4>{item.name}</h4>
+
+      <div className="quantity-controls">
+        <button
+          onClick={() => decrementItem(item.id)}
+          disabled={isOptimistic || item.quantity === 1}
+        >
+          -
+        </button>
+
+        <span className={item._optimistic ? 'updating' : ''}>
+          {item.quantity}
+        </span>
+
+        <button onClick={() => incrementItem(item.id)} disabled={isOptimistic}>
+          +
+        </button>
+      </div>
+
+      <button onClick={() => removeItem(item.id)} disabled={isOptimistic}>
+        Remove
+      </button>
+    </div>
+  )
+}
+```
+
+### Advanced: Per-Item Loading
+
+```jsx
+function ProductCard({ product }) {
+  const { addItem, cartDetails } = useOptimisticCart()
+
+  const itemInCart = cartDetails[product.id]
+  const isThisItemOptimistic = itemInCart?._optimistic === true
+
+  return (
+    <div className="product">
+      <h3>{product.name}</h3>
+      <p>${product.price / 100}</p>
+
+      {itemInCart && (
+        <div className="in-cart-badge">
+          In cart: {itemInCart.quantity}
+          {isThisItemOptimistic && ' (updating...)'}
+        </div>
+      )}
+
+      <button onClick={() => addItem(product)} disabled={isThisItemOptimistic}>
+        {isThisItemOptimistic ? 'Adding...' : 'Add to Cart'}
+      </button>
+    </div>
+  )
+}
+```
+
+## Migration from useShoppingCart()
+
+Migrating is simple - just replace `useShoppingCart` with `useOptimisticCart`:
+
+```diff
+- import { useShoppingCart } from 'use-shopping-cart'
++ import { useOptimisticCart } from 'use-shopping-cart'
+
+function MyComponent() {
+-  const { addItem, cartCount } = useShoppingCart()
++  const { addItem, cartCount, isOptimistic } = useOptimisticCart()
+
+  return (
+    <button onClick={() => addItem(product)}>
+-      Add to Cart
++      {isOptimistic ? 'Adding...' : 'Add to Cart'}
+    </button>
+  )
+}
+```
+
+## When to Use
+
+Use `useOptimisticCart()` when:
+
+- You want instant UI feedback for cart operations
+- You're dealing with slow network or localStorage operations
+- You want to improve perceived performance
+
+Stick with `useShoppingCart()` when:
+
+- You prefer simpler code without optimistic updates
+- You don't need loading states
+- You're migrating from older versions and want minimal changes
+
+## TypeScript
+
+```typescript
+import { useOptimisticCart } from 'use-shopping-cart'
+
+function ProductCard({ product }: { product: Product }) {
+  const { addItem, isOptimistic } = useOptimisticCart()
+
+  return (
+    <button onClick={() => addItem(product)} disabled={isOptimistic}>
+      {isOptimistic ? 'Adding...' : 'Add to Cart'}
+    </button>
+  )
+}
+```
+
+## See Also
+
+- [useShoppingCart()](/docs/usage/hooks/useShoppingCart) - Standard cart hook without optimistic updates
+- [React 19 useOptimistic](https://react.dev/reference/react/useOptimistic) - React's official documentation

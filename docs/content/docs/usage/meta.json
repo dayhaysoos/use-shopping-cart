@@ -1,0 +1,13 @@
+{
+  "title": "Usage",
+  "pages": [
+    "components",
+    "hooks",
+    "actions",
+    "properties",
+    "configuration",
+    "helpers",
+    "serverless"
+  ]
+}
+

@@ -1,36 +1,36 @@
 {
   "name": "docs",
-  "version": "0.0.0",
   "private": true,
+  "sideEffects": false,
+  "type": "module",
   "scripts": {
-    "docusaurus": "docusaurus",
-    "start": "docusaurus start",
-    "build": "docusaurus build",
-    "swizzle": "docusaurus swizzle",
-    "deploy": "docusaurus deploy",
-    "serve": "docusaurus serve"
+    "dev": "vite dev",
+    "build": "vite build",
+    "start": "node .output/server/index.mjs",
+    "postinstall": "fumadocs-mdx"
   },
   "dependencies": {
-    "@docusaurus/core": "^3.1.0",
-    "@docusaurus/preset-classic": "^3.1.0",
-    "@mdx-js/react": "^3.0.0",
-    "clsx": "^2.1.0",
-    "prism-react-renderer": "^2.3.0",
-    "react": "^19.0.0",
-    "react-dom": "^19.0.0",
-    "use-shopping-cart": "workspace:*"
+    "@tanstack/react-router": "^1.133.36",
+    "@tanstack/react-router-devtools": "^1.133.36",
+    "@tanstack/react-start": "^1.133.37",
+    "fumadocs-core": "16.0.7",
+    "fumadocs-mdx": "13.0.4",
+    "fumadocs-ui": "16.0.7",
+    "lucide-static": "^0.548.0",
+    "react": "^19.2.0",
+    "react-dom": "^19.2.0",
+    "tailwind-merge": "^3.3.1",
+    "vite": "^7.1.12"
   },
-  "browserslist": {
-    "production": [
-      ">0.2%",
-      "not dead",
-      "not op_mini all"
-    ],
-    "development": [
-      "last 1 chrome version",
-      "last 1 firefox version",
-      "last 1 safari version"
-    ]
+  "devDependencies": {
+    "@tailwindcss/vite": "^4.1.16",
+    "@types/mdx": "^2.0.13",
+    "@types/node": "^24.9.2",
+    "@types/react": "^19.2.2",
+    "@types/react-dom": "^19.2.2",
+    "@vitejs/plugin-react": "^5.1.0",
+    "tailwindcss": "^4.1.16",
+    "typescript": "^5.9.3",
+    "vite-tsconfig-paths": "^5.1.4"
   }
 }
-

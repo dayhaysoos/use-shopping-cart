@@ -1,0 +1,12 @@
+{
+  "title": "Properties",
+  "pages": [
+    "cartCount",
+    "totalPrice",
+    "formattedTotalPrice",
+    "cartDetails",
+    "shouldDisplayCart",
+    "lastClicked"
+  ]
+}
+

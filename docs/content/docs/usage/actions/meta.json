@@ -1,0 +1,19 @@
+{
+  "title": "Actions",
+  "pages": [
+    "addItem()",
+    "incrementItem()",
+    "decrementItem()",
+    "setItemQuantity()",
+    "removeItem()",
+    "clearCart()",
+    "loadCart()",
+    "redirectToCheckout()",
+    "checkoutSingleItem()",
+    "handleCartClick()",
+    "handleCartHover()",
+    "handleCloseCart()",
+    "storeLastClicked()"
+  ]
+}
+
