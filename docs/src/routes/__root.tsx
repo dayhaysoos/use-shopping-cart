@@ -7,6 +7,7 @@ import {
 import * as React from 'react'
 import appCss from '@/styles/app.css?url'
 import { RootProvider } from 'fumadocs-ui/provider/tanstack'
+import { CartProvider } from 'use-shopping-cart'
 
 export const Route = createRootRoute({
   head: () => ({
@@ -42,7 +43,20 @@ function RootDocument({ children }: { children: React.ReactNode }) {
         <HeadContent />
       </head>
       <body className="flex flex-col min-h-screen">
-        <RootProvider>{children}</RootProvider>
+        <RootProvider>
+          <CartProvider
+            mode="payment"
+            cartMode="checkout-session"
+            stripe={''}
+            billingAddressCollection={false}
+            successUrl="https://stripe.com"
+            cancelUrl="https://twitter.com/dayhaysoos"
+            currency="USD"
+            shouldPersist={false}
+          >
+            {children}
+          </CartProvider>
+        </RootProvider>
         <Scripts />
       </body>
     </html>

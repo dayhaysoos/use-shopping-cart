@@ -1,5 +1,5 @@
 {
   "title": "Helpers",
-  "pages": ["formatCurrencyString()", "filterCart()"]
+  "pages": ["formatCurrencyString", "filterCart"]
 }
 

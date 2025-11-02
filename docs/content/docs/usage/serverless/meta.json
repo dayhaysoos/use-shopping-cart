@@ -1,5 +1,5 @@
 {
   "title": "Serverless",
-  "pages": ["formatLineItems()", "validateCartItems()"]
+  "pages": ["formatLineItems", "validateCartItems"]
 }
 

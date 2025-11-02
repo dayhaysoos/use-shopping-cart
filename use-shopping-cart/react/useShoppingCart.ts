@@ -41,8 +41,9 @@ export function useShoppingCart(): UseShoppingCartReturn {
 
   // Subscribe to cart state with useSyncExternalStore
   const state = useSyncExternalStore(
-    (callback) => cart.subscribe(callback),
-    () => cart.getState()
+    (callback) => cart.subscribe(callback), // Subscribe to cart state
+    () => cart.getState(), // Client snapshot
+    () => cart.getState() // SSR snapshot
   )
 
   // Memoize methods to prevent re-creating on every render
