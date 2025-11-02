@@ -1,8 +1,7 @@
-'use client'
-
 import React from 'react'
 import { useShoppingCart, formatCurrencyString } from 'use-shopping-cart'
 import type { Product } from 'use-shopping-cart/core'
+import { CartDisplay } from './CartDisplay'
 
 const sampleProduct: Product = {
   id: 'banana_001',
@@ -90,25 +89,7 @@ export function AddItemDemo() {
           </button>
 
           {/* Cart Info */}
-          <div className="mt-4 p-3 bg-fd-muted rounded-md">
-            <p className="text-sm font-mono">
-              <strong>Cart Count:</strong> {cartCount}
-            </p>
-            {itemInCart && (
-              <div className="mt-2 text-xs">
-                <p>
-                  <strong>Quantity:</strong> {itemInCart.quantity}
-                </p>
-                <p>
-                  <strong>Value:</strong>{' '}
-                  {formatCurrencyString({
-                    value: itemInCart.value,
-                    currency: itemInCart.currency
-                  })}
-                </p>
-              </div>
-            )}
-          </div>
+          <CartDisplay />
         </div>
       </div>
     </div>
