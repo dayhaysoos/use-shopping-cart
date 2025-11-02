@@ -2,7 +2,10 @@
   "title": "Documentation",
   "pages": [
     "index",
-    "welcome",
+    "getting-started",
+    "getting-started-serverless",
+    "typescript",
+    "discord",
     "usage"
   ]
 }
