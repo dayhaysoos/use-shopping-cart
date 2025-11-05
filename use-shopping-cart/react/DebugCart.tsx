@@ -29,18 +29,6 @@ export function DebugCart(props: DebugCartProps) {
     changeLanguage,
     changeCurrency,
     redirectToCheckout,
-    checkoutSingleItem,
-    setCustomerEmail,
-    toggleAutomaticTax,
-    setCustomText,
-    setCustomFields,
-    setShippingOptions,
-    setUIMode,
-    togglePhoneCollection,
-    togglePromotionCodes,
-    toggleTermsOfService,
-    setCreateSessionEndpoint,
-    initEmbeddedCheckout,
     ...state
   } = cart
 

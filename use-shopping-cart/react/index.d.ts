@@ -58,21 +58,11 @@ export interface CartActions {
   setItemQuantity: (id: string, quantity: number) => undefined
 
   /**
-   * Redirects customers to the Stripe checkout. Works in both
-   * CheckoutSession and ClientOnly mode.
-   * @param sessionId Used in CheckoutSession mode, it is the ID of the
-   *                  checkout session created by your server/serverless function.
-   * @returns Nothing or an error wrapped in a promise if an error occurred
+   * Redirects customers to Stripe checkout with a server-created session ID.
+   * @param sessionId The checkout session ID created by your server endpoint.
+   * @returns Promise that resolves when redirect starts, or an error object
    */
-  redirectToCheckout: (sessionId?: string) => Promise<any>
-
-  /**
-   * Redirects customers to the Stripe checkout with a single product.
-   * Only works in ClientOnly mode.
-   * @param productId The ID of the product to buy one of.
-   * @returns Nothing or an error wrapped in a promise if an error occurred
-   */
-  checkoutSingleItem: (productId: string) => Promise<any>
+  redirectToCheckout: (sessionId: string) => Promise<any>
 
   /**
    * Totally clears the cart of all items
@@ -120,85 +110,6 @@ export interface CartActions {
    * Given an ISO currency code (e.g. USD), it sets `currency` to that value.
    */
   changeCurrency: (currency: string) => undefined
-
-  /**
-   * Sets the customer email to pre-fill at checkout.
-   */
-  setCustomerEmail: (email: string) => undefined
-
-  /**
-   * Enables or disables automatic tax calculation.
-   */
-  toggleAutomaticTax: (enabled: boolean) => undefined
-
-  /**
-   * Sets custom text to display at checkout.
-   */
-  setCustomText: (customText?: {
-    shippingAddress?: string
-    submit?: string
-    termsOfService?: string
-  }) => undefined
-
-  /**
-   * Sets custom fields to collect at checkout.
-   */
-  setCustomFields: (
-    fields?: Array<{
-      key: string
-      label: string
-      type: 'text' | 'dropdown' | 'numeric'
-      optional?: boolean
-      dropdown?: { options: Array<{ label: string; value: string }> }
-    }>
-  ) => undefined
-
-  /**
-   * Sets shipping options for checkout.
-   */
-  setShippingOptions: (
-    options?: Array<{
-      shippingRateId?: string
-      displayName?: string
-      amount?: number
-      deliveryEstimate?: {
-        minimum: { unit: 'day' | 'week'; value: number }
-        maximum: { unit: 'day' | 'week'; value: number }
-      }
-    }>
-  ) => undefined
-
-  /**
-   * Sets the UI mode for checkout: 'hosted' (default) or 'embedded'.
-   */
-  setUIMode: (mode: 'hosted' | 'embedded') => undefined
-
-  /**
-   * Enables or disables phone number collection at checkout.
-   */
-  togglePhoneCollection: (enabled: boolean) => undefined
-
-  /**
-   * Enables or disables promotion code input at checkout.
-   */
-  togglePromotionCodes: (enabled: boolean) => undefined
-
-  /**
-   * Requires or makes optional terms of service acceptance at checkout.
-   */
-  toggleTermsOfService: (required: boolean) => undefined
-
-  /**
-   * Sets the server endpoint for creating checkout sessions (required for embedded checkout).
-   */
-  setCreateSessionEndpoint: (endpoint: string) => undefined
-
-  /**
-   * Initializes Stripe embedded checkout and mounts it to the specified DOM element.
-   * Requires uiMode to be set to 'embedded' and createSessionEndpoint to be configured.
-   * @param elementSelector CSS selector for the element to mount the checkout UI
-   */
-  initEmbeddedCheckout: (elementSelector: string) => Promise<void>
 }
 
 /**
