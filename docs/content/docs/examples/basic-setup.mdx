@@ -1,0 +1,406 @@
+---
+title: Basic Setup Example
+id: basic-setup
+---
+
+A complete basic shopping cart implementation with add/remove functionality.
+
+## Overview
+
+This example demonstrates:
+
+- Adding products to cart
+- Removing items from cart
+- Displaying cart contents
+- Calculating totals
+- Redirecting to checkout
+
+## Complete Code
+
+### App Setup
+
+```jsx
+// App.jsx
+import { CartProvider } from 'use-shopping-cart'
+import ProductList from './components/ProductList'
+import Cart from './components/Cart'
+
+function App() {
+  return (
+    <CartProvider
+      stripe={process.env.REACT_APP_STRIPE_PUBLISHABLE_KEY}
+      currency="USD"
+    >
+      <div className="app">
+        <header>
+          <h1>My Store</h1>
+          <Cart />
+        </header>
+        <main>
+          <ProductList />
+        </main>
+      </div>
+    </CartProvider>
+  )
+}
+
+export default App
+```
+
+### Product Data
+
+```js
+// data/products.js
+export const products = [
+  {
+    id: 'banana_001',
+    name: 'Bananas',
+    description: 'Fresh yellow bananas',
+    price: 400, // $4.00 in cents
+    currency: 'USD',
+    image: 'https://example.com/banana.jpg'
+  },
+  {
+    id: 'apple_001',
+    name: 'Apples',
+    description: 'Crisp red apples',
+    price: 300, // $3.00 in cents
+    currency: 'USD',
+    image: 'https://example.com/apple.jpg'
+  },
+  {
+    id: 'orange_001',
+    name: 'Oranges',
+    description: 'Juicy oranges',
+    price: 350, // $3.50 in cents
+    currency: 'USD',
+    image: 'https://example.com/orange.jpg'
+  }
+]
+```
+
+### Product List Component
+
+```jsx
+// components/ProductList.jsx
+import { useShoppingCart, formatCurrencyString } from 'use-shopping-cart'
+import { products } from '../data/products'
+
+function ProductList() {
+  const { addItem } = useShoppingCart()
+
+  return (
+    <div className="product-list">
+      <h2>Products</h2>
+      <div className="products-grid">
+        {products.map((product) => {
+          const price = formatCurrencyString({
+            value: product.price,
+            currency: product.currency,
+            language: 'en-US'
+          })
+
+          return (
+            <div key={product.id} className="product-card">
+              <img src={product.image} alt={product.name} />
+              <h3>{product.name}</h3>
+              <p>{product.description}</p>
+              <p className="price">{price}</p>
+              <button onClick={() => addItem(product)}>Add to Cart</button>
+            </div>
+          )
+        })}
+      </div>
+    </div>
+  )
+}
+
+export default ProductList
+```
+
+### Cart Component
+
+```jsx
+// components/Cart.jsx
+import { useShoppingCart } from 'use-shopping-cart'
+
+function Cart() {
+  const {
+    cartCount,
+    formattedTotalPrice,
+    cartDetails,
+    incrementItem,
+    decrementItem,
+    removeItem,
+    clearCart,
+    redirectToCheckout
+  } = useShoppingCart()
+
+  if (cartCount === 0) {
+    return (
+      <div className="cart">
+        <p>Your cart is empty</p>
+      </div>
+    )
+  }
+
+  return (
+    <div className="cart">
+      <h2>Shopping Cart ({cartCount} items)</h2>
+
+      <div className="cart-items">
+        {Object.entries(cartDetails).map(([id, item]) => (
+          <div key={id} className="cart-item">
+            <img src={item.image} alt={item.name} />
+            <div className="item-details">
+              <h4>{item.name}</h4>
+              <p>{item.formattedPrice}</p>
+            </div>
+
+            <div className="quantity-controls">
+              <button onClick={() => decrementItem(id)}>-</button>
+              <span>{item.quantity}</span>
+              <button onClick={() => incrementItem(id)}>+</button>
+            </div>
+
+            <p className="item-total">{item.formattedValue}</p>
+
+            <button onClick={() => removeItem(id)}>Remove</button>
+          </div>
+        ))}
+      </div>
+
+      <div className="cart-footer">
+        <div className="cart-total">
+          <strong>Total:</strong>
+          <strong>{formattedTotalPrice}</strong>
+        </div>
+
+        <div className="cart-actions">
+          <button onClick={clearCart}>Clear Cart</button>
+          <button onClick={() => redirectToCheckout()}>Checkout</button>
+        </div>
+      </div>
+    </div>
+  )
+}
+
+export default Cart
+```
+
+### Basic Styling
+
+```css
+/* styles.css */
+.product-list {
+  padding: 2rem;
+}
+
+.products-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+  gap: 2rem;
+}
+
+.product-card {
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  padding: 1rem;
+  text-align: center;
+}
+
+.product-card img {
+  width: 100%;
+  height: 200px;
+  object-fit: cover;
+  border-radius: 4px;
+}
+
+.product-card button {
+  width: 100%;
+  padding: 0.75rem;
+  background: #0070f3;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.cart {
+  padding: 2rem;
+  background: #f5f5f5;
+  border-radius: 8px;
+}
+
+.cart-item {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  padding: 1rem;
+  background: white;
+  border-radius: 4px;
+  margin-bottom: 1rem;
+}
+
+.cart-item img {
+  width: 60px;
+  height: 60px;
+  object-fit: cover;
+  border-radius: 4px;
+}
+
+.quantity-controls {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.quantity-controls button {
+  width: 30px;
+  height: 30px;
+  border: 1px solid #ddd;
+  background: white;
+  cursor: pointer;
+  border-radius: 4px;
+}
+
+.cart-footer {
+  margin-top: 2rem;
+  padding-top: 1rem;
+  border-top: 2px solid #ddd;
+}
+
+.cart-total {
+  display: flex;
+  justify-content: space-between;
+  font-size: 1.25rem;
+  margin-bottom: 1rem;
+}
+
+.cart-actions {
+  display: flex;
+  gap: 1rem;
+}
+
+.cart-actions button {
+  flex: 1;
+  padding: 0.75rem;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.cart-actions button:first-child {
+  background: #dc3545;
+  color: white;
+}
+
+.cart-actions button:last-child {
+  background: #28a745;
+  color: white;
+}
+```
+
+## Server Endpoint
+
+Create a server endpoint to handle checkout:
+
+```js
+// pages/api/create-checkout-session.js (Next.js)
+import Stripe from 'stripe'
+const stripe = new Stripe(process.env.STRIPE_SECRET_KEY)
+
+export default async function handler(req, res) {
+  if (req.method !== 'POST') {
+    return res.status(405).json({ error: 'Method not allowed' })
+  }
+
+  try {
+    const { cartDetails } = req.body
+
+    const line_items = Object.values(cartDetails).map((item) => ({
+      price_data: {
+        currency: 'usd',
+        product_data: {
+          name: item.name,
+          images: [item.image]
+        },
+        unit_amount: item.price
+      },
+      quantity: item.quantity
+    }))
+
+    const session = await stripe.checkout.sessions.create({
+      mode: 'payment',
+      line_items,
+      success_url: `${req.headers.origin}/success?session_id={CHECKOUT_SESSION_ID}`,
+      cancel_url: req.headers.origin
+    })
+
+    res.redirect(303, session.url)
+  } catch (error) {
+    res.status(500).json({ error: error.message })
+  }
+}
+```
+
+## Try It Live
+
+See the [addItem() documentation](/docs/usage/actions/add-item) for an interactive demo of adding items to the cart.
+
+## Key Concepts
+
+### 1. Cart Persistence
+
+The cart automatically persists to localStorage by default:
+
+```jsx
+<CartProvider
+  stripe={STRIPE_KEY}
+  currency="USD"
+  shouldPersist={true} // Enable persistence (default)
+  persistKey="my-cart" // localStorage key name (default: 'use-shopping-cart')
+>
+  <App />
+</CartProvider>
+```
+
+### 2. Currency Formatting
+
+Use `formatCurrencyString` for consistent formatting:
+
+```jsx
+import { formatCurrencyString } from 'use-shopping-cart'
+
+const price = formatCurrencyString({
+  value: 1000, // cents
+  currency: 'USD',
+  language: 'en-US'
+})
+// Returns: "$10.00"
+```
+
+### 3. Cart Details Structure
+
+`cartDetails` is an object with product IDs as keys:
+
+```js
+{
+  "banana_001": {
+    id: "banana_001",
+    name: "Bananas",
+    price: 400,
+    quantity: 2,
+    value: 800, // price * quantity
+    formattedPrice: "$4.00",
+    formattedValue: "$8.00"
+  }
+}
+```
+
+## Next Steps
+
+- Configure checkout features in your [server endpoint](/docs/getting-started)
+- Explore [Stripe's Checkout Session API](https://stripe.com/docs/api/checkout/sessions/create)
+- Add [product metadata](/docs/examples/metadata)
+- Implement [cart persistence](/docs/concepts/persistence)

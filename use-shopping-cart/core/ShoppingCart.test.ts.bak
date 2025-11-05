@@ -762,3 +762,403 @@ describe('ShoppingCart', () => {
     })
   })
 })
+
+    it('throws when not in client-only mode', async () => {
+      const cart = new ShoppingCart({
+        shouldPersist: false,
+        stripe: 'pk_test_123',
+        cartMode: 'checkout-session'
+      })
+
+      await expect(cart.checkoutSingleItem('price_123')).rejects.toThrow(
+        'only works in client-only mode'
+      )
+    })
+  })
+
+  describe('new configuration methods (Phase 6)', () => {
+    describe('setCustomerEmail', () => {
+      it('sets customer email in state', () => {
+        const cart = new ShoppingCart({ shouldPersist: false })
+
+        cart.setCustomerEmail('test@example.com')
+
+        const state = cart.getState()
+        expect(state.customerEmail).toBe('test@example.com')
+      })
+
+      it('notifies subscribers when customer email is set', () => {
+        const cart = new ShoppingCart({ shouldPersist: false })
+        const callback = vi.fn()
+
+        cart.subscribe(callback)
+        cart.setCustomerEmail('customer@test.com')
+
+        expect(callback).toHaveBeenCalledWith(
+          expect.objectContaining({
+            customerEmail: 'customer@test.com'
+          })
+        )
+      })
+    })
+
+    describe('toggleAutomaticTax', () => {
+      it('enables automatic tax', () => {
+        const cart = new ShoppingCart({ shouldPersist: false })
+
+        cart.toggleAutomaticTax(true)
+
+        const state = cart.getState()
+        expect(state.automaticTax).toBe(true)
+      })
+
+      it('disables automatic tax', () => {
+        const cart = new ShoppingCart({
+          shouldPersist: false,
+          automaticTax: true
+        })
+
+        cart.toggleAutomaticTax(false)
+
+        const state = cart.getState()
+        expect(state.automaticTax).toBe(false)
+      })
+    })
+
+    describe('setCustomText', () => {
+      it('sets custom text for checkout', () => {
+        const cart = new ShoppingCart({ shouldPersist: false })
+
+        const customText = {
+          submit: 'Complete your order',
+          shippingAddress: 'Enter your address'
+        }
+
+        cart.setCustomText(customText)
+
+        const state = cart.getState()
+        expect(state.customText).toEqual(customText)
+      })
+    })
+
+    describe('setCustomFields', () => {
+      it('sets custom fields for checkout', () => {
+        const cart = new ShoppingCart({ shouldPersist: false })
+
+        const customFields = [
+          {
+            key: 'gift_message',
+            label: 'Gift Message',
+            type: 'text' as const,
+            optional: true
+          }
+        ]
+
+        cart.setCustomFields(customFields)
+
+        const state = cart.getState()
+        expect(state.customFields).toEqual(customFields)
+      })
+    })
+
+    describe('setShippingOptions', () => {
+      it('sets shipping options for checkout', () => {
+        const cart = new ShoppingCart({ shouldPersist: false })
+
+        const shippingOptions = [
+          {
+            displayName: 'Standard Shipping',
+            amount: 500,
+            deliveryEstimate: {
+              minimum: { unit: 'day' as const, value: 5 },
+              maximum: { unit: 'day' as const, value: 7 }
+            }
+          }
+        ]
+
+        cart.setShippingOptions(shippingOptions)
+
+        const state = cart.getState()
+        expect(state.shippingOptions).toEqual(shippingOptions)
+      })
+    })
+
+    describe('setUIMode', () => {
+      it('sets UI mode to embedded', () => {
+        const cart = new ShoppingCart({ shouldPersist: false })
+
+        cart.setUIMode('embedded')
+
+        const state = cart.getState()
+        expect(state.uiMode).toBe('embedded')
+      })
+
+      it('sets UI mode to hosted', () => {
+        const cart = new ShoppingCart({ shouldPersist: false })
+
+        cart.setUIMode('hosted')
+
+        const state = cart.getState()
+        expect(state.uiMode).toBe('hosted')
+      })
+    })
+
+    describe('togglePhoneCollection', () => {
+      it('enables phone number collection', () => {
+        const cart = new ShoppingCart({ shouldPersist: false })
+
+        cart.togglePhoneCollection(true)
+
+        const state = cart.getState()
+        expect(state.collectPhoneNumber).toBe(true)
+      })
+
+      it('disables phone number collection', () => {
+        const cart = new ShoppingCart({
+          shouldPersist: false,
+          collectPhoneNumber: true
+        })
+
+        cart.togglePhoneCollection(false)
+
+        const state = cart.getState()
+        expect(state.collectPhoneNumber).toBe(false)
+      })
+    })
+
+    describe('togglePromotionCodes', () => {
+      it('enables promotion codes', () => {
+        const cart = new ShoppingCart({ shouldPersist: false })
+
+        cart.togglePromotionCodes(true)
+
+        const state = cart.getState()
+        expect(state.allowPromotionCodes).toBe(true)
+      })
+
+      it('disables promotion codes', () => {
+        const cart = new ShoppingCart({
+          shouldPersist: false,
+          allowPromotionCodes: true
+        })
+
+        cart.togglePromotionCodes(false)
+
+        const state = cart.getState()
+        expect(state.allowPromotionCodes).toBe(false)
+      })
+    })
+
+    describe('toggleTermsOfService', () => {
+      it('requires terms of service', () => {
+        const cart = new ShoppingCart({ shouldPersist: false })
+
+        cart.toggleTermsOfService(true)
+
+        const state = cart.getState()
+        expect(state.requireTermsOfService).toBe(true)
+      })
+
+      it('makes terms of service optional', () => {
+        const cart = new ShoppingCart({
+          shouldPersist: false,
+          requireTermsOfService: true
+        })
+
+        cart.toggleTermsOfService(false)
+
+        const state = cart.getState()
+        expect(state.requireTermsOfService).toBe(false)
+      })
+    })
+
+    describe('setCreateSessionEndpoint', () => {
+      it('sets the create session endpoint', () => {
+        const cart = new ShoppingCart({ shouldPersist: false })
+
+        cart.setCreateSessionEndpoint('https://api.example.com/create-session')
+
+        const state = cart.getState()
+        expect(state.createSessionEndpoint).toBe(
+          'https://api.example.com/create-session'
+        )
+      })
+    })
+  })
+
+  describe('initEmbeddedCheckout', () => {
+    it('throws when uiMode is not embedded', async () => {
+      const cart = new ShoppingCart({
+        shouldPersist: false,
+        stripe: 'pk_test_123',
+        uiMode: 'hosted'
+      })
+
+      await expect(cart.initEmbeddedCheckout('#checkout')).rejects.toThrow(
+        'uiMode must be "embedded"'
+      )
+    })
+
+    it('throws when stripe key is not configured', async () => {
+      const cart = new ShoppingCart({
+        shouldPersist: false,
+        uiMode: 'embedded'
+      })
+
+      await expect(cart.initEmbeddedCheckout('#checkout')).rejects.toThrow(
+        'Stripe key required'
+      )
+    })
+
+    it('throws when createSessionEndpoint is not provided', async () => {
+      const cart = new ShoppingCart({
+        shouldPersist: false,
+        stripe: 'pk_test_123',
+        uiMode: 'embedded'
+      })
+
+      await expect(cart.initEmbeddedCheckout('#checkout')).rejects.toThrow(
+        'createSessionEndpoint required'
+      )
+    })
+
+    it('throws when fetch fails', async () => {
+      const cart = new ShoppingCart({
+        shouldPersist: false,
+        stripe: 'pk_test_123',
+        uiMode: 'embedded',
+        createSessionEndpoint: 'https://api.example.com/create-session'
+      })
+
+      // Mock fetch to fail
+      global.fetch = vi.fn().mockResolvedValue({
+        ok: false,
+        statusText: 'Internal Server Error'
+      })
+
+      await expect(cart.initEmbeddedCheckout('#checkout')).rejects.toThrow(
+        'Failed to create checkout session'
+      )
+    })
+
+    it('throws when no clientSecret is returned', async () => {
+      const cart = new ShoppingCart({
+        shouldPersist: false,
+        stripe: 'pk_test_123',
+        uiMode: 'embedded',
+        createSessionEndpoint: 'https://api.example.com/create-session'
+      })
+
+      // Mock fetch to return empty response
+      global.fetch = vi.fn().mockResolvedValue({
+        ok: true,
+        json: async () => ({})
+      })
+
+      await expect(cart.initEmbeddedCheckout('#checkout')).rejects.toThrow(
+        'No clientSecret returned'
+      )
+    })
+
+    it('calls fetch with correct parameters', async () => {
+      const cart = new ShoppingCart({
+        shouldPersist: false,
+        stripe: 'pk_test_123',
+        uiMode: 'embedded',
+        createSessionEndpoint: 'https://api.example.com/create-session',
+        mode: 'payment'
+      })
+
+      // Add an item to cart
+      cart.addItem({
+        id: 'price_123',
+        name: 'Test Product',
+        price: 1000,
+        currency: 'USD'
+      })
+
+      // Mock fetch
+      const mockFetch = vi.fn().mockResolvedValue({
+        ok: true,
+        json: async () => ({ clientSecret: 'cs_test_123' })
+      })
+      global.fetch = mockFetch
+
+      // Mock Stripe
+      const mockMount = vi.fn()
+      const mockCheckout = { mount: mockMount }
+      const mockInitEmbeddedCheckout = vi.fn().mockResolvedValue(mockCheckout)
+      const mockStripe = vi.fn().mockReturnValue({
+        initEmbeddedCheckout: mockInitEmbeddedCheckout
+      })
+
+      // @ts-ignore
+      global.window = { Stripe: mockStripe }
+
+      await cart.initEmbeddedCheckout('#checkout')
+
+      // Verify fetch was called correctly
+      expect(mockFetch).toHaveBeenCalledWith(
+        'https://api.example.com/create-session',
+        {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: expect.stringContaining('price_123')
+        }
+      )
+
+      // Verify Stripe was initialized
+      expect(mockStripe).toHaveBeenCalledWith('pk_test_123')
+
+      // Verify embedded checkout was initialized
+      expect(mockInitEmbeddedCheckout).toHaveBeenCalledWith({
+        clientSecret: 'cs_test_123'
+      })
+
+      // Verify mount was called
+      expect(mockMount).toHaveBeenCalledWith('#checkout')
+    })
+
+    it('sends cart details and mode to endpoint', async () => {
+      const cart = new ShoppingCart({
+        shouldPersist: false,
+        stripe: 'pk_test_123',
+        uiMode: 'embedded',
+        createSessionEndpoint: 'https://api.example.com/create-session',
+        mode: 'subscription'
+      })
+
+      cart.addItem({
+        id: 'price_456',
+        name: 'Subscription',
+        price: 2999,
+        currency: 'USD'
+      })
+
+      const mockFetch = vi.fn().mockResolvedValue({
+        ok: true,
+        json: async () => ({ clientSecret: 'cs_test_456' })
+      })
+      global.fetch = mockFetch
+
+      const mockMount = vi.fn()
+      const mockCheckout = { mount: mockMount }
+      const mockInitEmbeddedCheckout = vi.fn().mockResolvedValue(mockCheckout)
+      const mockStripe = vi.fn().mockReturnValue({
+        initEmbeddedCheckout: mockInitEmbeddedCheckout
+      })
+
+      // @ts-ignore
+      global.window = { Stripe: mockStripe }
+
+      await cart.initEmbeddedCheckout('#checkout-container')
+
+      const fetchCall = mockFetch.mock.calls[0]
+      const body = JSON.parse(fetchCall[1].body)
+
+      expect(body.mode).toBe('subscription')
+      expect(body.cartDetails).toHaveProperty('price_456')
+      expect(mockMount).toHaveBeenCalledWith('#checkout-container')
+    })
+  })
+})

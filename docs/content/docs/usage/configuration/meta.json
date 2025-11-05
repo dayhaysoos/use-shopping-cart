@@ -1,5 +1,4 @@
 {
   "title": "Configuration",
-  "pages": ["shouldPersist", "persistKey"]
+  "pages": ["shouldPersist", "persistKey", "storage"]
 }
-

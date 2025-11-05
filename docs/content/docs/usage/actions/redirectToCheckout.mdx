@@ -3,15 +3,26 @@ title: redirectToCheckout()
 id: redirect-to-checkout
 ---
 
-To send the buyer to Stripe's Checkout experience, use `redirectToCheckout`
+Redirects the user to Stripe's Checkout page using a server-created session ID.
 
-`redirectToCheckout` is configured for you by the props passed to CartProvider. You can pass it a sessionId
-(the preferred way) or refer to products in your Stripe dashboard to fulfill purchases.
+## Signature
 
-With use-shopping-cart's `redirectToCheckout`, you don't need to pass anything more than the sessionId you get
-from Stripe because all of the config is handled in the [CartProvider](docs/usage/components/cart-provider) props.
+```typescript
+redirectToCheckout(sessionId: string): Promise<{ error: any } | undefined>
+```
 
-This is how you'd use `redirectToCheckout()` with a serverless function:
+## Parameters
+
+- `sessionId` (string, required): The checkout session ID returned from your server endpoint
+
+## How It Works
+
+1. Your server creates a Stripe checkout session
+2. Server returns the `sessionId`
+3. Call `redirectToCheckout(sessionId)` on the client
+4. User is redirected to Stripe's checkout page
+
+## Usage
 
 ```jsx
 import React, { useState } from 'react'
@@ -26,9 +37,21 @@ export function RedirectToCheckout() {
     event.preventDefault()
 
     if (cartCount > 0) {
-      setStatus('idle')
+      setStatus('loading')
       try {
-        const result = await redirectToCheckout()
+        // 1. Call your server to create a checkout session
+        const response = await fetch('/api/create-checkout-session', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            cartDetails: useShoppingCart().cartDetails
+          })
+        })
+
+        const { sessionId } = await response.json()
+
+        // 2. Redirect to Stripe checkout with the session ID
+        const result = await redirectToCheckout(sessionId)
         if (result?.error) {
           console.error(result)
           setStatus('redirect-error')
@@ -71,5 +94,57 @@ export function RedirectToCheckout() {
 export default RedirectToCheckout
 ```
 
-Please refer to [Stripe's official documentation](https://stripe.com/docs/js/checkout/redirect_to_checkout)
-to learn more about redirectToCheckout.
+## Server Endpoint Example
+
+Your server endpoint should create the checkout session and return the `sessionId`:
+
+```js
+// pages/api/create-checkout-session.js (Next.js)
+import Stripe from 'stripe'
+const stripe = new Stripe(process.env.STRIPE_SECRET_KEY)
+
+export default async function handler(req, res) {
+  try {
+    const { cartDetails } = req.body
+
+    // Convert cart to line items
+    const line_items = Object.values(cartDetails).map((item) => ({
+      price_data: {
+        currency: 'usd',
+        product_data: {
+          name: item.name,
+          images: [item.image]
+        },
+        unit_amount: item.price
+      },
+      quantity: item.quantity
+    }))
+
+    // Create checkout session
+    const session = await stripe.checkout.sessions.create({
+      mode: 'payment',
+      line_items,
+      success_url: `${req.headers.origin}/success?session_id={CHECKOUT_SESSION_ID}`,
+      cancel_url: req.headers.origin
+    })
+
+    // Return session ID to client
+    res.json({ sessionId: session.id })
+  } catch (error) {
+    res.status(500).json({ error: error.message })
+  }
+}
+```
+
+## Notes
+
+- Requires a server endpoint to create Stripe checkout sessions
+- SessionId is required
+- Initializes Stripe.js with the publishable key from CartProvider
+- Returns error object if redirect fails
+
+## See Also
+
+- [Getting Started](/docs/getting-started) - Complete setup guide
+- [Stripe Checkout Sessions](https://stripe.com/docs/api/checkout/sessions) - Stripe API documentation
+- [Stripe.js redirectToCheckout](https://stripe.com/docs/js/checkout/redirect_to_checkout) - Stripe.js documentation

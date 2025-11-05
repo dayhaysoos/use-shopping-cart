@@ -1,0 +1,448 @@
+---
+title: Cart Persistence
+id: persistence
+---
+
+How cart data is saved and restored across sessions.
+
+## Overview
+
+Cart persistence ensures customers don't lose their cart when they:
+
+- Refresh the page
+- Close and reopen the browser
+- Navigate between pages
+- Return to your site later
+
+## How It Works
+
+### Auto-Save
+
+Every cart change is automatically saved:
+
+```
+User adds item
+      ↓
+Cart state updates
+      ↓
+State serialized to JSON
+      ↓
+Saved to storage
+      ↓
+User refreshes page
+      ↓
+State loaded from storage
+      ↓
+Cart restored
+```
+
+### Configuration
+
+```jsx
+<CartProvider
+  stripe={STRIPE_KEY}
+  currency="USD"
+  shouldPersist={true} // Enable persistence (default)
+  persistKey="my-shopping-cart" // Storage key (optional)
+>
+  <App />
+</CartProvider>
+```
+
+## Storage Adapters
+
+### LocalStorage (Default)
+
+Saves to browser's localStorage:
+
+```jsx
+<CartProvider
+  shouldPersist={true}
+  // Uses localStorage by default
+>
+  <App />
+</CartProvider>
+```
+
+**Pros:**
+
+- Persists across sessions
+- Available in all browsers
+- ~5-10MB storage limit
+
+**Cons:**
+
+- Not available in incognito mode
+- Synchronous (can block)
+- Not shared across tabs automatically
+
+### SessionStorage
+
+Clears when browser closes:
+
+```jsx
+import { createSessionStorage } from 'use-shopping-cart/core'
+
+;<CartProvider shouldPersist={true} storage={createSessionStorage()}>
+  <App />
+</CartProvider>
+```
+
+**Use when:**
+
+- Cart should clear on browser close
+- Temporary shopping sessions
+- Multi-tab isolation needed
+
+### Memory Storage
+
+No persistence (testing/SSR):
+
+```jsx
+import { createMemoryStorage } from 'use-shopping-cart/core'
+
+;<CartProvider shouldPersist={true} storage={createMemoryStorage()}>
+  <App />
+</CartProvider>
+```
+
+**Use when:**
+
+- Server-side rendering
+- Testing
+- No persistence needed
+
+### No Storage
+
+Disable persistence completely:
+
+```jsx
+<CartProvider shouldPersist={false}>
+  <App />
+</CartProvider>
+```
+
+## Custom Storage
+
+### Interface
+
+```typescript
+interface Storage {
+  getItem(key: string): string | null
+  setItem(key: string, value: string): void
+  removeItem(key: string): void
+}
+```
+
+### Example: IndexedDB
+
+```javascript
+const indexedDBStorage = {
+  async getItem(key) {
+    const db = await openDB()
+    return db.get('cart', key)
+  },
+
+  async setItem(key, value) {
+    const db = await openDB()
+    await db.put('cart', value, key)
+  },
+
+  async removeItem(key) {
+    const db = await openDB()
+    await db.delete('cart', key)
+  }
+}
+
+<CartProvider storage={indexedDBStorage} />
+```
+
+### Example: Server Sync
+
+```javascript
+const serverSyncStorage = {
+  getItem(key) {
+    // Load from localStorage as fallback
+    return localStorage.getItem(key)
+  },
+
+  setItem(key, value) {
+    // Save locally
+    localStorage.setItem(key, value)
+
+    // Sync to server
+    fetch('/api/save-cart', {
+      method: 'POST',
+      body: JSON.stringify({ cart: value })
+    })
+  },
+
+  removeItem(key) {
+    localStorage.removeItem(key)
+    fetch('/api/clear-cart', { method: 'POST' })
+  }
+}
+
+<CartProvider storage={serverSyncStorage} />
+```
+
+## Storage Key
+
+Customize the localStorage key name for multiple carts or to avoid conflicts:
+
+```jsx
+// Main cart - stores in localStorage under 'main-cart'
+<CartProvider persistKey="main-cart">
+  <MainShop />
+</CartProvider>
+
+// Gift cart - stores in localStorage under 'gift-cart'
+<CartProvider persistKey="gift-cart">
+  <GiftShop />
+</CartProvider>
+```
+
+**Note**: The `persistKey` is used directly as the localStorage key name. There's no prefix or transformation applied.
+
+## What Gets Stored
+
+Only cart-specific data is persisted to localStorage:
+
+```typescript
+{
+  cartDetails: { /* all cart items */ },
+  cartCount: number,
+  totalPrice: number,
+  formattedTotalPrice: string
+}
+```
+
+Configuration settings (stripe key, mode, etc.) are NOT stored - only the cart items.
+
+## Data Format
+
+### Serialized State
+
+The cart data is stored as JSON in localStorage:
+
+```json
+{
+  "cartCount": 2,
+  "totalPrice": 1200,
+  "currency": "USD",
+  "cartDetails": {
+    "banana_001": {
+      "id": "banana_001",
+      "name": "Bananas",
+      "price": 400,
+      "quantity": 2,
+      "value": 800
+    },
+    "apple_001": {
+      "id": "apple_001",
+      "name": "Apples",
+      "price": 400,
+      "quantity": 1,
+      "value": 400
+    }
+  }
+}
+```
+
+## Cross-Tab Sync
+
+By default, changes in one tab don't automatically sync to other tabs. You can enable cross-tab sync:
+
+```jsx
+import { useEffect } from 'react'
+import { useShoppingCart } from 'use-shopping-cart'
+
+function CrossTabSync() {
+  const { loadCart } = useShoppingCart()
+
+  useEffect(() => {
+    // Listen for storage changes from other tabs
+    const handleStorage = (e) => {
+      // Check if it's our cart key
+      if (e.key === 'use-shopping-cart' && e.newValue) {
+        const cart = JSON.parse(e.newValue)
+        loadCart(cart.cartDetails)
+      }
+    }
+
+    window.addEventListener('storage', handleStorage)
+    return () => window.removeEventListener('storage', handleStorage)
+  }, [])
+
+  return null
+}
+```
+
+**Note**: The `storage` event only fires in OTHER tabs, not the current tab. If using a custom `persistKey`, make sure to check for that key instead of `'use-shopping-cart'`.
+
+## Manual Control
+
+### Save Manually
+
+```jsx
+const { cartDetails } = useShoppingCart()
+
+const handleSave = () => {
+  localStorage.setItem('backup-cart', JSON.stringify(cartDetails))
+}
+```
+
+### Load Manually
+
+```jsx
+const { loadCart } = useShoppingCart()
+
+const handleRestore = () => {
+  const backup = localStorage.getItem('backup-cart')
+  if (backup) {
+    loadCart(JSON.parse(backup))
+  }
+}
+```
+
+### Clear Storage
+
+```jsx
+const { clearCart } = useShoppingCart()
+
+const handleClearEverything = () => {
+  clearCart() // Clears cart state
+  localStorage.removeItem('use-shopping-cart') // Clears storage
+}
+```
+
+## Best Practices
+
+### 1. Version Your Data
+
+```javascript
+const cart = {
+  version: 1,
+  data: cartDetails
+}
+
+localStorage.setItem(key, JSON.stringify(cart))
+```
+
+### 2. Handle Corrupted Data
+
+```javascript
+const customStorage = {
+  getItem(key) {
+    try {
+      const value = localStorage.getItem(key)
+      return value ? JSON.parse(value) : null
+    } catch (error) {
+      console.error('Corrupted cart data, clearing:', error)
+      localStorage.removeItem(key)
+      return null
+    }
+  }
+}
+```
+
+### 3. Expire Old Carts
+
+```javascript
+const EXPIRY_DAYS = 30
+
+const timestampedStorage = {
+  setItem(key, value) {
+    const data = {
+      value,
+      timestamp: Date.now()
+    }
+    localStorage.setItem(key, JSON.stringify(data))
+  },
+
+  getItem(key) {
+    const item = localStorage.getItem(key)
+    if (!item) return null
+
+    const { value, timestamp } = JSON.parse(item)
+    const age = Date.now() - timestamp
+    const maxAge = EXPIRY_DAYS * 24 * 60 * 60 * 1000
+
+    if (age > maxAge) {
+      localStorage.removeItem(key)
+      return null
+    }
+
+    return value
+  }
+}
+```
+
+### 4. Compress Large Carts
+
+```javascript
+import { compress, decompress } from 'lz-string'
+
+const compressedStorage = {
+  setItem(key, value) {
+    const compressed = compress(value)
+    localStorage.setItem(key, compressed)
+  },
+
+  getItem(key) {
+    const compressed = localStorage.getItem(key)
+    return compressed ? decompress(compressed) : null
+  }
+}
+```
+
+## Troubleshooting
+
+### Cart Not Persisting
+
+Check:
+
+1. `shouldPersist={true}` is set
+2. Storage is available (not incognito)
+3. Storage quota not exceeded
+4. No localStorage errors in console
+
+### Cart Clearing on Refresh
+
+Check:
+
+1. Using localStorage, not sessionStorage
+2. Not calling `clearCart()` on mount
+3. persistKey is consistent
+4. No browser extensions clearing storage
+
+### Data Loss
+
+Implement backup strategy:
+
+```jsx
+function BackupCart() {
+  const { cartDetails } = useShoppingCart()
+
+  useEffect(() => {
+    // Backup to server every 30 seconds
+    const interval = setInterval(() => {
+      if (Object.keys(cartDetails).length > 0) {
+        fetch('/api/backup-cart', {
+          method: 'POST',
+          body: JSON.stringify({ cart: cartDetails })
+        })
+      }
+    }, 30000)
+
+    return () => clearInterval(interval)
+  }, [cartDetails])
+}
+```
+
+## See Also
+
+- [ShoppingCart Class](/docs/concepts/shopping-cart-class) - Core class
+- [shouldPersist](/docs/usage/configuration/should-persist) - Enable/disable persistence
+- [persistKey](/docs/usage/configuration/persist-key) - Custom storage key
+- [loadCart](/docs/usage/actions/load-cart) - Load cart manually

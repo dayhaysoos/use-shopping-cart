@@ -9,7 +9,6 @@
     "clearCart",
     "loadCart",
     "redirectToCheckout",
-    "checkoutSingleItem",
     "handleCartClick",
     "handleCartHover",
     "handleCloseCart",

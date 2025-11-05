@@ -44,16 +44,7 @@ function RootDocument({ children }: { children: React.ReactNode }) {
       </head>
       <body className="flex flex-col min-h-screen">
         <RootProvider>
-          <CartProvider
-            mode="payment"
-            cartMode="checkout-session"
-            stripe={''}
-            billingAddressCollection={false}
-            successUrl="https://stripe.com"
-            cancelUrl="https://twitter.com/dayhaysoos"
-            currency="USD"
-            shouldPersist={false}
-          >
+          <CartProvider stripe={''} currency="USD" shouldPersist={false}>
             {children}
           </CartProvider>
         </RootProvider>

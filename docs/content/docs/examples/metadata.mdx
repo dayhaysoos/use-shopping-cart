@@ -1,0 +1,459 @@
+---
+title: Metadata Example
+id: metadata-example
+---
+
+Using price_metadata and product_metadata to pass custom data to Stripe.
+
+## Overview
+
+Metadata allows you to attach custom information to your cart items that gets passed to Stripe. This is useful for:
+
+- Tracking inventory IDs
+- Recording custom options
+- Storing fulfillment data
+- Passing additional product info
+
+## Types of Metadata
+
+### product_metadata
+
+Attached to the Stripe Product object. Use for data that describes the product itself.
+
+### price_metadata
+
+Attached to the Stripe Price object. Use for data specific to this price/variant.
+
+## Basic Usage
+
+### Adding Metadata
+
+```jsx
+import { useShoppingCart } from 'use-shopping-cart'
+
+function ProductWithMetadata() {
+  const { addItem } = useShoppingCart()
+
+  const product = {
+    id: 'tshirt_001',
+    name: 'T-Shirt',
+    price: 2000,
+    currency: 'USD',
+    image: 'https://example.com/tshirt.jpg'
+  }
+
+  const handleAddToCart = () => {
+    addItem(product, {
+      count: 1,
+      product_metadata: {
+        category: 'apparel',
+        collection: 'summer-2024',
+        sku: 'TSHIRT-BLK-M'
+      },
+      price_metadata: {
+        size: 'Medium',
+        color: 'Black',
+        variant_id: 'var_12345'
+      }
+    })
+  }
+
+  return <button onClick={handleAddToCart}>Add to Cart</button>
+}
+```
+
+## Common Use Cases
+
+### Product Variants
+
+```jsx
+function ProductVariants({ product, selectedSize, selectedColor }) {
+  const { addItem } = useShoppingCart()
+
+  const handleAddToCart = () => {
+    addItem(product, {
+      product_metadata: {
+        base_sku: product.sku,
+        category: product.category
+      },
+      price_metadata: {
+        size: selectedSize,
+        color: selectedColor,
+        variant_sku: `${product.sku}-${selectedColor}-${selectedSize}`
+      }
+    })
+  }
+
+  return <button onClick={handleAddToCart}>Add to Cart</button>
+}
+```
+
+### Custom Engraving
+
+```jsx
+function PersonalizedProduct({ product }) {
+  const { addItem } = useShoppingCart()
+  const [engraving, setEngraving] = useState('')
+
+  const handleAddToCart = () => {
+    addItem(product, {
+      product_metadata: {
+        customizable: 'true',
+        category: 'jewelry'
+      },
+      price_metadata: {
+        engraving_text: engraving,
+        engraving_fee: engraving ? 500 : 0
+      }
+    })
+  }
+
+  return (
+    <div>
+      <input
+        type="text"
+        value={engraving}
+        onChange={(e) => setEngraving(e.target.value)}
+        placeholder="Engraving text (optional)"
+        maxLength={20}
+      />
+      <button onClick={handleAddToCart}>Add to Cart</button>
+    </div>
+  )
+}
+```
+
+### Inventory Tracking
+
+```jsx
+function InventoryTracked Product({ product, warehouseId }) {
+  const { addItem } = useShoppingCart()
+
+  const handleAddToCart = () => {
+    addItem(product, {
+      product_metadata: {
+        warehouse_id: warehouseId,
+        bin_location: product.binLocation,
+        supplier_id: product.supplierId
+      },
+      price_metadata: {
+        inventory_id: product.inventoryId,
+        reserved_quantity: 1,
+        reservation_timestamp: Date.now()
+      }
+    })
+  }
+
+  return <button onClick={handleAddToCart}>Add to Cart</button>
+}
+```
+
+### Subscription Options
+
+```jsx
+function SubscriptionProduct({ product }) {
+  const { addItem } = useShoppingCart()
+  const [billingCycle, setBillingCycle] = useState('monthly')
+
+  const handleSubscribe = () => {
+    addItem(product, {
+      product_metadata: {
+        subscription_type: 'recurring',
+        product_category: 'subscription'
+      },
+      price_metadata: {
+        billing_cycle: billingCycle,
+        billing_interval: billingCycle === 'monthly' ? 1 : 12,
+        discount_applied: billingCycle === 'annual' ? '20%' : '0%'
+      }
+    })
+  }
+
+  return (
+    <div>
+      <select
+        value={billingCycle}
+        onChange={(e) => setBillingCycle(e.target.value)}
+      >
+        <option value="monthly">Monthly</option>
+        <option value="annual">Annual (20% off)</option>
+      </select>
+      <button onClick={handleSubscribe}>Subscribe</button>
+    </div>
+  )
+}
+```
+
+## Server-Side Access
+
+### In Checkout Session Creation
+
+```js
+// pages/api/create-checkout-session.js
+import Stripe from 'stripe'
+const stripe = new Stripe(process.env.STRIPE_SECRET_KEY)
+
+export default async function handler(req, res) {
+  try {
+    const { cartDetails } = req.body
+
+    const line_items = Object.values(cartDetails).map((item) => {
+      // Access metadata from cart item
+      const productMetadata = item.product_data?.metadata || {}
+      const priceMetadata = item.price_data?.metadata || {}
+
+      console.log('Product metadata:', productMetadata)
+      console.log('Price metadata:', priceMetadata)
+
+      return {
+        price_data: {
+          currency: 'usd',
+          product_data: {
+            name: item.name,
+            images: [item.image],
+            metadata: productMetadata // Include product metadata
+          },
+          unit_amount: item.price,
+          metadata: priceMetadata // Include price metadata
+        },
+        quantity: item.quantity
+      }
+    })
+
+    const session = await stripe.checkout.sessions.create({
+      mode: 'payment',
+      line_items,
+      success_url: `${req.headers.origin}/success?session_id={CHECKOUT_SESSION_ID}`,
+      cancel_url: req.headers.origin,
+      metadata: {
+        order_type: 'web',
+        source: 'shopping-cart'
+      }
+    })
+
+    res.redirect(303, session.url)
+  } catch (error) {
+    res.status(500).json({ error: error.message })
+  }
+}
+```
+
+### In Webhooks
+
+```js
+// pages/api/webhooks/stripe.js
+import Stripe from 'stripe'
+const stripe = new Stripe(process.env.STRIPE_SECRET_KEY)
+
+export default async function handler(req, res) {
+  const sig = req.headers['stripe-signature']
+  let event
+
+  try {
+    event = stripe.webhooks.constructEvent(
+      req.body,
+      sig,
+      process.env.STRIPE_WEBHOOK_SECRET
+    )
+  } catch (err) {
+    return res.status(400).send(`Webhook Error: ${err.message}`)
+  }
+
+  if (event.type === 'checkout.session.completed') {
+    const session = event.data.object
+
+    // Retrieve full session with line items
+    const fullSession = await stripe.checkout.sessions.retrieve(session.id, {
+      expand: ['line_items.data.price.product']
+    })
+
+    // Access metadata from line items
+    for (const lineItem of fullSession.line_items.data) {
+      const productMetadata = lineItem.price.product.metadata
+      const priceMetadata = lineItem.price.metadata
+
+      console.log('Processing item:', {
+        name: lineItem.description,
+        quantity: lineItem.quantity,
+        productMetadata,
+        priceMetadata
+      })
+
+      // Use metadata for fulfillment
+      if (priceMetadata.warehouse_id) {
+        await reserveInventory({
+          warehouseId: priceMetadata.warehouse_id,
+          sku: productMetadata.base_sku,
+          quantity: lineItem.quantity
+        })
+      }
+
+      // Handle custom options
+      if (priceMetadata.engraving_text) {
+        await createEngravingOrder({
+          text: priceMetadata.engraving_text,
+          productId: lineItem.price.product.id
+        })
+      }
+    }
+  }
+
+  res.json({ received: true })
+}
+```
+
+## Best Practices
+
+### 1. Naming Conventions
+
+Use clear, consistent naming:
+
+```jsx
+// Good
+product_metadata: {
+  category: 'electronics',
+  brand: 'TechCo',
+  model: 'X1000'
+}
+
+// Avoid
+product_metadata: {
+  cat: 'elec',
+  b: 'TC',
+  m: 'X1000'
+}
+```
+
+### 2. Data Types
+
+Metadata values must be strings:
+
+```jsx
+// Correct
+price_metadata: {
+  size: 'Medium',
+  stock_quantity: '100',
+  is_featured: 'true',
+  weight_kg: '2.5'
+}
+
+// Wrong
+price_metadata: {
+  size: 'Medium',
+  stock_quantity: 100,  // Number - will be converted to string
+  is_featured: true,    // Boolean - will be converted to string
+  weight_kg: 2.5        // Number - will be converted to string
+}
+```
+
+### 3. Size Limits
+
+Stripe limits metadata:
+
+- Maximum 50 keys per object
+- Maximum 500 characters per value
+- Maximum 8 KB total per object
+
+```jsx
+// Be mindful of limits
+price_metadata: {
+  description: product.description.substring(0, 500),  // Truncate if needed
+  custom_data: JSON.stringify(complexData).substring(0, 500)
+}
+```
+
+## Complete Example
+
+```jsx
+function CompleteMetadataExample() {
+  const { addItem } = useShoppingCart()
+  const [size, setSize] = useState('M')
+  const [color, setColor] = useState('Blue')
+  const [engraving, setEngraving] = useState('')
+
+  const product = {
+    id: 'custom_tshirt_001',
+    name: 'Custom T-Shirt',
+    price: 2500,
+    currency: 'USD',
+    image: 'https://example.com/tshirt.jpg'
+  }
+
+  const handleAddToCart = () => {
+    // Calculate additional fees
+    const engravingFee = engraving ? 500 : 0
+    const totalPrice = product.price + engravingFee
+
+    addItem(
+      { ...product, price: totalPrice },
+      {
+        product_metadata: {
+          category: 'apparel',
+          type: 'tshirt',
+          customizable: 'true',
+          base_sku: 'TSHIRT-001'
+        },
+        price_metadata: {
+          size,
+          color,
+          variant_sku: `TSHIRT-001-${color}-${size}`,
+          engraving_text: engraving || 'none',
+          engraving_fee: engravingFee.toString(),
+          custom_order: 'true',
+          fulfillment_type: 'print_on_demand'
+        }
+      }
+    )
+  }
+
+  return (
+    <div className="product-customizer">
+      <h2>{product.name}</h2>
+
+      <div className="options">
+        <label>
+          Size:
+          <select value={size} onChange={(e) => setSize(e.target.value)}>
+            <option value="XS">Extra Small</option>
+            <option value="S">Small</option>
+            <option value="M">Medium</option>
+            <option value="L">Large</option>
+            <option value="XL">Extra Large</option>
+          </select>
+        </label>
+
+        <label>
+          Color:
+          <select value={color} onChange={(e) => setColor(e.target.value)}>
+            <option value="Black">Black</option>
+            <option value="White">White</option>
+            <option value="Blue">Blue</option>
+            <option value="Red">Red</option>
+          </select>
+        </label>
+
+        <label>
+          Engraving (optional, +$5):
+          <input
+            type="text"
+            value={engraving}
+            onChange={(e) => setEngraving(e.target.value)}
+            maxLength={20}
+            placeholder="Up to 20 characters"
+          />
+        </label>
+      </div>
+
+      <button onClick={handleAddToCart}>
+        Add to Cart - ${(product.price + (engraving ? 500 : 0)) / 100}
+      </button>
+    </div>
+  )
+}
+```
+
+## See Also
+
+- [addItem()](/docs/usage/actions/add-item) - Adding items with metadata
+- [Stripe Metadata](https://stripe.com/docs/api/metadata) - Official Stripe docs
+- [Webhooks](https://stripe.com/docs/webhooks) - Processing orders with metadata

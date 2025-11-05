@@ -1,0 +1,263 @@
+---
+title: ShoppingCart Class
+id: shopping-cart-class
+---
+
+Understanding the core ShoppingCart class that powers use-shopping-cart v4.0.
+
+## Overview
+
+The `ShoppingCart` class is the heart of use-shopping-cart v4.0. It manages all cart state and provides methods for cart operations using a pub/sub pattern.
+
+## Basic Structure
+
+```typescript
+class ShoppingCart {
+  private state: CartState
+  private listeners: Set<Listener>
+  private storage: Storage
+
+  constructor(config: CartConfig) {
+    this.state = this.loadInitialState()
+    this.listeners = new Set()
+    this.storage = config.storage || createLocalStorage()
+  }
+
+  // Subscribe to state changes
+  subscribe(listener: Listener): Unsubscribe {
+    this.listeners.add(listener)
+    return () => this.listeners.delete(listener)
+  }
+
+  // Get current state
+  getSnapshot(): CartState {
+    return this.state
+  }
+
+  // Notify all listeners of changes
+  private notifyListeners(): void {
+    this.listeners.forEach((listener) => listener())
+  }
+}
+```
+
+## State Management
+
+### Immutable Updates
+
+All state modifications create new state objects:
+
+```typescript
+// Adding an item
+addItem(product: Product): void {
+  const entry = this.createCartEntry(product)
+
+  this.state = {
+    ...this.state,
+    cartDetails: {
+      ...this.state.cartDetails,
+      [product.id]: entry
+    },
+    cartCount: this.state.cartCount + 1,
+    totalPrice: this.state.totalPrice + product.price
+  }
+
+  this.persistState()
+  this.notifyListeners()
+}
+```
+
+### Why Immutability?
+
+1. **Predictable**: Easy to reason about state changes
+2. **Time-travel**: Can track state history
+3. **Debugging**: Clear before/after snapshots
+4. **React-friendly**: Works perfectly with React's rendering
+
+## Pub/Sub Pattern
+
+### How It Works
+
+```
+Component subscribes
+        ↓
+   Listener registered
+        ↓
+   State changes
+        ↓
+   All listeners notified
+        ↓
+   Components re-render
+```
+
+### Example
+
+```typescript
+// Component subscribes
+const unsubscribe = cart.subscribe(() => {
+  console.log('Cart changed!', cart.getState())
+})
+
+// Make changes
+cart.addItem(product) // Logs: "Cart changed! { ... }"
+cart.removeItem(id) // Logs: "Cart changed! { ... }"
+
+// Cleanup
+unsubscribe()
+```
+
+## Methods vs Properties
+
+### When to Use Methods
+
+Methods modify the cart state:
+
+```typescript
+cart.addItem(product) // Adds item
+cart.incrementItem(id) // Increases quantity
+cart.removeItem(id) // Removes item
+cart.clearCart() // Clears everything
+```
+
+### When to Use Properties
+
+Properties read the cart state:
+
+```typescript
+const count = cart.getState().cartCount
+const total = cart.getState().totalPrice
+const items = cart.getState().cartDetails
+```
+
+## Computed Values
+
+Some values are computed on-demand:
+
+```typescript
+class ShoppingCart {
+  // Computed when accessed
+  get formattedTotalPrice(): string {
+    return formatCurrencyString({
+      value: this.state.totalPrice,
+      currency: this.state.currency,
+      language: this.state.language
+    })
+  }
+
+  // Not stored, calculated fresh each time
+  get isEmpty(): boolean {
+    return this.state.cartCount === 0
+  }
+}
+```
+
+## Persistence
+
+### Auto-Save
+
+The cart automatically persists to storage on every change:
+
+```typescript
+private persistState(): void {
+  if (this.config.shouldPersist) {
+    const serialized = JSON.stringify(this.state)
+    this.storage.setItem(this.config.persistKey, serialized)
+  }
+}
+```
+
+### Auto-Load
+
+On initialization, the cart loads from storage:
+
+```typescript
+private loadInitialState(): CartState {
+  if (!this.config.shouldPersist) {
+    return this.createEmptyState()
+  }
+
+  const saved = this.storage.getItem(this.config.persistKey)
+  return saved ? JSON.parse(saved) : this.createEmptyState()
+}
+```
+
+## Error Handling
+
+The class includes built-in error handling:
+
+```typescript
+addItem(product: Product): void {
+  try {
+    this.validateProduct(product)
+    // ... add item logic
+  } catch (error) {
+    console.error('Failed to add item:', error)
+    // State remains unchanged
+  }
+}
+
+private validateProduct(product: Product): void {
+  if (!product.id) {
+    throw new Error('Product must have an id')
+  }
+  if (!product.price || product.price < 0) {
+    throw new Error('Product must have a valid price')
+  }
+}
+```
+
+## Testing
+
+The class is easily testable:
+
+```typescript
+import { ShoppingCart } from 'use-shopping-cart/core'
+
+test('adds item to cart', () => {
+  const cart = new ShoppingCart({
+    currency: 'USD',
+    stripe: 'pk_test_...'
+  })
+
+  const product = {
+    id: 'test_1',
+    name: 'Test Product',
+    price: 1000,
+    currency: 'USD'
+  }
+
+  cart.addItem(product)
+
+  expect(cart.getState().cartCount).toBe(1)
+  expect(cart.getState().totalPrice).toBe(1000)
+})
+```
+
+## Direct Usage (Advanced)
+
+While most users use `useShoppingCart()`, you can use the class directly:
+
+```typescript
+import { ShoppingCart } from 'use-shopping-cart/core'
+
+const cart = new ShoppingCart({
+  currency: 'USD',
+  stripe: 'pk_test_...'
+})
+
+// Subscribe to changes
+cart.subscribe(() => {
+  updateUI(cart.getState())
+})
+
+// Use cart methods
+cart.addItem(product)
+cart.incrementItem('product_id')
+cart.clearCart()
+```
+
+## See Also
+
+- [Architecture](/docs/architecture) - Overall architecture
+- [Persistence](/docs/concepts/persistence) - How persistence works
+- [useShoppingCart](/docs/usage/hooks/use-shopping-cart) - React hook wrapper

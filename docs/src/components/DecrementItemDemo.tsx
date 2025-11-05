@@ -1,3 +1,5 @@
+'use client'
+
 import React from 'react'
 import { useShoppingCart, formatCurrencyString } from 'use-shopping-cart'
 import type { Product } from 'use-shopping-cart/core'
@@ -12,8 +14,8 @@ const sampleProduct: Product = {
   image: 'https://i.imgur.com/AUJQtJC.jpg'
 }
 
-export function AddItemDemo() {
-  const { addItem, cartCount, cartDetails } = useShoppingCart()
+export function DecrementItemDemo() {
+  const { decrementItem, cartCount, cartDetails } = useShoppingCart()
 
   const price = formatCurrencyString({
     value: sampleProduct.price,
@@ -55,45 +57,29 @@ export function AddItemDemo() {
 
           {/* Action Buttons */}
           <div className="flex flex-col gap-3">
-            <h4 className="font-semibold mb-2">Try it out:</h4>
+            <h4 className="font-semibold mb-2">Decrement Item:</h4>
 
             <button
-              onClick={() => addItem(sampleProduct)}
-              className="px-4 py-2 bg-fd-primary text-fd-primary-foreground rounded-md hover:bg-fd-primary/90 transition-colors"
+              onClick={() => decrementItem(sampleProduct.id!)}
+              disabled={!itemInCart}
+              className="px-4 py-2 bg-fd-primary text-fd-primary-foreground rounded-md hover:bg-fd-primary/90 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
             >
-              Add to cart
+              Decrement by 1
             </button>
 
             <button
-              onClick={() => addItem(sampleProduct, { count: 10 })}
-              className="px-4 py-2 bg-fd-primary text-fd-primary-foreground rounded-md hover:bg-fd-primary/90 transition-colors"
+              onClick={() => decrementItem(sampleProduct.id!, { count: 5 })}
+              disabled={!itemInCart || itemInCart.quantity < 5}
+              className="px-4 py-2 bg-fd-primary text-fd-primary-foreground rounded-md hover:bg-fd-primary/90 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
             >
-              Add 10 to cart
+              Decrement by 5
             </button>
 
-            <button
-              onClick={() =>
-                addItem(sampleProduct, {
-                  count: 1,
-                  price_metadata: { type: 'fruit' }
-                })
-              }
-              className="px-4 py-2 bg-fd-secondary text-fd-secondary-foreground rounded-md hover:bg-fd-secondary/90 transition-colors"
-            >
-              Add with price metadata
-            </button>
-
-            <button
-              onClick={() =>
-                addItem(sampleProduct, {
-                  count: 1,
-                  product_metadata: { category: 'fruit' }
-                })
-              }
-              className="px-4 py-2 bg-fd-secondary text-fd-secondary-foreground rounded-md hover:bg-fd-secondary/90 transition-colors"
-            >
-              Add with product metadata
-            </button>
+            <p className="text-sm text-fd-muted-foreground mt-2">
+              {!itemInCart
+                ? '⚠️ Add the item to cart first to decrement'
+                : 'Click to decrease quantity (removes item if quantity reaches 0)'}
+            </p>
           </div>
         </div>
       </div>

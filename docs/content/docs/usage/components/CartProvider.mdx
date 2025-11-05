@@ -3,24 +3,47 @@ title: CartProvider
 id: cart-provider
 ---
 
-## CheckoutSession mode
+The `<CartProvider />` component wraps your app and provides cart state and methods to all child components via the `useShoppingCart()` hook.
 
-Creating a [CheckoutSession](https://stripe.com/docs/payments/checkout/one-time#create-checkout-session) server-side allows for a more flexible and powerful integration but requires a server component (e.g. a Netlify Function).
+## CheckoutSession Mode (Recommended)
+
+Creating a [CheckoutSession](https://stripe.com/docs/payments/checkout/one-time#create-checkout-session) server-side allows for a more flexible and powerful integration and provides access to all modern Stripe features.
 
 At the root level of your app, wrap your Root app in the `<CartProvider />`
 
+### Basic Example
+
 ```jsx
 import ReactDOM from 'react-dom'
-
 import { CartProvider } from 'use-shopping-cart'
-
 import App from './App'
 
 // Remember to add your public Stripe key
 const stripeKey = process.env.YOUR_STRIPE_PUBLIC_KEY
 
 ReactDOM.render(
-  <CartProvider cartMode="checkout-session" stripe={stripeKey} currency="USD">
+  <CartProvider stripe={stripeKey} currency="USD">
+    <App />
+  </CartProvider>,
+  document.getElementById('root')
+)
+```
+
+### With Custom Persistence Settings
+
+```jsx
+import ReactDOM from 'react-dom'
+import { CartProvider } from 'use-shopping-cart'
+import App from './App'
+
+ReactDOM.render(
+  <CartProvider
+    stripe={process.env.STRIPE_PUBLISHABLE_KEY}
+    currency="USD"
+    // Optional: Customize cart persistence
+    shouldPersist={true} // Enable persistence (default: true)
+    persistKey="my-custom-cart" // Custom localStorage key (default: 'use-shopping-cart')
+  >
     <App />
   </CartProvider>,
   document.getElementById('root')
@@ -49,61 +72,42 @@ const products = [
 
 Additionally, you must verify the cartItems on the server-side before creating the CheckoutSession. For this you can use the [validateCartItems() helper](/docs/usage/serverless/validate-cart-items).
 
-## Client-only Checkout mode
+## Complete Props Reference
 
-To operate a checkout page without any server component you need to enable client-only checkout mode and insert your product information in your Stripe Dashboard:
+| Prop            | Type             | Required | Default               | Description                                                        |
+| --------------- | ---------------- | -------- | --------------------- | ------------------------------------------------------------------ |
+| `stripe`        | `string`         | Yes      | -                     | Stripe publishable key (pk\_...) for client-side checkout redirect |
+| `currency`      | `string`         | No       | `'USD'`               | ISO currency code (e.g., 'USD', 'EUR', 'GBP')                      |
+| `language`      | `string`         | No       | Browser language      | Language for currency formatting (e.g., 'en-US', 'fr-FR')          |
+| `shouldPersist` | `boolean`        | No       | `true`                | Enable cart persistence in localStorage                            |
+| `persistKey`    | `string`         | No       | `'use-shopping-cart'` | localStorage key name for cart data                                |
+| `storage`       | `StorageAdapter` | No       | `localStorage`        | Custom storage adapter for persistence                             |
 
-- [Enable client-only Checkout](https://stripe.com/docs/payments/checkout/client#enable-checkout)
-- [Create your products](https://stripe.com/docs/payments/checkout/client#create-products)
+### Configuring Checkout Features
 
-At the root level of your app, wrap your Root app in the `<CartProvider />`
+Modern Stripe features (phone collection, promotion codes, automatic tax, custom fields, shipping options, etc.) should be configured **server-side** when creating the checkout session in your endpoint.
 
-```jsx
-import ReactDOM from 'react-dom'
-
-import { CartProvider } from 'use-shopping-cart'
-
-import App from './App'
-
-// Remember to add your public Stripe key
-const stripeKey = process.env.YOUR_STRIPE_PUBLIC_KEY
-
-ReactDOM.render(
-  <CartProvider
-    // Mode configuration for Stripe: payment or subscription
-    mode="payment"
-    // The mode for how you want to use the hooks. 'client-only' and 'checkout-session' are the options
-    cartMode="client-only"
-    stripe={stripeKey}
-    // The URL to which Stripe should send customers when payment is complete.
-    successUrl="http://localhost:3000/success"
-    // The URL to which Stripe should send customers when payment is canceled.
-    cancelUrl="http://localhost:3000"
-    currency="USD"
-    // https://stripe.com/docs/payments/checkout/client#collect-shipping-address
-    allowedCountries={['US', 'GB', 'CA']}
-    // https://stripe.com/docs/payments/checkout/client#collect-billing-address
-    billingAddressCollection={true}
-  >
-    <App />
-  </CartProvider>,
-  document.getElementById('root')
-)
-```
-
-When operating in client-only mode you must set the `successUrl` and `cancelUrl` props on the `CartProvider` component, and the product object must adhere to the following shape:
+Example:
 
 ```js
-const products = [
-  {
-    name: 'Bananas',
-    // sku ID from your Stripe Dashboard
-    sku: 'sku_GBJ2Ep8246qeeT',
-    // price in smallest currency unit (e.g. cent for USD)
-    price: 400,
-    currency: 'USD',
-    // Optional image to be shown on the Stripe Checkout page
-    image: 'https://my-image.com/image.jpg'
-  }
-]
+// In your server endpoint
+const session = await stripe.checkout.sessions.create({
+  mode: 'payment',
+  line_items,
+  success_url: `${origin}/success`,
+  cancel_url: origin,
+
+  // Configure all Stripe features here
+  phone_number_collection: { enabled: true },
+  allow_promotion_codes: true,
+  automatic_tax: { enabled: true }
+})
 ```
+
+See [Stripe's Checkout Session API](https://stripe.com/docs/api/checkout/sessions/create) for all available options.
+
+## Client-only Checkout Mode (Removed)
+
+> ⚠️ **REMOVED:** Client-only mode has been removed in v4.0. Please use checkout-session mode.
+
+See the [migration guide](/docs/migration-v4) for help upgrading.

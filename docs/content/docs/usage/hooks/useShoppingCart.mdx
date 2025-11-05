@@ -1,0 +1,189 @@
+---
+title: useShoppingCart()
+id: use-shopping-cart
+---
+
+The main hook for accessing shopping cart state and methods. Returns all cart properties and action methods.
+
+## Signature
+
+```typescript
+function useShoppingCart(): UseShoppingCartReturn
+```
+
+## Usage
+
+```jsx
+import { useShoppingCart } from 'use-shopping-cart'
+
+function MyComponent() {
+  const {
+    // Cart state
+    cartCount,
+    totalPrice,
+    formattedTotalPrice,
+    cartDetails,
+
+    // Cart actions
+    addItem,
+    removeItem,
+    incrementItem,
+    decrementItem,
+    clearCart,
+
+    // Checkout
+    redirectToCheckout
+  } = useShoppingCart()
+
+  // Use cart state and methods
+}
+```
+
+## Return Value
+
+The hook returns an object with all cart state and methods:
+
+### Cart State Properties
+
+| Property              | Type      | Description                                   |
+| --------------------- | --------- | --------------------------------------------- |
+| `cartCount`           | `number`  | Total number of items in cart                 |
+| `totalPrice`          | `number`  | Total price in smallest currency unit         |
+| `formattedTotalPrice` | `string`  | Formatted total price with currency symbol    |
+| `cartDetails`         | `object`  | Object containing all cart items with details |
+| `shouldDisplayCart`   | `boolean` | UI helper for displaying cart                 |
+| `lastClicked`         | `string`  | ID of last clicked product                    |
+
+### Cart Manipulation Methods
+
+| Method                                                                   | Description                    |
+| ------------------------------------------------------------------------ | ------------------------------ |
+| [`addItem(product, options?)`](/docs/usage/actions/add-item)             | Add product to cart            |
+| [`incrementItem(id, options?)`](/docs/usage/actions/increment-item)      | Increase quantity by 1         |
+| [`decrementItem(id, options?)`](/docs/usage/actions/decrement-item)      | Decrease quantity by 1         |
+| [`setItemQuantity(id, quantity)`](/docs/usage/actions/set-item-quantity) | Set specific quantity          |
+| [`removeItem(id)`](/docs/usage/actions/remove-item)                      | Remove item from cart          |
+| [`clearCart()`](/docs/usage/actions/clear-cart)                          | Remove all items               |
+| [`loadCart(cartDetails)`](/docs/usage/actions/load-cart)                 | Load cart from external source |
+
+### Checkout Methods
+
+| Method                                                                      | Description                                             |
+| --------------------------------------------------------------------------- | ------------------------------------------------------- |
+| [`redirectToCheckout(sessionId)`](/docs/usage/actions/redirect-to-checkout) | Redirect to Stripe checkout with server-created session |
+
+### UI Helper Methods
+
+| Method                                                                  | Description                |
+| ----------------------------------------------------------------------- | -------------------------- |
+| [`handleCartClick()`](/docs/usage/actions/handle-cart-click)            | Toggle cart display        |
+| [`handleCartHover()`](/docs/usage/actions/handle-cart-hover)            | Handle cart hover          |
+| [`handleCloseCart()`](/docs/usage/actions/handle-close-cart)            | Close cart display         |
+| [`storeLastClicked(productId)`](/docs/usage/actions/store-last-clicked) | Store last clicked product |
+
+## Complete Examples
+
+### Basic Cart Operations
+
+```jsx
+function ProductCard({ product }) {
+  const { addItem, cartDetails } = useShoppingCart()
+
+  const itemInCart = cartDetails[product.id]
+
+  return (
+    <div className="product">
+      <h3>{product.name}</h3>
+      <p>${product.price / 100}</p>
+
+      {itemInCart ? (
+        <p>In cart: {itemInCart.quantity}</p>
+      ) : (
+        <button onClick={() => addItem(product)}>Add to Cart</button>
+      )}
+    </div>
+  )
+}
+```
+
+### Cart Display Component
+
+```jsx
+function CartSummary() {
+  const {
+    cartCount,
+    formattedTotalPrice,
+    cartDetails,
+    incrementItem,
+    decrementItem,
+    removeItem,
+    redirectToCheckout
+  } = useShoppingCart()
+
+  if (cartCount === 0) {
+    return <p>Your cart is empty</p>
+  }
+
+  return (
+    <div className="cart">
+      <h2>Cart ({cartCount} items)</h2>
+
+      {Object.entries(cartDetails).map(([id, item]) => (
+        <div key={id} className="cart-item">
+          <h4>{item.name}</h4>
+          <p>{item.formattedPrice}</p>
+
+          <div className="quantity-controls">
+            <button onClick={() => decrementItem(id)}>-</button>
+            <span>{item.quantity}</span>
+            <button onClick={() => incrementItem(id)}>+</button>
+            <button onClick={() => removeItem(id)}>Remove</button>
+          </div>
+        </div>
+      ))}
+
+      <div className="cart-total">
+        <h3>Total: {formattedTotalPrice}</h3>
+        <button onClick={() => redirectToCheckout()}>Checkout</button>
+      </div>
+    </div>
+  )
+}
+```
+
+## TypeScript Support
+
+```typescript
+import { useShoppingCart } from 'use-shopping-cart'
+import type { Product } from 'use-shopping-cart/core'
+
+function TypeSafeComponent() {
+  const { addItem, cartDetails, incrementItem } = useShoppingCart()
+
+  // Fully typed product
+  const product: Product = {
+    id: 'banana_001',
+    name: 'Bananas',
+    price: 400,
+    currency: 'USD'
+  }
+
+  addItem(product)
+}
+```
+
+## Notes
+
+- Must be used within a `<CartProvider>` component
+- Returns stable references (safe to use in dependency arrays)
+- All methods are memoized
+- State updates trigger re-renders
+- Works with React 19+ features
+
+## See Also
+
+- [useOptimisticCart()](/docs/usage/hooks/use-optimistic-cart) - Optimistic UI updates
+- [useCartActions()](/docs/usage/hooks/use-cart-actions) - Form action integration
+- [CartProvider](/docs/usage/components/cart-provider) - Provider component
+- [Properties](/docs/usage/properties) - All available properties
+- [Actions](/docs/usage/actions) - All available methods

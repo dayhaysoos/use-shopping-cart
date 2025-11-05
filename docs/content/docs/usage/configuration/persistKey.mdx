@@ -3,28 +3,128 @@ title: persistKey
 id: persistKey
 ---
 
-This property allows you to override the default key used to persist the cart in `localStorage`. By default, the cart is stored under the key `root`.
+This property specifies the localStorage key name used to persist the cart. By default, the cart is stored under the key `'use-shopping-cart'`.
 
-```js
+## Type
+
+`string`
+
+## Default
+
+`'use-shopping-cart'`
+
+## Usage
+
+```jsx
 import ReactDOM from 'react-dom'
 import { CartProvider } from 'use-shopping-cart/react'
-
 import App from './App'
 
 ReactDOM.render(
   <CartProvider
-    mode="payment"
-    cartMode="checkout-session"
     stripe={process.env.REACT_APP_STRIPE_API_PUBLIC}
-    billingAddressCollection={false}
-    successUrl="https://stripe.com"
-    cancelUrl="https://twitter.com/dayhaysoos"
     currency="USD"
-    shouldPersist={false}
-    persistKey="my-redux-persist-key"
+    persistKey="my-custom-cart"
   >
     <App />
   </CartProvider>,
   document.getElementById('root')
 )
 ```
+
+## How It Works
+
+The `persistKey` is used directly as the localStorage key:
+
+```js
+// Default behavior
+localStorage.setItem('use-shopping-cart', cartData)
+
+// With custom persistKey
+localStorage.setItem('my-custom-cart', cartData)
+```
+
+## Common Use Cases
+
+### Multiple Cart Instances
+
+Run multiple independent carts on the same site:
+
+```jsx
+// Main shopping cart
+<CartProvider persistKey="main-cart">
+  <MainStore />
+</CartProvider>
+
+// Gift registry cart
+<CartProvider persistKey="gift-registry">
+  <GiftRegistry />
+</CartProvider>
+```
+
+Each cart maintains its own separate localStorage entry.
+
+### Environment-Specific Keys
+
+Use different keys for development and production:
+
+```jsx
+const persistKey = process.env.NODE_ENV === 'production'
+  ? 'shopping-cart'
+  : 'dev-shopping-cart'
+
+<CartProvider persistKey={persistKey}>
+  <App />
+</CartProvider>
+```
+
+### Namespace by User
+
+For multi-tenant applications:
+
+```jsx
+const persistKey = `cart-${userId}`
+
+<CartProvider persistKey={persistKey}>
+  <App />
+</CartProvider>
+```
+
+### Avoid Conflicts
+
+If your app uses localStorage extensively:
+
+```jsx
+<CartProvider persistKey="mystore-shopping-cart">
+  <App />
+</CartProvider>
+```
+
+## Inspecting in DevTools
+
+You can view the persisted cart data:
+
+1. Open browser DevTools
+2. Go to Application > Storage > Local Storage
+3. Find your key (default: `'use-shopping-cart'`)
+4. View the JSON cart data
+
+## Clear Specific Cart
+
+```js
+// Clear specific cart from localStorage
+localStorage.removeItem('my-custom-cart')
+```
+
+## Notes
+
+- Only relevant when `shouldPersist={true}` (default)
+- The key is used as-is, no prefixes or transformations
+- Choose unique keys to avoid conflicts
+- Keep keys consistent to maintain cart across sessions
+
+## See Also
+
+- [shouldPersist](/docs/usage/configuration/should-persist) - Enable/disable persistence
+- [storage](/docs/usage/configuration/storage) - Custom storage adapters
+- [Persistence](/docs/concepts/persistence) - How persistence works

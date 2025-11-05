@@ -13,12 +13,7 @@ import App from './App'
 
 ReactDOM.render(
   <CartProvider
-    mode="payment"
-    cartMode="checkout-session"
     stripe={process.env.REACT_APP_STRIPE_API_PUBLIC}
-    billingAddressCollection={false}
-    successUrl="https://stripe.com"
-    cancelUrl="https://twitter.com/dayhaysoos"
     currency="USD"
     shouldPersist={false}
   >

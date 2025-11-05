@@ -5,3 +5,33 @@ id: clear-cart
 
 `clearCart()` totally empties out the shopping cart. You might want to run this
 on your successUrl page to clear the products out of local storage.
+
+## Usage
+
+```jsx
+import { useShoppingCart } from 'use-shopping-cart'
+
+function CheckoutSuccess() {
+  const { clearCart } = useShoppingCart()
+
+  useEffect(() => {
+    // Clear cart after successful payment
+    clearCart()
+  }, [])
+
+  return (
+    <div>
+      <h1>Thank you for your purchase!</h1>
+      <p>Your cart has been cleared.</p>
+    </div>
+  )
+}
+```
+
+## Interactive Demo
+
+import { ClearCartDemo } from '../../../../src/components/ClearCartDemo'
+
+<ClearCartDemo />
+
+Try adding items and clearing the cart above! The cart state persists across all documentation pages.

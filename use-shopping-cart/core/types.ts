@@ -87,107 +87,36 @@ export interface CartState {
    */
   cartDetails: CartDetails
   /**
-   * Public Stripe key used for checkout.
+   * Stripe publishable key (pk_...) for client-side redirect to checkout.
+   * Used by redirectToCheckout() to initialize Stripe.js.
    */
   stripe?: string
   /**
-   * The mode used for determining if you will be checking out with Stripe
-   * in the client's browser only or instead by creating a checkout session
-   * with your server/serverless function.
+   * Currency code (ISO 4217) for cart pricing
    */
-  cartMode: 'checkout-session' | 'client-only'
-  /**
-   * The type of payment mode to be used in client-only cart mode.
-   */
-  mode: 'subscription' | 'payment' | 'setup'
-  /**
-   * The redirect url for a successful sale.
-   */
-  successUrl?: string
-  /**
-   * The redirect url for a cancelled sale.
-   */
-  cancelUrl?: string
-  /**
-   * Should the billing address be collected at the checkout. Defaults to false
-   */
-  billingAddressCollection?: boolean
-  /**
-   * The allowed countries
-   */
-  allowedCountries?: null | string[]
-  shouldDisplayCart: boolean
-  lastClicked: string
   currency: string
+  /**
+   * Language for currency formatting (e.g., 'en-US', 'fr-FR')
+   */
   language: string
   /**
-   * Determines if cart data should be persisted in local storage or not
+   * UI helper for displaying/hiding cart
+   */
+  shouldDisplayCart: boolean
+  /**
+   * ID of the last clicked product
+   */
+  lastClicked: string
+  /**
+   * Determines if cart data should be persisted in local storage
    */
   shouldPersist: boolean
-  /**
-   * Enable phone number collection at checkout
-   */
-  collectPhoneNumber?: boolean
-  /**
-   * Allow customers to enter promotion codes at checkout
-   */
-  allowPromotionCodes?: boolean
-  /**
-   * Enable automatic tax calculation
-   */
-  automaticTax?: boolean
-  /**
-   * Pre-fill customer email at checkout
-   */
-  customerEmail?: string
-  /**
-   * Require customers to accept terms of service
-   */
-  requireTermsOfService?: boolean
-  /**
-   * UI mode for checkout: 'hosted' (default) or 'embedded'
-   */
-  uiMode?: 'hosted' | 'embedded'
-  /**
-   * Custom text to display at checkout
-   */
-  customText?: {
-    shippingAddress?: string
-    submit?: string
-    termsOfService?: string
-  }
-  /**
-   * Custom fields to collect at checkout
-   */
-  customFields?: Array<{
-    key: string
-    label: string
-    type: 'text' | 'dropdown' | 'numeric'
-    optional?: boolean
-    dropdown?: { options: Array<{ label: string; value: string }> }
-  }>
-  /**
-   * Shipping options for checkout
-   */
-  shippingOptions?: Array<{
-    shippingRateId?: string
-    displayName?: string
-    amount?: number
-    deliveryEstimate?: {
-      minimum: { unit: 'day' | 'week'; value: number }
-      maximum: { unit: 'day' | 'week'; value: number }
-    }
-  }>
-  /**
-   * Endpoint for creating checkout session (required for embedded checkout)
-   */
-  createSessionEndpoint?: string
 }
 
 export interface CartConfig extends Partial<CartState> {
   /**
-   * String value to append after 'persist:' as the storage key when cart persistence is enabled. defaults to 'root'
-   * (thus creating the full storage key 'persist:root')
+   * The localStorage key name used to persist cart data. Defaults to 'use-shopping-cart'.
+   * Use this to namespace multiple carts or avoid conflicts with other storage keys.
    */
   persistKey?: string
   /**

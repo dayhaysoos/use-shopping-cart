@@ -1,3 +1,5 @@
+'use client'
+
 import React from 'react'
 import { useShoppingCart, formatCurrencyString } from 'use-shopping-cart'
 import type { Product } from 'use-shopping-cart/core'
@@ -12,8 +14,8 @@ const sampleProduct: Product = {
   image: 'https://i.imgur.com/AUJQtJC.jpg'
 }
 
-export function AddItemDemo() {
-  const { addItem, cartCount, cartDetails } = useShoppingCart()
+export function RemoveItemDemo() {
+  const { removeItem, addItem, cartCount, cartDetails } = useShoppingCart()
 
   const price = formatCurrencyString({
     value: sampleProduct.price,
@@ -57,43 +59,27 @@ export function AddItemDemo() {
           <div className="flex flex-col gap-3">
             <h4 className="font-semibold mb-2">Try it out:</h4>
 
-            <button
-              onClick={() => addItem(sampleProduct)}
-              className="px-4 py-2 bg-fd-primary text-fd-primary-foreground rounded-md hover:bg-fd-primary/90 transition-colors"
-            >
-              Add to cart
-            </button>
+            {!itemInCart ? (
+              <button
+                onClick={() => addItem(sampleProduct, { count: 5 })}
+                className="px-4 py-2 bg-fd-primary text-fd-primary-foreground rounded-md hover:bg-fd-primary/90 transition-colors"
+              >
+                Add 5 to cart
+              </button>
+            ) : (
+              <button
+                onClick={() => removeItem(sampleProduct.id!)}
+                className="px-4 py-2 bg-red-600 text-white rounded-md hover:bg-red-700 transition-colors"
+              >
+                Remove all from cart
+              </button>
+            )}
 
-            <button
-              onClick={() => addItem(sampleProduct, { count: 10 })}
-              className="px-4 py-2 bg-fd-primary text-fd-primary-foreground rounded-md hover:bg-fd-primary/90 transition-colors"
-            >
-              Add 10 to cart
-            </button>
-
-            <button
-              onClick={() =>
-                addItem(sampleProduct, {
-                  count: 1,
-                  price_metadata: { type: 'fruit' }
-                })
-              }
-              className="px-4 py-2 bg-fd-secondary text-fd-secondary-foreground rounded-md hover:bg-fd-secondary/90 transition-colors"
-            >
-              Add with price metadata
-            </button>
-
-            <button
-              onClick={() =>
-                addItem(sampleProduct, {
-                  count: 1,
-                  product_metadata: { category: 'fruit' }
-                })
-              }
-              className="px-4 py-2 bg-fd-secondary text-fd-secondary-foreground rounded-md hover:bg-fd-secondary/90 transition-colors"
-            >
-              Add with product metadata
-            </button>
+            <p className="text-sm text-fd-muted-foreground mt-2">
+              {!itemInCart
+                ? 'Add items to cart, then remove them completely'
+                : 'removeItem() removes the entire entry regardless of quantity'}
+            </p>
           </div>
         </div>
       </div>

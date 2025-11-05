@@ -3,10 +3,13 @@
   "pages": [
     "index",
     "getting-started",
-    "getting-started-serverless",
     "typescript",
+    "migration-v4",
+    "architecture",
     "discord",
-    "usage"
+    "usage",
+    "examples",
+    "concepts"
   ]
 }
 

@@ -1,0 +1,241 @@
+---
+title: storage
+id: storage
+---
+
+Configure custom storage adapters for cart persistence.
+
+## Type
+
+```typescript
+interface Storage {
+  getItem(key: string): string | null
+  setItem(key: string, value: string): void
+  removeItem(key: string): void
+}
+```
+
+## Default
+
+`createLocalStorage()` - Uses browser's localStorage
+
+## Usage
+
+### Default (LocalStorage)
+
+```jsx
+<CartProvider
+  stripe={STRIPE_KEY}
+  currency="USD"
+  // Uses localStorage by default
+>
+  <App />
+</CartProvider>
+```
+
+### SessionStorage
+
+```jsx
+import { createSessionStorage } from 'use-shopping-cart/core'
+
+;<CartProvider
+  stripe={STRIPE_KEY}
+  currency="USD"
+  storage={createSessionStorage()}
+>
+  <App />
+</CartProvider>
+```
+
+### Memory Storage
+
+```jsx
+import { createMemoryStorage } from 'use-shopping-cart/core'
+
+;<CartProvider
+  stripe={STRIPE_KEY}
+  currency="USD"
+  storage={createMemoryStorage()}
+>
+  <App />
+</CartProvider>
+```
+
+### No Storage
+
+```jsx
+import { createNoopStorage } from 'use-shopping-cart/core'
+
+;<CartProvider
+  stripe={STRIPE_KEY}
+  currency="USD"
+  storage={createNoopStorage()}
+  // Or simply:
+  // shouldPersist={false}
+>
+  <App />
+</CartProvider>
+```
+
+## Built-in Adapters
+
+### createLocalStorage() (Default)
+
+```typescript
+import { createLocalStorage } from 'use-shopping-cart/core'
+
+;<CartProvider storage={createLocalStorage()}>
+  <App />
+</CartProvider>
+```
+
+- Persists across browser sessions
+- ~5-10MB storage limit
+- Synchronous API
+- Not available in incognito mode
+- **Used by default** if no storage specified
+
+### createSessionStorage()
+
+```typescript
+import { createSessionStorage } from 'use-shopping-cart/core'
+
+;<CartProvider storage={createSessionStorage()}>
+  <App />
+</CartProvider>
+```
+
+- Clears when browser closes
+- ~5-10MB storage limit
+- Synchronous API
+- Per-tab storage
+- Good for temporary shopping sessions
+
+## Custom Storage Adapter
+
+### Example: Async Storage (React Native)
+
+```jsx
+import AsyncStorage from '@react-native-async-storage/async-storage'
+
+const asyncStorageAdapter = {
+  getItem: (key) => {
+    return AsyncStorage.getItem(key)
+  },
+  setItem: (key, value) => {
+    return AsyncStorage.setItem(key, value)
+  },
+  removeItem: (key) => {
+    return AsyncStorage.removeItem(key)
+  }
+}
+
+<CartProvider storage={asyncStorageAdapter}>
+  <App />
+</CartProvider>
+```
+
+### Example: Server Sync
+
+```jsx
+const serverSyncStorage = {
+  getItem(key) {
+    // Return from localStorage as fallback
+    return localStorage.getItem(key)
+  },
+
+  setItem(key, value) {
+    // Save locally first
+    localStorage.setItem(key, value)
+
+    // Then sync to server (fire and forget)
+    fetch('/api/save-cart', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ key, value })
+    }).catch(console.error)
+  },
+
+  removeItem(key) {
+    localStorage.removeItem(key)
+
+    fetch('/api/clear-cart', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ key })
+    }).catch(console.error)
+  }
+}
+
+<CartProvider storage={serverSyncStorage} />
+```
+
+### Example: Compressed Storage
+
+```jsx
+import LZString from 'lz-string'
+
+const compressedStorage = {
+  getItem(key) {
+    const compressed = localStorage.getItem(key)
+    return compressed ? LZString.decompress(compressed) : null
+  },
+
+  setItem(key, value) {
+    const compressed = LZString.compress(value)
+    localStorage.setItem(key, compressed)
+  },
+
+  removeItem(key) {
+    localStorage.removeItem(key)
+  }
+}
+
+<CartProvider storage={compressedStorage} />
+```
+
+### Example: IndexedDB
+
+```jsx
+import { openDB } from 'idb'
+
+const dbPromise = openDB('cart-db', 1, {
+  upgrade(db) {
+    db.createObjectStore('cart')
+  }
+})
+
+const indexedDBStorage = {
+  async getItem(key) {
+    const db = await dbPromise
+    return db.get('cart', key)
+  },
+
+  async setItem(key, value) {
+    const db = await dbPromise
+    return db.put('cart', value, key)
+  },
+
+  async removeItem(key) {
+    const db = await dbPromise
+    return db.delete('cart', key)
+  }
+}
+
+<CartProvider storage={indexedDBStorage} />
+```
+
+## Notes
+
+- Storage adapter is called on every cart change
+- Must implement all three methods: `getItem`, `setItem`, `removeItem`
+- Methods can be async (return Promises)
+- Values are always strings (serialized JSON)
+- Handle errors gracefully to prevent cart crashes
+- SSR is handled automatically (no special storage needed)
+
+## See Also
+
+- [Persistence](/docs/concepts/persistence) - How persistence works
+- [shouldPersist](/docs/usage/configuration/should-persist) - Enable/disable
+- [persistKey](/docs/usage/configuration/persist-key) - Storage key
