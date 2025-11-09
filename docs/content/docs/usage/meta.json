@@ -2,7 +2,6 @@
   "title": "Usage",
   "pages": [
     "actions",
-    "configuration",
     "helpers",
     "serverless"
   ]
