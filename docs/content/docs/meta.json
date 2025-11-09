@@ -3,13 +3,12 @@
   "pages": [
     "index",
     "getting-started",
-    "typescript",
-    "migration-v4",
-    "architecture",
-    "discord",
     "usage",
     "examples",
-    "concepts"
+    "discord",
+    "concepts",
+    "typescript",
+    "migration-v4"
   ]
 }
 
