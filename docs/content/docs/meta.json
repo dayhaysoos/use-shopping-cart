@@ -3,6 +3,7 @@
   "pages": [
     "index",
     "getting-started",
+    "examples",
     "components",
     "hooks",
     "actions",
@@ -10,10 +11,7 @@
     "configuration",
     "helpers",
     "serverless",
-    "examples",
-    "discord",
     "concepts",
-    "typescript",
     "migration-v4"
   ]
 }
