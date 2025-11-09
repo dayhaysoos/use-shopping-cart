@@ -3,6 +3,9 @@
   "pages": [
     "index",
     "getting-started",
+    "components",
+    "hooks",
+    "properties",
     "usage",
     "examples",
     "discord",
