@@ -3,66 +3,98 @@ title: setItemQuantity()
 id: set-item-quantity
 ---
 
-`setItemQuantity(id, quantity)` allows you to update the quantity of an entry in the cart by the ID of the product.
+Sets an item's quantity to a specific number. If set to 0, the item is removed from the cart.
 
-```jsx
-import React from 'react'
+## Basic Usage
+
+```typescript
 import { useShoppingCart } from 'use-shopping-cart'
 
-export function Cart() {
+function CartItem({ itemId }: { itemId: string }) {
   const { setItemQuantity, cartDetails } = useShoppingCart()
+  const item = cartDetails[itemId]
 
-  const entries = []
-  for (const id in cartDetails) {
-    const entry = cartDetails[id]
+  return (
+    <div className="cart-item">
+      <span>{item.name}</span>
 
-    const options = []
-    for (let quantity = 1; quantity <= 20; ++quantity)
-      options.push(<option value={quantity}>{quantity}</option>)
-
-    entries.push(
-      <article
-        style={{
-          display: 'flex',
-          flexDirection: 'column',
-          justifyContent: 'center',
-          alignItems: 'center',
-          width: '50%'
-        }}
-      >
-        <figure style={{ textAlign: 'center' }}>
-          <img
-            style={{ height: 200, width: 250 }}
-            src={entry.image}
-            alt={entry.name}
-          />
-          <figcaption>{entry.name}</figcaption>
-        </figure>
-        <p>{entry.formattedValue}</p>
-
-        <div style={{ display: 'flex', alignItem: 'center' }}>
-          {/* Dropdown to change the item's quantity */}
-          <label htmlFor="quantity-select" style={{ margin: '0 1rem 0 0' }}>
-            Quantity:
-          </label>
-          <select
-            id="quantity-select"
-            defaultValue={entry.quantity}
-            onChange={(event) => {
-              setItemQuantity(id, parseInt(event.target.value, 10))
-            }}
-          >
-            {options}
-          </select>
-        </div>
-      </article>
-    )
-  }
-
-  if (entries.length) return entries
-  return <p>You currently don't have any items in your cart.</p>
+      <input
+        type="number"
+        value={item.quantity}
+        onChange={(e) => setItemQuantity(itemId, parseInt(e.target.value))}
+        min="0"
+      />
+    </div>
+  )
 }
 ```
+
+## With Dropdown Selector
+
+```typescript
+function CartItem({ itemId }: { itemId: string }) {
+  const { setItemQuantity, cartDetails } = useShoppingCart()
+  const item = cartDetails[itemId]
+
+  return (
+    <div className="cart-item">
+      <span>{item.name}</span>
+
+      <select
+        value={item.quantity}
+        onChange={(e) => setItemQuantity(itemId, parseInt(e.target.value))}
+      >
+        {[1, 2, 3, 4, 5, 10, 15, 20].map((qty) => (
+          <option key={qty} value={qty}>
+            {qty}
+          </option>
+        ))}
+      </select>
+    </div>
+  )
+}
+```
+
+## Complete Cart Example
+
+```typescript
+function Cart() {
+  const { setItemQuantity, cartDetails, cartCount } = useShoppingCart()
+
+  if (cartCount === 0) {
+    return <p>Your cart is empty</p>
+  }
+
+  return (
+    <div>
+      {Object.entries(cartDetails).map(([id, item]) => (
+        <div key={id} className="cart-item">
+          <h4>{item.name}</h4>
+          <p>{item.formattedValue}</p>
+
+          <label>
+            Quantity:
+            <input
+              type="number"
+              value={item.quantity}
+              onChange={(e) =>
+                setItemQuantity(id, parseInt(e.target.value) || 0)
+              }
+              min="0"
+            />
+          </label>
+        </div>
+      ))}
+    </div>
+  )
+}
+```
+
+## Notes
+
+- Setting quantity to 0 removes the item from cart
+- Useful for quantity pickers and dropdowns
+- Replaces the current quantity (doesn't add or subtract)
 
 ## Interactive Demo
 

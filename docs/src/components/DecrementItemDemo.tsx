@@ -15,7 +15,7 @@ const sampleProduct: Product = {
 }
 
 export function DecrementItemDemo() {
-  const { decrementItem, cartCount, cartDetails } = useShoppingCart()
+  const { decrementItem, addItem, cartCount, cartDetails } = useShoppingCart()
 
   const price = formatCurrencyString({
     value: sampleProduct.price,
@@ -57,29 +57,43 @@ export function DecrementItemDemo() {
 
           {/* Action Buttons */}
           <div className="flex flex-col gap-3">
-            <h4 className="font-semibold mb-2">Decrement Item:</h4>
+            {!itemInCart ? (
+              <>
+                <h4 className="font-semibold mb-2">Add to Cart First:</h4>
+                <button
+                  onClick={() => addItem(sampleProduct, { count: 10 })}
+                  className="px-4 py-2 bg-green-600 text-white rounded-md hover:bg-green-700 transition-colors"
+                >
+                  Add 10 {sampleProduct.name} to Cart
+                </button>
+                <p className="text-sm text-fd-muted-foreground">
+                  Add items to your cart to try decrementing
+                </p>
+              </>
+            ) : (
+              <>
+                <h4 className="font-semibold mb-2">Decrement Item:</h4>
+                <button
+                  onClick={() => decrementItem(sampleProduct.id!)}
+                  className="px-4 py-2 bg-fd-primary text-fd-primary-foreground rounded-md hover:bg-fd-primary/90 transition-colors"
+                >
+                  Decrement by 1
+                </button>
 
-            <button
-              onClick={() => decrementItem(sampleProduct.id!)}
-              disabled={!itemInCart}
-              className="px-4 py-2 bg-fd-primary text-fd-primary-foreground rounded-md hover:bg-fd-primary/90 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-            >
-              Decrement by 1
-            </button>
+                <button
+                  onClick={() => decrementItem(sampleProduct.id!, { count: 5 })}
+                  disabled={itemInCart.quantity < 5}
+                  className="px-4 py-2 bg-fd-primary text-fd-primary-foreground rounded-md hover:bg-fd-primary/90 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                >
+                  Decrement by 5
+                </button>
 
-            <button
-              onClick={() => decrementItem(sampleProduct.id!, { count: 5 })}
-              disabled={!itemInCart || itemInCart.quantity < 5}
-              className="px-4 py-2 bg-fd-primary text-fd-primary-foreground rounded-md hover:bg-fd-primary/90 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-            >
-              Decrement by 5
-            </button>
-
-            <p className="text-sm text-fd-muted-foreground mt-2">
-              {!itemInCart
-                ? '⚠️ Add the item to cart first to decrement'
-                : 'Click to decrease quantity (removes item if quantity reaches 0)'}
-            </p>
+                <p className="text-sm text-fd-muted-foreground mt-2">
+                  Click to decrease quantity (removes item if quantity reaches
+                  0)
+                </p>
+              </>
+            )}
           </div>
         </div>
       </div>

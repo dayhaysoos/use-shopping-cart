@@ -5,19 +5,19 @@ title: addItem()
 
 To add a product to the cart, use `useShoppingCart()`'s `addItem(product)` method. It takes in your product object which must be in the following shape:
 
-| Key            | Value (type)                                                  | Required                    |
-| :------------- | :------------------------------------------------------------ | :-------------------------- |
-| `name`         | Name of the product to be shown on the Checkout page (string) | Yes in CheckoutSession mode |
-| `description`  | description to be shown on the Stripe Checkout page (string)  | No                          |
-| `id `          | A unique identifier for this item (string)                    | Yes                         |
-| `price`        | Price in smallest currency unit (number)                      | Yes                         |
-| `currency`     | ISO currency code (string)                                    | Yes                         |
-| `image`        | Image to be shown on the Stripe Checkout page (string)        | No                          |
-| `price_id`     | Price id provided by Stripe                                   | No                          |
-| `sku_id `      | SKU id provided by Stripe (Supports Deprecated API)           | No                          |
-| `sku`          | A unique identifier for this item (string)                    | No (Interchangable with id) |
-| `price_data`   | Optional params for Price API for Serverless integrations     | Required for Session id     |
-| `product_data` | Optional params for Price API for Serverless integrations     | Required for Session id     |
+| Key            | Value (type)                                                  | Required |
+| :------------- | :------------------------------------------------------------ | :------- |
+| `name`         | Name of the product to be shown on the Checkout page (string) | Yes      |
+| `description`  | description to be shown on the Stripe Checkout page (string)  | No       |
+| `id `          | A unique identifier for this item (string)                    | Yes      |
+| `price`        | Price in smallest currency unit (number)                      | Yes      |
+| `currency`     | ISO currency code (string)                                    | Yes      |
+| `image`        | Image to be shown on the Stripe Checkout page (string)        | No       |
+| `price_id`     | Price id provided by Stripe                                   | No       |
+| `sku_id `      | SKU id provided by Stripe (Supports Deprecated API)           | No       |
+| `sku`          | A unique identifier for this item (string)                    | No       |
+| `price_data`   | Optional params for Price API for Serverless integrations     | No       |
+| `product_data` | Optional params for Price API for Serverless integrations     | No       |
 
 ```js
 const products = [
@@ -32,109 +32,61 @@ const products = [
 ]
 ```
 
-### HEADS UP
+## Basic Usage
 
-When this library was made, it was done with Stripe's SKU API in mind. SKU is depreceated now in favor
-of the Price API. This is why `sku` and `id` are interchangable. You can use `sku` if you want, but it's preferred
-that you use `id` instead.
+```typescript
+import { useShoppingCart } from 'use-shopping-cart'
+import type { Product } from 'use-shopping-cart/core'
 
-You can add an optional quantity param, to add by that number. `addItem(product, { count: 10 })` for example would add by 10.
-
-```jsx
-function Product({ product }) {
+function ProductCard({ product }: { product: Product }) {
   const { addItem } = useShoppingCart()
 
-  /* A helper function that turns the price into a readable format */
-  const price = formatCurrencyString({
-    value: product.price,
-    currency: product.currency,
-    language: 'en-US'
-  })
   return (
-    <article
-      style={{
-        display: 'flex',
-        flexDirection: 'column',
-        justifyContent: 'center',
-        alignItems: 'center',
-        width: '50%'
-      }}
-    >
-      <figure style={{ textAlign: 'center' }}>
-        <img
-          style={{ height: 200, width: 250 }}
-          src={product.image}
-          alt={product.name}
-        />
-        <figcaption>{product.name}</figcaption>
-      </figure>
-      <p>{price}</p>
-      {/* Adds the item to the cart */}
-      <section
-        style={{
-          display: 'flex',
-          justifyContent: 'space-evenly',
-          width: '100%'
-        }}
-      >
-        <button
-          onClick={() => addItem(product)}
-          aria-label={`Add ${product.name} to your cart`}
-          style={{ height: 50, width: 100, marginBottom: 30 }}
-        >
-          Add to cart
-        </button>
-        <button
-          onClick={() => addItem(product, { count: 10 })}
-          aria-label={`Add 10 ${product.name} to your cart`}
-          style={{ height: 50, width: 100, marginBottom: 30 }}
-        >
-          Add 10 to cart
-        </button>
-      </section>
-      <section
-        style={{
-          display: 'flex',
-          justifyContent: 'space-evenly',
-          width: '100%'
-        }}
-      >
-        <button
-          onClick={() =>
-            addItem(product, { price_metadata: { type: 'fruit' } })
-          }
-          aria-label={`Add ${product.name} to your cart with price metadata`}
-          style={{ height: 50, width: 100, marginBottom: 30 }}
-        >
-          Add to Cart with price metadata
-        </button>
-        <button
-          onClick={() =>
-            addItem(product, { product_metadata: { type: 'fruit' } })
-          }
-          aria-label={`Add ${product.name} to your cart with product metadata`}
-          style={{ height: 50, width: 100, marginBottom: 30 }}
-        >
-          Add to Cart with product metadata
-        </button>
-      </section>
-    </article>
+    <div className="product-card">
+      <img src={product.image} alt={product.name} />
+      <h3>{product.name}</h3>
+      <p>${product.price / 100}</p>
+
+      <button onClick={() => addItem(product)}>Add to Cart</button>
+    </div>
   )
 }
 ```
 
-## Dynamic metadata
+## Adding with Custom Quantity
 
-Stripe's API allows for room to add metadata to either product_metadata or price_metadata.
-use-shopping-cart allows you to add metadata through the second param.
+You can add multiple items at once by passing a `count` option:
 
-```jsx
+```typescript
+// Add 10 items at once
+addItem(product, { count: 10 })
+```
+
+## Adding with Metadata
+
+Stripe allows you to attach custom metadata to products and prices. This metadata will be passed through to your Stripe Checkout session and webhooks:
+
+```typescript
 addItem(product, {
   count: 1,
-  product_metadata: { type: 'fruit' },
-  price_metadata: { someKey: 'a value' }
+  product_metadata: {
+    category: 'fruit',
+    seasonal: 'true'
+  },
+  price_metadata: {
+    discount_applied: 'summer-sale',
+    original_price: '5.99'
+  }
 })
 ```
+
+See the [metadata example](/docs/examples/metadata) for a complete implementation.
+
+## Notes
+
+- **SKU vs ID**: `sku` and `id` are interchangeable for backwards compatibility, but `id` is preferred (SKU API is deprecated by Stripe)
+- The product must include at minimum: `id`, `name`, `price`, and `currency`
+- Metadata is optional and useful for tracking, analytics, or custom business logic
 
 ## Interactive Demo
 

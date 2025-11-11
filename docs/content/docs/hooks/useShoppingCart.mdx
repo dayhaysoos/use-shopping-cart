@@ -56,30 +56,30 @@ The hook returns an object with all cart state and methods:
 
 ### Cart Manipulation Methods
 
-| Method                                                                   | Description                    |
-| ------------------------------------------------------------------------ | ------------------------------ |
-| [`addItem(product, options?)`](/docs/usage/actions/add-item)             | Add product to cart            |
-| [`incrementItem(id, options?)`](/docs/usage/actions/increment-item)      | Increase quantity by 1         |
-| [`decrementItem(id, options?)`](/docs/usage/actions/decrement-item)      | Decrease quantity by 1         |
-| [`setItemQuantity(id, quantity)`](/docs/usage/actions/set-item-quantity) | Set specific quantity          |
-| [`removeItem(id)`](/docs/usage/actions/remove-item)                      | Remove item from cart          |
-| [`clearCart()`](/docs/usage/actions/clear-cart)                          | Remove all items               |
-| [`loadCart(cartDetails)`](/docs/usage/actions/load-cart)                 | Load cart from external source |
+| Method                                                           | Description                    |
+| ---------------------------------------------------------------- | ------------------------------ |
+| [`addItem(product, options?)`](/docs/actions/addItem)            | Add product to cart            |
+| [`incrementItem(id, options?)`](/docs/actions/incrementItem)     | Increase quantity by 1         |
+| [`decrementItem(id, options?)`](/docs/actions/decrementItem)     | Decrease quantity by 1         |
+| [`setItemQuantity(id, quantity)`](/docs/actions/setItemQuantity) | Set specific quantity          |
+| [`removeItem(id)`](/docs/actions/removeItem)                     | Remove item from cart          |
+| [`clearCart()`](/docs/actions/clearCart)                         | Remove all items               |
+| [`loadCart(cartDetails)`](/docs/actions/loadCart)                | Load cart from external source |
 
 ### Checkout Methods
 
-| Method                                                                      | Description                                             |
-| --------------------------------------------------------------------------- | ------------------------------------------------------- |
-| [`redirectToCheckout(sessionId)`](/docs/usage/actions/redirect-to-checkout) | Redirect to Stripe checkout with server-created session |
+| Method                                                              | Description                                             |
+| ------------------------------------------------------------------- | ------------------------------------------------------- |
+| [`redirectToCheckout(sessionId)`](/docs/actions/redirectToCheckout) | Redirect to Stripe checkout with server-created session |
 
 ### UI Helper Methods
 
-| Method                                                                  | Description                |
-| ----------------------------------------------------------------------- | -------------------------- |
-| [`handleCartClick()`](/docs/usage/actions/handle-cart-click)            | Toggle cart display        |
-| [`handleCartHover()`](/docs/usage/actions/handle-cart-hover)            | Handle cart hover          |
-| [`handleCloseCart()`](/docs/usage/actions/handle-close-cart)            | Close cart display         |
-| [`storeLastClicked(productId)`](/docs/usage/actions/store-last-clicked) | Store last clicked product |
+| Method                                                          | Description                |
+| --------------------------------------------------------------- | -------------------------- |
+| [`handleCartClick()`](/docs/actions/handleCartClick)            | Toggle cart display        |
+| [`handleCartHover()`](/docs/actions/handleCartHover)            | Handle cart hover          |
+| [`handleCloseCart()`](/docs/actions/handleCloseCart)            | Close cart display         |
+| [`storeLastClicked(productId)`](/docs/actions/storeLastClicked) | Store last clicked product |
 
 ## Complete Examples
 
@@ -182,8 +182,8 @@ function TypeSafeComponent() {
 
 ## See Also
 
-- [useOptimisticCart()](/docs/usage/hooks/use-optimistic-cart) - Optimistic UI updates
-- [useCartActions()](/docs/usage/hooks/use-cart-actions) - Form action integration
-- [CartProvider](/docs/usage/components/cart-provider) - Provider component
-- [Properties](/docs/usage/properties) - All available properties
-- [Actions](/docs/usage/actions) - All available methods
+- [useOptimisticCart()](/docs/hooks/useOptimisticCart) - Optimistic UI updates
+- [useCartActions()](/docs/hooks/useCartActions) - Form action integration
+- [CartProvider](/docs/components/CartProvider) - Provider component
+- [Properties](/docs/properties) - All available properties
+- [Actions](/docs/actions) - All available methods

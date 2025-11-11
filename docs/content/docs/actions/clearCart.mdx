@@ -3,12 +3,30 @@ title: clearCart()
 id: clear-cart
 ---
 
-`clearCart()` totally empties out the shopping cart. You might want to run this
-on your successUrl page to clear the products out of local storage.
+Removes all items from the cart at once. Commonly used after successful checkout.
 
-## Usage
+## Basic Usage
 
-```jsx
+```typescript
+import { useShoppingCart } from 'use-shopping-cart'
+
+function Cart() {
+  const { clearCart, cartCount } = useShoppingCart()
+
+  return (
+    <div>
+      <button onClick={() => clearCart()} disabled={cartCount === 0}>
+        Clear Cart
+      </button>
+    </div>
+  )
+}
+```
+
+## Clear After Checkout
+
+```typescript
+import { useEffect } from 'react'
 import { useShoppingCart } from 'use-shopping-cart'
 
 function CheckoutSuccess() {
@@ -17,16 +35,22 @@ function CheckoutSuccess() {
   useEffect(() => {
     // Clear cart after successful payment
     clearCart()
-  }, [])
+  }, [clearCart])
 
   return (
     <div>
       <h1>Thank you for your purchase!</h1>
-      <p>Your cart has been cleared.</p>
+      <p>Your order has been confirmed.</p>
     </div>
   )
 }
 ```
+
+## Notes
+
+- Removes all items regardless of quantity
+- Also clears persisted cart from localStorage
+- Cannot be undone
 
 ## Interactive Demo
 

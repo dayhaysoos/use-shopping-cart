@@ -3,68 +3,60 @@ title: incrementItem()
 id: increment-item
 ---
 
-`incrementItem(id)` takes the ID of a product in the cart and increments the quantity by 1 by default. You can pass an optional quantity for the second argument to increase by that number. For example, `incrementItem(id, { count: 10 } )` would increase the quantity by 10.
+Increases the quantity of an item already in the cart by 1 (or by a custom amount).
 
-```jsx
-function Cart() {
+## Basic Usage
+
+```typescript
+import { useShoppingCart } from 'use-shopping-cart'
+
+function CartItem({ itemId }: { itemId: string }) {
   const { incrementItem, cartDetails } = useShoppingCart()
+  const item = cartDetails[itemId]
 
-  const entries = []
-  for (const id in cartDetails) {
-    const entry = cartDetails[id]
-    entries.push(
-      <article
-        style={{
-          display: 'flex',
-          flexDirection: 'column',
-          justifyContent: 'center',
-          alignItems: 'center',
-          width: '50%'
-        }}
-      >
-        <figure style={{ textAlign: 'center' }}>
-          <img
-            style={{ height: 200, width: 250 }}
-            src={entry.image}
-            alt={entry.name}
-          />
-          <figcaption>{entry.name}</figcaption>
-        </figure>
-        <p>{entry.formattedValue}</p>
+  return (
+    <div className="cart-item">
+      <span>{item.name}</span>
+      <span>Quantity: {item.quantity}</span>
 
-        <section
-          style={{
-            width: '100%',
-            display: 'flex',
-            justifyContent: 'space-evenly'
-          }}
-        >
-          {/* Increases the quantity of the item */}
-          <button
-            onClick={() => incrementItem(id)}
-            aria-label={`Add one ${entry.name} to your cart`}
-            style={{ height: 50, width: 100, marginBottom: 30 }}
-          >
-            Add one {entry.name} to your cart
-          </button>
+      <button onClick={() => incrementItem(itemId)}>+1</button>
+    </div>
+  )
+}
+```
 
-          {/* Increases the item quantity by 10 */}
-          <button
-            onClick={() => {
-              incrementItem(id, { count: 10 })
-            }}
-            aria-label={`Add ten ${entry.name} to your cart`}
-            style={{ height: 50, width: 100, marginBottom: 30 }}
-          >
-            Add 10 {entry.name} to your cart
-          </button>
-        </section>
-      </article>
-    )
+## Increment by Custom Amount
+
+You can increase the quantity by more than 1:
+
+```typescript
+// Increase by 10
+incrementItem(itemId, { count: 10 })
+```
+
+## Complete Cart Example
+
+```typescript
+function Cart() {
+  const { incrementItem, cartDetails, cartCount } = useShoppingCart()
+
+  if (cartCount === 0) {
+    return <p>Your cart is empty</p>
   }
 
-  if (entries.length) return entries
-  return <p>You currently don't have any items in your cart.</p>
+  return (
+    <div>
+      {Object.entries(cartDetails).map(([id, item]) => (
+        <div key={id} className="cart-item">
+          <h4>{item.name}</h4>
+          <p>Quantity: {item.quantity}</p>
+
+          <button onClick={() => incrementItem(id)}>+</button>
+          <button onClick={() => incrementItem(id, { count: 5 })}>+5</button>
+        </div>
+      ))}
+    </div>
+  )
 }
 ```
 

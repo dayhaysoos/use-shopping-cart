@@ -15,7 +15,7 @@ const sampleProduct: Product = {
 }
 
 export function IncrementItemDemo() {
-  const { incrementItem, cartCount, cartDetails } = useShoppingCart()
+  const { incrementItem, addItem, cartCount, cartDetails } = useShoppingCart()
 
   const price = formatCurrencyString({
     value: sampleProduct.price,
@@ -57,29 +57,41 @@ export function IncrementItemDemo() {
 
           {/* Action Buttons */}
           <div className="flex flex-col gap-3">
-            <h4 className="font-semibold mb-2">Increment Item:</h4>
+            {!itemInCart ? (
+              <>
+                <h4 className="font-semibold mb-2">Add to Cart First:</h4>
+                <button
+                  onClick={() => addItem(sampleProduct)}
+                  className="px-4 py-2 bg-green-600 text-white rounded-md hover:bg-green-700 transition-colors"
+                >
+                  Add {sampleProduct.name} to Cart
+                </button>
+                <p className="text-sm text-fd-muted-foreground">
+                  Add the item to your cart to try incrementing
+                </p>
+              </>
+            ) : (
+              <>
+                <h4 className="font-semibold mb-2">Increment Item:</h4>
+                <button
+                  onClick={() => incrementItem(sampleProduct.id!)}
+                  className="px-4 py-2 bg-fd-primary text-fd-primary-foreground rounded-md hover:bg-fd-primary/90 transition-colors"
+                >
+                  Increment by 1
+                </button>
 
-            <button
-              onClick={() => incrementItem(sampleProduct.id!)}
-              disabled={!itemInCart}
-              className="px-4 py-2 bg-fd-primary text-fd-primary-foreground rounded-md hover:bg-fd-primary/90 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-            >
-              Increment by 1
-            </button>
+                <button
+                  onClick={() => incrementItem(sampleProduct.id!, { count: 5 })}
+                  className="px-4 py-2 bg-fd-primary text-fd-primary-foreground rounded-md hover:bg-fd-primary/90 transition-colors"
+                >
+                  Increment by 5
+                </button>
 
-            <button
-              onClick={() => incrementItem(sampleProduct.id!, { count: 5 })}
-              disabled={!itemInCart}
-              className="px-4 py-2 bg-fd-primary text-fd-primary-foreground rounded-md hover:bg-fd-primary/90 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-            >
-              Increment by 5
-            </button>
-
-            <p className="text-sm text-fd-muted-foreground mt-2">
-              {!itemInCart
-                ? '⚠️ Add the item to cart first to increment'
-                : 'Click to increase quantity'}
-            </p>
+                <p className="text-sm text-fd-muted-foreground mt-2">
+                  Click to increase quantity
+                </p>
+              </>
+            )}
           </div>
         </div>
       </div>

@@ -5,10 +5,6 @@ id: cart-provider
 
 The `<CartProvider />` component wraps your app and provides cart state and methods to all child components via the `useShoppingCart()` hook.
 
-## CheckoutSession Mode (Recommended)
-
-Creating a [CheckoutSession](https://stripe.com/docs/payments/checkout/one-time#create-checkout-session) server-side allows for a more flexible and powerful integration and provides access to all modern Stripe features.
-
 At the root level of your app, wrap your Root app in the `<CartProvider />`
 
 ### Basic Example
@@ -50,7 +46,7 @@ ReactDOM.render(
 )
 ```
 
-When using CheckoutSessions your product object must adhere to the following shape:
+Your product object must adhere to the following shape:
 
 ```js
 const products = [
@@ -59,8 +55,8 @@ const products = [
     name: 'Bananas',
     // Optional description to be shown on the Stripe Checkout page
     description: 'Yummy yellow fruit',
-    // A unique identifier for this item (stock keeping unit)
-    sku: 'sku_banana001',
+    // A unique identifier for this item
+    id: 'id_banana001',
     // price in smallest currency unit (e.g. cent for USD)
     price: 400,
     currency: 'USD',
@@ -70,7 +66,7 @@ const products = [
 ]
 ```
 
-Additionally, you must verify the cartItems on the server-side before creating the CheckoutSession. For this you can use the [validateCartItems() helper](/docs/usage/serverless/validate-cart-items).
+Additionally, you must verify the cartItems on the server-side before creating the CheckoutSession. For this you can use the [validateCartItems() helper](/docs/serverless/validateCartItems).
 
 ## Complete Props Reference
 

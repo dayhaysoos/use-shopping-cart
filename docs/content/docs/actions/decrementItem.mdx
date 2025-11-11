@@ -3,70 +3,67 @@ title: decrementItem()
 id: decrement-item
 ---
 
-`decrementItem(id)` takes the ID of a product in the cart and decrements the quantity by 1 by default. You can pass an optional quantity for the second argument to decrease by that number. For example, `decrementItem(id, { count: 10 } )` would decrease the quantity by 10. If the quantity of an entry in the cart goes below one, it will be automatically removed from the cart.
+Decreases the quantity of an item in the cart by 1 (or by a custom amount). If the quantity reaches 0, the item is automatically removed.
 
-```jsx
+## Basic Usage
+
+```typescript
 import { useShoppingCart } from 'use-shopping-cart'
 
-function Cart(product) {
+function CartItem({ itemId }: { itemId: string }) {
   const { decrementItem, cartDetails } = useShoppingCart()
+  const item = cartDetails[itemId]
 
-  const entries = []
-  for (const sku in cartDetails) {
-    const entry = cartDetails[sku]
-    entries.push(
-      <article
-        style={{
-          display: 'flex',
-          flexDirection: 'column',
-          justifyContent: 'center',
-          alignItems: 'center',
-          width: '50%'
-        }}
-      >
-        <figure style={{ textAlign: 'center' }}>
-          <img
-            style={{ height: 200, width: 250 }}
-            src={entry.image}
-            alt={entry.name}
-          />
-          <figcaption>{entry.name}</figcaption>
-        </figure>
-        <p>{entry.formattedValue}</p>
+  return (
+    <div className="cart-item">
+      <span>{item.name}</span>
+      <span>Quantity: {item.quantity}</span>
 
-        <section
-          style={{
-            width: '100%',
-            display: 'flex',
-            justifyContent: 'space-evenly'
-          }}
-        >
-          {/* decreases the quantity of the item */}
-          <button
-            onClick={() => decrementItem(sku)}
-            aria-label={`Remove one ${entry.name} from your cart`}
-            style={{ height: 50, width: 100, marginBottom: 30 }}
-          >
-            Remove one {entry.name} to your cart
-          </button>
-
-          {/* decreases the item quantity by 10 */}
-          <button
-            onClick={() => decrementItem(sku, { count: 10 })}
-            aria-label={`Remove ten ${entry.name} from your cart`}
-            style={{ height: 50, width: 100, marginBottom: 30 }}
-          >
-            Remove 10 {entry.name} to your cart
-          </button>
-        </section>
-      </article>
-    )
-  }
-
-  if (entries.length) return entries
-  return <p>You currently don't have any items in your cart.</p>
+      <button onClick={() => decrementItem(itemId)}>-1</button>
+    </div>
+  )
 }
 ```
+
+## Decrement by Custom Amount
+
+You can decrease the quantity by more than 1:
+
+```typescript
+// Decrease by 10
+decrementItem(itemId, { count: 10 })
+```
+
+## Complete Cart Example
+
+```typescript
+function Cart() {
+  const { decrementItem, cartDetails, cartCount } = useShoppingCart()
+
+  if (cartCount === 0) {
+    return <p>Your cart is empty</p>
+  }
+
+  return (
+    <div>
+      {Object.entries(cartDetails).map(([id, item]) => (
+        <div key={id} className="cart-item">
+          <h4>{item.name}</h4>
+          <p>Quantity: {item.quantity}</p>
+
+          <button onClick={() => decrementItem(id)}>-</button>
+          <button onClick={() => decrementItem(id, { count: 5 })}>-5</button>
+        </div>
+      ))}
+    </div>
+  )
+}
+```
+
+## Notes
+
+- Automatically removes item from cart when quantity reaches 0
+- Safe to decrement below 0 (just removes the item)
 
 ## Interactive Demo
 

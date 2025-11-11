@@ -3,62 +3,62 @@ title: removeItem()
 id: remove-item
 ---
 
-Completely removes a product's entry from the cart by ID.
+Completely removes a product from the cart, regardless of quantity.
 
-```jsx
-import React from 'react'
+## Basic Usage
+
+```typescript
 import { useShoppingCart } from 'use-shopping-cart'
 
-export function Cart() {
+function CartItem({ itemId }: { itemId: string }) {
   const { removeItem, cartDetails } = useShoppingCart()
+  const item = cartDetails[itemId]
 
-  const entries = []
-  for (const id in cartDetails) {
-    const entry = cartDetails[id]
-    entries.push(
-      <article
-        style={{
-          display: 'flex',
-          flexDirection: 'column',
-          justifyContent: 'center',
-          alignItems: 'center',
-          width: '50%'
-        }}
-      >
-        <figure style={{ textAlign: 'center' }}>
-          <img
-            style={{ height: 200, width: 250 }}
-            src={entry.image}
-            alt={entry.name}
-          />
-          <figcaption>{entry.name}</figcaption>
-        </figure>
-        <p>{entry.formattedValue}</p>
+  return (
+    <div className="cart-item">
+      <span>{item.name}</span>
+      <span>Quantity: {item.quantity}</span>
 
-        <section
-          style={{
-            width: '100%',
-            display: 'flex',
-            justifyContent: 'space-evenly'
-          }}
-        >
-          {/* Removes the item from the cart */}
-          <button
-            onClick={() => removeItem(id)}
-            aria-label={`Remove ${entry.name} from your cart`}
-            style={{ height: 50, width: 100, marginBottom: 30 }}
-          >
-            Remove from cart
-          </button>
-        </section>
-      </article>
-    )
-  }
-
-  if (entries.length) return entries
-  return <p>You currently don't have any items in your cart.</p>
+      <button onClick={() => removeItem(itemId)}>Remove</button>
+    </div>
+  )
 }
 ```
+
+## Complete Cart Example
+
+```typescript
+function Cart() {
+  const { removeItem, cartDetails, cartCount } = useShoppingCart()
+
+  if (cartCount === 0) {
+    return <p>Your cart is empty</p>
+  }
+
+  return (
+    <div>
+      {Object.entries(cartDetails).map(([id, item]) => (
+        <div key={id} className="cart-item">
+          <img src={item.image} alt={item.name} />
+          <div>
+            <h4>{item.name}</h4>
+            <p>Quantity: {item.quantity}</p>
+            <p>{item.formattedValue}</p>
+          </div>
+
+          <button onClick={() => removeItem(id)}>Remove</button>
+        </div>
+      ))}
+    </div>
+  )
+}
+```
+
+## Notes
+
+- Removes the entire entry, regardless of quantity
+- Useful for "Remove from cart" buttons
+- For decreasing quantity by 1, use [`decrementItem()`](/docs/actions/decrementItem) instead
 
 ## Interactive Demo
 
