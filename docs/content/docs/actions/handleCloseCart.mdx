@@ -3,4 +3,101 @@ title: handleCloseCart()
 id: handle-close-cart
 ---
 
-This action takes no arguments and sets `shouldDisplayCart` to `false`. This can be useful if you want to create a button that closes the cart.
+Closes the cart display by setting `shouldDisplayCart` to `false`. Useful for close buttons and hover interactions.
+
+## Basic Usage
+
+```typescript
+import { useShoppingCart } from 'use-shopping-cart'
+
+function CartSidebar() {
+  const { handleCloseCart, shouldDisplayCart } = useShoppingCart()
+
+  if (!shouldDisplayCart) return null
+
+  return (
+    <div className="cart-sidebar">
+      <button onClick={handleCloseCart} className="close-button">
+        ×
+      </button>
+      {/* Cart contents */}
+    </div>
+  )
+}
+```
+
+## With Overlay/Backdrop
+
+```typescript
+import { useShoppingCart } from 'use-shopping-cart'
+
+function CartOverlay() {
+  const { handleCloseCart, shouldDisplayCart, cartDetails } = useShoppingCart()
+
+  if (!shouldDisplayCart) return null
+
+  return (
+    <>
+      {/* Backdrop - click to close */}
+      <div className="fixed inset-0 bg-black/50" onClick={handleCloseCart} />
+
+      {/* Cart Sidebar */}
+      <div className="fixed right-0 top-0 h-full w-96 bg-white shadow-xl">
+        <div className="p-4">
+          <div className="flex justify-between items-center mb-4">
+            <h2>Your Cart</h2>
+            <button onClick={handleCloseCart}>×</button>
+          </div>
+
+          {Object.entries(cartDetails).map(([id, item]) => (
+            <div key={id}>
+              <span>{item.name}</span>
+            </div>
+          ))}
+        </div>
+      </div>
+    </>
+  )
+}
+```
+
+## With Escape Key
+
+```typescript
+import { useEffect } from 'react'
+import { useShoppingCart } from 'use-shopping-cart'
+
+function CartModal() {
+  const { handleCloseCart, shouldDisplayCart } = useShoppingCart()
+
+  useEffect(() => {
+    const handleEscape = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') {
+        handleCloseCart()
+      }
+    }
+
+    if (shouldDisplayCart) {
+      window.addEventListener('keydown', handleEscape)
+      return () => window.removeEventListener('keydown', handleEscape)
+    }
+  }, [shouldDisplayCart, handleCloseCart])
+
+  if (!shouldDisplayCart) return null
+
+  return <div className="cart-modal">{/* Cart content */}</div>
+}
+```
+
+## Notes
+
+- Only closes the cart (doesn't toggle)
+- Commonly used with backdrop/overlay clicks
+- Pair with `handleCartHover()` for hover interactions
+- Use with escape key handlers for accessibility
+
+## See Also
+
+- [handleCartClick()](/docs/actions/handleCartClick) - Toggle open/closed
+- [handleCartHover()](/docs/actions/handleCartHover) - Open on hover
+- [shouldDisplayCart](/docs/properties/shouldDisplayCart) - Display state property

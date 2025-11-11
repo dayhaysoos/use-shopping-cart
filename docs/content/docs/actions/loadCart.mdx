@@ -3,38 +3,121 @@ title: loadCart()
 id: load-cart
 ---
 
-`loadCart(cartDetails, shouldMerge=true)` allows you to load in a previously created cart allowing the you to persist your user's shopping session across devices when logged in. `cartDetails` is the previously created `cartDetails`. `shouldMerge` is a boolean that is by default set to `true` that will try to join the current cart's details with the one you're passing in right now. If it is set to `false` it simply replaces the current cart's details with the one you're passing in.
+Loads a previously saved cart, enabling cart persistence across devices or sessions. Useful for logged-in users.
 
-It is recommended to set `shouldMerge` to false to avoid accidental repeated merging.
+## Signature
 
-```jsx
-import React, { useEffect } from 'react'
+```typescript
+loadCart(cartDetails: CartDetails, shouldMerge?: boolean): void
+```
+
+## Parameters
+
+- `cartDetails` - The cart data to load (CartDetails object)
+- `shouldMerge` - Whether to merge with current cart (default: `true`)
+  - `true` - Combines loaded cart with current cart
+  - `false` - Replaces current cart entirely (recommended)
+
+## Basic Usage
+
+```typescript
+import { useEffect } from 'react'
 import { useShoppingCart } from 'use-shopping-cart'
 
-export function App() {
+function App() {
+  const { loadCart } = useShoppingCart()
+
+  useEffect(() => {
+    // Load cart from your API
+    async function loadUserCart() {
+      const response = await fetch('/api/cart')
+      const savedCart = await response.json()
+
+      if (savedCart) {
+        loadCart(savedCart, false) // Replace current cart
+      }
+    }
+
+    loadUserCart()
+  }, [loadCart])
+
+  return <YourApp />
+}
+```
+
+## Load Cart on User Login
+
+```typescript
+import { useEffect } from 'react'
+import { useShoppingCart } from 'use-shopping-cart'
+import { useUser } from './auth'
+
+function CartSync() {
   const { loadCart } = useShoppingCart()
   const user = useUser()
 
-  // Make an API request to your backend in a useEffect() to retrieve your user's previous cart
   useEffect(() => {
-    let cancelled = false
-    async function handler() {
-      const userCartDetails = await getData(user.id)
-      if (!cancelled && userCartDetails) loadCart(userCartDetails, false)
-    }
+    if (!user?.id) return
 
-    if (user?.id) {
-      handler()
-      return () => {
-        cancelled = true
+    let cancelled = false
+
+    async function syncCart() {
+      const response = await fetch(`/api/users/${user.id}/cart`)
+      const userCart = await response.json()
+
+      if (!cancelled && userCart) {
+        loadCart(userCart, false)
       }
     }
-  }, [user])
 
-  return <DebugCart />
+    syncCart()
+
+    return () => {
+      cancelled = true
+    }
+  }, [user?.id, loadCart])
+
+  return null
 }
-
-export default App
 ```
 
-The above example is the ideal use-case for `loadCart()`.
+## Save Cart on Changes
+
+```typescript
+import { useEffect } from 'react'
+import { useShoppingCart } from 'use-shopping-cart'
+
+function CartPersistence() {
+  const { cartDetails } = useShoppingCart()
+  const user = useUser()
+
+  useEffect(() => {
+    if (!user?.id) return
+
+    // Debounce saves
+    const timeoutId = setTimeout(() => {
+      fetch(`/api/users/${user.id}/cart`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ cartDetails })
+      })
+    }, 500)
+
+    return () => clearTimeout(timeoutId)
+  }, [cartDetails, user?.id])
+
+  return null
+}
+```
+
+## Notes
+
+- **Recommended:** Set `shouldMerge` to `false` to avoid accidental duplicate merging
+- Typically used with user authentication systems
+- Cart structure must match the CartDetails type
+- Works alongside localStorage persistence (for logged-out users)
+
+## See Also
+
+- [Persistence](/docs/concepts/persistence) - How cart persistence works
+- [shouldPersist](/docs/configuration/shouldPersist) - localStorage persistence

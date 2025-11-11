@@ -3,4 +3,87 @@ title: storeLastClicked()
 id: store-last-clicked
 ---
 
-This action takes a string and updates the value of `lastClicked` with it. This can be useful for tracking the last product that was clicked by the user.
+Stores a product ID to track which product was last interacted with. Useful for "Recently Viewed" features or analytics.
+
+## Basic Usage
+
+```typescript
+import { useShoppingCart } from 'use-shopping-cart'
+
+function ProductCard({ product }: { product: Product }) {
+  const { storeLastClicked, addItem } = useShoppingCart()
+
+  return (
+    <div className="product-card" onClick={() => storeLastClicked(product.id)}>
+      <img src={product.image} alt={product.name} />
+      <h3>{product.name}</h3>
+      <button onClick={() => addItem(product)}>Add to Cart</button>
+    </div>
+  )
+}
+```
+
+## Accessing the Last Clicked Product
+
+```typescript
+import { useShoppingCart } from 'use-shopping-cart'
+
+function RecentlyViewed() {
+  const { lastClicked, cartDetails } = useShoppingCart()
+
+  if (!lastClicked) {
+    return <p>No recently viewed products</p>
+  }
+
+  const product = cartDetails[lastClicked]
+
+  return (
+    <div className="recently-viewed">
+      <h4>Recently Viewed</h4>
+      {product && (
+        <div>
+          <img src={product.image} alt={product.name} />
+          <p>{product.name}</p>
+        </div>
+      )}
+    </div>
+  )
+}
+```
+
+## Complete Example
+
+```typescript
+function ProductGrid({ products }: { products: Product[] }) {
+  const { storeLastClicked, lastClicked, addItem } = useShoppingCart()
+
+  return (
+    <div>
+      {lastClicked && (
+        <p className="text-sm text-muted">Last viewed: {lastClicked}</p>
+      )}
+
+      <div className="grid grid-cols-3 gap-4">
+        {products.map((product) => (
+          <div
+            key={product.id}
+            className="product-card"
+            onClick={() => storeLastClicked(product.id)}
+          >
+            <img src={product.image} alt={product.name} />
+            <h3>{product.name}</h3>
+            <button onClick={() => addItem(product)}>Add to Cart</button>
+          </div>
+        ))}
+      </div>
+    </div>
+  )
+}
+```
+
+## Notes
+
+- Stores a string value (typically a product ID)
+- Persists across page navigation
+- Access via the `lastClicked` property
+- Useful for analytics and "Recently Viewed" features

@@ -3,6 +3,75 @@ title: handleCartHover()
 id: handle-cart-hover
 ---
 
-This action takes no arguments and sets `shouldDisplayCart` to `true`. This can be useful if you want to create a button that only opens the cart and have a separate way to hide the cart.
+Opens the cart display by setting `shouldDisplayCart` to `true`. Useful for hover-to-open cart interactions.
 
-It is possible that in the future this may be renamed or aliased to `openCartDisplay()`.
+## Basic Usage
+
+```typescript
+import { useShoppingCart } from 'use-shopping-cart'
+
+function CartButton() {
+  const { handleCartHover, handleCloseCart, cartCount } = useShoppingCart()
+
+  return (
+    <div
+      onMouseEnter={handleCartHover}
+      onMouseLeave={handleCloseCart}
+      className="cart-trigger"
+    >
+      <button>Cart ({cartCount})</button>
+    </div>
+  )
+}
+```
+
+## Complete Example with Cart Display
+
+```typescript
+import { useShoppingCart } from 'use-shopping-cart'
+
+function Header() {
+  const {
+    handleCartHover,
+    handleCloseCart,
+    shouldDisplayCart,
+    cartCount,
+    cartDetails
+  } = useShoppingCart()
+
+  return (
+    <header>
+      <div
+        onMouseEnter={handleCartHover}
+        onMouseLeave={handleCloseCart}
+        className="relative"
+      >
+        <button className="cart-button">Cart ({cartCount})</button>
+
+        {shouldDisplayCart && (
+          <div className="cart-dropdown">
+            {cartCount === 0 ? (
+              <p>Your cart is empty</p>
+            ) : (
+              <div>
+                {Object.entries(cartDetails).map(([id, item]) => (
+                  <div key={id}>
+                    <span>{item.name}</span>
+                    <span>×{item.quantity}</span>
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
+        )}
+      </div>
+    </header>
+  )
+}
+```
+
+## Notes
+
+- Only opens the cart (doesn't toggle)
+- Use with `handleCloseCart()` for hover interactions
+- Check `shouldDisplayCart` property to show/hide cart UI

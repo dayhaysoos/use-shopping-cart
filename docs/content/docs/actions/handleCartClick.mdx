@@ -3,6 +3,85 @@ title: handleCartClick()
 id: handle-cart-click
 ---
 
-This action takes no arguments and toggles `shouldDisplayCart` between `true` and `false`. This can be useful if you want to implement a cart with a button to toggle it open and closed.
+Toggles the cart display between open and closed states. Perfect for click-to-toggle cart interactions.
 
-It is possible that in the future this may be renamed or aliased to `toggleCartDisplay()`.
+## Basic Usage
+
+```typescript
+import { useShoppingCart } from 'use-shopping-cart'
+
+function CartButton() {
+  const { handleCartClick, cartCount } = useShoppingCart()
+
+  return <button onClick={handleCartClick}>Cart ({cartCount})</button>
+}
+```
+
+## Complete Example with Cart Display
+
+```typescript
+import { useShoppingCart } from 'use-shopping-cart'
+
+function Header() {
+  const {
+    handleCartClick,
+    shouldDisplayCart,
+    cartCount,
+    cartDetails,
+    formattedTotalPrice
+  } = useShoppingCart()
+
+  return (
+    <header className="header">
+      <button onClick={handleCartClick} className="cart-button">
+        🛒 Cart ({cartCount})
+      </button>
+
+      {shouldDisplayCart && (
+        <div className="cart-sidebar">
+          <div className="cart-header">
+            <h2>Your Cart</h2>
+            <button onClick={handleCartClick}>×</button>
+          </div>
+
+          {cartCount === 0 ? (
+            <p>Your cart is empty</p>
+          ) : (
+            <>
+              <div className="cart-items">
+                {Object.entries(cartDetails).map(([id, item]) => (
+                  <div key={id} className="cart-item">
+                    <img src={item.image} alt={item.name} />
+                    <div>
+                      <h4>{item.name}</h4>
+                      <p>Qty: {item.quantity}</p>
+                      <p>{item.formattedValue}</p>
+                    </div>
+                  </div>
+                ))}
+              </div>
+
+              <div className="cart-footer">
+                <p>Total: {formattedTotalPrice}</p>
+                <button>Checkout</button>
+              </div>
+            </>
+          )}
+        </div>
+      )}
+    </header>
+  )
+}
+```
+
+## Notes
+
+- Toggles between open and closed states
+- Use `shouldDisplayCart` property to show/hide cart UI
+- Can be called on same button to both open and close
+
+## See Also
+
+- [handleCartHover()](/docs/actions/handleCartHover) - Open on hover
+- [handleCloseCart()](/docs/actions/handleCloseCart) - Close only
+- [shouldDisplayCart](/docs/properties/shouldDisplayCart) - Display state property

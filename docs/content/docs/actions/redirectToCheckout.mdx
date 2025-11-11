@@ -22,98 +22,118 @@ redirectToCheckout(sessionId: string): Promise<{ error: any } | undefined>
 3. Call `redirectToCheckout(sessionId)` on the client
 4. User is redirected to Stripe's checkout page
 
-## Usage
+## Basic Usage
 
-```jsx
-import React, { useState } from 'react'
+```typescript
 import { useShoppingCart } from 'use-shopping-cart'
-import { AddMoreItems } from './utilities'
 
-export function RedirectToCheckout() {
-  const [status, setStatus] = useState('idle')
-  const { redirectToCheckout, cartCount } = useShoppingCart()
+function CheckoutButton() {
+  const { redirectToCheckout, cartDetails, cartCount } = useShoppingCart()
 
-  async function handleClick(event) {
-    event.preventDefault()
+  const handleCheckout = async () => {
+    if (cartCount === 0) return
 
-    if (cartCount > 0) {
-      setStatus('loading')
-      try {
-        // 1. Call your server to create a checkout session
-        const response = await fetch('/api/create-checkout-session', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            cartDetails: useShoppingCart().cartDetails
-          })
-        })
+    // 1. Call your server to create a checkout session
+    const response = await fetch('/api/checkout', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ cartDetails })
+    })
 
-        const { sessionId } = await response.json()
+    const { sessionId } = await response.json()
 
-        // 2. Redirect to Stripe checkout with the session ID
-        const result = await redirectToCheckout(sessionId)
-        if (result?.error) {
-          console.error(result)
-          setStatus('redirect-error')
-        }
-      } catch (error) {
-        console.error(error)
-        setStatus('redirect-error')
-      }
-    } else {
-      setStatus('missing-items')
+    // 2. Redirect to Stripe checkout
+    const result = await redirectToCheckout(sessionId)
+
+    if (result?.error) {
+      console.error('Redirect failed:', result.error)
     }
   }
 
   return (
-    <article
-      style={{
-        display: 'flex',
-        flexDirection: 'column',
-        justifyContent: 'center',
-        alignItems: 'center',
-        width: '50%'
-      }}
-    >
-      {status === 'missing-items' && <AddMoreItems />}
-
-      {status === 'redirect-error' && (
-        <p>Unable to redirect to Stripe checkout page.</p>
-      )}
-
-      <button
-        onClick={handleClick}
-        style={{ height: 50, width: 100, marginBottom: 30 }}
-      >
-        Checkout
-      </button>
-    </article>
+    <button onClick={handleCheckout} disabled={cartCount === 0}>
+      Proceed to Checkout
+    </button>
   )
 }
+```
 
-export default RedirectToCheckout
+## With Loading States
+
+```typescript
+import { useState } from 'react'
+import { useShoppingCart } from 'use-shopping-cart'
+
+function CheckoutButton() {
+  const { redirectToCheckout, cartDetails, cartCount } = useShoppingCart()
+  const [isLoading, setIsLoading] = useState(false)
+  const [error, setError] = useState<string | null>(null)
+
+  const handleCheckout = async () => {
+    if (cartCount === 0) return
+
+    setIsLoading(true)
+    setError(null)
+
+    try {
+      const response = await fetch('/api/checkout', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ cartDetails })
+      })
+
+      if (!response.ok) {
+        throw new Error('Failed to create checkout session')
+      }
+
+      const { sessionId } = await response.json()
+      const result = await redirectToCheckout(sessionId)
+
+      if (result?.error) {
+        setError('Unable to redirect to checkout')
+      }
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Checkout failed')
+    } finally {
+      setIsLoading(false)
+    }
+  }
+
+  return (
+    <div>
+      <button onClick={handleCheckout} disabled={cartCount === 0 || isLoading}>
+        {isLoading ? 'Redirecting...' : 'Checkout'}
+      </button>
+
+      {error && <p className="error">{error}</p>}
+    </div>
+  )
+}
 ```
 
 ## Server Endpoint Example
 
 Your server endpoint should create the checkout session and return the `sessionId`:
 
-```js
-// pages/api/create-checkout-session.js (Next.js)
+```typescript
+// app/api/checkout/route.ts (Next.js App Router)
+import { NextRequest, NextResponse } from 'next/server'
 import Stripe from 'stripe'
-const stripe = new Stripe(process.env.STRIPE_SECRET_KEY)
 
-export default async function handler(req, res) {
+const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!)
+
+export async function POST(req: NextRequest) {
   try {
-    const { cartDetails } = req.body
+    const { cartDetails } = await req.json()
 
     // Convert cart to line items
-    const line_items = Object.values(cartDetails).map((item) => ({
+    const line_items = Object.values(cartDetails).map((item: any) => ({
       price_data: {
-        currency: 'usd',
+        currency: item.currency.toLowerCase(),
         product_data: {
           name: item.name,
-          images: [item.image]
+          description: item.description,
+          images: item.image ? [item.image] : []
         },
         unit_amount: item.price
       },
@@ -124,14 +144,17 @@ export default async function handler(req, res) {
     const session = await stripe.checkout.sessions.create({
       mode: 'payment',
       line_items,
-      success_url: `${req.headers.origin}/success?session_id={CHECKOUT_SESSION_ID}`,
-      cancel_url: req.headers.origin
+      success_url: `${req.nextUrl.origin}/success?session_id={CHECKOUT_SESSION_ID}`,
+      cancel_url: req.nextUrl.origin
     })
 
-    // Return session ID to client
-    res.json({ sessionId: session.id })
+    return NextResponse.json({ sessionId: session.id })
   } catch (error) {
-    res.status(500).json({ error: error.message })
+    console.error('Checkout error:', error)
+    return NextResponse.json(
+      { error: 'Failed to create checkout session' },
+      { status: 500 }
+    )
   }
 }
 ```
