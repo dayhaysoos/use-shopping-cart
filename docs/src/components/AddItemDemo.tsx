@@ -10,7 +10,8 @@ const sampleProducts: Product[] = [
     description: 'Yummy yellow fruit',
     price: 400,
     currency: 'USD',
-    image: 'https://i.imgur.com/AUJQtJC.jpg'
+    image:
+      'https://images.unsplash.com/photo-1571771894821-ce9b6c11b08e?w=400&h=400&fit=crop&q=80'
   },
   {
     id: 'apple_001',
@@ -18,7 +19,8 @@ const sampleProducts: Product[] = [
     description: 'Crisp and delicious',
     price: 300,
     currency: 'USD',
-    image: 'https://i.imgur.com/vkwjWG1.jpg'
+    image:
+      'https://images.unsplash.com/photo-1568702846914-96b305d2aaeb?w=400&h=400&fit=crop&q=80'
   },
   {
     id: 'orange_001',
@@ -26,7 +28,8 @@ const sampleProducts: Product[] = [
     description: 'Juicy citrus fruit',
     price: 350,
     currency: 'USD',
-    image: 'https://i.imgur.com/m7IHiAN.jpg'
+    image:
+      'https://images.unsplash.com/photo-1547514701-42782101795e?w=400&h=400&fit=crop&q=80'
   }
 ]
 
