@@ -27,7 +27,7 @@ export function CartSidebar({ isOpen, onClose }: CartSidebarProps) {
       {/* Backdrop */}
       {isOpen && (
         <div
-          className="fixed inset-0 bg-black/50 z-[60] transition-opacity"
+          className="fixed inset-0 bg-black/50 z-60 transition-opacity"
           onClick={onClose}
           aria-hidden="true"
         />
@@ -35,7 +35,7 @@ export function CartSidebar({ isOpen, onClose }: CartSidebarProps) {
 
       {/* Sidebar */}
       <div
-        className={`fixed top-0 right-0 h-full w-full max-w-md bg-fd-background border-l border-fd-border z-[70] transform transition-transform duration-300 ease-in-out shadow-2xl ${
+        className={`fixed top-0 right-0 h-full w-full max-w-md bg-fd-background border-l border-fd-border z-70 transform transition-transform duration-300 ease-in-out shadow-2xl ${
           isOpen ? 'translate-x-0' : 'translate-x-full'
         }`}
       >
@@ -43,7 +43,7 @@ export function CartSidebar({ isOpen, onClose }: CartSidebarProps) {
           {/* Header */}
           <div className="flex items-center justify-between p-4 border-b border-fd-border">
             <h2 className="text-lg font-semibold">
-              Shopping Cart {cartCount > 0 && `(${cartCount})`}
+              Shopping Cart {(cartCount ?? 0) > 0 && `(${cartCount})`}
             </h2>
             <button
               onClick={onClose}
