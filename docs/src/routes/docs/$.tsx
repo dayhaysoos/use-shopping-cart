@@ -14,6 +14,7 @@ import {
 import defaultMdxComponents from 'fumadocs-ui/mdx'
 import { createClientLoader } from 'fumadocs-mdx/runtime/vite'
 import { baseOptions } from '@/lib/layout.shared'
+import { CartButton } from '@/components/CartButton'
 
 export const Route = createFileRoute('/docs/$')({
   component: Page,
@@ -67,9 +68,14 @@ function Page() {
   )
 
   return (
-    <DocsLayout {...baseOptions()} tree={tree}>
-      <Content />
-    </DocsLayout>
+    <>
+      <DocsLayout {...baseOptions()} tree={tree}>
+        <Content />
+      </DocsLayout>
+      <div className="fixed top-4 right-4 z-50">
+        <CartButton />
+      </div>
+    </>
   )
 }
 
