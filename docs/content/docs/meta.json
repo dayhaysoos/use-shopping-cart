@@ -3,15 +3,15 @@
   "pages": [
     "index",
     "getting-started",
-    "examples",
+    "actions",
     "components",
     "hooks",
-    "actions",
     "properties",
     "configuration",
     "helpers",
     "serverless",
     "concepts",
+    "examples",
     "migration-v4"
   ]
 }

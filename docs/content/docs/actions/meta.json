@@ -1,5 +1,6 @@
 {
   "title": "Actions",
+  "defaultOpen": true,
   "pages": [
     "addItem",
     "incrementItem",
