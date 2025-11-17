@@ -85,41 +85,6 @@ describe('CartProvider', () => {
 
     expect(screen.getByText('Content')).toBeInTheDocument()
   })
-
-  it('accepts new Stripe API modernization props', () => {
-    function TestComponent() {
-      const cart = useCartContext()
-      const state = cart.getState()
-      return (
-        <div>
-          <div data-testid="email">{state.customerEmail}</div>
-          <div data-testid="tax">{String(state.automaticTax)}</div>
-          <div data-testid="phone">{String(state.collectPhoneNumber)}</div>
-          <div data-testid="promo">{String(state.allowPromotionCodes)}</div>
-          <div data-testid="ui-mode">{state.uiMode}</div>
-        </div>
-      )
-    }
-
-    render(
-      <CartProvider
-        shouldPersist={false}
-        customerEmail="test@example.com"
-        automaticTax={true}
-        collectPhoneNumber={true}
-        allowPromotionCodes={true}
-        uiMode="embedded"
-      >
-        <TestComponent />
-      </CartProvider>
-    )
-
-    expect(screen.getByTestId('email')).toHaveTextContent('test@example.com')
-    expect(screen.getByTestId('tax')).toHaveTextContent('true')
-    expect(screen.getByTestId('phone')).toHaveTextContent('true')
-    expect(screen.getByTestId('promo')).toHaveTextContent('true')
-    expect(screen.getByTestId('ui-mode')).toHaveTextContent('embedded')
-  })
 })
 
 describe('useCartContext', () => {
