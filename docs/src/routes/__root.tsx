@@ -7,7 +7,6 @@ import {
 import * as React from 'react'
 import appCss from '@/styles/app.css?url'
 import { RootProvider } from 'fumadocs-ui/provider/tanstack'
-import { CartProvider } from 'use-shopping-cart'
 
 export const Route = createRootRoute({
   head: () => ({
@@ -23,7 +22,11 @@ export const Route = createRootRoute({
         title: 'use-shopping-cart'
       }
     ],
-    links: [{ rel: 'stylesheet', href: appCss }]
+    links: [
+      { rel: 'stylesheet', href: appCss },
+      { rel: 'icon', type: 'image/png', href: '/favicon.png' },
+      { rel: 'icon', type: 'image/x-icon', href: '/favicon.ico' }
+    ]
   }),
   component: RootComponent
 })
@@ -43,11 +46,7 @@ function RootDocument({ children }: { children: React.ReactNode }) {
         <HeadContent />
       </head>
       <body className="flex flex-col min-h-screen">
-        <RootProvider>
-          <CartProvider stripe={''} currency="USD" shouldPersist={false}>
-            {children}
-          </CartProvider>
-        </RootProvider>
+        <RootProvider>{children}</RootProvider>
         <Scripts />
       </body>
     </html>

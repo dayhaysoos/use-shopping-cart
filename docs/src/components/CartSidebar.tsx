@@ -177,11 +177,7 @@ export function CartSidebar({ isOpen, onClose }: CartSidebarProps) {
                 Checkout (Demo)
               </button>
               <button
-                onClick={() => {
-                  if (window.confirm('Clear all items from cart?')) {
-                    clearCart()
-                  }
-                }}
+                onClick={() => clearCart()}
                 className="w-full py-2 text-sm text-fd-muted-foreground hover:text-fd-destructive transition-colors"
               >
                 Clear Cart

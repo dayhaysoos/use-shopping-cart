@@ -1,3 +1,107 @@
 @import 'tailwindcss';
+
+@theme {
+  /* use-shopping-cart Brand Colors */
+  --color-primary: #3ECF8E;
+  --color-primary-dark: #23A068;
+  --color-primary-darker: #0E603B;
+  --color-accent: #6772E5;
+  --color-navy: #32325D;
+}
+
 @import 'fumadocs-ui/css/neutral.css';
 @import 'fumadocs-ui/css/preset.css';
+
+/* Override Fumadocs theme colors */
+:root {
+  /* Primary color (buttons, links, highlights) - Brand Green */
+  --color-fd-primary: hsl(163, 68%, 65%); /* #3ECF8E */
+  --color-fd-primary-foreground: hsl(0, 0%, 0%);
+  
+  /* Accent color - Brand Purple */  
+  --color-fd-accent: hsl(233, 71%, 67%); /* #6772E5 */
+  --color-fd-accent-foreground: hsl(0, 0%, 100%);
+  
+  /* Make links use primary color */
+  --tw-prose-links: var(--color-fd-primary);
+}
+
+/* Custom brand styling */
+
+/* Links - green with purple hover */
+.prose a:not(.no-underline) {
+  color: var(--color-primary);
+  transition: color 0.2s ease;
+}
+
+.prose a:not(.no-underline):hover {
+  color: var(--color-accent);
+}
+
+/* Code inline highlights */
+.prose :not(pre) > code {
+  background-color: var(--color-navy);
+  color: var(--color-primary);
+  border: 1px solid rgba(62, 207, 142, 0.2);
+}
+
+/* Scrollbar styling */
+::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--color-navy);
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--color-primary);
+  border-radius: 5px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--color-primary-dark);
+}
+
+/* Selection color */
+::selection {
+  background-color: var(--color-primary);
+  color: #000;
+}
+
+/* Focus rings */
+*:focus-visible {
+  outline: 2px solid var(--color-primary);
+  outline-offset: 2px;
+}
+
+/* Interactive demo borders */
+.not-prose {
+  border-color: rgba(62, 207, 142, 0.2) !important;
+}
+
+/* Sidebar active item accent */
+[data-active="true"] {
+  border-left-color: var(--color-primary) !important;
+}
+
+/* Success states */
+.text-green-600 {
+  color: var(--color-primary) !important;
+}
+
+/* Gradient effects for special elements */
+.brand-gradient {
+  background: linear-gradient(135deg, var(--color-primary) 0%, var(--color-accent) 100%);
+}
+
+/* Button hover effects - green to purple transition */
+button:not(:disabled):hover {
+  transition: background-color 0.3s ease, border-color 0.3s ease;
+}
+
+/* Subtle green glow on interactive elements */
+.interactive-glow:hover {
+  box-shadow: 0 0 20px rgba(62, 207, 142, 0.3);
+}
