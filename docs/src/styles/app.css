@@ -24,6 +24,11 @@
   
   /* Make links use primary color */
   --tw-prose-links: var(--color-fd-primary);
+  --section-spacing: clamp(4rem, 7vw, 7.5rem);
+}
+
+html {
+  scroll-behavior: smooth;
 }
 
 /* Custom brand styling */
@@ -104,4 +109,121 @@ button:not(:disabled):hover {
 /* Subtle green glow on interactive elements */
 .interactive-glow:hover {
   box-shadow: 0 0 20px rgba(62, 207, 142, 0.3);
+}
+
+.skip-link {
+  position: absolute;
+  left: -999px;
+  top: 1rem;
+  z-index: 100;
+  border-radius: 9999px;
+  background: #fff;
+  color: #000;
+  padding: 0.5rem 1rem;
+  font-weight: 600;
+  box-shadow: 0 15px 40px rgba(0, 0, 0, 0.35);
+}
+
+.skip-link:focus-visible {
+  left: 1rem;
+}
+
+.feature-card {
+  position: relative;
+  overflow: hidden;
+  background: linear-gradient(
+    135deg,
+    rgba(255, 255, 255, 0.08),
+    rgba(255, 255, 255, 0.02)
+  );
+}
+
+.feature-card::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  pointer-events: none;
+}
+
+.feature-card--muted {
+  background: linear-gradient(
+    135deg,
+    rgba(255, 255, 255, 0.04),
+    rgba(255, 255, 255, 0.01)
+  );
+}
+
+.cart-action-button {
+  position: relative;
+  overflow: hidden;
+  --button-pointer-x: 0.5;
+  --button-pointer-y: 0.5;
+  --button-pointer-active: 0;
+}
+
+.cart-action-button::after {
+  content: '';
+  position: absolute;
+  inset: -1px;
+  border-radius: inherit;
+  pointer-events: none;
+  background: radial-gradient(
+      circle at calc(var(--button-pointer-x, 0.5) * 100%)
+      calc(var(--button-pointer-y, 0.5) * 100%),
+      rgba(103, 114, 229, 0.65),
+      rgba(62, 207, 142, 0.4) 85%,
+      transparent 70%
+    ),
+    radial-gradient(
+      circle at calc(var(--button-pointer-x, 0.5) * 100%)
+      calc(var(--button-pointer-y, 0.5) * 100%),
+      rgba(255, 255, 255, 0.35),
+      transparent 60%
+    );
+  opacity: calc(0.15 + 0.65 * var(--button-pointer-active, 0));
+  transition: opacity 200ms ease;
+  mix-blend-mode: multiply;
+  filter: blur(10px) saturate(2.5);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .cart-action-button::after {
+    transition: none;
+  }
+}
+
+@layer utilities {
+  @keyframes text-shine {
+    0% {
+      background-position: 25% 50%;
+    }
+    100% {
+      background-position: 75% 50%;
+    }
+  }
+
+  .text-shine {
+    background: linear-gradient(
+      90deg,
+      var(--color-primary-darker) 0%,
+      var(--color-primary) 25%,
+      var(--color-accent) 50%,
+      var(--color-primary) 75%,
+      var(--color-accent) 100%
+    );
+    background-size: 500% auto;
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+    animation: text-shine 3s ease-in-out infinite alternate;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .text-shine {
+      animation: none;
+      background-position: 50% 50%;
+    }
+  }
 }
