@@ -15,16 +15,34 @@
 /* Override Fumadocs theme colors */
 :root {
   /* Primary color (buttons, links, highlights) - Brand Green */
-  --color-fd-primary: hsl(163, 68%, 65%); /* #3ECF8E */
-  --color-fd-primary-foreground: hsl(0, 0%, 0%);
-  
-  /* Accent color - Brand Purple */  
-  --color-fd-accent: hsl(233, 71%, 67%); /* #6772E5 */
-  --color-fd-accent-foreground: hsl(0, 0%, 100%);
-  
+  --color-fd-primary: #3ecf8e;
+  --color-fd-primary-foreground: #050505;
+
+  /* Accent color - Brand Purple */
+  --color-fd-accent: #6772e5;
+  --color-fd-accent-foreground: #ffffff;
+
+  --color-fd-background: #f5f6fb;
+  --color-fd-foreground: #0b1124;
+  --color-fd-muted: #e0e3f1;
+  --color-fd-muted-foreground: #4b567a;
+  --color-fd-secondary: #e8ecff;
+  --color-fd-secondary-foreground: #0b1124;
+  --color-fd-border: #c5c9e0;
+
   /* Make links use primary color */
   --tw-prose-links: var(--color-fd-primary);
   --section-spacing: clamp(4rem, 7vw, 7.5rem);
+}
+
+html.dark {
+  --color-fd-background: #05060f;
+  --color-fd-foreground: #f8fbff;
+  --color-fd-muted: rgba(255, 255, 255, 0.08);
+  --color-fd-muted-foreground: rgba(255, 255, 255, 0.7);
+  --color-fd-secondary: rgba(255, 255, 255, 0.12);
+  --color-fd-secondary-foreground: #f8fbff;
+  --color-fd-border: rgba(255, 255, 255, 0.2);
 }
 
 html {
@@ -83,17 +101,17 @@ html {
 
 /* Interactive demo borders */
 .not-prose {
-  border-color: rgba(62, 207, 142, 0.2) !important;
+  border-color: rgba(62, 207, 142, 0.2);
 }
 
 /* Sidebar active item accent */
 [data-active="true"] {
-  border-left-color: var(--color-primary) !important;
+  border-left-color: var(--color-primary);
 }
 
 /* Success states */
 .text-green-600 {
-  color: var(--color-primary) !important;
+  color: var(--color-primary);
 }
 
 /* Gradient effects for special elements */
@@ -128,6 +146,38 @@ button:not(:disabled):hover {
   left: 1rem;
 }
 
+header#nd-nav {
+  background-color: color-mix(in srgb, var(--color-fd-background) 95%, white);
+  border-color: color-mix(in srgb, var(--color-fd-border) 80%, transparent);
+}
+
+html.dark header#nd-nav {
+  background-color: rgba(5, 6, 15, 0.9);
+  border-color: rgba(255, 255, 255, 0.15);
+}
+
+header#nd-nav a {
+  color: #1b233d;
+  font-weight: 500;
+}
+
+header#nd-nav a:hover,
+header#nd-nav a[data-active='true'] {
+  color: #05070f;
+  font-weight: 600;
+}
+
+html.dark header#nd-nav a {
+  color: #f8fbff;
+  font-weight: 500;
+}
+
+html.dark header#nd-nav a:hover,
+html.dark header#nd-nav a[data-active='true'] {
+  color: #ffffff;
+  font-weight: 600;
+}
+
 .feature-card {
   position: relative;
   overflow: hidden;
@@ -136,6 +186,9 @@ button:not(:disabled):hover {
     rgba(255, 255, 255, 0.08),
     rgba(255, 255, 255, 0.02)
   );
+  --button-pointer-x: 0.5;
+  --button-pointer-y: 0.5;
+  --button-pointer-active: 0;
 }
 
 .feature-card::before {
@@ -145,6 +198,33 @@ button:not(:disabled):hover {
   border-radius: inherit;
   border: 1px solid rgba(255, 255, 255, 0.1);
   pointer-events: none;
+  z-index: 0;
+}
+
+.feature-card::after {
+  content: '';
+  position: absolute;
+  inset: -1px;
+  border-radius: inherit;
+  pointer-events: none;
+  background: radial-gradient(
+      circle at calc(var(--button-pointer-x, 0.5) * 100%)
+      calc(var(--button-pointer-y, 0.5) * 100%),
+      rgba(103, 114, 229, 0.4),
+      rgba(62, 207, 142, 0.25) 60%,
+      transparent 75%
+    ),
+    radial-gradient(
+      circle at calc(var(--button-pointer-x, 0.5) * 100%)
+      calc(var(--button-pointer-y, 0.5) * 100%),
+      rgba(255, 255, 255, 0.35),
+      transparent 60%
+    );
+  opacity: calc(0.05 + 0.45 * var(--button-pointer-active, 0));
+  transition: opacity 220ms ease;
+  mix-blend-mode: screen;
+  filter: blur(25px) saturate(2);
+  z-index: 0;
 }
 
 .feature-card--muted {
@@ -189,9 +269,15 @@ button:not(:disabled):hover {
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .cart-action-button::after {
+  .cart-action-button::after,
+  .feature-card::after {
     transition: none;
   }
+}
+
+.feature-card > * {
+  position: relative;
+  z-index: 1;
 }
 
 @layer utilities {

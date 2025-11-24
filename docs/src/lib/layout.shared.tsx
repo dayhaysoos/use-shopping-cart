@@ -10,7 +10,7 @@ export function baseOptions(): BaseLayoutProps {
     nav: {
       enabled: true,
       title: (
-        <div className="flex items-center gap-2 text-white">
+        <div className="flex items-center gap-2 text-[#0b1124] dark:text-white">
           <img
             src="/logo.png"
             alt="use-shopping-cart logo"

@@ -198,12 +198,12 @@ function PlaygroundContent() {
         </div>
       </div>
 
-      <div className="rounded-2xl border border-black/10 bg-white p-6 shadow-md dark:border-white/10 dark:bg-black/40">
+      <div className="rounded-2xl border border-[#cfd5ea] bg-white p-6 shadow-md dark:border-white/10 dark:bg-black/40">
         <div className="flex flex-wrap items-center justify-between gap-3">
           <div
             role="tablist"
             aria-label="Cart preview mode"
-            className="inline-flex items-center gap-2 rounded-full border border-black/10 bg-black/5 p-1 dark:border-white/10 dark:bg-white/5"
+            className="inline-flex items-center gap-2 rounded-full border border-[#d6dcf2] bg-[#e9ecf8] p-1 dark:border-white/10 dark:bg-white/5"
           >
             <button
               type="button"
@@ -214,7 +214,7 @@ function PlaygroundContent() {
               className={`rounded-full px-3 py-1 text-xs font-semibold transition ${
                 previewMode === 'ui'
                   ? 'bg-white text-[#0b1124] shadow-sm dark:bg-black/70 dark:text-white'
-                  : 'text-neutral-500 hover:text-neutral-800 dark:text-white/60 dark:hover:text-white'
+                  : 'text-[#1f2337] hover:text-[#0b1124] dark:text-white/60 dark:hover:text-white'
               }`}
               onClick={() => setPreviewMode('ui')}
             >
@@ -229,7 +229,7 @@ function PlaygroundContent() {
               className={`rounded-full px-3 py-1 text-xs font-semibold transition ${
                 previewMode === 'json'
                   ? 'bg-white text-[#0b1124] shadow-sm dark:bg-black/70 dark:text-white'
-                  : 'text-neutral-500 hover:text-neutral-800 dark:text-white/60 dark:hover:text-white'
+                  : 'text-[#1f2337] hover:text-[#0b1124] dark:text-white/60 dark:hover:text-white'
               }`}
               onClick={() => setPreviewMode('json')}
             >
@@ -302,14 +302,14 @@ function PlaygroundContent() {
             </div>
 
             <div
-              className="mt-6 space-y-2 rounded-2xl bg-black/4 p-5 text-sm dark:bg-white/5"
+              className="mt-6 space-y-2 rounded-2xl bg-[#e9ecf8] p-5 text-sm dark:bg-white/5"
               aria-live="polite"
             >
               <div className="flex items-center justify-between text-neutral-700 dark:text-white/70">
                 <span>Subtotal</span>
                 <span>{formattedSubtotal}</span>
               </div>
-              <div className="flex items-center justify-between text-fd-primary">
+              <div className="flex items-center justify-between text-[#0e603b] dark:text-fd-primary">
                 <span>Promotion</span>
                 <span>- {formattedDiscount}</span>
               </div>

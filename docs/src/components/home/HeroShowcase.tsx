@@ -120,10 +120,7 @@ export function HeroShowcase() {
 
   return (
     <div className="relative overflow-hidden rounded-3xl border border-black/10 bg-linear-to-br from-[#0f1328] via-[#11183A] to-[#151f4a] px-4 py-8 text-white shadow-[0_40px_90px_rgba(5,6,15,0.4)] dark:border-white/5">
-      <div className="mb-4 flex items-center justify-between">
-        <h3 className="text-base font-semibold uppercase tracking-[0.4em] text-fd-primary">
-          Under the hood
-        </h3>
+      <div className="mb-4 flex items-center justify-end">
         <button
           type="button"
           aria-pressed={isPaused}
@@ -146,6 +143,8 @@ export function HeroShowcase() {
                 ? 'opacity-100 translate-y-0'
                 : 'pointer-events-none opacity-0 -translate-y-4'
             }`}
+            aria-hidden={index !== activeIndex}
+            tabIndex={-1}
           >
             <p className="text-xs font-semibold uppercase tracking-[0.4em] text-white/50">
               {item.group}

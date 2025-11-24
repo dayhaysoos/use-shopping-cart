@@ -1,0 +1,21 @@
+---
+title: Cart properties overview
+description: Reference table for the derived properties returned by use-shopping-cart.
+---
+
+All of these values are exposed by `useShoppingCart()` so you can render totals,
+badges, or debug panels without reaching into internal state. The linked pages
+go deeper on each property.
+
+| Property                                                      | Type                                    | Purpose                                                                 |
+| ------------------------------------------------------------- | --------------------------------------- | ----------------------------------------------------------------------- |
+| [`cartCount`](/docs/properties/cartCount)                     | `number`                                | Total quantity across every line item.                                  |
+| [`cartDetails`](/docs/properties/cartDetails)                 | `Record<string, CartEntry>`             | Canonical line item map keyed by product id.                            |
+| [`formattedTotalPrice`](/docs/properties/formattedTotalPrice) | `string`                                | Localized currency string you can drop straight into UI.                |
+| [`lastClicked`](/docs/properties/lastClicked)                 | `{ id: string; label: string } \| null` | Metadata describing the last button interaction, useful for animations. |
+| [`shouldDisplayCart`](/docs/properties/shouldDisplayCart)     | `boolean`                               | True when the customer has interacted with the cart UI recently.        |
+| [`totalPrice`](/docs/properties/totalPrice)                   | `number`                                | Raw integer total (in the smallest currency unit) for calculations.     |
+
+> ℹ️ Looking for optimistic state or helper functions? See the
+> [`useOptimisticCart`](/docs/hooks/useOptimisticCart) hook and the
+> [`actions` section](/docs/actions) for mutation helpers.

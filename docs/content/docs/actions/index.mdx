@@ -1,0 +1,38 @@
+---
+title: Cart actions overview
+description: Summary of the cart mutation helpers exposed by use-shopping-cart.
+---
+
+Each cart action is a focused helper that mutates the client-side cart state and
+keeps the UI in sync. Use this overview to decide which helper you need, then
+drill into the detailed reference pages that follow.
+
+## State mutation helpers
+
+- `addItem(product)` — Insert a new product or merge quantities when the item
+  already exists.
+- `incrementItem(id, opts?)` — Increase a line item’s quantity by one (or a
+  custom step) while preserving product metadata.
+- `decrementItem(id, opts?)` — Decrease quantity and remove the line once the
+  count hits zero.
+- `setItemQuantity(id, quantity)` — Directly set an absolute quantity when you
+  have a numeric input field.
+- `removeItem(id)` — Drop a product completely without touching the rest of the
+  cart.
+- `clearCart()` — Reset the cart state, useful after a successful checkout or
+  when signing a user out.
+
+## Session + Checkout helpers
+
+- `loadCart(items)` — Hydrate carts from storage or server-rendered data.
+- `redirectToCheckout(options)` — Kick off Stripe Checkout using the current
+  cart contents or a pre-built session id.
+
+## UI feedback helpers
+
+- `handleCartClick(event)` / `handleCartHover(event)` — Track the last cart
+  interaction so you can animate the UI contextually.
+- `handleCloseCart()` — Reset cart hover/focus metadata when a cart drawer is
+  closed.
+- `storeLastClicked()` — Imperatively mark a cart button as “recently used”
+  during advanced animations.

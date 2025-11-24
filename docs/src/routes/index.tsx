@@ -5,6 +5,7 @@ import { baseOptions } from '@/lib/layout.shared'
 import { Container, Section, SectionHeading } from '@/components/home/Section'
 import { CartInteractionPlayground } from '@/components/CartInteractionPlayground'
 import { HeroShowcase } from '@/components/home/HeroShowcase'
+import { Highlight, themes, type Language } from 'prism-react-renderer'
 
 type HomeMetrics = {
   githubStars: number | null
@@ -16,21 +17,23 @@ type HomeLoaderData = {
 }
 
 const INSTALL_SNIPPET = 'npm install @stripe/stripe-js use-shopping-cart'
+const CODE_THEME = themes.nightOwl
 
 const PRIMARY_FEATURES = [
   {
     title: 'Optimistic cart UX',
-    description: 'Show instant quantity and price changes with React 19 hooks.'
+    description:
+      'useOptimisticCart mirrors server state so quantity and price changes feel instant while requests settle.'
   },
   {
-    title: 'Promotion code ready',
+    title: 'State persistence controls',
     description:
-      'Demo how discounts feel in the cart before wiring Stripe backends.'
+      'Tune persistKey, storage, and shouldPersist to decide exactly how carts survive reloads or sign-outs.'
   },
   {
-    title: 'Serverless utilities',
+    title: 'Inventory filters',
     description:
-      'Validate carts and hydrate Checkout sessions with one helper import.'
+      'Run filterCart on live cartDetails to build subscription-only, digital, or custom product views on the fly.'
   }
 ]
 
@@ -41,14 +44,14 @@ const SECONDARY_FEATURES = [
       'Core logic ships with unit + integration coverage so you can focus on UX.'
   },
   {
-    title: 'Jamstack friendly',
+    title: 'Event-aware buttons',
     description:
-      'Use the same cart logic in Next.js, Remix, Astro, or Vite projects.'
+      'handleCartClick, handleCartHover, and handleCloseCart emit metadata for animating CTAs, drawers, or tooltips.'
   },
   {
-    title: 'Community-backed support',
+    title: 'Serverless utilities',
     description:
-      'Open source contributions from agencies, indie hackers, and SaaS teams.'
+      'Validate carts and hydrate Stripe Checkout sessions with a single helper import.'
   }
 ]
 
@@ -76,7 +79,7 @@ export function Root() {
   {
     title: 'Shape your products',
     description:
-      'Inventory can come from Stripe, CMS, or JSON as long as the fields match.',
+      'Inventory can come from Stripe, a CMS, a database, or JSON as long as the fields match.',
     language: 'ts',
     code: `export const products = [
   {
@@ -342,7 +345,8 @@ function HeroSection({ metrics }: { metrics: HomeMetrics }) {
             </a>
           </div>
           <div className="rounded-2xl border border-black/10 bg-white p-4 text-sm font-mono text-[#0f1328] shadow-sm dark:border-white/10 dark:bg-black/40 dark:text-white/80">
-            <span className="text-fd-primary">$</span> {INSTALL_SNIPPET}
+            <span className="text-[#0e603b] dark:text-fd-primary">$</span>{' '}
+            {INSTALL_SNIPPET}
           </div>
           <div className="flex flex-wrap gap-4">
             <StatBadge
@@ -375,7 +379,7 @@ function CartPlaygroundSection() {
         <div className="rounded-3xl border border-black/10 bg-white p-6 shadow-[0_30px_80px_rgba(5,6,15,0.15)] dark:border-white/10 dark:bg-black/60 dark:shadow-[0_30px_80px_rgba(5,6,15,0.55)]">
           <a
             href="#after-playground"
-            className="skip-playground mb-4 inline-flex text-sm font-semibold text-fd-primary underline-offset-4 focus-visible:outline"
+            className="skip-playground mb-4 inline-flex text-sm font-semibold text-[#0e603b] underline-offset-4 focus-visible:outline dark:text-fd-primary"
           >
             Skip interactive cart demo
           </a>
@@ -393,8 +397,8 @@ function FeatureHighlights() {
       <Container className="space-y-10">
         <SectionHeading
           eyebrow="Modern cart toolkit"
-          title="Everything you need to launch slick Stripe carts."
-          description="Feature-rich defaults that stay out of your way. Configure once, share across frameworks, and keep iterating."
+          title="Ship Stripe-ready carts without reinventing state."
+          description="Purpose-built for React 19 apps: compose cart hooks, format helpers, and server utilities to launch Stripe Checkout faster."
         />
         <div className="grid gap-6 md:grid-cols-3">
           {PRIMARY_FEATURES.map((feature) => (
@@ -456,21 +460,6 @@ function SocialProofSection({ metrics }: { metrics: HomeMetrics }) {
             tooltip={metricTooltip(metrics.npmDownloads)}
           />
           <MetricBadge label="Years in production" value="4+" />
-          <MetricBadge label="PRs merged" value="400+" />
-        </div>
-        <div className="grid gap-4 md:grid-cols-3">
-          <QuoteCard
-            quote="We shipped a testable Stripe cart in under a day."
-            author="Jason Lengstorf · Learn with Jason"
-          />
-          <QuoteCard
-            quote="Finally—cart logic that feels native to React 19."
-            author="Delba de Oliveira · Vercel"
-          />
-          <QuoteCard
-            quote="It’s our go-to for demos, prototypes, and production shops."
-            author="Indie Worldwide Community"
-          />
         </div>
       </Container>
     </Section>
@@ -524,8 +513,24 @@ function FeatureCard({
   description: string
   muted?: boolean
 }) {
+  const cardRef = React.useRef<HTMLDivElement>(null)
+
+  const handlePointerMove = React.useCallback(
+    (event: React.PointerEvent<HTMLDivElement>) => {
+      setFeatureCardGlow(cardRef.current, event)
+    },
+    []
+  )
+
+  const handlePointerLeave = React.useCallback(() => {
+    resetFeatureCardGlow(cardRef.current)
+  }, [])
+
   return (
     <div
+      ref={cardRef}
+      onPointerMove={handlePointerMove}
+      onPointerLeave={handlePointerLeave}
       className={`feature-card rounded-2xl border border-black/10 p-6 transition hover:-translate-y-1 hover:border-black/30 dark:border-white/10 dark:hover:border-white/30 ${
         muted ? 'feature-card--muted' : ''
       }`}
@@ -538,6 +543,28 @@ function FeatureCard({
       </p>
     </div>
   )
+}
+
+function setFeatureCardGlow(
+  node: HTMLDivElement | null,
+  event: React.PointerEvent<HTMLDivElement>
+) {
+  if (!node) return
+  const rect = node.getBoundingClientRect()
+  const x = (event.clientX - rect.left) / rect.width
+  const y = (event.clientY - rect.top) / rect.height
+  node.style.setProperty('--button-pointer-x', clampToUnit(x).toString())
+  node.style.setProperty('--button-pointer-y', clampToUnit(y).toString())
+  node.style.setProperty('--button-pointer-active', '1')
+}
+
+function resetFeatureCardGlow(node: HTMLDivElement | null) {
+  if (!node) return
+  node.style.setProperty('--button-pointer-active', '0')
+}
+
+function clampToUnit(value: number) {
+  return Math.min(1, Math.max(0, value))
 }
 
 function WorkflowCard({
@@ -568,22 +595,15 @@ function WorkflowCard({
           </p>
         </div>
       </div>
-      <pre className="mt-4 flex-1 overflow-x-auto rounded-xl bg-[#f4f5fb] p-4 text-xs text-[#111426] dark:bg-[#04050C] dark:text-white/80">
-        <code>{code}</code>
-      </pre>
+      <div className="mt-4 flex-1 overflow-auto rounded-xl bg-[#050a1d] p-4 text-[#f8fbff] dark:bg-[#04050C] dark:text-white">
+        <CodeBlock
+          code={code}
+          language={language}
+          className="m-0 whitespace-pre-wrap font-mono text-xs leading-relaxed"
+        />
+      </div>
       <p className="mt-2 text-xs uppercase tracking-[0.3em] text-neutral-500 dark:text-white/40">
         {language}
-      </p>
-    </div>
-  )
-}
-
-function QuoteCard({ quote, author }: { quote: string; author: string }) {
-  return (
-    <div className="rounded-2xl border border-black/10 bg-white p-6 text-sm text-neutral-700 shadow-sm dark:border-white/10 dark:bg-black/30 dark:text-white/80">
-      <p className="italic">&ldquo;{quote}&rdquo;</p>
-      <p className="mt-4 text-xs font-semibold uppercase tracking-[0.3em] text-neutral-500 dark:text-white/50">
-        {author}
       </p>
     </div>
   )
@@ -670,7 +690,7 @@ function CodeTabs({ tabs }: { tabs: readonly FrameworkTab[] }) {
   if (!activeTab) return null
 
   return (
-    <div className="space-y-4 rounded-2xl border border-black/10 bg-white p-4 shadow-sm dark:border-white/10 dark:bg-black/30">
+    <div className="space-y-4 rounded-2xl border border-[#cfd5ea] bg-white p-4 shadow-sm dark:border-white/10 dark:bg-black/30">
       <div className="flex flex-wrap gap-2">
         {tabs.map((tab) => (
           <button
@@ -680,7 +700,7 @@ function CodeTabs({ tabs }: { tabs: readonly FrameworkTab[] }) {
             className={`rounded-full px-4 py-2 text-sm font-semibold transition ${
               activeTab.id === tab.id
                 ? 'bg-fd-primary text-black'
-                : 'bg-black/5 text-[#0b1124] hover:bg-black/10 dark:bg-white/5 dark:text-white dark:hover:bg-white/10'
+                : 'bg-[#dfe4f5] text-[#0b1124] hover:bg-[#cfd6ec] dark:bg-white/5 dark:text-white dark:hover:bg-white/10'
             }`}
           >
             {tab.label}
@@ -691,14 +711,18 @@ function CodeTabs({ tabs }: { tabs: readonly FrameworkTab[] }) {
         <button
           type="button"
           onClick={handleCopy}
-          className="absolute right-4 top-4 rounded-full border border-black/10 px-3 py-1 text-xs font-semibold text-[#0b1124] transition hover:border-black/40 dark:border-white/20 dark:text-white/70 dark:hover:border-white/50"
+          className="absolute right-4 top-4 rounded-full border border-[#c7cee5] bg-[#edf0fb] px-3 py-1 text-xs font-semibold text-[#0b1124] transition hover:border-[#acb5da] hover:bg-[#dde2f5] dark:border-white/20 dark:bg-transparent dark:text-white/70 dark:hover:border-white/50"
         >
           {copied ? 'Copied' : 'Copy'}
         </button>
-        <pre className="overflow-x-auto rounded-2xl bg-[#f4f5fb] p-5 text-xs text-[#111426] dark:bg-[#04050C] dark:text-white/80">
-          <code>{activeTab.code}</code>
-        </pre>
-        <span className="absolute right-4 bottom-4 text-[11px] uppercase tracking-[0.3em] text-neutral-500 dark:text-white/40">
+        <div className="overflow-x-auto rounded-2xl bg-[#030717] p-5 text-[#fdfefe] dark:bg-[#04050C] dark:text-white">
+          <CodeBlock
+            code={activeTab.code}
+            language={activeTab.language}
+            className="m-0 whitespace-pre-wrap font-mono text-xs leading-relaxed"
+          />
+        </div>
+        <span className="absolute right-4 bottom-4 text-[11px] uppercase tracking-[0.3em] text-[#a9b3ce] dark:text-white/50">
           {activeTab.language}
         </span>
       </div>
@@ -731,4 +755,46 @@ function metricTooltip(value: number | null): string | undefined {
   }
 
   return undefined
+}
+
+function CodeBlock({
+  code,
+  language,
+  className
+}: {
+  code: string
+  language: string
+  className?: string
+}) {
+  const prismLanguage = normalizeLanguage(language)
+  return (
+    <Highlight code={code} language={prismLanguage} theme={CODE_THEME}>
+      {({
+        className: highlightClass,
+        style,
+        tokens,
+        getLineProps,
+        getTokenProps
+      }) => (
+        <pre
+          className={`${highlightClass ?? ''} ${className ?? ''}`.trim()}
+          style={{ ...style, background: 'transparent' }}
+        >
+          {tokens.map((line, i) => (
+            <div key={i} {...getLineProps({ line })}>
+              {line.map((token, key) => (
+                <span key={key} {...getTokenProps({ token })} />
+              ))}
+            </div>
+          ))}
+        </pre>
+      )}
+    </Highlight>
+  )
+}
+
+function normalizeLanguage(language: string): Language {
+  if (language === 'ts') return 'tsx'
+  if (language === 'js') return 'tsx'
+  return (language as Language) || 'tsx'
 }

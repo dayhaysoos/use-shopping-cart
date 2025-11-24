@@ -54,7 +54,7 @@ export function SectionHeading({
   return (
     <div className={cx('flex flex-col gap-4', alignment)}>
       {eyebrow ? (
-        <p className="text-xs font-semibold uppercase tracking-[0.3em] text-fd-primary">
+        <p className="text-xs font-semibold uppercase tracking-[0.3em] text-[#0e603b] dark:text-fd-primary">
           {eyebrow}
         </p>
       ) : null}
