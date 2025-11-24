@@ -6,6 +6,9 @@ import {
 } from 'use-shopping-cart'
 import type { Product } from 'use-shopping-cart/core'
 
+import { useMutation, useQuery } from 'convex/react'
+import { api } from '../../convex/_generated/api'
+
 const BANANA_PRODUCT: Product = {
   id: 'banana_001',
   name: 'Bananas',
@@ -54,6 +57,20 @@ function PlaygroundContent() {
     totalPrice
   } = useShoppingCart()
 
+  const incrementCounter = useMutation(api.counter.increment)
+  const interactionCount = useQuery(api.counter.getTotal) ?? 0
+
+  const recordInteraction = React.useCallback(() => {
+    incrementCounter({ amount: 1 }).catch((error) => {
+      console.error('Failed to record cart interaction', error)
+    })
+  }, [incrementCounter])
+
+  const formattedInteractionCount = React.useMemo(
+    () => interactionCount.toLocaleString('en-US'),
+    [interactionCount]
+  )
+
   const [promotionApplied, setPromotionApplied] = React.useState(false)
   const [shippingTier, setShippingTier] =
     React.useState<ShippingTier>('standard')
@@ -92,252 +109,279 @@ function PlaygroundContent() {
 
   const handleAddBananas = () => {
     addItem(BANANA_PRODUCT)
+    recordInteraction()
   }
 
   const handleAddApples = () => {
     addItem(APPLE_PRODUCT)
+    recordInteraction()
   }
 
   const handleIncrement = () => {
     if (!BANANA_PRODUCT.id) return
     if (!bananaInCart) {
       addItem(BANANA_PRODUCT)
+      recordInteraction()
       return
     }
     incrementItem(BANANA_PRODUCT.id)
+    recordInteraction()
   }
 
   const handleDecrement = () => {
     if (!BANANA_PRODUCT.id || !bananaInCart) return
     decrementItem(BANANA_PRODUCT.id)
+    recordInteraction()
   }
 
   const handlePromotion = () => {
     setPromotionApplied((prev) => !prev)
+    recordInteraction()
   }
 
   const handleShipping = () => {
     setShippingTier((prev) => (prev === 'standard' ? 'priority' : 'standard'))
+    recordInteraction()
   }
 
   const handleClear = () => {
     clearCart()
     setPromotionApplied(false)
     setShippingTier('standard')
+    recordInteraction()
+  }
+
+  const handlePreviewModeChange = (mode: 'ui' | 'json') => {
+    setPreviewMode(mode)
+    recordInteraction()
+  }
+
+  const handleCheckout = () => {
+    recordInteraction()
   }
 
   const cartItems = Object.values(cartDetails)
 
   return (
-    <div className="grid gap-8 lg:grid-cols-[minmax(0,0.9fr)_minmax(0,1.1fr)]">
-      <div className="space-y-4 rounded-2xl border border-black/10 bg-white p-4 shadow-sm dark:border-white/10 dark:bg-white/5 md:p-6">
-        <p
-          id="playground-instructions"
-          className="text-sm text-neutral-700 dark:text-white/70"
-        >
-          Every control below triggers the same cart methods you use in an app.
-          The totals on the right announce updates automatically.
-        </p>
-        <fieldset
-          className="space-y-4"
-          aria-describedby="playground-instructions"
-        >
-          <legend className="sr-only">Cart interaction controls</legend>
+    <div className="space-y-6">
+      <div className="grid gap-8 lg:grid-cols-[minmax(0,0.9fr)_minmax(0,1.1fr)]">
+        <div className="space-y-4 rounded-2xl border border-black/10 bg-white p-4 shadow-sm dark:border-white/10 dark:bg-white/5 md:p-6">
+          <p
+            id="playground-instructions"
+            className="text-sm text-neutral-700 dark:text-white/70"
+          >
+            Every control below triggers the same cart methods you use in an
+            app. The totals on the right announce updates automatically.
+          </p>
+          <fieldset
+            className="space-y-4"
+            aria-describedby="playground-instructions"
+          >
+            <legend className="sr-only">Cart interaction controls</legend>
+            <div className="grid gap-3 md:grid-cols-2">
+              <ActionButton
+                label="Add bananas"
+                helper="Calls addItem(banana_001)"
+                onClick={handleAddBananas}
+              />
+              <ActionButton
+                label="Add apples"
+                helper="Calls addItem(apple_001)"
+                onClick={handleAddApples}
+              />
+              <ActionButton
+                label="Increment quantity"
+                helper="Calls incrementItem(id)"
+                onClick={handleIncrement}
+                disabled={!bananaInCart}
+              />
+              <ActionButton
+                label="Decrement quantity"
+                helper="Calls decrementItem(id)"
+                onClick={handleDecrement}
+                disabled={!bananaInCart}
+              />
+              <ActionButton
+                label={
+                  promotionApplied ? 'Remove promotion' : 'Apply promotion'
+                }
+                helper="Simulates togglePromotionCodes(true)"
+                onClick={handlePromotion}
+                ariaPressed={promotionApplied}
+              />
+              <ActionButton
+                label={
+                  shippingTier === 'standard'
+                    ? 'Enable priority shipping'
+                    : 'Return to free shipping'
+                }
+                helper="Simulates setting alternate shipping tiers"
+                onClick={handleShipping}
+              />
+              <ActionButton
+                label="Clear cart"
+                helper="Calls clearCart()"
+                onClick={handleClear}
+                tone="danger"
+              />
+            </div>
+          </fieldset>
           <div className="grid gap-3 md:grid-cols-2">
-            <ActionButton
-              label="Add bananas"
-              helper="Calls addItem(banana_001)"
-              onClick={handleAddBananas}
-            />
-            <ActionButton
-              label="Add apples"
-              helper="Calls addItem(apple_001)"
-              onClick={handleAddApples}
-            />
-            <ActionButton
-              label="Increment quantity"
-              helper="Calls incrementItem(id)"
-              onClick={handleIncrement}
-              disabled={!bananaInCart}
-            />
-            <ActionButton
-              label="Decrement quantity"
-              helper="Calls decrementItem(id)"
-              onClick={handleDecrement}
-              disabled={!bananaInCart}
-            />
-            <ActionButton
-              label={promotionApplied ? 'Remove promotion' : 'Apply promotion'}
-              helper="Simulates togglePromotionCodes(true)"
-              onClick={handlePromotion}
-              ariaPressed={promotionApplied}
-            />
-            <ActionButton
-              label={
-                shippingTier === 'standard'
-                  ? 'Enable priority shipping'
-                  : 'Return to free shipping'
-              }
-              helper="Simulates setting alternate shipping tiers"
-              onClick={handleShipping}
-            />
-            <ActionButton
-              label="Clear cart"
-              helper="Calls clearCart()"
-              onClick={handleClear}
-              tone="danger"
+            <SummaryChip label="cartCount" value={cartCount ?? 0} />
+            <SummaryChip
+              label="formattedTotalPrice"
+              value={formattedTotalPrice ?? '$0.00'}
             />
           </div>
-        </fieldset>
-        <div className="grid gap-3 md:grid-cols-2">
-          <SummaryChip label="cartCount" value={cartCount ?? 0} />
-          <SummaryChip
-            label="formattedTotalPrice"
-            value={formattedTotalPrice ?? '$0.00'}
-          />
-        </div>
-      </div>
-
-      <div className="rounded-2xl border border-[#cfd5ea] bg-white p-6 shadow-md dark:border-white/10 dark:bg-black/40">
-        <div className="flex flex-wrap items-center justify-between gap-3">
-          <div
-            role="tablist"
-            aria-label="Cart preview mode"
-            className="inline-flex items-center gap-2 rounded-full border border-[#d6dcf2] bg-[#e9ecf8] p-1 dark:border-white/10 dark:bg-white/5"
-          >
-            <button
-              type="button"
-              role="tab"
-              aria-selected={previewMode === 'ui'}
-              aria-controls="cart-preview-ui"
-              tabIndex={previewMode === 'ui' ? 0 : -1}
-              className={`rounded-full px-3 py-1 text-xs font-semibold transition ${
-                previewMode === 'ui'
-                  ? 'bg-white text-[#0b1124] shadow-sm dark:bg-black/70 dark:text-white'
-                  : 'text-[#1f2337] hover:text-[#0b1124] dark:text-white/60 dark:hover:text-white'
-              }`}
-              onClick={() => setPreviewMode('ui')}
-            >
-              Cart UI
-            </button>
-            <button
-              type="button"
-              role="tab"
-              aria-selected={previewMode === 'json'}
-              aria-controls="cart-preview-json"
-              tabIndex={previewMode === 'json' ? 0 : -1}
-              className={`rounded-full px-3 py-1 text-xs font-semibold transition ${
-                previewMode === 'json'
-                  ? 'bg-white text-[#0b1124] shadow-sm dark:bg-black/70 dark:text-white'
-                  : 'text-[#1f2337] hover:text-[#0b1124] dark:text-white/60 dark:hover:text-white'
-              }`}
-              onClick={() => setPreviewMode('json')}
-            >
-              Cart JSON
-            </button>
-          </div>
-          <span className="text-xs font-semibold uppercase tracking-wide text-neutral-600 dark:text-white/60">
-            {previewMode === 'ui'
-              ? 'Live mock UI — nothing billed'
-              : 'cartDetails updates live'}
-          </span>
         </div>
 
-        {previewMode === 'ui' ? (
-          <div
-            id="cart-preview-ui"
-            role="tabpanel"
-            aria-label="Cart UI preview"
-          >
-            <div className="mt-4 flex items-center justify-between">
-              <div>
-                <p className="text-sm font-semibold text-[#0b1124] dark:text-white">
-                  Cart preview
-                </p>
-                <p className="text-xs text-neutral-600 dark:text-white/60">
-                  Toggle actions to see totals move.
-                </p>
-              </div>
-              <span className="rounded-full border border-black/10 px-3 py-1 text-xs font-semibold text-[#0b1124] dark:border-white/20 dark:text-white/70">
-                {shippingTier === 'standard'
-                  ? 'Free shipping'
-                  : 'Priority shipping'}
-              </span>
-            </div>
-
-            <div className="mt-4 space-y-3">
-              {cartItems.length === 0 ? (
-                <p className="rounded-xl border border-dashed border-black/20 p-4 text-sm text-neutral-600 dark:border-white/20 dark:text-white/60">
-                  Cart is empty. Add the sample product to see totals update.
-                </p>
-              ) : (
-                cartItems.map((item) => (
-                  <div
-                    key={item.id}
-                    className="flex items-center gap-4 rounded-xl bg-black/4 p-4 dark:bg-white/5"
-                  >
-                    {item.image ? (
-                      <img
-                        src={item.image}
-                        alt={item.name}
-                        className="h-14 w-14 shrink-0 rounded-xl object-cover"
-                      />
-                    ) : (
-                      <div className="h-14 w-14 shrink-0 rounded-xl bg-linear-to-br from-fd-primary to-fd-accent/80" />
-                    )}
-                    <div className="flex-1">
-                      <p className="font-semibold text-[#0b1124] dark:text-white">
-                        {item.name}
-                      </p>
-                      <p className="text-xs text-neutral-600 dark:text-white/60">
-                        Qty {item.quantity} · {item.formattedPrice}
-                      </p>
-                    </div>
-                    <p className="text-sm font-semibold text-[#0b1124] dark:text-white">
-                      {item.formattedValue}
-                    </p>
-                  </div>
-                ))
-              )}
-            </div>
-
+        <div className="rounded-2xl border border-[#cfd5ea] bg-white p-6 shadow-md dark:border-white/10 dark:bg-black/40">
+          <div className="flex flex-wrap items-center justify-between gap-3">
             <div
-              className="mt-6 space-y-2 rounded-2xl bg-[#e9ecf8] p-5 text-sm dark:bg-white/5"
-              aria-live="polite"
+              role="tablist"
+              aria-label="Cart preview mode"
+              className="inline-flex items-center gap-2 rounded-full border border-[#d6dcf2] bg-[#e9ecf8] p-1 dark:border-white/10 dark:bg-white/5"
             >
-              <div className="flex items-center justify-between text-neutral-700 dark:text-white/70">
-                <span>Subtotal</span>
-                <span>{formattedSubtotal}</span>
-              </div>
-              <div className="flex items-center justify-between text-[#0e603b] dark:text-fd-primary">
-                <span>Promotion</span>
-                <span>- {formattedDiscount}</span>
-              </div>
-              <div className="flex items-center justify-between text-neutral-700 dark:text-white/70">
-                <span>Shipping</span>
-                <span>{formattedShipping}</span>
-              </div>
-              <div className="flex items-center justify-between pt-2 text-base font-semibold text-[#0b1124] dark:text-white">
-                <span>Total</span>
-                <span>{formattedComputedTotal}</span>
-              </div>
               <button
-                className="mt-4 w-full rounded-full bg-fd-primary px-4 py-3 text-sm font-semibold text-black"
                 type="button"
+                role="tab"
+                aria-selected={previewMode === 'ui'}
+                aria-controls="cart-preview-ui"
+                tabIndex={previewMode === 'ui' ? 0 : -1}
+                className={`rounded-full px-3 py-1 text-xs font-semibold transition ${
+                  previewMode === 'ui'
+                    ? 'bg-white text-[#0b1124] shadow-sm dark:bg-black/70 dark:text-white'
+                    : 'text-[#1f2337] hover:text-[#0b1124] dark:text-white/60 dark:hover:text-white'
+                }`}
+                onClick={() => handlePreviewModeChange('ui')}
               >
-                Checkout with Stripe
+                Cart UI
+              </button>
+              <button
+                type="button"
+                role="tab"
+                aria-selected={previewMode === 'json'}
+                aria-controls="cart-preview-json"
+                tabIndex={previewMode === 'json' ? 0 : -1}
+                className={`rounded-full px-3 py-1 text-xs font-semibold transition ${
+                  previewMode === 'json'
+                    ? 'bg-white text-[#0b1124] shadow-sm dark:bg-black/70 dark:text-white'
+                    : 'text-[#1f2337] hover:text-[#0b1124] dark:text-white/60 dark:hover:text-white'
+                }`}
+                onClick={() => handlePreviewModeChange('json')}
+              >
+                Cart JSON
               </button>
             </div>
+            <span className="text-xs font-semibold uppercase tracking-wide text-neutral-600 dark:text-white/60">
+              {previewMode === 'ui'
+                ? 'Live mock UI — nothing billed'
+                : 'cartDetails updates live'}
+            </span>
           </div>
-        ) : (
-          <CartJsonPanel
-            id="cart-preview-json"
-            ariaLabel="Cart JSON preview"
-            json={cartDetailsJSON}
-            hasData={hasCartEntries}
-          />
-        )}
+
+          {previewMode === 'ui' ? (
+            <div
+              id="cart-preview-ui"
+              role="tabpanel"
+              aria-label="Cart UI preview"
+            >
+              <div className="mt-4 flex items-center justify-between">
+                <div>
+                  <p className="text-sm font-semibold text-[#0b1124] dark:text-white">
+                    Cart preview
+                  </p>
+                  <p className="text-xs text-neutral-600 dark:text-white/60">
+                    Toggle actions to see totals move.
+                  </p>
+                </div>
+                <span className="rounded-full border border-black/10 px-3 py-1 text-xs font-semibold text-[#0b1124] dark:border-white/20 dark:text-white/70">
+                  {shippingTier === 'standard'
+                    ? 'Free shipping'
+                    : 'Priority shipping'}
+                </span>
+              </div>
+
+              <div className="mt-4 space-y-3">
+                {cartItems.length === 0 ? (
+                  <p className="rounded-xl border border-dashed border-black/20 p-4 text-sm text-neutral-600 dark:border-white/20 dark:text-white/60">
+                    Cart is empty. Add the sample product to see totals update.
+                  </p>
+                ) : (
+                  cartItems.map((item) => (
+                    <div
+                      key={item.id}
+                      className="flex items-center gap-4 rounded-xl bg-black/4 p-4 dark:bg-white/5"
+                    >
+                      {item.image ? (
+                        <img
+                          src={item.image}
+                          alt={item.name}
+                          className="h-14 w-14 shrink-0 rounded-xl object-cover"
+                        />
+                      ) : (
+                        <div className="h-14 w-14 shrink-0 rounded-xl bg-linear-to-br from-fd-primary to-fd-accent/80" />
+                      )}
+                      <div className="flex-1">
+                        <p className="font-semibold text-[#0b1124] dark:text-white">
+                          {item.name}
+                        </p>
+                        <p className="text-xs text-neutral-600 dark:text-white/60">
+                          Qty {item.quantity} · {item.formattedPrice}
+                        </p>
+                      </div>
+                      <p className="text-sm font-semibold text-[#0b1124] dark:text-white">
+                        {item.formattedValue}
+                      </p>
+                    </div>
+                  ))
+                )}
+              </div>
+
+              <div
+                className="mt-6 space-y-2 rounded-2xl bg-[#e9ecf8] p-5 text-sm dark:bg-white/5"
+                aria-live="polite"
+              >
+                <div className="flex items-center justify-between text-neutral-700 dark:text-white/70">
+                  <span>Subtotal</span>
+                  <span>{formattedSubtotal}</span>
+                </div>
+                <div className="flex items-center justify-between text-[#0e603b] dark:text-fd-primary">
+                  <span>Promotion</span>
+                  <span>- {formattedDiscount}</span>
+                </div>
+                <div className="flex items-center justify-between text-neutral-700 dark:text-white/70">
+                  <span>Shipping</span>
+                  <span>{formattedShipping}</span>
+                </div>
+                <div className="flex items-center justify-between pt-2 text-base font-semibold text-[#0b1124] dark:text-white">
+                  <span>Total</span>
+                  <span>{formattedComputedTotal}</span>
+                </div>
+                <button
+                  className="mt-4 w-full rounded-full bg-fd-primary px-4 py-3 text-sm font-semibold text-black"
+                  type="button"
+                  onClick={handleCheckout}
+                >
+                  Checkout with Stripe
+                </button>
+              </div>
+            </div>
+          ) : (
+            <CartJsonPanel
+              id="cart-preview-json"
+              ariaLabel="Cart JSON preview"
+              json={cartDetailsJSON}
+              hasData={hasCartEntries}
+            />
+          )}
+        </div>
       </div>
+
+      <ConvexCounterSummary
+        countLabel={formattedInteractionCount}
+        ariaLabel={`This cart has been clicked ${interactionCount} times.`}
+      />
     </div>
   )
 }
@@ -416,6 +460,28 @@ function SummaryChip({
       </p>
       <p className="mt-1 text-xl font-semibold text-[#0b1124] dark:text-white">
         {value}
+      </p>
+    </div>
+  )
+}
+
+function ConvexCounterSummary({
+  countLabel,
+  ariaLabel
+}: {
+  countLabel: string
+  ariaLabel: string
+}) {
+  return (
+    <div
+      className="rounded-2xl border border-dashed border-[#cfd5ea] bg-white/90 p-5 text-center shadow-sm transition hover:shadow-md dark:border-white/20 dark:bg-white/5"
+      aria-label={ariaLabel}
+    >
+      <p
+        className="text-lg font-semibold text-[#0b1124] tracking-wide dark:text-white"
+        aria-live="polite"
+      >
+        This cart has been clicked {countLabel} times.
       </p>
     </div>
   )

@@ -9,6 +9,7 @@ interface CartIconProps {
 
 export function CartIcon({ onClick }: CartIconProps) {
   const { cartCount } = useShoppingCart()
+  const displayCartCount = cartCount ?? 0
 
   return (
     <button
@@ -32,9 +33,9 @@ export function CartIcon({ onClick }: CartIconProps) {
         <circle cx="19" cy="21" r="1" />
         <path d="M2.05 2.05h2l2.66 12.42a2 2 0 0 0 2 1.58h9.78a2 2 0 0 0 1.95-1.57l1.65-7.43H5.12" />
       </svg>
-      {cartCount > 0 && (
+      {displayCartCount > 0 && (
         <span className="absolute -top-2 -right-2 bg-fd-primary text-fd-primary-foreground text-xs font-bold rounded-full h-6 w-6 flex items-center justify-center shadow-md">
-          {cartCount}
+          {displayCartCount}
         </span>
       )}
     </button>

@@ -5,8 +5,10 @@ import {
   Scripts
 } from '@tanstack/react-router'
 import * as React from 'react'
-import appCss from '@/styles/app.css?url'
+import { ConvexProvider } from 'convex/react'
 import { RootProvider } from 'fumadocs-ui/provider/tanstack'
+import appCss from '@/styles/app.css?url'
+import { convexClient } from '@/lib/convexClient'
 
 const LIST_PATCH_SCRIPT = `(function(){var SELECTOR='li.list-none';function wrap(li){if(!li||li.dataset.uscListWrapped==='true'){return;}if(li.closest('ul,ol,menu')){return;}var parent=li.parentElement;if(!parent){return;}var wrapper=document.createElement('ul');wrapper.setAttribute('data-usc-list-wrapper','');wrapper.style.listStyle='none';wrapper.style.margin='0';wrapper.style.padding='0';parent.insertBefore(wrapper,li);wrapper.appendChild(li);li.dataset.uscListWrapped='true';}function scan(root){var nodes=(root.matches?root.matches(SELECTOR)?[root]:[]:[]).concat(Array.from(root.querySelectorAll?root.querySelectorAll(SELECTOR):[]));nodes.forEach(wrap);}function init(){scan(document);var observer=new MutationObserver(function(mutations){mutations.forEach(function(m){m.addedNodes&&m.addedNodes.forEach(function(node){if(node.nodeType!==1)return;scan(node);});});});observer.observe(document.body,{childList:true,subtree:true});}if(document.readyState==='loading'){document.addEventListener('DOMContentLoaded',init,{once:true});}else{init();}})();`
 
@@ -57,7 +59,9 @@ function RootDocument({ children }: { children: React.ReactNode }) {
         />
       </head>
       <body className="flex flex-col min-h-screen">
-        <RootProvider>{children}</RootProvider>
+        <ConvexProvider client={convexClient}>
+          <RootProvider>{children}</RootProvider>
+        </ConvexProvider>
         <Scripts />
       </body>
     </html>
