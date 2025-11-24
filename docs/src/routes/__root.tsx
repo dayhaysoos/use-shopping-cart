@@ -22,6 +22,11 @@ export const Route = createRootRoute({
       },
       {
         title: 'use-shopping-cart'
+      },
+      {
+        name: 'description',
+        content:
+          'use-shopping-cart is the React toolkit for building Stripe Checkout flows with managed cart state, helpers, and optimized UX.'
       }
     ],
     links: [

@@ -602,7 +602,7 @@ function WorkflowCard({
           className="m-0 whitespace-pre-wrap font-mono text-xs leading-relaxed"
         />
       </div>
-      <p className="mt-2 text-xs uppercase tracking-[0.3em] text-neutral-500 dark:text-white/40">
+      <p className="mt-2 text-xs uppercase tracking-[0.3em] text-neutral-500 dark:text-white/75">
         {language}
       </p>
     </div>
@@ -623,7 +623,7 @@ function StatBadge({
       className="rounded-2xl border border-black/10 bg-white px-4 py-3 text-sm text-neutral-700 shadow-sm dark:border-white/10 dark:bg-black/50 dark:text-white/80"
       title={tooltip}
     >
-      <p className="text-xs uppercase tracking-[0.3em] text-neutral-500 dark:text-white/50">
+      <p className="text-xs uppercase tracking-[0.3em] text-neutral-500 dark:text-white/80">
         {label}
       </p>
       <p className="mt-1 text-xl font-semibold text-[#0b1124] dark:text-white">
@@ -647,7 +647,7 @@ function MetricBadge({
       className="flex flex-col rounded-2xl border border-black/10 bg-white px-5 py-4 text-center text-sm text-neutral-600 shadow-sm dark:border-white/10 dark:bg-black/40 dark:text-white/70"
       title={tooltip}
     >
-      <span className="text-xs uppercase tracking-[0.3em] text-neutral-500 dark:text-white/40">
+      <span className="text-xs uppercase tracking-[0.3em] text-neutral-500 dark:text-white/75">
         {label}
       </span>
       <span className="mt-2 text-2xl font-semibold text-[#0b1124] dark:text-white">
