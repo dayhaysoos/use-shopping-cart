@@ -25,7 +25,7 @@
   --color-fd-background: #f5f6fb;
   --color-fd-foreground: #0b1124;
   --color-fd-muted: #e0e3f1;
-  --color-fd-muted-foreground: #4b567a;
+  --color-fd-muted-foreground: #2b304d;
   --color-fd-secondary: #e8ecff;
   --color-fd-secondary-foreground: #0b1124;
   --color-fd-border: #c5c9e0;
@@ -53,12 +53,20 @@ html {
 
 /* Links - green with purple hover */
 .prose a:not(.no-underline) {
-  color: var(--color-primary);
+  color: color-mix(in srgb, var(--color-primary) 30%, #020714 70%);
   transition: color 0.2s ease;
 }
 
 .prose a:not(.no-underline):hover {
-  color: var(--color-accent);
+  color: color-mix(in srgb, var(--color-primary) 70%, #041028 30%);
+}
+
+html.dark .prose a:not(.no-underline) {
+  color: color-mix(in srgb, var(--color-primary) 70%, #fcfdff 30%);
+}
+
+html.dark .prose a:not(.no-underline):hover {
+  color: color-mix(in srgb, var(--color-primary) 85%, #ffffff 15%);
 }
 
 /* Code inline highlights */
@@ -66,6 +74,119 @@ html {
   background-color: var(--color-navy);
   color: var(--color-primary);
   border: 1px solid rgba(62, 207, 142, 0.2);
+}
+
+figure.shiki {
+  background-color: #f2f4ff;
+  color: #050816;
+  border-color: rgba(5, 8, 22, 0.08);
+}
+
+figure.shiki pre,
+figure.shiki code {
+  background: transparent;
+  color: inherit;
+}
+
+figure.shiki .shiki {
+  background: transparent;
+}
+
+html.dark figure.shiki {
+  background-color: #01030a;
+  color: #f9fbff;
+  border-color: rgba(248, 251, 255, 0.18);
+  box-shadow: 0 30px 60px rgba(0, 0, 0, 0.6);
+}
+
+html.dark figure.shiki pre,
+html.dark figure.shiki code {
+  color: #f6f8ff;
+}
+
+.shiki:not(.not-fumadocs-codeblock *) code span {
+  color: color-mix(
+    in srgb,
+    var(--shiki-light, currentColor) 30%,
+    #01030a 70%
+  );
+}
+
+html.dark .shiki:not(.not-fumadocs-codeblock *) code span {
+  color: color-mix(
+    in srgb,
+    var(--shiki-dark, currentColor) 60%,
+    #f8fbff 40%
+  );
+}
+
+/* Improve code comment contrast in both themes */
+.shiki:not(.not-fumadocs-codeblock *) code
+  span[style*='--shiki-light:#6A737D'],
+.shiki:not(.not-fumadocs-codeblock *) code
+  span[style*='--shiki-light:#6a737d'] {
+  color: #2f3a55;
+}
+
+html.dark .shiki:not(.not-fumadocs-codeblock *) code
+    span[style*='--shiki-dark:#6A737D'],
+html.dark .shiki:not(.not-fumadocs-codeblock *) code
+    span[style*='--shiki-dark:#6a737d'] {
+  color: #ced7ef;
+}
+
+#nd-docs-layout .text-fd-primary,
+body:not(.dark) .text-fd-primary {
+  color: color-mix(in srgb, var(--color-fd-primary) 25%, #020714 75%);
+}
+
+html.dark #nd-docs-layout .text-fd-primary,
+html.dark .text-fd-primary {
+  color: color-mix(in srgb, var(--color-fd-primary) 70%, #fefefe 30%);
+}
+
+#nd-sidebar a[data-status='active'],
+#nd-toc a[data-active='true'],
+.prose a[data-card] {
+  color: #041028;
+  font-weight: 600;
+}
+
+.prose a[data-card] {
+  background-color: #e2e6f7;
+  border: 1px solid rgba(4, 8, 22, 0.12);
+  box-shadow: 0 12px 30px rgba(5, 7, 15, 0.12);
+}
+
+.prose a[data-card]:hover {
+  background-color: #d6dbf2;
+  border-color: rgba(4, 8, 22, 0.22);
+}
+
+#nd-sidebar a[data-status='active'] {
+  background-color: color-mix(
+    in srgb,
+    var(--color-fd-primary) 15%,
+    transparent
+  );
+  box-shadow: inset 0 0 0 1px rgba(0, 0, 0, 0.06);
+}
+
+html.dark #nd-sidebar a[data-status='active'],
+html.dark #nd-toc a[data-active='true'],
+html.dark .prose a[data-card] {
+  color: #fefefe;
+}
+
+html.dark .prose a[data-card] {
+  background-color: #080c1f;
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  box-shadow: 0 14px 40px rgba(0, 0, 0, 0.6);
+}
+
+html.dark .prose a[data-card]:hover {
+  background-color: #0d1432;
+  border-color: rgba(255, 255, 255, 0.28);
 }
 
 /* Scrollbar styling */

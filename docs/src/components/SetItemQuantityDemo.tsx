@@ -85,7 +85,7 @@ export function SetItemQuantityDemo() {
               >
                 <img
                   src={product.image}
-                  alt={product.name}
+                  alt={`${product.name} product photo`}
                   className="w-full h-20 object-contain rounded mb-1"
                 />
                 <p className="text-xs text-center font-medium">
@@ -99,7 +99,7 @@ export function SetItemQuantityDemo() {
           <div className="flex flex-col items-center">
             <img
               src={selectedProduct.image}
-              alt={selectedProduct.name}
+              alt={`${selectedProduct.name} product photo`}
               className="w-full max-w-xs h-48 object-contain rounded-lg mb-4"
             />
             <h3 className="text-xl font-semibold">{selectedProduct.name}</h3>

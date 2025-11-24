@@ -61,7 +61,7 @@ export function ClearCartDemo() {
                 <div key={product.id} className="flex flex-col items-center">
                   <img
                     src={product.image}
-                    alt={product.name}
+                    alt={`${product.name} product photo`}
                     className="w-20 h-20 object-contain rounded-lg"
                   />
                   <p className="text-xs text-center mt-1">{product.name}</p>
