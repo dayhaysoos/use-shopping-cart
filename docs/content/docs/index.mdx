@@ -2,3 +2,15 @@
 title: Welcome
 description: Welcome to use-shopping-cart
 ---
+
+## What is use-shopping-cart?
+
+`use-shopping-cart` is a front-end cart toolkit for building checkout-ready commerce flows in React without rebuilding cart state, currency math, or Stripe wiring from scratch. It ships a headless CartProvider plus hooks so you can layer your own UI while the library keeps totals and persistence in sync.
+
+### At a glance
+
+- **Managed cart state**: CartProvider, `useShoppingCart`, and action helpers (`addItem`, `setItemQuantity`, etc.) keep items, promos, totals, and persistence in sync across tabs.
+- **Checkout-ready utilities**: Helpers for Stripe Checkout, serverless line item validation, optimistic cart updates, and currency formatting so totals always match your backend.
+- **Front-end focused**: Built entirely for React apps—drop the provider into your tree, wire up your preferred routing/data tools, and bring your own backend when you’re ready.
+
+Use the sidebar to dive into the API surface (`CartProvider`, hooks, helpers) or jump straight into the [Getting started](./getting-started) guide for install instructions and your first checkout flow.

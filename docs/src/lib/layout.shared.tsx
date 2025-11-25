@@ -40,12 +40,6 @@ export function baseOptions(): BaseLayoutProps {
         url: DISCORD_URL,
         external: true,
         on: 'nav'
-      },
-      {
-        type: 'button',
-        text: 'Get started',
-        url: `${DOCS_URL}/getting-started`,
-        on: 'nav'
       }
     ]
   }

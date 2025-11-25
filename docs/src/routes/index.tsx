@@ -397,7 +397,7 @@ function FeatureHighlights() {
       <Container className="space-y-10">
         <SectionHeading
           eyebrow="Modern cart toolkit"
-          title="Ship Stripe-ready carts without reinventing state."
+          title="Ship Checkout-ready carts without reinventing state."
           description="Purpose-built for React 19 apps: compose cart hooks, format helpers, and server utilities to launch Stripe Checkout faster."
         />
         <div className="grid gap-6 md:grid-cols-3">
