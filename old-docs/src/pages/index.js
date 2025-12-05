@@ -89,7 +89,7 @@ const Home = () => {
           <div className={styles.explainersCta}>
             <Link
               className={clsx('button button--primary button--lg')}
-              to="https://github.com/dayhaysoos/use-shopping-cart/tree/master/examples"
+              to="https://github.com/dayhaysoos/use-shopping-cart/tree/legacy-examples/examples"
             >
               Checkout full examples
             </Link>

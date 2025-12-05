@@ -1,6 +1,6 @@
 {
   "include": ["src/**/*.ts", "src/**/*.tsx", "content/**/*.tsx", "*.ts", "*.tsx"],
-  "exclude": ["node_modules", "dist", "../examples/**", "../old-docs/**"],
+  "exclude": ["node_modules", "dist", "../old-docs/**"],
   "compilerOptions": {
     "strict": true,
     "esModuleInterop": true,

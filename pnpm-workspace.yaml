@@ -1,6 +1,3 @@
 packages:
   - 'use-shopping-cart/**'
-  - 'examples/**'
-  - '!examples/gatsby'
-  - '!examples/cra'
   - 'docs'
