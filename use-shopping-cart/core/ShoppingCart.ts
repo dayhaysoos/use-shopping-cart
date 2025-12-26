@@ -3,6 +3,7 @@ import type {
   CartState,
   CartConfig,
   CartDetails,
+  CartEntry,
   Product,
   AddItemOptions,
   IncrementOptions,
@@ -46,6 +47,7 @@ export class ShoppingCart {
   private _subscribers: Set<SubscribeCallback>
   private _storage: StorageAdapter | null
   private _persistKey: string
+  private _hasBeenModified: boolean = false
 
   constructor(config: CartConfig = {}) {
     // Initialize state
@@ -124,7 +126,10 @@ export class ShoppingCart {
       if (stored instanceof Promise) {
         stored
           .then((data) => {
-            if (data) this._parseAndLoadStoredData(data)
+            // Only load if cart hasn't been modified since initialization
+            if (data && !this._hasBeenModified) {
+              this._parseAndLoadStoredData(data)
+            }
           })
           .catch((err) => {
             console.warn('Failed to load cart from storage:', err)
@@ -139,20 +144,56 @@ export class ShoppingCart {
     }
   }
 
+  /**
+   * Validate that a cart entry has all required fields and valid values.
+   */
+  private _isValidCartEntry(entry: unknown): entry is CartEntry {
+    if (!entry || typeof entry !== 'object') return false
+
+    const e = entry as Record<string, unknown>
+    return (
+      typeof e.id === 'string' &&
+      typeof e.price === 'number' &&
+      typeof e.quantity === 'number' &&
+      e.quantity > 0 &&
+      typeof e.value === 'number' &&
+      typeof e.name === 'string' &&
+      typeof e.currency === 'string'
+    )
+  }
+
   private _parseAndLoadStoredData(stored: string): void {
     try {
       const parsed = JSON.parse(stored)
 
       // Only restore specific fields
-      const { cartDetails, cartCount, totalPrice, formattedTotalPrice } = parsed
+      const { cartDetails } = parsed
 
       if (cartDetails && typeof cartDetails === 'object') {
+        // Validate each cart entry before loading
+        const validatedCartDetails: CartDetails = {}
+        for (const id in cartDetails) {
+          const entry = cartDetails[id]
+          if (this._isValidCartEntry(entry)) {
+            validatedCartDetails[id] = entry
+          } else {
+            console.warn(`Invalid cart entry "${id}" skipped during load`)
+          }
+        }
+
+        // Recalculate totals from validated entries
+        const { totalPrice, cartCount } = calculateTotals(validatedCartDetails)
+
         this._state = {
           ...this._state,
-          cartDetails,
-          cartCount: cartCount ?? 0,
-          totalPrice: totalPrice ?? 0,
-          formattedTotalPrice: formattedTotalPrice ?? '$0.00'
+          cartDetails: validatedCartDetails,
+          cartCount,
+          totalPrice,
+          formattedTotalPrice: calculateFormattedTotalPrice(
+            totalPrice,
+            this._state.currency,
+            this._state.language
+          )
         }
         // Notify subscribers so React components re-render with loaded cart data
         this._notifySubscribers()
@@ -187,6 +228,7 @@ export class ShoppingCart {
   // ============================================================================
 
   addItem(product: Product, options: AddItemOptions = {}): void {
+    this._hasBeenModified = true
     validateProduct(product)
 
     const count = options.count ?? 1
@@ -264,6 +306,7 @@ export class ShoppingCart {
   }
 
   incrementItem(id: string, options: IncrementOptions = {}): void {
+    this._hasBeenModified = true
     const count = options.count ?? 1
     validateCount(count, 'incrementItem')
     validateItemExists(id, this._state.cartDetails, 'incrementItem')
@@ -302,6 +345,7 @@ export class ShoppingCart {
   }
 
   decrementItem(id: string, options: IncrementOptions = {}): void {
+    this._hasBeenModified = true
     const count = options.count ?? 1
     validateCount(count, 'decrementItem')
     validateItemExists(id, this._state.cartDetails, 'decrementItem')
@@ -364,6 +408,7 @@ export class ShoppingCart {
   }
 
   setItemQuantity(id: string, quantity: number): void {
+    this._hasBeenModified = true
     validateQuantity(quantity, 'setItemQuantity')
     validateItemExists(id, this._state.cartDetails, 'setItemQuantity')
 
@@ -406,6 +451,7 @@ export class ShoppingCart {
   }
 
   removeItem(id: string): void {
+    this._hasBeenModified = true
     validateItemExists(id, this._state.cartDetails, 'removeItem')
 
     const entry = this._state.cartDetails[id]
@@ -430,6 +476,7 @@ export class ShoppingCart {
   }
 
   clearCart(): void {
+    this._hasBeenModified = true
     // ✅ IMMUTABLE - single state update
     this._state = {
       ...this._state,
@@ -520,6 +567,9 @@ export class ShoppingCart {
   }
 
   changeLanguage(language: string): void {
+    // Early return if language hasn't changed
+    if (language === this._state.language) return
+
     // Recalculate all formatted prices with new language
     const newCartDetails: CartDetails = {}
 
@@ -552,6 +602,9 @@ export class ShoppingCart {
   }
 
   changeCurrency(currency: string): void {
+    // Early return if currency hasn't changed
+    if (currency === this._state.currency) return
+
     // Recalculate all formatted prices with new currency
     const newCartDetails: CartDetails = {}
 

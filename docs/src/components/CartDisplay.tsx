@@ -78,7 +78,11 @@ export function CartDisplay() {
                     Added:
                   </span>
                   <span className="font-mono text-[10px]">
-                    {new Date(cartDetails[key].timestamp).toLocaleTimeString()}
+                    {cartDetails[key].timestamp
+                      ? new Date(
+                          cartDetails[key].timestamp
+                        ).toLocaleTimeString()
+                      : 'N/A'}
                   </span>
                 </div>
               </div>

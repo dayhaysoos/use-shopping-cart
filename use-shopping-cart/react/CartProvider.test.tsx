@@ -104,3 +104,89 @@ describe('useCartContext', () => {
     spy.mockRestore()
   })
 })
+
+// Integration tests with useShoppingCart
+import { useShoppingCart } from './useShoppingCart'
+import { act } from '@testing-library/react'
+
+describe('CartProvider integration with useShoppingCart', () => {
+  function TestComponent() {
+    const { cartCount, addItem, formattedTotalPrice } = useShoppingCart()
+    return (
+      <div>
+        <span data-testid="count">{cartCount}</span>
+        <span data-testid="total">{formattedTotalPrice}</span>
+        <button
+          onClick={() =>
+            addItem({
+              id: 'test',
+              name: 'Test',
+              price: 1000,
+              currency: 'USD'
+            })
+          }
+        >
+          Add
+        </button>
+      </div>
+    )
+  }
+
+  it('updates UI when items are added', async () => {
+    render(
+      <CartProvider shouldPersist={false}>
+        <TestComponent />
+      </CartProvider>
+    )
+
+    expect(screen.getByTestId('count')).toHaveTextContent('0')
+
+    await act(async () => {
+      screen.getByText('Add').click()
+    })
+
+    expect(screen.getByTestId('count')).toHaveTextContent('1')
+    expect(screen.getByTestId('total')).toHaveTextContent('$10.00')
+  })
+
+  it('shares state between multiple consumers', async () => {
+    function SecondConsumer() {
+      const { cartCount } = useShoppingCart()
+      return <span data-testid="second-count">{cartCount}</span>
+    }
+
+    render(
+      <CartProvider shouldPersist={false}>
+        <TestComponent />
+        <SecondConsumer />
+      </CartProvider>
+    )
+
+    await act(async () => {
+      screen.getByText('Add').click()
+    })
+
+    // Both consumers should see the same count
+    expect(screen.getByTestId('count')).toHaveTextContent('1')
+    expect(screen.getByTestId('second-count')).toHaveTextContent('1')
+  })
+
+  it('increments quantity when adding same product twice', async () => {
+    render(
+      <CartProvider shouldPersist={false}>
+        <TestComponent />
+      </CartProvider>
+    )
+
+    await act(async () => {
+      screen.getByText('Add').click()
+    })
+
+    await act(async () => {
+      screen.getByText('Add').click()
+    })
+
+    expect(screen.getByTestId('count')).toHaveTextContent('2')
+    expect(screen.getByTestId('total')).toHaveTextContent('$20.00')
+  })
+})

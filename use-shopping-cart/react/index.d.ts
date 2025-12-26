@@ -115,9 +115,7 @@ export interface CartActions {
 /**
  * Provides several utilities and pieces of data for you to use in your application.
  */
-export function useShoppingCart<SelectorResult extends Partial<CartState>>(
-  selector?: (state: CartState) => SelectorResult
-): SelectorResult & CartActions
+export function useShoppingCart(): CartState & CartActions
 
 /**
  * Displays the values returned by `useShoppingCart()` in a table format.
