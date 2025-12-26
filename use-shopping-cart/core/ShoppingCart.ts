@@ -494,6 +494,7 @@ export class ShoppingCart {
   }
 
   loadCart(cartDetails: CartDetails, shouldMerge = true): void {
+    this._hasBeenModified = true
     let newCartDetails: CartDetails
 
     if (shouldMerge) {

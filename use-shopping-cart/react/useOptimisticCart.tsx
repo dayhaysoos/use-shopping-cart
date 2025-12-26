@@ -9,6 +9,7 @@ import type {
   AddItemOptions,
   IncrementOptions
 } from '../core/types'
+import { getProductId } from '../core/Entry'
 
 interface OptimisticCartEntry extends CartEntry {
   _optimistic?: boolean
@@ -83,8 +84,10 @@ export function useOptimisticCart() {
     switch (action.type) {
       case 'ADD_ITEM': {
         const { product, options } = action
-        const id =
-          product.id || product.price_id || product.sku_id || product.sku || ''
+        // Use getProductId to ensure consistent ID resolution with ShoppingCart.
+        // If product has no ID, getProductId generates a UUID and mutates the product,
+        // ensuring both optimistic and real cart states use the same key.
+        const id = getProductId(product)
         const count = options?.count || 1
 
         // Item already exists - increment it
