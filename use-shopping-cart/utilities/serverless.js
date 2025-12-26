@@ -1,13 +1,36 @@
 function validateCartItems(inventorySrc, cartDetails) {
   const validatedItems = []
 
+  // Build a Map for O(1) lookups instead of O(n) find() calls
+  // Only set a key if it doesn't exist to preserve "first match wins" semantics
+  // from the original find() implementation
+  const inventoryMap = new Map()
+  for (const product of inventorySrc) {
+    if (product.id && !inventoryMap.has(product.id)) {
+      inventoryMap.set(product.id, product)
+    }
+    if (product.sku && !inventoryMap.has(product.sku)) {
+      inventoryMap.set(product.sku, product)
+    }
+  }
+
   for (const id in cartDetails) {
-    const inventoryItem = inventorySrc.find((currentProduct) => {
-      return currentProduct.id === id || currentProduct.sku === id
-    })
+    const inventoryItem = inventoryMap.get(id)
     if (inventoryItem === undefined) {
       throw new Error(
         `Invalid Cart: product with id "${id}" is not in your inventory.`
+      )
+    }
+
+    // Validate quantity is a positive integer
+    const quantity = cartDetails[id].quantity
+    if (
+      typeof quantity !== 'number' ||
+      !Number.isInteger(quantity) ||
+      quantity <= 0
+    ) {
+      throw new Error(
+        `Invalid Cart: product "${id}" has invalid quantity "${quantity}". Quantity must be a positive integer.`
       )
     }
 

@@ -65,7 +65,7 @@ export function validateProduct(product: unknown): void {
     throw new ValidationError('Product must be an object')
   }
 
-  const p = product as any
+  const p = product as Record<string, unknown>
 
   if (typeof p.price !== 'number') {
     throw new ValidationError('Product.price must be a number')

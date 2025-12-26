@@ -8,25 +8,25 @@ describe('ShoppingCart', () => {
       const cart = new ShoppingCart()
       const state = cart.getState()
 
-      expect(state.cartMode).toBe(initialState.cartMode)
-      expect(state.mode).toBe(initialState.mode)
       expect(state.currency).toBe(initialState.currency)
       expect(state.cartCount).toBe(0)
       expect(state.totalPrice).toBe(0)
       expect(state.cartDetails).toEqual({})
+      expect(state.shouldDisplayCart).toBe(false)
+      expect(state.lastClicked).toBe('')
     })
 
     it('merges config with initial state', () => {
       const cart = new ShoppingCart({
         currency: 'EUR',
-        mode: 'subscription',
-        cartMode: 'client-only'
+        language: 'de-DE',
+        stripe: 'pk_test_123'
       })
 
       const state = cart.getState()
       expect(state.currency).toBe('EUR')
-      expect(state.mode).toBe('subscription')
-      expect(state.cartMode).toBe('client-only')
+      expect(state.language).toBe('de-DE')
+      expect(state.stripe).toBe('pk_test_123')
     })
 
     it('respects shouldPersist false', () => {
@@ -115,11 +115,20 @@ describe('ShoppingCart', () => {
     it('loads from storage on initialization', () => {
       const storage = createMemoryStorage()
 
-      // Pre-populate storage
+      // Pre-populate storage with valid cart entries
       storage.setItem(
         'test-cart',
         JSON.stringify({
-          cartDetails: {},
+          cartDetails: {
+            'item-1': {
+              id: 'item-1',
+              name: 'Test Item',
+              price: 200,
+              currency: 'USD',
+              quantity: 5,
+              value: 1000
+            }
+          },
           cartCount: 5,
           totalPrice: 1000,
           formattedTotalPrice: '$10.00'
@@ -135,6 +144,7 @@ describe('ShoppingCart', () => {
       const state = cart.getState()
       expect(state.cartCount).toBe(5)
       expect(state.totalPrice).toBe(1000)
+      expect(state.cartDetails['item-1']).toBeDefined()
     })
 
     it('handles missing storage gracefully', () => {
@@ -759,6 +769,172 @@ describe('ShoppingCart', () => {
       await expect(cart.redirectToCheckout('' as any)).rejects.toThrow(
         'sessionId is required'
       )
+    })
+
+    it('throws when stripe key has invalid format', async () => {
+      const cart = new ShoppingCart({
+        shouldPersist: false,
+        stripe: 'invalid_key_123'
+      })
+
+      await expect(cart.redirectToCheckout('sess_123')).rejects.toThrow(
+        'Invalid Stripe publishable key format'
+      )
+    })
+  })
+
+  // ============================================================================
+  // EDGE CASE TESTS (Phase 7)
+  // ============================================================================
+
+  describe('addItem edge cases', () => {
+    it('handles product without any ID fields by generating consistent ID', () => {
+      const cart = new ShoppingCart({ shouldPersist: false })
+      const product = { name: 'No ID Product', price: 100, currency: 'USD' }
+
+      cart.addItem(product)
+      cart.addItem(product) // Same product again - should increment, not duplicate
+
+      const state = cart.getState()
+      // Should have only one entry that was incremented
+      expect(Object.keys(state.cartDetails)).toHaveLength(1)
+      expect(state.cartCount).toBe(2)
+      expect(state.totalPrice).toBe(200)
+    })
+
+    it('rejects negative count', () => {
+      const cart = new ShoppingCart({ shouldPersist: false })
+      const product = { id: 'test', name: 'Test', price: 100, currency: 'USD' }
+
+      expect(() => cart.addItem(product, { count: -1 })).toThrow()
+    })
+
+    it('rejects zero count', () => {
+      const cart = new ShoppingCart({ shouldPersist: false })
+      const product = { id: 'test', name: 'Test', price: 100, currency: 'USD' }
+
+      expect(() => cart.addItem(product, { count: 0 })).toThrow()
+    })
+
+    it('rejects non-number count', () => {
+      const cart = new ShoppingCart({ shouldPersist: false })
+      const product = { id: 'test', name: 'Test', price: 100, currency: 'USD' }
+
+      expect(() => cart.addItem(product, { count: '5' as any })).toThrow()
+    })
+  })
+
+  describe('storage security', () => {
+    it('ignores malformed JSON in storage', () => {
+      const storage = createMemoryStorage()
+      storage.setItem('cart', 'not valid json {{{}')
+
+      const cart = new ShoppingCart({ storage, persistKey: 'cart' })
+      expect(cart.getState().cartCount).toBe(0)
+    })
+
+    it('ignores cart entries with negative quantities', () => {
+      const storage = createMemoryStorage()
+      storage.setItem(
+        'cart',
+        JSON.stringify({
+          cartDetails: {
+            'bad-item': {
+              id: 'bad-item',
+              name: 'Bad Item',
+              price: 100,
+              currency: 'USD',
+              quantity: -5,
+              value: -500
+            }
+          },
+          cartCount: -5,
+          totalPrice: -500
+        })
+      )
+
+      const cart = new ShoppingCart({ storage, persistKey: 'cart' })
+      expect(cart.getState().cartDetails['bad-item']).toBeUndefined()
+      expect(cart.getState().cartCount).toBe(0)
+    })
+
+    it('ignores cart entries with missing required fields', () => {
+      const storage = createMemoryStorage()
+      storage.setItem(
+        'cart',
+        JSON.stringify({
+          cartDetails: {
+            incomplete: { id: 'incomplete' } // missing price, quantity, name, currency
+          },
+          cartCount: 1,
+          totalPrice: 100
+        })
+      )
+
+      const cart = new ShoppingCart({ storage, persistKey: 'cart' })
+      expect(cart.getState().cartDetails['incomplete']).toBeUndefined()
+      expect(cart.getState().cartCount).toBe(0)
+    })
+
+    it('loads valid entries and skips invalid ones', () => {
+      const storage = createMemoryStorage()
+      storage.setItem(
+        'cart',
+        JSON.stringify({
+          cartDetails: {
+            'valid-item': {
+              id: 'valid-item',
+              name: 'Valid Item',
+              price: 100,
+              currency: 'USD',
+              quantity: 2,
+              value: 200
+            },
+            'invalid-item': {
+              id: 'invalid-item',
+              quantity: -1 // Invalid
+            }
+          },
+          cartCount: 1,
+          totalPrice: 100
+        })
+      )
+
+      const cart = new ShoppingCart({ storage, persistKey: 'cart' })
+      const state = cart.getState()
+
+      expect(state.cartDetails['valid-item']).toBeDefined()
+      expect(state.cartDetails['invalid-item']).toBeUndefined()
+      expect(state.cartCount).toBe(2)
+      expect(state.totalPrice).toBe(200)
+    })
+  })
+
+  describe('no-op optimizations', () => {
+    it('changeLanguage does not update state when language is same', () => {
+      const cart = new ShoppingCart({
+        shouldPersist: false,
+        language: 'en-US'
+      })
+      const callback = vi.fn()
+
+      cart.subscribe(callback)
+      cart.changeLanguage('en-US') // Same language
+
+      expect(callback).not.toHaveBeenCalled()
+    })
+
+    it('changeCurrency does not update state when currency is same', () => {
+      const cart = new ShoppingCart({
+        shouldPersist: false,
+        currency: 'USD'
+      })
+      const callback = vi.fn()
+
+      cart.subscribe(callback)
+      cart.changeCurrency('USD') // Same currency
+
+      expect(callback).not.toHaveBeenCalled()
     })
   })
 })

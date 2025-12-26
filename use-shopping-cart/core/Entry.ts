@@ -18,16 +18,23 @@ function generateUUID(): string {
 }
 
 /**
- * Extract the ID from a product (or generate one if missing)
+ * Extract the ID from a product (or generate one if missing).
+ * If a UUID is generated, it is attached to the product object
+ * to ensure consistent identification on subsequent calls.
  */
 export function getProductId(product: Product): string {
-  return (
+  const existingId =
     ('id' in product && product.id) ||
     ('price_id' in product && product.price_id) ||
     ('sku_id' in product && product.sku_id) ||
-    ('sku' in product && product.sku) ||
-    generateUUID()
-  )
+    ('sku' in product && product.sku)
+
+  if (existingId) return existingId
+
+  // Generate and attach ID to product for consistency
+  const generatedId = generateUUID()
+  ;(product as { id?: string }).id = generatedId
+  return generatedId
 }
 
 /**
@@ -37,8 +44,8 @@ export function createCartEntry(
   id: string,
   product: Product,
   quantity: number,
-  price_metadata: Record<string, any> = {},
-  product_metadata: Record<string, any> = {},
+  price_metadata: Record<string, unknown> = {},
+  product_metadata: Record<string, unknown> = {},
   currency: string,
   language: string
 ): CartEntry {

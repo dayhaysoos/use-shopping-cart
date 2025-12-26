@@ -1,1 +1,5 @@
-pnpm lint-staged
+#!/usr/bin/env sh
+. "$(dirname -- "$0")/_/husky.sh"
+
+pnpm test
+pnpm exec lint-staged

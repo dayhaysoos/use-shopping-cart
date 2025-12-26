@@ -226,4 +226,85 @@ describe('useOptimisticCart', () => {
     // Final state should be correct
     expect(result.current.cartCount).toBe(3)
   })
+
+  test('should generate unique IDs for products without IDs', async () => {
+    const { result } = renderHook(() => useOptimisticCart(), { wrapper })
+
+    // Products without any ID field - they should each get a unique generated UUID
+    const productWithoutId1 = {
+      name: 'Product Without ID 1',
+      price: 500,
+      currency: 'USD'
+    }
+    const productWithoutId2 = {
+      name: 'Product Without ID 2',
+      price: 750,
+      currency: 'USD'
+    }
+
+    // Add both products
+    await act(async () => {
+      result.current.addItem(productWithoutId1)
+    })
+
+    await waitFor(() => {
+      expect(result.current.cartCount).toBe(1)
+    })
+
+    await act(async () => {
+      result.current.addItem(productWithoutId2)
+    })
+
+    // Both products should be in cart with unique IDs
+    await waitFor(() => {
+      expect(result.current.cartCount).toBe(2)
+    })
+
+    // Check that both products have unique generated IDs
+    const cartEntries = Object.values(result.current.cartDetails)
+    expect(cartEntries.length).toBe(2)
+
+    const ids = Object.keys(result.current.cartDetails)
+    expect(ids[0]).not.toBe('')
+    expect(ids[1]).not.toBe('')
+    expect(ids[0]).not.toBe(ids[1])
+
+    // The IDs should also be assigned to the original product objects
+    expect(productWithoutId1.id).toBeDefined()
+    expect(productWithoutId2.id).toBeDefined()
+    expect(productWithoutId1.id).not.toBe(productWithoutId2.id)
+  })
+
+  test('should reconcile optimistic state with real state for products without IDs', async () => {
+    const { result } = renderHook(() => useOptimisticCart(), { wrapper })
+
+    const productWithoutId = {
+      name: 'Product Without ID',
+      price: 1200,
+      currency: 'USD'
+    }
+
+    // Add item - optimistic update should use getProductId which generates a UUID
+    await act(async () => {
+      result.current.addItem(productWithoutId)
+    })
+
+    await waitFor(() => {
+      expect(result.current.cartCount).toBe(1)
+    })
+
+    // The product should now have an ID assigned
+    expect(productWithoutId.id).toBeDefined()
+    expect(typeof productWithoutId.id).toBe('string')
+    expect(productWithoutId.id.length).toBeGreaterThan(0)
+
+    // The cart should use this same ID
+    expect(result.current.cartDetails[productWithoutId.id]).toBeDefined()
+    expect(result.current.cartDetails[productWithoutId.id].quantity).toBe(1)
+
+    // isOptimistic should be false after the real state is reconciled
+    await waitFor(() => {
+      expect(result.current.isOptimistic).toBe(false)
+    })
+  })
 })
