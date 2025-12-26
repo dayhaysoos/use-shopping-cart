@@ -88,7 +88,7 @@ export function useOptimisticCart() {
         // If product has no ID, getProductId generates a UUID and mutates the product,
         // ensuring both optimistic and real cart states use the same key.
         const id = getProductId(product)
-        const count = options?.count || 1
+        const count = options?.count ?? 1
 
         // Item already exists - increment it
         if (state[id]) {
@@ -238,7 +238,7 @@ export function useOptimisticCart() {
 
   // Wrap incrementItem
   const incrementItem = (id: string, options: IncrementOptions = {}) => {
-    const count = options.count || 1
+    const count = options.count ?? 1
     startTransition(() => {
       updateOptimisticCart({
         type: 'INCREMENT_ITEM',
@@ -251,7 +251,7 @@ export function useOptimisticCart() {
 
   // Wrap decrementItem
   const decrementItem = (id: string, options: IncrementOptions = {}) => {
-    const count = options.count || 1
+    const count = options.count ?? 1
     startTransition(() => {
       updateOptimisticCart({
         type: 'DECREMENT_ITEM',
