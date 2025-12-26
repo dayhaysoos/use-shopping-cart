@@ -2,10 +2,16 @@ function validateCartItems(inventorySrc, cartDetails) {
   const validatedItems = []
 
   // Build a Map for O(1) lookups instead of O(n) find() calls
+  // Only set a key if it doesn't exist to preserve "first match wins" semantics
+  // from the original find() implementation
   const inventoryMap = new Map()
   for (const product of inventorySrc) {
-    if (product.id) inventoryMap.set(product.id, product)
-    if (product.sku) inventoryMap.set(product.sku, product)
+    if (product.id && !inventoryMap.has(product.id)) {
+      inventoryMap.set(product.id, product)
+    }
+    if (product.sku && !inventoryMap.has(product.sku)) {
+      inventoryMap.set(product.sku, product)
+    }
   }
 
   for (const id in cartDetails) {
