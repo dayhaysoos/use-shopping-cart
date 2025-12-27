@@ -5,6 +5,60 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [4.0.0-alpha.2] - 2025-12-26
+
+### 🚨 Breaking Changes
+
+- **Removed Redux**: Redux dependency has been completely removed from the codebase
+  - The library now uses React's built-in state management
+  - No migration needed for end users, this is an internal change
+
+### ✨ New Features
+
+- **useOptimisticCart Hook**: New hook leveraging React 19's `useOptimistic` for instant UI feedback
+  - Provides optimistic updates for cart actions
+  - Improves perceived performance with instant UI updates
+- **New Documentation Components**: Added several reusable components for documentation
+  - `CartButton`: Button component for cart actions
+  - `CartIcon`: Icon component for cart display
+  - `CartSidebar`: Sidebar component for cart display
+  - `CartDisplay`: Component for improved cart information presentation
+  - `DebugCart`: Component for cart state debugging
+- **Enhanced Configuration**: New configuration methods and embedded checkout functionality
+- **Convex Integration**: Integrated Convex for enhanced cart interaction tracking
+
+### 🐛 Bug Fixes
+
+- Fixed z-index values in CartSidebar component
+- Fixed cartCount nullability handling in CartSidebar
+- Fixed useOptimisticCart JS conversion for Sucrase compatibility
+- Fixed product images in documentation and demos
+
+### 🔧 Refactoring
+
+- Removed deprecated examples and cleaned up workspace configuration
+- Simplified DebugCart and updated CartActions interface
+- Simplified Jest configuration
+- Replaced uuid package with native UUID generation
+- Removed husky configuration and updated pre-commit hook
+- Cleaned up CartProvider tests and removed outdated test files
+
+### 📚 Documentation
+
+- **Major Documentation Overhaul**: Complete reorganization and enhancement of documentation
+  - Reorganized documentation structure for better clarity
+  - Added interactive demos for cart actions
+  - Added interactive demo for optimistic cart functionality
+  - Enhanced documentation with new examples and component references
+  - Improved layout styling and branding
+  - Added helper functions documentation for cart management
+  - Migrated and improved serverless documentation
+
+### ♿ Accessibility
+
+- Improved accessibility with dark mode support
+- Updated image alt attributes for better screen reader support
+
 ## [4.0.0] - 2024-12-20
 
 ### 🚨 Breaking Changes
