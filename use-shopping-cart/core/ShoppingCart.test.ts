@@ -131,7 +131,9 @@ describe('ShoppingCart', () => {
           },
           cartCount: 5,
           totalPrice: 1000,
-          formattedTotalPrice: '$10.00'
+          formattedTotalPrice: '$10.00',
+          currency: 'EUR',
+          language: 'de-DE'
         })
       )
 
@@ -145,6 +147,8 @@ describe('ShoppingCart', () => {
       expect(state.cartCount).toBe(5)
       expect(state.totalPrice).toBe(1000)
       expect(state.cartDetails['item-1']).toBeDefined()
+      expect(state.currency).toBe('EUR')
+      expect(state.language).toBe('de-DE')
     })
 
     it('handles missing storage gracefully', () => {

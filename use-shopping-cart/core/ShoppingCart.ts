@@ -154,9 +154,13 @@ export class ShoppingCart {
     return (
       typeof e.id === 'string' &&
       typeof e.price === 'number' &&
+      Number.isFinite(e.price) &&
       typeof e.quantity === 'number' &&
+      Number.isFinite(e.quantity) &&
+      Number.isInteger(e.quantity) &&
       e.quantity > 0 &&
       typeof e.value === 'number' &&
+      Number.isFinite(e.value) &&
       typeof e.name === 'string' &&
       typeof e.currency === 'string'
     )
@@ -167,7 +171,7 @@ export class ShoppingCart {
       const parsed = JSON.parse(stored)
 
       // Only restore specific fields
-      const { cartDetails } = parsed
+      const { cartDetails, currency, language } = parsed
 
       if (cartDetails && typeof cartDetails === 'object') {
         // Validate each cart entry before loading
@@ -181,18 +185,29 @@ export class ShoppingCart {
           }
         }
 
+        const nextCurrency =
+          typeof currency === 'string' && currency.length > 0
+            ? currency
+            : this._state.currency
+        const nextLanguage =
+          typeof language === 'string' && language.length > 0
+            ? language
+            : this._state.language
+
         // Recalculate totals from validated entries
         const { totalPrice, cartCount } = calculateTotals(validatedCartDetails)
 
         this._state = {
           ...this._state,
+          currency: nextCurrency,
+          language: nextLanguage,
           cartDetails: validatedCartDetails,
           cartCount,
           totalPrice,
           formattedTotalPrice: calculateFormattedTotalPrice(
             totalPrice,
-            this._state.currency,
-            this._state.language
+            nextCurrency,
+            nextLanguage
           )
         }
         // Notify subscribers so React components re-render with loaded cart data
@@ -214,7 +229,9 @@ export class ShoppingCart {
         cartDetails: this._state.cartDetails,
         cartCount: this._state.cartCount,
         totalPrice: this._state.totalPrice,
-        formattedTotalPrice: this._state.formattedTotalPrice
+        formattedTotalPrice: this._state.formattedTotalPrice,
+        currency: this._state.currency,
+        language: this._state.language
       }
 
       this._storage.setItem(this._persistKey, JSON.stringify(toPersist))

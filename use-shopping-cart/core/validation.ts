@@ -17,10 +17,16 @@ export class ValidationError extends Error {
 }
 
 export function validateCount(count: unknown, actionName: string): void {
-  if (typeof count !== 'number') {
-    const error = `Invalid count in ${actionName}: count must be a number. The current type is ${typeOf(
+  if (typeof count !== 'number' || !Number.isFinite(count)) {
+    const error = `Invalid count in ${actionName}: count must be a finite number. The current type is ${typeOf(
       count
     )}.`
+    console.warn(error)
+    throw new ValidationError(error)
+  }
+
+  if (!Number.isInteger(count)) {
+    const error = `Invalid count in ${actionName}: count must be an integer. The current value is ${count}.`
     console.warn(error)
     throw new ValidationError(error)
   }
@@ -33,10 +39,16 @@ export function validateCount(count: unknown, actionName: string): void {
 }
 
 export function validateQuantity(quantity: unknown, actionName: string): void {
-  if (typeof quantity !== 'number') {
-    const error = `Invalid quantity in ${actionName}: quantity must be a number. The current type is ${typeOf(
+  if (typeof quantity !== 'number' || !Number.isFinite(quantity)) {
+    const error = `Invalid quantity in ${actionName}: quantity must be a finite number. The current type is ${typeOf(
       quantity
     )}.`
+    console.warn(error)
+    throw new ValidationError(error)
+  }
+
+  if (!Number.isInteger(quantity)) {
+    const error = `Invalid quantity in ${actionName}: quantity must be an integer. The current value is ${quantity}.`
     console.warn(error)
     throw new ValidationError(error)
   }

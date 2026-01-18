@@ -1,11 +1,23 @@
 function validateCartItems(inventorySrc, cartDetails) {
   const validatedItems = []
 
+  if (!inventorySrc || typeof inventorySrc[Symbol.iterator] !== 'function') {
+    throw new Error('Invalid Cart: inventory must be an iterable collection.')
+  }
+
+  if (!cartDetails || typeof cartDetails !== 'object') {
+    throw new Error('Invalid Cart: cartDetails must be an object.')
+  }
+
   // Build a Map for O(1) lookups instead of O(n) find() calls
   // Only set a key if it doesn't exist to preserve "first match wins" semantics
   // from the original find() implementation
   const inventoryMap = new Map()
   for (const product of inventorySrc) {
+    if (!product || typeof product !== 'object') {
+      throw new Error('Invalid Cart: inventory items must be objects.')
+    }
+
     if (product.id && !inventoryMap.has(product.id)) {
       inventoryMap.set(product.id, product)
     }
@@ -15,6 +27,11 @@ function validateCartItems(inventorySrc, cartDetails) {
   }
 
   for (const id in cartDetails) {
+    const cartItem = cartDetails[id]
+    if (!cartItem || typeof cartItem !== 'object') {
+      throw new Error(`Invalid Cart: cart item "${id}" must be an object.`)
+    }
+
     const inventoryItem = inventoryMap.get(id)
     if (inventoryItem === undefined) {
       throw new Error(
@@ -23,7 +40,7 @@ function validateCartItems(inventorySrc, cartDetails) {
     }
 
     // Validate quantity is a positive integer
-    const quantity = cartDetails[id].quantity
+    const quantity = cartItem.quantity
     if (
       typeof quantity !== 'number' ||
       !Number.isInteger(quantity) ||
@@ -44,16 +61,16 @@ function validateCartItems(inventorySrc, cartDetails) {
         },
         ...inventoryItem.price_data
       },
-      quantity: cartDetails[id].quantity
+      quantity
     }
 
     if (
-      cartDetails[id].product_data &&
-      typeof cartDetails[id].product_data.metadata === 'object'
+      cartItem.product_data &&
+      typeof cartItem.product_data.metadata === 'object'
     ) {
       item.price_data.product_data.metadata = {
         ...item.price_data.product_data.metadata,
-        ...cartDetails[id].product_data.metadata
+        ...cartItem.product_data.metadata
       }
     }
 

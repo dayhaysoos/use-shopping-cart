@@ -211,6 +211,30 @@ describe('validateCartItems', () => {
     )
   })
 
+  it('throws an error when inventory is not iterable', () => {
+    expect(() => {
+      validateCartItems(null, cartDetails)
+    }).toThrow('Invalid Cart: inventory must be an iterable collection.')
+  })
+
+  it('throws an error when cartDetails is not an object', () => {
+    expect(() => {
+      validateCartItems(inventory, null)
+    }).toThrow('Invalid Cart: cartDetails must be an object.')
+  })
+
+  it('throws an error when cart items are not objects', () => {
+    expect(() => {
+      validateCartItems(inventory, { bad: 'item' })
+    }).toThrow('Invalid Cart: cart item "bad" must be an object.')
+  })
+
+  it('throws an error when inventory items are not objects', () => {
+    expect(() => {
+      validateCartItems([null], cartDetails)
+    }).toThrow('Invalid Cart: inventory items must be objects.')
+  })
+
   it('returns first match when inventory has overlapping id and sku values across products', () => {
     // ProductA has sku: 'ABC', ProductB has id: 'ABC'
     // The first match (ProductA via sku) should win

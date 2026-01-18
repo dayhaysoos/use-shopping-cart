@@ -219,7 +219,9 @@ describe('ShoppingCart with async storage', () => {
           }
         },
         cartCount: 3,
-        totalPrice: 1500
+        totalPrice: 1500,
+        currency: 'EUR',
+        language: 'fr-FR'
       })
     )
 
@@ -234,5 +236,7 @@ describe('ShoppingCart with async storage', () => {
     // Should have loaded from storage
     expect(state.cartDetails['stored-item']).toBeDefined()
     expect(state.cartCount).toBe(3)
+    expect(state.currency).toBe('EUR')
+    expect(state.language).toBe('fr-FR')
   })
 })
