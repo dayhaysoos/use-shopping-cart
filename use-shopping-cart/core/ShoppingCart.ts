@@ -186,9 +186,13 @@ export class ShoppingCart {
         }
 
         const nextCurrency =
-          typeof currency === 'string' ? currency : this._state.currency
+          typeof currency === 'string' && currency.length > 0
+            ? currency
+            : this._state.currency
         const nextLanguage =
-          typeof language === 'string' ? language : this._state.language
+          typeof language === 'string' && language.length > 0
+            ? language
+            : this._state.language
 
         // Recalculate totals from validated entries
         const { totalPrice, cartCount } = calculateTotals(validatedCartDetails)
