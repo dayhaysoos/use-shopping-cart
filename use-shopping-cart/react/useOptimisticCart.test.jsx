@@ -269,10 +269,9 @@ describe('useOptimisticCart', () => {
     expect(ids[1]).not.toBe('')
     expect(ids[0]).not.toBe(ids[1])
 
-    // The IDs should also be assigned to the original product objects
-    expect(productWithoutId1.id).toBeDefined()
-    expect(productWithoutId2.id).toBeDefined()
-    expect(productWithoutId1.id).not.toBe(productWithoutId2.id)
+    // The product objects should remain unmutated
+    expect(productWithoutId1.id).toBeUndefined()
+    expect(productWithoutId2.id).toBeUndefined()
   })
 
   test('should reconcile optimistic state with real state for products without IDs', async () => {
@@ -293,14 +292,17 @@ describe('useOptimisticCart', () => {
       expect(result.current.cartCount).toBe(1)
     })
 
-    // The product should now have an ID assigned
-    expect(productWithoutId.id).toBeDefined()
-    expect(typeof productWithoutId.id).toBe('string')
-    expect(productWithoutId.id.length).toBeGreaterThan(0)
+    const cartEntries = Object.values(result.current.cartDetails)
+    expect(cartEntries.length).toBe(1)
 
-    // The cart should use this same ID
-    expect(result.current.cartDetails[productWithoutId.id]).toBeDefined()
-    expect(result.current.cartDetails[productWithoutId.id].quantity).toBe(1)
+    const [cartEntry] = cartEntries
+    expect(cartEntry.id).toBeDefined()
+    expect(typeof cartEntry.id).toBe('string')
+    expect(cartEntry.id.length).toBeGreaterThan(0)
+
+    // The cart should use this generated ID
+    expect(result.current.cartDetails[cartEntry.id]).toBeDefined()
+    expect(result.current.cartDetails[cartEntry.id].quantity).toBe(1)
 
     // isOptimistic should be false after the real state is reconciled
     await waitFor(() => {

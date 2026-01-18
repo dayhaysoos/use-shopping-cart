@@ -10,7 +10,17 @@ import {
 describe('validateCount', () => {
   it('throws on non-number', () => {
     expect(() => validateCount('5', 'addItem')).toThrow(ValidationError)
-    expect(() => validateCount('5', 'addItem')).toThrow('must be a number')
+    expect(() => validateCount('5', 'addItem')).toThrow('finite number')
+  })
+
+  it('throws on non-integer', () => {
+    expect(() => validateCount(1.5, 'addItem')).toThrow(ValidationError)
+    expect(() => validateCount(1.5, 'addItem')).toThrow('integer')
+  })
+
+  it('throws on infinite', () => {
+    expect(() => validateCount(Infinity, 'addItem')).toThrow(ValidationError)
+    expect(() => validateCount(Infinity, 'addItem')).toThrow('finite number')
   })
 
   it('throws on zero', () => {
@@ -40,7 +50,23 @@ describe('validateQuantity', () => {
       ValidationError
     )
     expect(() => validateQuantity('5', 'setItemQuantity')).toThrow(
-      'must be a number'
+      'finite number'
+    )
+  })
+
+  it('throws on non-integer', () => {
+    expect(() => validateQuantity(2.5, 'setItemQuantity')).toThrow(
+      ValidationError
+    )
+    expect(() => validateQuantity(2.5, 'setItemQuantity')).toThrow('integer')
+  })
+
+  it('throws on infinite', () => {
+    expect(() => validateQuantity(Infinity, 'setItemQuantity')).toThrow(
+      ValidationError
+    )
+    expect(() => validateQuantity(Infinity, 'setItemQuantity')).toThrow(
+      'finite number'
     )
   })
 

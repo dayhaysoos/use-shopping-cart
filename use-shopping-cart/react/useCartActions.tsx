@@ -12,6 +12,8 @@ interface ActionState<T = null> {
   quantity?: number | null
 }
 
+const MAX_PRODUCT_JSON_LENGTH = 50_000
+
 type AddItemState = ActionState & { productId: string | null }
 type ItemState = ActionState & { itemId: string | null }
 type QuantityState = ActionState & {
@@ -24,6 +26,40 @@ function getErrorMessage(error: unknown): string {
   if (error instanceof Error) return error.message
   if (typeof error === 'string') return error
   return 'An unknown error occurred'
+}
+
+function parsePositiveInteger(
+  value: FormDataEntryValue | null,
+  fieldName: string
+): number | null {
+  if (value === null) return null
+  if (typeof value !== 'string') {
+    throw new Error(`${fieldName} must be a string`)
+  }
+
+  const parsed = Number(value)
+  if (!Number.isFinite(parsed) || !Number.isInteger(parsed) || parsed <= 0) {
+    throw new Error(`${fieldName} must be a positive integer`)
+  }
+
+  return parsed
+}
+
+function parseNonNegativeInteger(
+  value: FormDataEntryValue | null,
+  fieldName: string
+): number | null {
+  if (value === null) return null
+  if (typeof value !== 'string') {
+    throw new Error(`${fieldName} must be a string`)
+  }
+
+  const parsed = Number(value)
+  if (!Number.isFinite(parsed) || !Number.isInteger(parsed) || parsed < 0) {
+    throw new Error(`${fieldName} must be a non-negative integer`)
+  }
+
+  return parsed
 }
 
 /**
@@ -67,18 +103,43 @@ export function useCartActions() {
           }
         }
 
-        const product = JSON.parse(productJSON)
-        validateProduct(product)
-        const count =
-          countStr && typeof countStr === 'string' ? parseInt(countStr, 10) : 1
+        if (productJSON.length > MAX_PRODUCT_JSON_LENGTH) {
+          return {
+            status: 'error',
+            error: 'Product data is too large',
+            productId: null
+          }
+        }
 
-        cart.addItem(product, { count })
+        let product: unknown
+        try {
+          product = JSON.parse(productJSON)
+        } catch (error) {
+          if (error instanceof SyntaxError) {
+            return {
+              status: 'error',
+              error: 'Product data must be valid JSON',
+              productId: null
+            }
+          }
+          throw error
+        }
+
+        validateProduct(product)
+        const count = parsePositiveInteger(countStr, 'count') ?? 1
+
+        const safeProduct = product as Parameters<typeof cart.addItem>[0]
+        cart.addItem(safeProduct, { count })
 
         return {
           status: 'success',
           error: null,
           productId:
-            product.id || product.price_id || product.sku_id || product.sku
+            safeProduct.id ||
+            safeProduct.price_id ||
+            safeProduct.sku_id ||
+            safeProduct.sku ||
+            null
         }
       } catch (error) {
         return {
@@ -145,12 +206,12 @@ export function useCartActions() {
             }
           }
 
-          const quantity = parseInt(quantityStr, 10)
+          const quantity = parseNonNegativeInteger(quantityStr, 'quantity')
 
-          if (isNaN(quantity) || quantity < 0) {
+          if (quantity === null) {
             return {
               status: 'error',
-              error: 'Quantity must be a valid number',
+              error: 'Quantity is required',
               itemId: null,
               quantity: null
             }
@@ -206,10 +267,7 @@ export function useCartActions() {
             }
           }
 
-          const count =
-            countStr && typeof countStr === 'string'
-              ? parseInt(countStr, 10)
-              : 1
+          const count = parsePositiveInteger(countStr, 'count') ?? 1
           cart.incrementItem(itemId, { count })
 
           return { status: 'success', error: null, itemId }
@@ -240,10 +298,7 @@ export function useCartActions() {
             }
           }
 
-          const count =
-            countStr && typeof countStr === 'string'
-              ? parseInt(countStr, 10)
-              : 1
+          const count = parsePositiveInteger(countStr, 'count') ?? 1
           cart.decrementItem(itemId, { count })
 
           return { status: 'success', error: null, itemId }

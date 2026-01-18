@@ -60,6 +60,55 @@ describe('getProductId', () => {
     expect(typeof id).toBe('string')
     expect(id.length).toBeGreaterThan(0)
   })
+
+  it('does not mutate product when generating ID', () => {
+    const product: Product = {
+      name: 'Test',
+      price: 100,
+      currency: 'USD'
+    }
+
+    getProductId(product)
+
+    expect(product).not.toHaveProperty('id')
+  })
+
+  it('falls back to custom UUID when crypto.randomUUID is unavailable', () => {
+    const product: Product = {
+      name: 'Test',
+      price: 100,
+      currency: 'USD'
+    }
+
+    const originalCrypto = globalThis.crypto
+    Object.defineProperty(globalThis, 'crypto', {
+      value: undefined,
+      configurable: true
+    })
+
+    const id = getProductId(product)
+
+    Object.defineProperty(globalThis, 'crypto', {
+      value: originalCrypto,
+      configurable: true
+    })
+
+    expect(id).toBeTruthy()
+    expect(typeof id).toBe('string')
+  })
+
+  it('returns consistent generated IDs for the same product reference', () => {
+    const product: Product = {
+      name: 'Test',
+      price: 100,
+      currency: 'USD'
+    }
+
+    const firstId = getProductId(product)
+    const secondId = getProductId(product)
+
+    expect(firstId).toBe(secondId)
+  })
 })
 
 describe('createCartEntry', () => {

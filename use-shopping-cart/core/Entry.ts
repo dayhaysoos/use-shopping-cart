@@ -17,10 +17,10 @@ function generateUUID(): string {
   })
 }
 
+const generatedIdCache = new WeakMap<object, string>()
+
 /**
  * Extract the ID from a product (or generate one if missing).
- * If a UUID is generated, it is attached to the product object
- * to ensure consistent identification on subsequent calls.
  */
 export function getProductId(product: Product): string {
   const existingId =
@@ -31,9 +31,11 @@ export function getProductId(product: Product): string {
 
   if (existingId) return existingId
 
-  // Generate and attach ID to product for consistency
+  const cachedId = generatedIdCache.get(product as object)
+  if (cachedId) return cachedId
+
   const generatedId = generateUUID()
-  ;(product as { id?: string }).id = generatedId
+  generatedIdCache.set(product as object, generatedId)
   return generatedId
 }
 

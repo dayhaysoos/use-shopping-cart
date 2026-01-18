@@ -25,7 +25,9 @@ beforeAll(() => {
     if (
       typeof args[0] === 'string' &&
       (args[0].includes('Invalid product ID') ||
-        args[0].includes('Invalid count used'))
+        args[0].includes('Invalid count used') ||
+        args[0].includes('Invalid count in') ||
+        args[0].includes('Invalid quantity in'))
     ) {
       return
     }
@@ -99,6 +101,104 @@ describe('useCartActions', () => {
       })
 
       expect(result.current.addItemState.error).toBe('Product data is required')
+    })
+
+    test('should reject invalid JSON product data', async () => {
+      const { result } = renderHook(() => useCartActions(), { wrapper })
+
+      const formData = new FormData()
+      formData.append('product', '{broken')
+
+      await act(async () => {
+        await result.current.addToCartAction(formData)
+      })
+
+      await waitFor(() => {
+        expect(result.current.addItemState.status).toBe('error')
+      })
+
+      expect(result.current.addItemState.error).toBe(
+        'Product data must be valid JSON'
+      )
+    })
+
+    test('should reject oversized product data', async () => {
+      const { result } = renderHook(() => useCartActions(), { wrapper })
+
+      const formData = new FormData()
+      formData.append('product', 'x'.repeat(60_000))
+
+      await act(async () => {
+        await result.current.addToCartAction(formData)
+      })
+
+      await waitFor(() => {
+        expect(result.current.addItemState.status).toBe('error')
+      })
+
+      expect(result.current.addItemState.error).toBe(
+        'Product data is too large'
+      )
+    })
+
+    test('should reject non-integer count', async () => {
+      const { result } = renderHook(() => useCartActions(), { wrapper })
+
+      const formData = new FormData()
+      formData.append('product', JSON.stringify(mockProduct))
+      formData.append('count', '1.5')
+
+      await act(async () => {
+        await result.current.addToCartAction(formData)
+      })
+
+      await waitFor(() => {
+        expect(result.current.addItemState.status).toBe('error')
+      })
+
+      expect(result.current.addItemState.error).toBe(
+        'count must be a positive integer'
+      )
+    })
+
+    test('should reject infinite count', async () => {
+      const { result } = renderHook(() => useCartActions(), { wrapper })
+
+      const formData = new FormData()
+      formData.append('product', JSON.stringify(mockProduct))
+      formData.append('count', 'Infinity')
+
+      await act(async () => {
+        await result.current.addToCartAction(formData)
+      })
+
+      await waitFor(() => {
+        expect(result.current.addItemState.status).toBe('error')
+      })
+
+      expect(result.current.addItemState.error).toBe(
+        'count must be a positive integer'
+      )
+    })
+
+    test('should reject negative count', async () => {
+      const { result } = renderHook(() => useCartActions(), { wrapper })
+
+      const formData = new FormData()
+      formData.append('product', JSON.stringify(mockProduct))
+      formData.append('count', '-2')
+
+      await act(async () => {
+        await result.current.addToCartAction(formData)
+      })
+
+      await waitFor(() => {
+        expect(result.current.addItemState.status).toBe('error')
+      })
+
+      expect(result.current.addItemState.error).toBe(
+        'count must be a positive integer'
+      )
     })
 
     test('should default count to 1 if not provided', async () => {
@@ -234,7 +334,7 @@ describe('useCartActions', () => {
       })
 
       expect(result.current.updateQuantityState.error).toBe(
-        'Quantity must be a valid number'
+        'quantity must be a non-negative integer'
       )
     })
 
@@ -254,7 +354,47 @@ describe('useCartActions', () => {
       })
 
       expect(result.current.updateQuantityState.error).toBe(
-        'Quantity must be a valid number'
+        'quantity must be a non-negative integer'
+      )
+    })
+
+    test('should reject non-integer quantity', async () => {
+      const { result } = renderHook(() => useCartActions(), { wrapper })
+
+      const formData = new FormData()
+      formData.append('itemId', 'test_id')
+      formData.append('quantity', '1.25')
+
+      await act(async () => {
+        await result.current.updateQuantityAction(formData)
+      })
+
+      await waitFor(() => {
+        expect(result.current.updateQuantityState.status).toBe('error')
+      })
+
+      expect(result.current.updateQuantityState.error).toBe(
+        'quantity must be a non-negative integer'
+      )
+    })
+
+    test('should reject infinite quantity', async () => {
+      const { result } = renderHook(() => useCartActions(), { wrapper })
+
+      const formData = new FormData()
+      formData.append('itemId', 'test_id')
+      formData.append('quantity', 'Infinity')
+
+      await act(async () => {
+        await result.current.updateQuantityAction(formData)
+      })
+
+      await waitFor(() => {
+        expect(result.current.updateQuantityState.status).toBe('error')
+      })
+
+      expect(result.current.updateQuantityState.error).toBe(
+        'quantity must be a non-negative integer'
       )
     })
   })
@@ -336,6 +476,26 @@ describe('useCartActions', () => {
         'Item ID is required'
       )
     })
+
+    test('should reject invalid count', async () => {
+      const { result } = renderHook(() => useCartActions(), { wrapper })
+
+      const formData = new FormData()
+      formData.append('itemId', 'test_id')
+      formData.append('count', '0')
+
+      await act(async () => {
+        await result.current.incrementItemAction(formData)
+      })
+
+      await waitFor(() => {
+        expect(result.current.incrementItemState.status).toBe('error')
+      })
+
+      expect(result.current.incrementItemState.error).toBe(
+        'count must be a positive integer'
+      )
+    })
   })
 
   describe('decrementItemAction', () => {
@@ -385,6 +545,26 @@ describe('useCartActions', () => {
 
       expect(result.current.decrementItemState.error).toBe(
         'Item ID is required'
+      )
+    })
+
+    test('should reject invalid count', async () => {
+      const { result } = renderHook(() => useCartActions(), { wrapper })
+
+      const formData = new FormData()
+      formData.append('itemId', 'test_id')
+      formData.append('count', '-1')
+
+      await act(async () => {
+        await result.current.decrementItemAction(formData)
+      })
+
+      await waitFor(() => {
+        expect(result.current.decrementItemState.status).toBe('error')
+      })
+
+      expect(result.current.decrementItemState.error).toBe(
+        'count must be a positive integer'
       )
     })
   })
