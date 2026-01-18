@@ -3,6 +3,7 @@
 import { useActionState } from 'react'
 import { useShoppingCart } from './useShoppingCart'
 import { validateProduct } from '../core/validation'
+import { getProductId } from '../core/Entry'
 
 interface ActionState<T = null> {
   status: 'idle' | 'success' | 'error'
@@ -134,12 +135,7 @@ export function useCartActions() {
         return {
           status: 'success',
           error: null,
-          productId:
-            safeProduct.id ||
-            safeProduct.price_id ||
-            safeProduct.sku_id ||
-            safeProduct.sku ||
-            null
+          productId: getProductId(safeProduct)
         }
       } catch (error) {
         return {
@@ -208,16 +204,7 @@ export function useCartActions() {
 
           const quantity = parseNonNegativeInteger(quantityStr, 'quantity')
 
-          if (quantity === null) {
-            return {
-              status: 'error',
-              error: 'Quantity is required',
-              itemId: null,
-              quantity: null
-            }
-          }
-
-          cart.setItemQuantity(itemId, quantity)
+          cart.setItemQuantity(itemId, quantity!)
 
           return { status: 'success', error: null, itemId, quantity }
         } catch (error) {
