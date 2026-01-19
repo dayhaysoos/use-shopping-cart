@@ -1,36 +1,70 @@
-# This workflow will run tests using node and then publish a package to GitHub Packages when a release is created
+# This workflow runs tests and builds, then publishes to npm on version tags.
 # For more information see: https://help.github.com/actions/language-and-framework-guides/publishing-nodejs-packages
 
 name: Node.js Package
 
 on:
   push:
-    branches: 
-      - release
-        
+    tags:
+      - 'v*'
+  workflow_dispatch:
 
 jobs:
-  build:
+  test:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v2
-      - uses: actions/setup-node@v1
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
         with:
-          node-version: 12
+          version: 10
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: pnpm
+
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm --filter use-shopping-cart run test
+      - run: pnpm --filter use-shopping-cart run test:types
+
+  build:
+    needs: test
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 10
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: pnpm
+
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm --filter use-shopping-cart run build
 
   publish-npm:
     needs: build
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v2
-      - uses: actions/setup-node@v1
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
         with:
-          node-version: 12
+          version: 10
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
           registry-url: https://registry.npmjs.org/
-      - run: yarn install && npm publish
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+      - name: Publish to npm
+        run: |
+          if [[ "${{ github.event_name }}" == "workflow_dispatch" ]]; then
+            pnpm --filter use-shopping-cart publish --dry-run
+          else
+            pnpm --filter use-shopping-cart publish
+          fi
         env:
           NODE_AUTH_TOKEN: ${{secrets.NPM_AUTH_TOKEN}}
-
 #   publish-gpr:
 #     needs: build
 #     runs-on: ubuntu-latest

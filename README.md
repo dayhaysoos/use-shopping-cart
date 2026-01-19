@@ -1,6 +1,9 @@
 # use-shopping-cart
+
 <!-- ALL-CONTRIBUTORS-BADGE:START - Do not remove or modify this section -->
+
 [![All Contributors](https://img.shields.io/badge/all_contributors-21-orange.svg?style=flat-square)](#contributors-)
+
 <!-- ALL-CONTRIBUTORS-BADGE:END -->
 
 [![NPM](https://img.shields.io/npm/v/use-shopping-cart.svg?style=flat-square)](https://www.npmjs.com/package/use-shopping-cart)
@@ -9,7 +12,7 @@
 
 > A React Hook that handles shopping cart state and logic for Stripe.
 
-**⚠️ v4.0.0-alpha requires React 19** - If you're using React 18, please use [v3.x](https://github.com/dayhaysoos/use-shopping-cart/tree/v3.2.0). 
+**⚠️ v4.0.0-alpha requires React 19** - If you're using React 18, please use [v3.x](https://github.com/dayhaysoos/use-shopping-cart/tree/v3.2.0).
 
 > **Note:** v4.0.0 is under active development. The React 19 upgrade is complete, with Redux removal and TypeScript migration coming soon.
 
@@ -33,6 +36,7 @@ yarn add use-shopping-cart
 ```
 
 **Requirements:**
+
 - React 19.0.0 or higher
 - Node.js 18 or higher
 
@@ -61,9 +65,33 @@ It is likely that you are using a value like `cartCount` that is loaded from Loc
 If you're working on this project **please check out
 [the CONTRIBUTING.md file](https://github.com/dayhaysoos/use-shopping-cart/blob/master/use-shopping-cart/CONTRIBUTING.md)**.
 
+## Maintainer Release Process
+
+Maintainer-only: this section is for project maintainers.
+
+Local validation:
+
+```bash
+pnpm --filter use-shopping-cart run test
+pnpm --filter use-shopping-cart run test:types
+pnpm --filter use-shopping-cart run build
+pnpm --filter use-shopping-cart publish --dry-run
+```
+
+CI validation (no publish):
+
+- Run the "Node.js Package" workflow manually. Manual runs always do `pnpm publish --dry-run`.
+
+Publish (automatic on tags):
+
+- Update the version in `use-shopping-cart/package.json` and commit it.
+- Create a tag like `vX.Y.Z` and push it.
+- The tag triggers CI tests, build, and npm publish.
+
 ## Contributors ✨
 
 Thanks goes to these wonderful people ([emoji key](https://allcontributors.org/docs/en/emoji-key)):
+
 <!-- ALL-CONTRIBUTORS-LIST:START - Do not remove or modify this section -->
 <!-- prettier-ignore-start -->
 <!-- markdownlint-disable -->
