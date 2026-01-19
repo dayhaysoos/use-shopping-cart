@@ -11,6 +11,7 @@ const wrapper = ({ children }) => (
     cartMode="client-only"
     stripe="pk_test_123"
     currency="USD"
+    language="en-US"
     shouldPersist={false}
   >
     {children}
@@ -91,6 +92,12 @@ describe('useOptimisticCart', () => {
     // Wait for increment to complete
     await waitFor(() => {
       expect(result.current.cartDetails[mockProduct.id].quantity).toBe(2)
+      expect(result.current.cartDetails[mockProduct.id].formattedValue).toBe(
+        '$20.00'
+      )
+      expect(result.current.cartDetails[mockProduct.id].formattedPrice).toBe(
+        '$10.00'
+      )
     })
   })
 

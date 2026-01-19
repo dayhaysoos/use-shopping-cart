@@ -657,6 +657,43 @@ describe('ShoppingCart', () => {
       expect(state.cartCount).toBe(4)
       expect(state.totalPrice).toBe(1000)
     })
+
+    it('normalizes loaded entries missing computed fields', () => {
+      const cart = new ShoppingCart({
+        shouldPersist: false,
+        currency: 'USD',
+        language: 'en-US'
+      })
+
+      const newCartDetails = {
+        'item-1': {
+          id: 'item-1',
+          name: 'Bananas',
+          price: 1000,
+          currency: 'USD',
+          quantity: 2
+        } as any,
+        'item-2': {
+          id: 'item-2',
+          name: 'Carrots',
+          price: 500,
+          currency: 'USD',
+          quantity: 1
+        } as any
+      }
+
+      cart.loadCart(newCartDetails, false)
+
+      const state = cart.getState()
+      expect(state.cartCount).toBe(3)
+      expect(state.totalPrice).toBe(2500)
+      expect(state.formattedTotalPrice).toBe('$25.00')
+      expect(state.cartDetails['item-1'].value).toBe(2000)
+      expect(state.cartDetails['item-1'].formattedValue).toBe('$20.00')
+      expect(state.cartDetails['item-1'].formattedPrice).toBe('$10.00')
+      expect(state.cartDetails['item-2'].formattedValue).toBe('$5.00')
+      expect(state.cartDetails['item-2'].formattedPrice).toBe('$5.00')
+    })
   })
 
   describe('handleCartHover', () => {
