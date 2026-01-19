@@ -1,10 +1,8 @@
-
 # use-shopping-cart
 
 > A React Hook that handles shopping cart state and logic for Stripe.
 
 https://useshoppingcart.com
-
 
 [![All Contributors](https://img.shields.io/badge/all_contributors-12-orange.svg?style=flat-square)](#contributors-) [![NPM](https://img.shields.io/npm/v/use-shopping-cart.svg)](https://www.npmjs.com/package/use-shopping-cart) [![JavaScript Style Guide](https://img.shields.io/badge/code_style-standard-brightgreen.svg)](https://standardjs.com)
 
@@ -14,7 +12,6 @@ https://useshoppingcart.com
 ![Serverless code example](/assets/serverless.png)
 Click to open gist.
 ](https://gist.github.com/ChrisBrownie55/f4d395b104a06e8df44e009440247856)
-
 
 ## Documentation
 
@@ -32,12 +29,33 @@ You need to polyfill `formatToParts` if you want to support older browsers. You 
 
 It is likely that you are using a value like `cartCount` that is loaded from LocalStorage which doesn't exist on the server. More info in [issue #122](https://github.com/dayhaysoos/use-shopping-cart/issues/122)
 
-
 ## Contributing to use-shopping-cart
 
 If you're working on this project **please check out
 [the CONTRIBUTING.md file](https://github.com/dayhaysoos/use-shopping-cart/blob/master/use-shopping-cart/CONTRIBUTING.md)**.
 
+## Maintainer Release Process
+
+Maintainer-only: this section is for project maintainers.
+
+Local validation:
+
+```bash
+pnpm --filter use-shopping-cart run test
+pnpm --filter use-shopping-cart run test:types
+pnpm --filter use-shopping-cart run build
+pnpm --filter use-shopping-cart publish --dry-run
+```
+
+CI validation (no publish):
+
+- Run the "Node.js Package" workflow manually. Manual runs always do `pnpm publish --dry-run`.
+
+Publish (automatic on tags):
+
+- Update the version in `use-shopping-cart/package.json` and commit it.
+- Create a tag like `vX.Y.Z` and push it.
+- The tag triggers CI tests, build, and npm publish.
 
 ## Contributors ✨
 
@@ -67,10 +85,10 @@ Thanks goes to these wonderful people ([emoji key](https://allcontributors.org/d
 
 <!-- markdownlint-enable -->
 <!-- prettier-ignore-end -->
+
 <!-- ALL-CONTRIBUTORS-LIST:END -->
 
 This project follows the [all-contributors](https://github.com/all-contributors/all-contributors) specification. Contributions of any kind welcome!
-
 
 ## License
 

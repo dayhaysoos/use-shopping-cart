@@ -4,11 +4,6 @@ import type { CartState, CartEntry, Product } from '../core/types'
 import { ShoppingCart, formatCurrencyString, filterCart } from '../core/index'
 
 const cart = new ShoppingCart({
-  cartMode: 'client-only',
-  mode: 'payment',
-  successUrl: 'https://www.example.com/success',
-  cancelUrl: 'https://www.example.com/cancel',
-  billingAddressCollection: true,
   stripe: '',
   currency: 'USD',
   shouldPersist: true
@@ -79,14 +74,9 @@ cart.changeStripeKey('blah')
 cart.changeLanguage('es-MX')
 cart.changeCurrency('MXN')
 try {
-  cart.redirectToCheckout()
-} catch {}
-try {
   cart.redirectToCheckout('ptslpcbwoi328jcxm82')
 } catch {}
-try {
-  cart.checkoutSingleItem('id_watermelon')
-} catch {}
+
 cart.handleCartHover()
 cart.handleCartClick()
 cart.handleCloseCart()

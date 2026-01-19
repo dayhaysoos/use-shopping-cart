@@ -58,6 +58,29 @@ pnpm dev:docs
 pnpm dev:nextjs
 ```
 
+### Maintainer Release Process
+
+Maintainer-only: this section is for project maintainers.
+
+Local validation:
+
+```bash
+pnpm --filter use-shopping-cart run test
+pnpm --filter use-shopping-cart run test:types
+pnpm --filter use-shopping-cart run build
+pnpm --filter use-shopping-cart publish --dry-run
+```
+
+CI validation (no publish):
+
+- Run the "Node.js Package" workflow manually. Manual runs always do `pnpm publish --dry-run`.
+
+Publish (automatic on tags):
+
+- Update the version in `use-shopping-cart/package.json` and commit it.
+- Create a tag like `vX.Y.Z` and push it.
+- The tag triggers CI tests, build, and npm publish.
+
 ### Warning about editing the README
 
 Please make all README edits to `/README.md` and when you're done copy them to `/use-shopping-cart/README.md`. This is done so that once the README updates are merged and published to NPM, you can see the README appear on both GitHub and NPM.
