@@ -31,13 +31,13 @@ STRIPE_API_PUBLIC=
 STRIPE_API_SECRET=
 
 # documentation/.env.example
-GATSBY_STRIPE_PUBLISHABLE_KEY=
+STRIPE_PUBLISHABLE_KEY=
+
 ```
 
 The following tutorials teach how to set up your custom environment variables for your project for their respective frameworks.
 
 - [create-react-app](https://create-react-app.dev/docs/adding-custom-environment-variables/)
-- [gatsby.js](https://www.gatsbyjs.org/docs/environment-variables/)
 - [next.js](https://nextjs.org/docs/api-reference/next.config.js/environment-variables)
 - [react-static](https://github.com/react-static/react-static/blob/master/docs/concepts.md#environment-variables)
 
