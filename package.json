@@ -2,11 +2,12 @@
   "scripts": {
     "dev": "netlify dev",
     "preinstall": "npx only-allow pnpm",
-    "dev:docs": "pnpm run bundle && pnpm --filter docs run start",
-    "test": "pnpm --filter use-shopping-cart build && pnpm --filter use-shopping-cart run test",
-    "test:watch": "pnpm --filter use-shopping-cart build && pnpm --filter use-shopping-cart run test:watch",
+    "dev:docs": "concurrently \"pnpm --filter use-shopping-cart run build:watch\" \"pnpm --filter docs run start\"",
+    "test": "pnpm --filter use-shopping-cart run build && pnpm --filter use-shopping-cart run test",
+    "test:watch": "pnpm --filter use-shopping-cart run build && pnpm --filter use-shopping-cart run test:watch",
     "build": "pnpm --filter docs run build",
     "bundle": "pnpm --filter use-shopping-cart run build",
+    "release:alpha": "pnpm --filter use-shopping-cart version prerelease --preid alpha && pnpm --filter use-shopping-cart run test && pnpm --filter use-shopping-cart publish --tag alpha",
     "publish": "pnpm --filter use-shopping-cart publish"
   },
   "dependencies": {
@@ -14,20 +15,24 @@
     "open-cli": "^6.0.1",
     "prettier": "^2.8.8"
   },
+  "packageManager": "pnpm@10.18.1",
   "lint-staged": {
     "*.{js,jsx,.d.ts,ts,tsx,mdx}": "prettier --write"
   },
   "devDependencies": {
     "all-contributors-cli": "^6.26.1",
+    "concurrently": "^9.2.1",
     "eslint": "^9.0.0",
     "husky": "^9.0.0",
     "lint-staged": "^15.2.0",
     "typescript": "^5.3.3",
     "webpack-dev-server": "^5.0.0"
   },
-  "resolutions": {
-    "babel-loader": "^9.1.0",
-    "jest": "^29.7.0"
+  "pnpm": {
+    "overrides": {
+      "babel-loader": "^9.1.0",
+      "jest": "^29.7.0"
+    }
   },
   "funding": [
     {

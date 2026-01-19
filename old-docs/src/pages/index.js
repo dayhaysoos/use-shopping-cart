@@ -54,7 +54,7 @@ const Home = () => {
               <Feature
                 title="Jamstack harmonized"
                 imageUrl="img/music.svg"
-                description="We love stacking jam on our toast! Next.js, Gatsby and raspberry flavours!"
+                description="We love stacking jam on our toast! Next.js, Remix, and raspberry flavours!"
               />
               <Feature
                 title="Serverless ready"
