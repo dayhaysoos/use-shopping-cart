@@ -7,7 +7,7 @@
     "test:watch": "pnpm --filter use-shopping-cart run build && pnpm --filter use-shopping-cart run test:watch",
     "build": "pnpm --filter docs run build",
     "bundle": "pnpm --filter use-shopping-cart run build",
-    "release:alpha": "pnpm --filter use-shopping-cart version prerelease --preid alpha && pnpm --filter use-shopping-cart run test && pnpm --filter use-shopping-cart publish --tag alpha",
+    "release:alpha": "pnpm --filter use-shopping-cart run test && pnpm --filter use-shopping-cart version prerelease --preid alpha && pnpm --filter use-shopping-cart publish --tag alpha",
     "publish": "pnpm --filter use-shopping-cart publish"
   },
   "dependencies": {
