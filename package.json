@@ -2,7 +2,7 @@
   "scripts": {
     "dev": "netlify dev",
     "preinstall": "npx only-allow pnpm",
-    "dev:docs": "pnpm run bundle && concurrently \"pnpm --filter use-shopping-cart run build:watch\" \"pnpm --filter docs run start\"",
+    "dev:docs": "concurrently \"pnpm --filter use-shopping-cart run build:watch\" \"pnpm --filter docs run dev\"",
     "test": "pnpm --filter use-shopping-cart run build && pnpm --filter use-shopping-cart run test",
     "test:watch": "pnpm --filter use-shopping-cart run build && pnpm --filter use-shopping-cart run test:watch",
     "build": "pnpm --filter docs run build",
