@@ -56,7 +56,7 @@ function ProductCard({ product }: { product: Product }) {
 
 ## Adding with Custom Quantity
 
-You can add multiple items at once by passing a `count` option:
+You can add multiple items at once by passing a `count` option (positive integers only):
 
 ```typescript
 // Add 10 items at once
@@ -87,6 +87,7 @@ See the [metadata example](/docs/examples/metadata) for a complete implementatio
 
 - **SKU vs ID**: `sku` and `id` are interchangeable for backwards compatibility, but `id` is preferred (SKU API is deprecated by Stripe)
 - The product must include at minimum: `id`, `name`, `price`, and `currency`
+- `count` must be a positive integer
 - Metadata is optional and useful for tracking, analytics, or custom business logic
 
 ## Interactive Demo

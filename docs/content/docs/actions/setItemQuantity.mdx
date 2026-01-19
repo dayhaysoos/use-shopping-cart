@@ -3,7 +3,7 @@ title: setItemQuantity()
 id: set-item-quantity
 ---
 
-Sets an item's quantity to a specific number. If set to 0, the item is removed from the cart.
+Sets an item's quantity to a specific integer. If set to 0, the item is removed from the cart.
 
 ## Basic Usage
 
@@ -92,6 +92,7 @@ function Cart() {
 
 ## Notes
 
+- Quantity must be a non-negative integer
 - Setting quantity to 0 removes the item from cart
 - Useful for quantity pickers and dropdowns
 - Replaces the current quantity (doesn't add or subtract)

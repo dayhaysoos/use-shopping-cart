@@ -27,7 +27,7 @@ function CartItem({ itemId }: { itemId: string }) {
 
 ## Decrement by Custom Amount
 
-You can decrease the quantity by more than 1:
+You can decrease the quantity by more than 1 (positive integers only):
 
 ```typescript
 // Decrease by 10
@@ -63,7 +63,7 @@ function Cart() {
 ## Notes
 
 - Automatically removes item from cart when quantity reaches 0
-- Safe to decrement below 0 (just removes the item)
+- Counts must be positive integers
 
 ## Interactive Demo
 

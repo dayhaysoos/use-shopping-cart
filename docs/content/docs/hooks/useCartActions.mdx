@@ -61,8 +61,8 @@ function ProductCard({ product }) {
 
 **Form fields:**
 
-- `product` (required): JSON string of product object
-- `count` (optional): Number of items to add (default: 1)
+- `product` (required): JSON string of product object (max 50,000 chars)
+- `count` (optional): Positive integer count to add (default: 1)
 
 ```jsx
 <form action={addToCartAction}>
@@ -98,7 +98,7 @@ function ProductCard({ product }) {
 **Form fields:**
 
 - `itemId` (required): ID of the item
-- `quantity` (required): New quantity
+- `quantity` (required): Non-negative integer quantity
 
 ```jsx
 <form action={updateQuantityAction}>
@@ -117,7 +117,7 @@ function ProductCard({ product }) {
 **Form fields:**
 
 - `itemId` (required): ID of the item
-- `count` (optional): Amount to increment (default: 1)
+- `count` (optional): Positive integer amount to increment (default: 1)
 
 #### Decrement Item
 
@@ -128,7 +128,7 @@ function ProductCard({ product }) {
 **Form fields:**
 
 - `itemId` (required): ID of the item
-- `count` (optional): Amount to decrement (default: 1)
+- `count` (optional): Positive integer amount to decrement (default: 1)
 
 #### Clear Cart
 
