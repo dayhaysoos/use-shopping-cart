@@ -166,6 +166,35 @@ export class ShoppingCart {
     )
   }
 
+  private _normalizeCartDetails(
+    cartDetails: CartDetails,
+    currency: string,
+    language: string
+  ): CartDetails {
+    const normalizedCartDetails: CartDetails = {}
+
+    for (const id in cartDetails) {
+      const entry = cartDetails[id]
+      const baseEntry = createCartEntry(
+        id,
+        entry,
+        entry.quantity,
+        {},
+        {},
+        currency,
+        language
+      )
+
+      const normalizedEntry = entry.timestamp
+        ? { ...baseEntry, timestamp: entry.timestamp }
+        : baseEntry
+
+      normalizedCartDetails[id] = normalizedEntry
+    }
+
+    return normalizedCartDetails
+  }
+
   private _parseAndLoadStoredData(stored: string): void {
     try {
       const parsed = JSON.parse(stored)
@@ -525,12 +554,17 @@ export class ShoppingCart {
       newCartDetails = { ...cartDetails }
     }
 
-    const { totalPrice, cartCount } = calculateTotals(newCartDetails)
+    const normalizedCartDetails = this._normalizeCartDetails(
+      newCartDetails,
+      this._state.currency,
+      this._state.language
+    )
+    const { totalPrice, cartCount } = calculateTotals(normalizedCartDetails)
 
     // ✅ IMMUTABLE - single state update
     this._state = {
       ...this._state,
-      cartDetails: newCartDetails,
+      cartDetails: normalizedCartDetails,
       totalPrice,
       cartCount,
       formattedTotalPrice: calculateFormattedTotalPrice(

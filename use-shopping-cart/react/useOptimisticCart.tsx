@@ -92,12 +92,24 @@ export function useOptimisticCart() {
 
         // Item already exists - increment it
         if (state[id]) {
+          const nextQuantity = state[id].quantity + count
+          const nextValue = state[id].price * nextQuantity
           return {
             ...state,
             [id]: {
               ...state[id],
-              quantity: state[id].quantity + count,
-              value: state[id].price * (state[id].quantity + count),
+              quantity: nextQuantity,
+              value: nextValue,
+              formattedValue: formatPrice(
+                nextValue,
+                cart.currency,
+                cart.language
+              ),
+              formattedPrice: formatPrice(
+                state[id].price,
+                cart.currency,
+                cart.language
+              ),
               _optimistic: true
             }
           }
@@ -139,12 +151,25 @@ export function useOptimisticCart() {
         const { id, count = 1 } = action
         if (!state[id]) return state
 
+        const nextQuantity = state[id].quantity + count
+        const nextValue = state[id].price * nextQuantity
+
         return {
           ...state,
           [id]: {
             ...state[id],
-            quantity: state[id].quantity + count,
-            value: state[id].price * (state[id].quantity + count),
+            quantity: nextQuantity,
+            value: nextValue,
+            formattedValue: formatPrice(
+              nextValue,
+              cart.currency,
+              cart.language
+            ),
+            formattedPrice: formatPrice(
+              state[id].price,
+              cart.currency,
+              cart.language
+            ),
             _optimistic: true
           }
         }
@@ -162,12 +187,24 @@ export function useOptimisticCart() {
           return rest
         }
 
+        const nextValue = state[id].price * newQuantity
+
         return {
           ...state,
           [id]: {
             ...state[id],
             quantity: newQuantity,
-            value: state[id].price * newQuantity,
+            value: nextValue,
+            formattedValue: formatPrice(
+              nextValue,
+              cart.currency,
+              cart.language
+            ),
+            formattedPrice: formatPrice(
+              state[id].price,
+              cart.currency,
+              cart.language
+            ),
             _optimistic: true
           }
         }
@@ -183,12 +220,24 @@ export function useOptimisticCart() {
           return rest
         }
 
+        const nextValue = state[id].price * quantity
+
         return {
           ...state,
           [id]: {
             ...state[id],
             quantity,
-            value: state[id].price * quantity,
+            value: nextValue,
+            formattedValue: formatPrice(
+              nextValue,
+              cart.currency,
+              cart.language
+            ),
+            formattedPrice: formatPrice(
+              state[id].price,
+              cart.currency,
+              cart.language
+            ),
             _optimistic: true
           }
         }
