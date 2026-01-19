@@ -211,11 +211,13 @@ Only cart-specific data is persisted to localStorage:
   cartDetails: { /* all cart items */ },
   cartCount: number,
   totalPrice: number,
-  formattedTotalPrice: string
+  formattedTotalPrice: string,
+  currency: string,
+  language: string
 }
 ```
 
-Configuration settings (stripe key, mode, etc.) are NOT stored - only the cart items.
+Configuration settings (stripe key, mode, etc.) are NOT stored - only cart state and formatting context.
 
 ## Data Format
 
@@ -227,7 +229,9 @@ The cart data is stored as JSON in localStorage:
 {
   "cartCount": 2,
   "totalPrice": 1200,
+  "formattedTotalPrice": "$12.00",
   "currency": "USD",
+  "language": "en-US",
   "cartDetails": {
     "banana_001": {
       "id": "banana_001",
