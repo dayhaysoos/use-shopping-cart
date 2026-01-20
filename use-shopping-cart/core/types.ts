@@ -87,8 +87,8 @@ export interface CartState {
    */
   cartDetails: CartDetails
   /**
-   * Stripe publishable key (pk_...) for client-side redirect to checkout.
-   * Used by redirectToCheckout() to initialize Stripe.js.
+   * Stripe publishable key (pk_...) for legacy redirect flows.
+   * Only required when redirectToCheckout() is called with a sessionId.
    */
   stripe?: string
   /**
@@ -112,6 +112,13 @@ export interface CartState {
    */
   shouldPersist: boolean
 }
+
+export type RedirectToCheckoutInput =
+  | string
+  | {
+      sessionId?: string
+      sessionUrl?: string
+    }
 
 export interface CartConfig extends Partial<CartState> {
   /**

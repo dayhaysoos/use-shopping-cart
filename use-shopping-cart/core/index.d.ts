@@ -17,6 +17,7 @@ export type {
   CartEntryAttributes,
   CartDetails,
   CartState,
+  RedirectToCheckoutInput,
   CartConfig,
   AddItemOptions,
   IncrementOptions,

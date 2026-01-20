@@ -25,8 +25,8 @@ drill into the detailed reference pages that follow.
 ## Session + Checkout helpers
 
 - `loadCart(items)` — Hydrate carts from storage or server-rendered data.
-- `redirectToCheckout(options)` — Kick off Stripe Checkout using the current
-  cart contents or a pre-built session id.
+- `redirectToCheckout(session)` — Kick off Stripe Checkout using a session URL
+  from your server (session.id is legacy only).
 
 ## UI feedback helpers
 

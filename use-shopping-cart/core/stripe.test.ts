@@ -21,23 +21,23 @@ describe('redirectToCheckout', () => {
     )
   })
 
-  it('throws when sessionId is missing', async () => {
+  it('throws when session input is missing', async () => {
     const state = {
       stripe: 'pk_test_123'
     } as unknown as CartState
 
     await expect(redirectToCheckout(state, '' as any)).rejects.toThrow(
-      'sessionId is required'
+      'sessionUrl or sessionId is required'
     )
   })
 
-  it('throws when sessionId is undefined', async () => {
+  it('throws when session input is undefined', async () => {
     const state = {
       stripe: 'pk_test_123'
     } as unknown as CartState
 
     await expect(redirectToCheckout(state, undefined as any)).rejects.toThrow(
-      'sessionId is required'
+      'sessionUrl or sessionId is required'
     )
   })
 })

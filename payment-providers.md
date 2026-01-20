@@ -97,7 +97,7 @@ These are the three different modes of payment that a Checkout Session can have.
 
 #### Client-Only
 
-The Client-Only mode is characterized by defining your products directly in the Stripe Dashboard and then referencing them by ID on the client-side, where you'll send the checkout options through `stripe.redirectToCheckout(options)`. Has [several limitations listed on the Stripe Docs](https://stripe.com/docs/payments/checkout/client).
+The Client-Only mode is characterized by defining your products directly in the Stripe Dashboard and then referencing them by ID on the client-side, where you'll redirect to the Checkout Session URL (`session.url`). Has [several limitations listed on the Stripe Docs](https://stripe.com/docs/payments/checkout/client).
 
 This mode only allows two payment modes, `payment` or `subscription`.
 

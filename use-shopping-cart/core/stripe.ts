@@ -1,5 +1,60 @@
 import type { Stripe as StripeType } from '@stripe/stripe-js'
-import type { CartState } from './types'
+import type { CartState, RedirectToCheckoutInput } from './types'
+
+type RedirectToCheckoutOptions = {
+  sessionId?: string
+  sessionUrl?: string
+}
+
+type StripeLegacyRedirect = StripeType & {
+  redirectToCheckout: (options: { sessionId: string }) => Promise<
+    | {
+        error: any
+      }
+    | undefined
+  >
+}
+
+const checkoutUrlPattern = /^https?:\/\//i
+
+function resolveCheckoutRedirectInput(
+  input: RedirectToCheckoutInput
+): RedirectToCheckoutOptions {
+  if (typeof input === 'string') {
+    const trimmed = input.trim()
+    if (!trimmed) return {}
+    if (checkoutUrlPattern.test(trimmed)) return { sessionUrl: trimmed }
+    return { sessionId: trimmed }
+  }
+
+  if (!input) return {}
+
+  const sessionUrl =
+    typeof input.sessionUrl === 'string' && input.sessionUrl.trim().length > 0
+      ? input.sessionUrl
+      : undefined
+  const sessionId =
+    typeof input.sessionId === 'string' && input.sessionId.trim().length > 0
+      ? input.sessionId
+      : undefined
+
+  return {
+    sessionId,
+    sessionUrl
+  }
+}
+
+function hasLegacyRedirect(stripe: StripeType): stripe is StripeLegacyRedirect {
+  return (
+    typeof (stripe as StripeLegacyRedirect).redirectToCheckout === 'function'
+  )
+}
+
+function assertBrowser(): void {
+  if (typeof window === 'undefined') {
+    throw new Error('Checkout redirects can only be initiated in the browser')
+  }
+}
 
 function initializeStripe(publicKey: string): StripeType {
   if (typeof window === 'undefined') {
@@ -30,16 +85,32 @@ function initializeStripe(publicKey: string): StripeType {
 }
 
 /**
- * Redirects to Stripe checkout with a server-created session ID.
+ * Redirects to Stripe checkout with a session URL (preferred) or legacy session ID.
  *
- * @param state - Cart state containing the Stripe publishable key
- * @param sessionId - The session ID returned from your server endpoint
+ * @param state - Cart state containing the Stripe publishable key (sessionId only)
+ * @param input - Session URL (session.url) or a legacy session ID
  * @returns Promise that resolves when redirect starts, or an error object
  */
 export async function redirectToCheckout(
   state: CartState,
-  sessionId: string
+  input: RedirectToCheckoutInput
 ): Promise<{ error: any } | undefined> {
+  const { sessionId, sessionUrl } = resolveCheckoutRedirectInput(input)
+
+  if (!sessionId && !sessionUrl) {
+    throw new Error('sessionUrl or sessionId is required')
+  }
+
+  if (sessionUrl) {
+    assertBrowser()
+    window.location.assign(sessionUrl)
+    return
+  }
+
+  if (!sessionId) {
+    throw new Error('sessionUrl or sessionId is required')
+  }
+
   if (
     !state.stripe ||
     typeof state.stripe !== 'string' ||
@@ -57,10 +128,12 @@ export async function redirectToCheckout(
     )
   }
 
-  if (!sessionId) {
-    throw new Error('sessionId is required')
+  const stripe = initializeStripe(state.stripe)
+  if (!hasLegacyRedirect(stripe)) {
+    throw new Error(
+      'Stripe.js redirectToCheckout is not available. Pass sessionUrl instead.'
+    )
   }
 
-  const stripe = initializeStripe(state.stripe)
   return stripe.redirectToCheckout({ sessionId })
 }

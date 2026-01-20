@@ -3,23 +3,31 @@ title: redirectToCheckout()
 id: redirect-to-checkout
 ---
 
-Redirects the user to Stripe's Checkout page using a server-created session ID.
+Redirects the user to Stripe's Checkout page using a server-created session URL.
 
 ## Signature
 
 ```typescript
-redirectToCheckout(sessionId: string): Promise<{ error: any } | undefined>
+type RedirectToCheckoutInput =
+  | string
+  | { sessionUrl?: string; sessionId?: string }
+
+redirectToCheckout(input: RedirectToCheckoutInput): Promise<
+  { error: any } | undefined
+>
 ```
 
 ## Parameters
 
-- `sessionId` (string, required): The checkout session ID returned from your server endpoint
+- `input` (string or object, required):
+  - `sessionUrl` (string): The `session.url` returned from your server endpoint (recommended)
+  - `sessionId` (string): Legacy checkout session ID for older Stripe.js versions
 
 ## How It Works
 
 1. Your server creates a Stripe checkout session
-2. Server returns the `sessionId`
-3. Call `redirectToCheckout(sessionId)` on the client
+2. Server returns the `session.url`
+3. Call `redirectToCheckout(sessionUrl)` on the client
 4. User is redirected to Stripe's checkout page
 
 ## Basic Usage
@@ -40,10 +48,10 @@ function CheckoutButton() {
       body: JSON.stringify({ cartDetails })
     })
 
-    const { sessionId } = await response.json()
+    const { sessionUrl } = await response.json()
 
     // 2. Redirect to Stripe checkout
-    const result = await redirectToCheckout(sessionId)
+    const result = await redirectToCheckout(sessionUrl)
 
     if (result?.error) {
       console.error('Redirect failed:', result.error)
@@ -86,8 +94,8 @@ function CheckoutButton() {
         throw new Error('Failed to create checkout session')
       }
 
-      const { sessionId } = await response.json()
-      const result = await redirectToCheckout(sessionId)
+      const { sessionUrl } = await response.json()
+      const result = await redirectToCheckout(sessionUrl)
 
       if (result?.error) {
         setError('Unable to redirect to checkout')
@@ -113,7 +121,7 @@ function CheckoutButton() {
 
 ## Server Endpoint Example
 
-Your server endpoint should create the checkout session and return the `sessionId`:
+Your server endpoint should create the checkout session and return the `session.url`:
 
 ```typescript
 // app/api/checkout/route.ts (Next.js App Router)
@@ -148,7 +156,7 @@ export async function POST(req: NextRequest) {
       cancel_url: req.nextUrl.origin
     })
 
-    return NextResponse.json({ sessionId: session.id })
+    return NextResponse.json({ sessionUrl: session.url })
   } catch (error) {
     console.error('Checkout error:', error)
     return NextResponse.json(
@@ -162,12 +170,12 @@ export async function POST(req: NextRequest) {
 ## Notes
 
 - Requires a server endpoint to create Stripe checkout sessions
-- SessionId is required
-- Initializes Stripe.js with the publishable key from CartProvider
+- `sessionUrl` is required for Stripe.js v8+ (session IDs are legacy)
+- Stripe publishable key is only required when passing a sessionId
 - Returns error object if redirect fails
 
 ## See Also
 
 - [Getting Started](/docs/getting-started) - Complete setup guide
 - [Stripe Checkout Sessions](https://stripe.com/docs/api/checkout/sessions) - Stripe API documentation
-- [Stripe.js redirectToCheckout](https://stripe.com/docs/js/checkout/redirect_to_checkout) - Stripe.js documentation
+- [Checkout Sessions object](https://stripe.com/docs/api/checkout/sessions/object) - `session.url` reference
