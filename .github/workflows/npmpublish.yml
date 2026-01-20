@@ -59,9 +59,9 @@ jobs:
         working-directory: use-shopping-cart
         run: |
           if [[ "${{ github.event_name }}" == "workflow_dispatch" ]]; then
-            npm publish --dry-run
+            npm publish --dry-run --tag alpha
           else
-            npm publish
+            npm publish --tag alpha
           fi
 #   publish-gpr:
 #     needs: build
