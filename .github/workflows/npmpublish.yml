@@ -53,9 +53,9 @@ jobs:
       - name: Publish to npm
         run: |
           if [[ "${{ github.event_name }}" == "workflow_dispatch" ]]; then
-            pnpm --filter use-shopping-cart publish --dry-run
+            pnpm --filter use-shopping-cart publish --dry-run --no-git-checks
           else
-            pnpm --filter use-shopping-cart publish
+            pnpm --filter use-shopping-cart publish --no-git-checks
           fi
         env:
           NODE_AUTH_TOKEN: ${{secrets.NPM_AUTH_TOKEN}}
