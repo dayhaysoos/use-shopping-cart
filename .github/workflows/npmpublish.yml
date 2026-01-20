@@ -9,6 +9,10 @@ on:
       - 'v*'
   workflow_dispatch:
 
+permissions:
+  contents: read
+  id-token: write
+
 jobs:
   test:
     runs-on: ubuntu-latest
@@ -49,16 +53,16 @@ jobs:
           node-version: 20
           registry-url: https://registry.npmjs.org/
           cache: pnpm
+      - run: npm install -g npm@11.5.1
       - run: pnpm install --frozen-lockfile
       - name: Publish to npm
+        working-directory: use-shopping-cart
         run: |
           if [[ "${{ github.event_name }}" == "workflow_dispatch" ]]; then
-            pnpm --filter use-shopping-cart publish --dry-run --no-git-checks
+            npm publish --dry-run
           else
-            pnpm --filter use-shopping-cart publish --no-git-checks
+            npm publish
           fi
-        env:
-          NODE_AUTH_TOKEN: ${{secrets.NPM_AUTH_TOKEN}}
 #   publish-gpr:
 #     needs: build
 #     runs-on: ubuntu-latest

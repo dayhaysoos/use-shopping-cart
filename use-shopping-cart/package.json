@@ -1,6 +1,6 @@
 {
   "name": "use-shopping-cart",
-  "version": "4.0.0-alpha.4",
+  "version": "4.0.0-alpha.5",
   "description": "Shopping cart state and logic for Stripe",
   "author": "dayhaysoos",
   "license": "MIT",
