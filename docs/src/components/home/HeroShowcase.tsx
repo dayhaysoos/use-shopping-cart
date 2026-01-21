@@ -1,5 +1,6 @@
 import * as React from 'react'
 import { Highlight, themes, type Language } from 'prism-react-renderer'
+import { trackEvent } from '@/lib/analytics'
 
 const theme = themes.nightOwl
 
@@ -124,7 +125,13 @@ export function HeroShowcase() {
         <button
           type="button"
           aria-pressed={isPaused}
-          onClick={() => setIsPaused((prev) => !prev)}
+          onClick={() =>
+            setIsPaused((prev) => {
+              const nextValue = !prev
+              trackEvent(nextValue ? 'showcase_pause' : 'showcase_resume')
+              return nextValue
+            })
+          }
           className="rounded-full border border-white/20 px-4 py-1 text-xs font-semibold text-white/80 transition hover:border-white/40"
         >
           {isPaused || prefersReducedMotion ? 'Resume' : 'Pause'}

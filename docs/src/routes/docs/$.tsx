@@ -3,7 +3,7 @@ import { DocsLayout } from 'fumadocs-ui/layouts/docs'
 import { createServerFn } from '@tanstack/react-start'
 import { source } from '@/lib/source'
 import type * as PageTree from 'fumadocs-core/page-tree'
-import { useMemo } from 'react'
+import { useEffect, useMemo } from 'react'
 import { docs } from '@/.source'
 import {
   DocsBody,
@@ -16,6 +16,7 @@ import { createClientLoader } from 'fumadocs-mdx/runtime/vite'
 import { baseOptions } from '@/lib/layout.shared'
 import { CartButton } from '@/components/CartButton'
 import { CartProvider } from 'use-shopping-cart'
+import { trackEvent } from '@/lib/analytics'
 
 export const Route = createFileRoute('/docs/$')({
   component: Page,
@@ -67,6 +68,10 @@ function Page() {
     () => transformPageTree(data.tree as PageTree.Folder),
     [data.tree]
   )
+
+  useEffect(() => {
+    trackEvent('docs_page_view')
+  }, [data.path])
 
   return (
     <CartProvider stripe={''} currency="USD" shouldPersist={false}>

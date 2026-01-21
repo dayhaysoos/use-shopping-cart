@@ -11,6 +11,7 @@ import appCss from '@/styles/app.css?url'
 import { convexClient } from '@/lib/convexClient'
 
 const LIST_PATCH_SCRIPT = `(function(){var SELECTOR='li.list-none';function wrap(li){if(!li||li.dataset.uscListWrapped==='true'){return;}if(li.closest('ul,ol,menu')){return;}var parent=li.parentElement;if(!parent){return;}var wrapper=document.createElement('ul');wrapper.setAttribute('data-usc-list-wrapper','');wrapper.style.listStyle='none';wrapper.style.margin='0';wrapper.style.padding='0';parent.insertBefore(wrapper,li);wrapper.appendChild(li);li.dataset.uscListWrapped='true';}function scan(root){var nodes=(root.matches?root.matches(SELECTOR)?[root]:[]:[]).concat(Array.from(root.querySelectorAll?root.querySelectorAll(SELECTOR):[]));nodes.forEach(wrap);}function init(){scan(document);var observer=new MutationObserver(function(mutations){mutations.forEach(function(m){m.addedNodes&&m.addedNodes.forEach(function(node){if(node.nodeType!==1)return;scan(node);});});});observer.observe(document.body,{childList:true,subtree:true});}if(document.readyState==='loading'){document.addEventListener('DOMContentLoaded',init,{once:true});}else{init();}})();`
+const FATHOM_SITE_ID = import.meta.env.VITE_FATHOM_SITE_ID ?? 'RFCETJAH'
 
 export const Route = createRootRoute({
   head: () => ({
@@ -53,6 +54,13 @@ function RootDocument({ children }: { children: React.ReactNode }) {
     <html lang="en" suppressHydrationWarning>
       <head>
         <HeadContent />
+        {import.meta.env.PROD ? (
+          <script
+            src="https://cdn.usefathom.com/script.js"
+            data-site={FATHOM_SITE_ID}
+            defer
+          />
+        ) : null}
         <script
           id="usc-a11y-list-patch"
           dangerouslySetInnerHTML={{ __html: LIST_PATCH_SCRIPT }}

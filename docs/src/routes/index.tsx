@@ -1,11 +1,13 @@
 import * as React from 'react'
 import { createFileRoute, Link } from '@tanstack/react-router'
+import { useEffect } from 'react'
 import { HomeLayout } from 'fumadocs-ui/layouts/home'
 import { baseOptions } from '@/lib/layout.shared'
 import { Container, Section, SectionHeading } from '@/components/home/Section'
 import { CartInteractionPlayground } from '@/components/CartInteractionPlayground'
 import { HeroShowcase } from '@/components/home/HeroShowcase'
 import { Highlight, themes, type Language } from 'prism-react-renderer'
+import { trackEvent } from '@/lib/analytics'
 
 type HomeMetrics = {
   githubStars: number | null
@@ -286,6 +288,10 @@ async function fetchNpmDownloads(): Promise<number | null> {
 function Home() {
   const { metrics } = Route.useLoaderData() as HomeLoaderData
 
+  useEffect(() => {
+    trackEvent('home_view')
+  }, [])
+
   return (
     <HomeLayout
       {...baseOptions()}
@@ -329,12 +335,14 @@ function HeroSection({ metrics }: { metrics: HomeMetrics }) {
               params={{
                 _splat: 'getting-started'
               }}
+              onClick={() => trackEvent('home_get_started_click')}
               className="inline-flex items-center justify-center rounded-full bg-fd-primary px-6 py-3 text-sm font-semibold text-black transition hover:bg-fd-primary/90"
             >
               Get started
             </Link>
             <a
               href="#cart-playground"
+              onClick={() => trackEvent('home_try_it_out_click')}
               className="inline-flex items-center justify-center rounded-full border border-black/10 px-6 py-3 text-sm font-semibold text-[#0b1124] transition hover:border-black/40 dark:border-white/20 dark:text-white dark:hover:border-white/40 scroll-smooth"
             >
               Try it out
