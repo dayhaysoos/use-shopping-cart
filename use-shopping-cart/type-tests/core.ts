@@ -74,7 +74,7 @@ cart.changeStripeKey('blah')
 cart.changeLanguage('es-MX')
 cart.changeCurrency('MXN')
 try {
-  cart.redirectToCheckout('ptslpcbwoi328jcxm82')
+  cart.redirectToCheckout('https://checkout.stripe.com/pay/cs_test_123')
 } catch {}
 
 cart.handleCartHover()

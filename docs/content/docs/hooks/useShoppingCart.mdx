@@ -68,9 +68,9 @@ The hook returns an object with all cart state and methods:
 
 ### Checkout Methods
 
-| Method                                                              | Description                                             |
-| ------------------------------------------------------------------- | ------------------------------------------------------- |
-| [`redirectToCheckout(sessionId)`](/docs/actions/redirectToCheckout) | Redirect to Stripe checkout with server-created session |
+| Method                                                               | Description                                                 |
+| -------------------------------------------------------------------- | ----------------------------------------------------------- |
+| [`redirectToCheckout(sessionUrl)`](/docs/actions/redirectToCheckout) | Redirect to Stripe checkout with server-created session URL |
 
 ### UI Helper Methods
 
@@ -87,9 +87,20 @@ The hook returns an object with all cart state and methods:
 
 ```jsx
 function ProductCard({ product }) {
-  const { addItem, cartDetails } = useShoppingCart()
+  const { addItem, cartDetails, redirectToCheckout } = useShoppingCart()
 
   const itemInCart = cartDetails[product.id]
+
+  const handleCheckout = async () => {
+    const response = await fetch('/api/checkout', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ cartDetails })
+    })
+
+    const { sessionUrl } = await response.json()
+    await redirectToCheckout(sessionUrl)
+  }
 
   return (
     <div className="product">
@@ -120,6 +131,17 @@ function CartSummary() {
     redirectToCheckout
   } = useShoppingCart()
 
+  const handleCheckout = async () => {
+    const response = await fetch('/api/checkout', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ cartDetails })
+    })
+
+    const { sessionUrl } = await response.json()
+    await redirectToCheckout(sessionUrl)
+  }
+
   if (cartCount === 0) {
     return <p>Your cart is empty</p>
   }
@@ -144,7 +166,7 @@ function CartSummary() {
 
       <div className="cart-total">
         <h3>Total: {formattedTotalPrice}</h3>
-        <button onClick={() => redirectToCheckout()}>Checkout</button>
+        <button onClick={handleCheckout}>Checkout</button>
       </div>
     </div>
   )

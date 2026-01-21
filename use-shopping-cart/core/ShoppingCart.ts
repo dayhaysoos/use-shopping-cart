@@ -9,7 +9,8 @@ import type {
   IncrementOptions,
   SubscribeCallback,
   UnsubscribeFunction,
-  StorageAdapter
+  StorageAdapter,
+  RedirectToCheckoutInput
 } from './types'
 import { calculateFormattedTotalPrice } from './formatters'
 import { createLocalStorage } from './storage'
@@ -693,14 +694,14 @@ export class ShoppingCart {
   // ============================================================================
 
   /**
-   * Redirects to Stripe checkout with a server-created session ID.
+   * Redirects to Stripe checkout with a session URL (preferred) or session ID.
    *
-   * @param sessionId - The session ID returned from your server endpoint
+   * @param input - Session URL (session.url) or a legacy session ID
    * @returns Promise that resolves when redirect starts, or an error object
    */
   async redirectToCheckout(
-    sessionId: string
+    input: RedirectToCheckoutInput
   ): Promise<{ error: any } | undefined> {
-    return stripeRedirect(this._state, sessionId)
+    return stripeRedirect(this._state, input)
   }
 }

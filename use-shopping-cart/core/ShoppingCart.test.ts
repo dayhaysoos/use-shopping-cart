@@ -801,14 +801,14 @@ describe('ShoppingCart', () => {
       )
     })
 
-    it('throws when sessionId is missing', async () => {
+    it('throws when session input is missing', async () => {
       const cart = new ShoppingCart({
         shouldPersist: false,
         stripe: 'pk_test_123'
       })
 
       await expect(cart.redirectToCheckout('' as any)).rejects.toThrow(
-        'sessionId is required'
+        'sessionUrl or sessionId is required'
       )
     })
 

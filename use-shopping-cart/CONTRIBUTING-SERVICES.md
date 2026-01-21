@@ -44,8 +44,8 @@ In the options, the `mode` property determines what modes should be allowed for 
 
 Then below that, you can define a method/function that matches the `serviceProperty` name for your service, _`paypal` most likely._ The parameters for this function are `serviceObject, options, parameters`:
 
-- `serviceObject` - your service itself that you would use to do the checkout (`stripe.redirectToCheckout()`)
-- `options` - you created this via `getCheckoutData` and if you're in `checkout-session` mode you'll have a `sessionId` on it as well.
+- `serviceObject` - your service itself that you would use to do the checkout (for Stripe Checkout this is a redirect to `session.url`).
+- `options` - you created this via `getCheckoutData` and if you're in `checkout-session` mode you'll have a `sessionUrl` on it as well.
 - `parameters` - this is any extra options that you might need from the developer before you can go to the checkout, example below:
 
 https://github.com/dayhaysoos/use-shopping-cart/blob/master/use-shopping-cart/src/index.js#L143-L149

@@ -130,8 +130,10 @@ function TestUseShoppingCartActions() {
     cart.changeLanguage('ja')
     cart.changeCurrency('JPY')
 
-    // Redirect to checkout (requires sessionId now)
-    cart.redirectToCheckout('sess_123').catch(() => {})
+    // Redirect to checkout (use session.url)
+    cart
+      .redirectToCheckout('https://checkout.stripe.com/pay/cs_test_123')
+      .catch(() => {})
   }, [])
 
   return <p>Actions!</p>

@@ -10,6 +10,13 @@ type ProviderProps = CartConfig & {
   loading?: React.ReactNode
 }
 
+type RedirectToCheckoutInput =
+  | string
+  | {
+      sessionId?: string
+      sessionUrl?: string
+    }
+
 /**
  * Context provider to interact with Stripe API
  */
@@ -58,11 +65,11 @@ export interface CartActions {
   setItemQuantity: (id: string, quantity: number) => undefined
 
   /**
-   * Redirects customers to Stripe checkout with a server-created session ID.
-   * @param sessionId The checkout session ID created by your server endpoint.
+   * Redirects customers to Stripe checkout with a session URL or legacy session ID.
+   * @param input Session URL (session.url) or a checkout session ID.
    * @returns Promise that resolves when redirect starts, or an error object
    */
-  redirectToCheckout: (sessionId: string) => Promise<any>
+  redirectToCheckout: (input: RedirectToCheckoutInput) => Promise<any>
 
   /**
    * Totally clears the cart of all items
