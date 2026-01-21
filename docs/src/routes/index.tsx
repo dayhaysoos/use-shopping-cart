@@ -314,10 +314,6 @@ function HeroSection({ metrics }: { metrics: HomeMetrics }) {
     <Section className="pt-20">
       <Container className="grid gap-12 lg:grid-cols-[minmax(0,1.05fr)_minmax(0,0.95fr)] lg:items-center">
         <div className="space-y-6">
-          <div className="inline-flex items-center gap-2 rounded-full border border-black/10 bg-black/5 px-4 py-2 text-xs font-medium uppercase tracking-[0.3em] text-black/70 dark:border-white/10 dark:bg-white/5 dark:text-white/80">
-            React 19 ready
-            <span className="inline-block h-2 w-2 rounded-full bg-fd-primary" />
-          </div>
           <div className="space-y-6">
             <h1 className="text-4xl font-semibold leading-tight tracking-tight text-[#0b1124] dark:text-white sm:text-5xl lg:text-6xl text-shine">
               Launch Stripe-shaped carts in minutes.

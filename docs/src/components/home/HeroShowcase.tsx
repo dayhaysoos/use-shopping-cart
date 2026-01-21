@@ -119,7 +119,7 @@ export function HeroShowcase() {
   }, [prefersReducedMotion, isPaused])
 
   return (
-    <div className="relative overflow-hidden rounded-3xl border border-black/10 bg-linear-to-br from-[#0f1328] via-[#11183A] to-[#151f4a] px-4 py-8 text-white shadow-[0_40px_90px_rgba(5,6,15,0.4)] dark:border-white/5">
+    <div className="relative overflow-hidden rounded-3xl border border-black/10 bg-linear-to-br from-[#0f1328] via-[#11183A] to-[#151f4a] px-4 py-4 text-white shadow-[0_40px_90px_rgba(5,6,15,0.4)] dark:border-white/5">
       <div className="mb-4 flex items-center justify-end">
         <button
           type="button"
