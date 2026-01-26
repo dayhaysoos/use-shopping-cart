@@ -27,7 +27,9 @@ export function baseOptions(): BaseLayoutProps {
       {
         text: 'Docs',
         url: DOCS_URL,
-        on: 'nav'
+        on: 'nav',
+        // Force full page reload to bypass SPA navigation issues with server functions
+        external: true
       },
       {
         text: 'GitHub',
