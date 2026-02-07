@@ -6,7 +6,7 @@ import tailwindcss from '@tailwindcss/vite'
 import mdx from 'fumadocs-mdx/vite'
 import netlify from '@netlify/vite-plugin-tanstack-start'
 
-export default defineConfig({
+export default defineConfig(async ({ command }) => ({
   server: {
     port: 3000
   },
@@ -22,6 +22,6 @@ export default defineConfig({
       }
     }),
     react(),
-    netlify()
+    command === 'build' && netlify()
   ]
-})
+}))
