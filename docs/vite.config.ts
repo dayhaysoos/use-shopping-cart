@@ -10,6 +10,22 @@ export default defineConfig(async ({ command }) => ({
   server: {
     port: 3000
   },
+  optimizeDeps: {
+    include: [
+      'convex/react',
+      'convex/server',
+      'tailwind-merge',
+      'prism-react-renderer',
+      'date-fns',
+      'fumadocs-ui/layouts/home',
+      'fumadocs-ui/layouts/docs',
+      'fumadocs-ui/provider/tanstack',
+      'fumadocs-ui/page',
+      'fumadocs-ui/mdx',
+      'fumadocs-mdx/runtime/browser',
+      'fumadocs-core/source/client'
+    ]
+  },
   plugins: [
     mdx(await import('./source.config')),
     tailwindcss(),

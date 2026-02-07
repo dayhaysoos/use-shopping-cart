@@ -18,7 +18,8 @@
     "baseUrl": ".",
     "paths": {
       "@/*": ["./src/*"],
-      "@/.source": [".source"]
+      "@/.source": [".source"],
+      "@/.source/*": [".source/*"]
     },
     "noEmit": true
   }

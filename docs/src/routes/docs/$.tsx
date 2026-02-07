@@ -1,10 +1,7 @@
 import { createFileRoute, notFound } from '@tanstack/react-router'
 import { DocsLayout } from 'fumadocs-ui/layouts/docs'
 import { createServerFn } from '@tanstack/react-start'
-import { source } from '@/lib/source'
-import type * as PageTree from 'fumadocs-core/page-tree'
-import { useEffect, useMemo } from 'react'
-import { docs } from '@/.source'
+import browserCollections from '@/.source/browser'
 import {
   DocsBody,
   DocsDescription,
@@ -12,37 +9,29 @@ import {
   DocsTitle
 } from 'fumadocs-ui/page'
 import defaultMdxComponents from 'fumadocs-ui/mdx'
-import { createClientLoader } from 'fumadocs-mdx/runtime/vite'
 import { baseOptions } from '@/lib/layout.shared'
 import { CartButton } from '@/components/CartButton'
 import { CartProvider } from 'use-shopping-cart'
 import { trackEvent } from '@/lib/analytics'
+import { useFumadocsLoader } from 'fumadocs-core/source/client'
+import { Suspense, useEffect } from 'react'
 
-export const Route = createFileRoute('/docs/$')({
-  component: Page,
-  loader: async ({ params }) => {
-    const slugs = params._splat?.split('/') ?? []
-    const data = await loader({ data: slugs })
-    await clientLoader.preload(data.path)
-    return data
-  }
-})
-
-const loader = createServerFn({
+const getPageData = createServerFn({
   method: 'GET'
 })
   .inputValidator((slugs: string[]) => slugs)
   .handler(async ({ data: slugs }) => {
+    const { source } = await import('@/lib/source')
     const page = source.getPage(slugs)
     if (!page) throw notFound()
 
     return {
-      tree: source.pageTree as object,
+      pageTree: await source.serializePageTree(source.pageTree),
       path: page.path
     }
   })
 
-const clientLoader = createClientLoader(docs.doc, {
+const clientLoader = browserCollections.docs.createClientLoader({
   id: 'docs',
   component({ toc, frontmatter, default: MDX }) {
     return (
@@ -61,13 +50,18 @@ const clientLoader = createClientLoader(docs.doc, {
   }
 })
 
+export const Route = createFileRoute('/docs/$')({
+  component: Page,
+  loader: async ({ params }) => {
+    const slugs = params._splat?.split('/') ?? []
+    const data = await getPageData({ data: slugs })
+    await clientLoader.preload(data.path)
+    return data
+  }
+})
+
 function Page() {
-  const data = Route.useLoaderData()
-  const Content = clientLoader.getComponent(data.path)
-  const tree = useMemo(
-    () => transformPageTree(data.tree as PageTree.Folder),
-    [data.tree]
-  )
+  const data = useFumadocsLoader(Route.useLoaderData())
 
   useEffect(() => {
     trackEvent('docs_page_view')
@@ -75,45 +69,12 @@ function Page() {
 
   return (
     <CartProvider stripe={''} currency="USD" shouldPersist={false}>
-      <DocsLayout {...baseOptions()} tree={tree}>
-        <Content />
+      <DocsLayout {...baseOptions()} tree={data.pageTree}>
+        <Suspense>{clientLoader.useContent(data.path)}</Suspense>
       </DocsLayout>
       <div className="fixed top-4 right-4 z-50">
         <CartButton />
       </div>
     </CartProvider>
   )
-}
-
-function transformPageTree(root: PageTree.Root): PageTree.Root {
-  function mapNode<T extends PageTree.Node>(item: T): T {
-    if (typeof item.icon === 'string') {
-      item = {
-        ...item,
-        icon: (
-          <span
-            dangerouslySetInnerHTML={{
-              __html: item.icon
-            }}
-          />
-        )
-      }
-    }
-
-    if (item.type === 'folder') {
-      return {
-        ...item,
-        index: item.index ? mapNode(item.index) : undefined,
-        children: item.children.map(mapNode)
-      }
-    }
-
-    return item
-  }
-
-  return {
-    ...root,
-    children: root.children.map(mapNode),
-    fallback: root.fallback ? transformPageTree(root.fallback) : undefined
-  }
 }

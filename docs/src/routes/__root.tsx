@@ -5,67 +5,12 @@ import {
   Scripts
 } from '@tanstack/react-router'
 import * as React from 'react'
-import { useEffect } from 'react'
 import { ConvexProvider } from 'convex/react'
 import { RootProvider } from 'fumadocs-ui/provider/tanstack'
 import appCss from '@/styles/app.css?url'
 import { convexClient } from '@/lib/convexClient'
 
 const FATHOM_SITE_ID = import.meta.env.VITE_FATHOM_SITE_ID ?? 'RFCETJAH'
-
-// A11y patch to wrap orphan <li> elements in <ul> containers
-// Must run AFTER React hydration to avoid hydration mismatch
-function useListPatch() {
-  useEffect(() => {
-    const SELECTOR = 'li.list-none'
-
-    function wrap(li: Element) {
-      if (!(li instanceof HTMLLIElement)) return
-      if (li.dataset.uscListWrapped === 'true') return
-      if (li.closest('ul,ol,menu')) return
-
-      const parent = li.parentElement
-      if (!parent) return
-
-      const wrapper = document.createElement('ul')
-      wrapper.setAttribute('data-usc-list-wrapper', '')
-      wrapper.style.listStyle = 'none'
-      wrapper.style.margin = '0'
-      wrapper.style.padding = '0'
-      parent.insertBefore(wrapper, li)
-      wrapper.appendChild(li)
-      li.dataset.uscListWrapped = 'true'
-    }
-
-    function scan(root: Element | Document) {
-      const nodes: Element[] = []
-      if (root instanceof Element && root.matches?.(SELECTOR)) {
-        nodes.push(root)
-      }
-      if (root.querySelectorAll) {
-        nodes.push(...Array.from(root.querySelectorAll(SELECTOR)))
-      }
-      nodes.forEach(wrap)
-    }
-
-    // Initial scan after hydration
-    scan(document)
-
-    // Watch for new nodes
-    const observer = new MutationObserver((mutations) => {
-      mutations.forEach((m) => {
-        m.addedNodes.forEach((node) => {
-          if (node.nodeType !== 1) return
-          scan(node as Element)
-        })
-      })
-    })
-
-    observer.observe(document.body, { childList: true, subtree: true })
-
-    return () => observer.disconnect()
-  }, [])
-}
 
 export const Route = createRootRoute({
   head: () => ({
@@ -104,8 +49,6 @@ function RootComponent() {
 }
 
 function RootDocument({ children }: { children: React.ReactNode }) {
-  // Run a11y list patch after hydration to avoid hydration mismatch
-  useListPatch()
   return (
     <html lang="en" suppressHydrationWarning>
       <head>
