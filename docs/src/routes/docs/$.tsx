@@ -1,6 +1,7 @@
 import { createFileRoute, notFound } from '@tanstack/react-router'
 import { DocsLayout } from 'fumadocs-ui/layouts/docs'
 import { createServerFn } from '@tanstack/react-start'
+import { staticFunctionMiddleware } from '@tanstack/start-static-server-functions'
 import browserCollections from '@/.source/browser'
 import {
   DocsBody,
@@ -19,6 +20,7 @@ import { Suspense, useEffect } from 'react'
 const getPageData = createServerFn({
   method: 'GET'
 })
+  .middleware([staticFunctionMiddleware])
   .inputValidator((slugs: string[]) => slugs)
   .handler(async ({ data: slugs }) => {
     const { source } = await import('@/lib/source')
@@ -26,7 +28,7 @@ const getPageData = createServerFn({
     if (!page) throw notFound()
 
     return {
-      pageTree: await source.serializePageTree(source.pageTree),
+      pageTree: await source.serializePageTree(source.getPageTree()),
       path: page.path
     }
   })
