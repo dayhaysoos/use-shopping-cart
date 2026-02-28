@@ -11,6 +11,7 @@ Version 4.0.0 is a major update that brings React 19 support and several importa
 use-shopping-cart v4.0.0 requires React 19 as a peer dependency.
 
 **Before (v3.x):**
+
 ```json
 {
   "dependencies": {
@@ -22,6 +23,7 @@ use-shopping-cart v4.0.0 requires React 19 as a peer dependency.
 ```
 
 **After (v4.x):**
+
 ```json
 {
   "dependencies": {
@@ -46,12 +48,14 @@ Node.js 18 or higher is now required (previously Node.js 8+).
 In v3.x, the `CartProvider` would recreate the Redux store every time props changed, which could cause unexpected behavior. This has been fixed in v4.0.0.
 
 **What this means for you:**
+
 - Your cart state should be more stable
 - No action required on your part - this fix is automatic
 
 #### Updated Dependencies
 
 All dependencies have been updated to their latest versions:
+
 - TypeScript 5.3
 - Jest 29
 - ESLint 9
@@ -81,11 +85,11 @@ yarn add react@^19.0.0 react-dom@^19.0.0
 #### 2. Update use-shopping-cart
 
 ```bash
-npm install use-shopping-cart@^4.0.0
+npm install use-shopping-cart@rc
 # or
-pnpm add use-shopping-cart@^4.0.0
+pnpm add use-shopping-cart@rc
 # or
-yarn add use-shopping-cart@^4.0.0
+yarn add use-shopping-cart@rc
 ```
 
 #### 3. Run React 19 Codemods (Optional)
@@ -97,6 +101,7 @@ npx codemod@latest react/19/migration-recipe
 ```
 
 This will automatically update deprecated APIs like:
+
 - `ReactDOM.render` → `ReactDOM.createRoot`
 - String refs → Ref callbacks
 - And more...
@@ -126,6 +131,7 @@ npm test
 #### Issue: Type errors with refs
 
 **Error:**
+
 ```
 Cannot assign to 'current' because it is a read-only property
 ```
@@ -144,6 +150,7 @@ const ref = useRef<HTMLDivElement>(null)
 #### Issue: Test failures with `act`
 
 **Error:**
+
 ```
 Cannot find module 'react-dom/test-utils'
 ```
@@ -178,16 +185,18 @@ While v4.0.0 is primarily focused on React 19 compatibility, it includes several
 3. **Modern Dependencies**: All dependencies updated to latest stable versions
 4. **Improved TypeScript**: Better type definitions and React 19 compatibility
 
-### What's Next?
+### Release Status
 
-We're continuing work on v4.0.0 with these upcoming features:
+`v4.0.0-rc.1` is the current release candidate.
 
-- **Redux Removal (Coming in v4.0.0)**: Replace Redux with a lightweight class-based cart
-- **Full TypeScript Migration**: Convert entire codebase from JavaScript to TypeScript
-- **Smaller Bundle Size**: Reduce bundle size by ~70% by removing Redux
-- **Framework Agnostic Core**: Use the cart with React, Vue, Svelte, or vanilla JS
+Completed v4 work includes:
 
-The React 19 upgrade you just completed is the first step. Stay tuned for the complete v4.0.0 release!
+- React 19 support
+- Redux removal in favor of a class-based cart core
+- TypeScript migration across the core and React bindings
+- Updated tests, tooling, and docs for the new architecture
+
+The final v4.0.0 release is focused on release hardening, CI validation, and documentation polish.
 
 ### Getting Help
 
@@ -211,6 +220,5 @@ yarn add use-shopping-cart@^3.2.0 react@^18.2.0 react-dom@^18.2.0
 
 ---
 
-**Last Updated:** December 2024
-**Version:** 4.0.0
-
+**Last Updated:** February 2026
+**Version:** 4.0.0-rc.1

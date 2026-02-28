@@ -58,11 +58,27 @@ jobs:
       - name: Publish to npm
         working-directory: use-shopping-cart
         run: |
-          if [[ "${{ github.event_name }}" == "workflow_dispatch" ]]; then
-            npm publish --dry-run --tag alpha
-          else
-            npm publish --tag alpha
+          VERSION="$(node -p \"require('./package.json').version\")"
+          DIST_TAG="latest"
+
+          if [[ "$VERSION" == *"-"* ]]; then
+            DIST_TAG="${VERSION#*-}"
+            DIST_TAG="${DIST_TAG%%.*}"
           fi
+
+          echo "Publishing use-shopping-cart@$VERSION with dist-tag: $DIST_TAG"
+
+          PUBLISH_ARGS=()
+          if [[ "$DIST_TAG" != "latest" ]]; then
+            PUBLISH_ARGS+=(--tag "$DIST_TAG")
+          fi
+
+          if [[ "${{ github.event_name }}" == "workflow_dispatch" ]]; then
+            npm publish --dry-run "${PUBLISH_ARGS[@]}"
+          else
+            npm publish "${PUBLISH_ARGS[@]}"
+          fi
+
 #   publish-gpr:
 #     needs: build
 #     runs-on: ubuntu-latest
