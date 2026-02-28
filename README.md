@@ -12,9 +12,9 @@
 
 > A React Hook that handles shopping cart state and logic for Stripe.
 
-**⚠️ v4.0.0-alpha requires React 19** - If you're using React 18, please use [v3.x](https://github.com/dayhaysoos/use-shopping-cart/tree/v3.2.0).
+**⚠️ v4 requires React 19** - If you're using React 18, please use [v3.x](https://github.com/dayhaysoos/use-shopping-cart/tree/v3.2.0).
 
-> **Note:** v4.0.0 is under active development. The React 19 upgrade is complete, with Redux removal and TypeScript migration coming soon.
+> **Note:** `v4.0.0-rc.1` is the current release candidate. React 19 support is complete, and v4 now uses the class-based cart architecture.
 
 https://useshoppingcart.com
 
@@ -28,11 +28,11 @@ Click to open gist.
 ## Installation
 
 ```bash
-npm install use-shopping-cart
+npm install use-shopping-cart@rc
 # or
-pnpm add use-shopping-cart
+pnpm add use-shopping-cart@rc
 # or
-yarn add use-shopping-cart
+yarn add use-shopping-cart@rc
 ```
 
 **Requirements:**
