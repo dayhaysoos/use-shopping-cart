@@ -1,5 +1,11 @@
 {
-  "include": ["src/**/*.ts", "src/**/*.tsx", "content/**/*.tsx", "*.ts", "*.tsx"],
+  "include": [
+    "src/**/*.ts",
+    "src/**/*.tsx",
+    "content/**/*.tsx",
+    "*.ts",
+    "*.tsx"
+  ],
   "exclude": ["node_modules", "dist", "../old-docs/**"],
   "compilerOptions": {
     "strict": true,
@@ -15,12 +21,12 @@
     "target": "ES2022",
     "allowJs": true,
     "forceConsistentCasingInFileNames": true,
-    "baseUrl": ".",
     "paths": {
       "@/*": ["./src/*"],
-      "@/.source": [".source"],
-      "@/.source/*": [".source/*"]
+      "@/.source": ["./.source"],
+      "@/.source/*": ["./.source/*"]
     },
-    "noEmit": true
+    "noEmit": true,
+    "allowImportingTsExtensions": true
   }
 }

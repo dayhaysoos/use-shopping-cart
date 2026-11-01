@@ -3,11 +3,10 @@
 import * as React from 'react'
 import { useShoppingCart } from './useShoppingCart'
 
-export interface DebugCartProps
-  extends React.DetailedHTMLProps<
-    React.TableHTMLAttributes<HTMLTableElement>,
-    HTMLTableElement
-  > {}
+export interface DebugCartProps extends React.DetailedHTMLProps<
+  React.TableHTMLAttributes<HTMLTableElement>,
+  HTMLTableElement
+> {}
 
 export function DebugCart(props: DebugCartProps) {
   const cart = useShoppingCart()

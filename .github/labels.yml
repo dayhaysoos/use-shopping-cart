@@ -1,16 +1,16 @@
 documentation:
-  - documentation/*
-  - documentation/**/*
-  - ./README.md
-  - use-shopping-cart/README.md
-
-example: examples/**/*
+  - changed-files:
+      - any-glob-to-any-file:
+          - docs/**
+          - README.md
+          - use-shopping-cart/README.md
 
 package:
-  - use-shopping-cart/*
-  - use-shopping-cart/**/*
+  - changed-files:
+      - any-glob-to-any-file: use-shopping-cart/**
 
 tests:
-  - use-shopping-cart/**/*.test.*
-
-
+  - changed-files:
+      - any-glob-to-any-file:
+          - use-shopping-cart/**/*.test.*
+          - use-shopping-cart/type-tests/**
