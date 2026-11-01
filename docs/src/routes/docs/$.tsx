@@ -21,7 +21,7 @@ const getPageData = createServerFn({
   method: 'GET'
 })
   .middleware([staticFunctionMiddleware])
-  .inputValidator((slugs: string[]) => slugs)
+  .validator((slugs: string[]) => slugs)
   .handler(async ({ data: slugs }) => {
     const { source } = await import('@/lib/source')
     const page = source.getPage(slugs)
