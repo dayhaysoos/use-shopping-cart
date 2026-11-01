@@ -5,7 +5,7 @@ import { useShoppingCart } from './useShoppingCart'
 import { validateProduct } from '../core/validation'
 import { getProductId } from '../core/Entry'
 
-interface ActionState<T = null> {
+export interface ActionState {
   status: 'idle' | 'success' | 'error'
   error: string | null
   productId?: string | null
@@ -15,13 +15,18 @@ interface ActionState<T = null> {
 
 const MAX_PRODUCT_JSON_LENGTH = 50_000
 
-type AddItemState = ActionState & { productId: string | null }
-type ItemState = ActionState & { itemId: string | null }
-type QuantityState = ActionState & {
+export type AddItemState = ActionState & { productId: string | null }
+export type ItemState = ActionState & { itemId: string | null }
+export type QuantityState = ActionState & {
   itemId: string | null
   quantity: number | null
 }
-type ClearState = { status: 'idle' | 'success' | 'error'; error: string | null }
+export type ClearState = {
+  status: 'idle' | 'success' | 'error'
+  error: string | null
+}
+export type RemoveItemState = ItemState
+export type UpdateQuantityState = QuantityState
 
 function getErrorMessage(error: unknown): string {
   if (error instanceof Error) return error.message

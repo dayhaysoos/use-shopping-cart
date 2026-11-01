@@ -42,7 +42,6 @@ const inventory = [
 ]
 
 const cartDetails = {
-  // eslint-disable-next-line camelcase
   price_bananas: {
     id: 'price_bananas',
     price: 400,
@@ -58,7 +57,7 @@ const cartDetails = {
       metadata: { availability: 'limited time', type: 'fruit' }
     }
   },
-  // eslint-disable-next-line camelcase
+
   price_oranges: {
     id: 'price_oranges',
     price: 100,
@@ -73,7 +72,7 @@ const cartDetails = {
     price_data: {},
     product_data: {}
   },
-  // eslint-disable-next-line camelcase
+
   id_donation: {
     id: 'donation',
     price: 2000,
@@ -85,7 +84,7 @@ const cartDetails = {
     price_data: {},
     product_data: {}
   },
-  // eslint-disable-next-line camelcase
+
   id_burger: {
     id: 'id_burger',
     price: 850,
@@ -100,9 +99,9 @@ const cartDetails = {
     product_data: {
       metadata: {
         type: 'meal',
-        // eslint-disable-next-line camelcase
+
         order_id: '6753',
-        // eslint-disable-next-line camelcase
+
         extra_toppings: 'jalapeños, mustard, mayo, caramelized onions'
       }
     }
@@ -175,9 +174,9 @@ describe('validateCartItems', () => {
           ],
           metadata: {
             type: 'meal',
-            // eslint-disable-next-line camelcase
+
             order_id: '6753',
-            // eslint-disable-next-line camelcase
+
             extra_toppings: 'jalapeños, mustard, mayo, caramelized onions'
           }
         }
@@ -189,7 +188,6 @@ describe('validateCartItems', () => {
   it('throws an error if product does not exist in inventory', () => {
     expect(() => {
       validateCartItems(inventory, {
-        // eslint-disable-next-line camelcase
         price_icecream: {
           id: 'price_icecream',
           price: 2000,

@@ -11,11 +11,11 @@ import type {
 } from '../core/types'
 import { getProductId } from '../core/Entry'
 
-interface OptimisticCartEntry extends CartEntry {
+export interface OptimisticCartEntry extends CartEntry {
   _optimistic?: boolean
 }
 
-type OptimisticCartDetails = {
+export type OptimisticCartDetails = {
   [id: string]: OptimisticCartEntry
 }
 

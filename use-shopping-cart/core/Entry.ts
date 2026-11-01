@@ -1,4 +1,3 @@
-import { formatISO } from 'date-fns'
 import { formatCurrencyString } from './formatters'
 import type { Product, CartEntry, CartDetails } from './types'
 
@@ -64,7 +63,7 @@ export function createCartEntry(
       currency,
       language
     }),
-    timestamp: formatISO(new Date()),
+    timestamp: new Date().toISOString(),
     price_data: {
       ...product.price_data,
       ...price_metadata
