@@ -568,6 +568,7 @@ export class ShoppingCart {
   }
 
   /**
+   * Load cart details into the cart, merging with the current items by default.
    * @param cartDetails The cart cartDetails stored somewhere (e.g. on the server).
    * @param shouldMerge Defaults to true. When false, it replaces cartDetails entirely.
    * @see CartDetails
