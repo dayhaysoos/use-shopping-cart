@@ -1,0 +1,5 @@
+# The Netlify site builds from the repo root, so this file (not docs/netlify.toml)
+# is the one Netlify reads. Values here override the site's UI env vars.
+[build.environment]
+  # @tanstack/react-start (docs) requires Node >= 22.12
+  NODE_VERSION = "24"
