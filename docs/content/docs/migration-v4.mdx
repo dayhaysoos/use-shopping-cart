@@ -7,7 +7,7 @@ Guide for upgrading from v3.x to v4.0.
 
 ## Overview
 
-Version 4.0 brings significant improvements while maintaining 100% backward compatibility with v3.x. The main changes include:
+Version 4.0 brings significant improvements while staying API-compatible with v3.x checkout-session mode. The main changes include:
 
 - **Redux Removal**: Now uses React's native `useSyncExternalStore`
 - **Modern Stripe Features**: Phone collection, promotion codes, automatic tax, etc.
@@ -44,7 +44,25 @@ npm install react@19 react-dom@19
 
 **Breaking:** `cartMode="client-only"` is no longer supported. You must use checkout-session mode with a server endpoint.
 
-**All other APIs**: 100% backward compatible for checkout-session mode users.
+### Node.js 22+ Required
+
+The package now declares `"engines": { "node": ">=22" }`. This applies to the Node.js version that runs your build and your server (where you call `validateCartItems`).
+
+### Build File Paths Changed
+
+Imports through `use-shopping-cart`, `use-shopping-cart/core` and `use-shopping-cart/utilities` are unchanged. Only code that points at a file inside the package breaks: deep imports, a Jest `moduleNameMapper`, a bundler alias, or a CDN URL.
+
+| v3                        | v4                                          |
+| ------------------------- | ------------------------------------------- |
+| `dist/react.es.js`        | `dist/react.mjs`                            |
+| `dist/react.js`           | `dist/react.cjs`                            |
+| `dist/core.es.js`         | `dist/core.mjs`                             |
+| `dist/core.js`            | `dist/core.cjs`                             |
+| `utilities/serverless.js` | `dist/utilities.mjs` / `dist/utilities.cjs` |
+
+`dist/react.umd.js` and `dist/core.umd.js` keep their names.
+
+**All other APIs**: backward compatible for checkout-session mode users.
 
 ## What's New in v4.0
 
@@ -308,11 +326,11 @@ npm install -D @types/react@19 @types/react-dom@19
 
 ## Summary
 
-### No Breaking Changes ✅
+### Mostly Compatible ✅
 
-- 100% backward compatible
-- Existing code works without modifications
-- Opt-in to new features when ready
+- Public APIs are backward compatible for checkout-session mode users
+- Existing imports from the package entry points work without changes
+- Opt in to new features when ready
 
 ### Major Improvements ✨
 
@@ -326,5 +344,7 @@ npm install -D @types/react@19 @types/react-dom@19
 
 - Client-only mode (must migrate to checkout-session)
 - All client-only mode props (`mode`, `cartMode`, `successUrl`, `cancelUrl`, `billingAddressCollection`, `allowedCountries`)
+- Support for Node.js versions below 22
+- The old `dist/*.es.js` / `dist/*.js` file names (use the package entry points)
 
 **If you're using checkout-session mode in v3.x, upgrading to v4.0 is seamless. If you're using client-only mode, migration is required but straightforward.**
