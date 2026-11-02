@@ -1,4 +1,4 @@
-# For all pull requests made to master, next, dev branches, this workflow will:
+# For all pull requests made to master, next, dev, react-19 branches, this workflow will:
 # - install all dependencies
 # - run all tests for the 'use-shopping-cart' workspace with pnpm
 
@@ -6,7 +6,7 @@ name: Tests
 
 on:
   pull_request:
-    branches: [master, next, dev]
+    branches: [master, next, dev, react-19]
 
 jobs:
   test-package:
