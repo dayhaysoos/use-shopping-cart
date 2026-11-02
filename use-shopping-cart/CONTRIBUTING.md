@@ -37,7 +37,7 @@ The following tutorials teach how to set up your custom environment variables fo
 - [next.js](https://nextjs.org/docs/api-reference/next.config.js/environment-variables)
 - [react-static](https://github.com/react-static/react-static/blob/master/docs/concepts.md#environment-variables)
 
-Here are a couple commands to get you started in development:
+Here are a couple commands to get you started in development (run them from the repo root):
 
 ```bash
 # Builds use-shopping-cart in watch-mode and runs the documentation site locally

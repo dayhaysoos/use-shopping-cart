@@ -2,106 +2,28 @@
 
 import { useSyncExternalStore, useMemo } from 'react'
 import { useCartContext } from './CartProvider'
-import type {
-  AddItemOptions,
-  CartDetails,
-  CartState,
-  IncrementOptions,
-  Product,
-  RedirectToCheckoutInput
-} from '../core/types'
+import type { ShoppingCart } from '../core/ShoppingCart'
+import type { CartState } from '../core/types'
 
-export interface CartActions {
-  /**
-   * Add `count` amount of a product to the cart
-   * @param product The product to add to the cart
-   * @param options.count The quantity of the product to add, defaults to 1
-   */
-  addItem: (product: Product, options?: AddItemOptions) => void
-
-  /**
-   * Increase the quantity of an item in the cart by `count`
-   * @param id The product ID of the item to increase in quantity
-   * @param options.count The quantity to increase by, defaults to 1
-   */
-  incrementItem: (id: string, options?: IncrementOptions) => void
-
-  /**
-   * Reduce the quantity of an item in the cart by `count`
-   * @param id The product ID of the item to reduce in quantity
-   * @param options.count The quantity to decrease by, defaults to 1
-   */
-  decrementItem: (id: string, options?: IncrementOptions) => void
-
-  /**
-   * Set the quantity of an item in the cart to a specific value
-   * @param id The product ID of the item whose quantity you wish to change
-   * @param quantity The quantity to set the item to
-   */
-  setItemQuantity: (id: string, quantity: number) => void
-
-  /**
-   * Remove an item from the cart by its product ID
-   * @param id The product ID of the item in the cart to remove
-   */
-  removeItem: (id: string) => void
-
-  /**
-   * Totally clears the cart of all items
-   */
-  clearCart: () => void
-
-  /**
-   * @param cartDetails The cart cartDetails stored somewhere (e.g. on the server).
-   * @param shouldMerge Defaults to true. When false, it replaces cartDetails entirely.
-   * @see CartDetails
-   */
-  loadCart: (cartDetails: CartDetails, shouldMerge?: boolean) => void
-
-  /**
-   * Sets `shouldDisplayCart` to `true`.
-   */
-  handleCartHover: () => void
-
-  /**
-   * Toggles `shouldDisplayCart` between `true` and `false`.
-   */
-  handleCartClick: () => void
-
-  /**
-   * Sets `shouldDisplayCart` to `false`.
-   */
-  handleCloseCart: () => void
-
-  /**
-   * Given a product ID, it sets `lastClicked` to that value.
-   */
-  storeLastClicked: (id: string) => void
-
-  /**
-   * Given a public Stripe key string, it sets `stripe` to that value.
-   */
-  changeStripeKey: (key: string) => void
-
-  /**
-   * Given an ISO language code (e.g. en-US), it sets `language` to that value.
-   */
-  changeLanguage: (language: string) => void
-
-  /**
-   * Given an ISO currency code (e.g. USD), it sets `currency` to that value.
-   */
-  changeCurrency: (currency: string) => void
-
-  /**
-   * Redirects customers to Stripe checkout with a session URL (preferred) or legacy session ID.
-   * @param input Session URL (session.url) or a checkout session ID.
-   * @returns Promise that resolves when redirect starts, or an error object
-   */
-  redirectToCheckout: (
-    input: RedirectToCheckoutInput
-  ) => Promise<{ error: any } | undefined>
-}
+/** The cart methods returned by `useShoppingCart`; documented on `ShoppingCart`. */
+export type CartActions = Pick<
+  ShoppingCart,
+  | 'addItem'
+  | 'incrementItem'
+  | 'decrementItem'
+  | 'setItemQuantity'
+  | 'removeItem'
+  | 'clearCart'
+  | 'loadCart'
+  | 'handleCartHover'
+  | 'handleCartClick'
+  | 'handleCloseCart'
+  | 'storeLastClicked'
+  | 'changeStripeKey'
+  | 'changeLanguage'
+  | 'changeCurrency'
+  | 'redirectToCheckout'
+>
 
 export interface UseShoppingCartReturn extends CartState, CartActions {}
 

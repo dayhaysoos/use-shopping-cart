@@ -74,7 +74,6 @@ const entries = [
   {
     name: 'react',
     input: './react/index.ts',
-    external: ['react'],
     useClientDirective: true,
     umdName: 'UseShoppingCart'
   },
@@ -92,7 +91,6 @@ const entries = [
 
 const jsBuilds = entries.map((entry) => ({
   input: entry.input,
-  external: entry.external,
   plugins: [
     ...plugins,
     ...(entry.useClientDirective ? [addUseClientDirective()] : []),
