@@ -99,9 +99,7 @@ const cartDetails = {
     product_data: {
       metadata: {
         type: 'meal',
-
         order_id: '6753',
-
         extra_toppings: 'jalapeños, mustard, mayo, caramelized onions'
       }
     }
@@ -174,9 +172,7 @@ describe('validateCartItems', () => {
           ],
           metadata: {
             type: 'meal',
-
             order_id: '6753',
-
             extra_toppings: 'jalapeños, mustard, mayo, caramelized onions'
           }
         }

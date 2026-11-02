@@ -51,7 +51,7 @@ import { ShoppingCart } from 'use-shopping-cart/core'
 import { validateCartItems } from 'use-shopping-cart/utilities'
 ```
 
-These are unchanged. If you hard-coded a file path (a deep import, a Jest `moduleNameMapper`, a bundler alias, or a CDN URL), update it:
+These are unchanged. Importing `use-shopping-cart/dist/...` was already blocked by the package's `exports` map, but tooling that bypasses it can still point at a file. If you hard-coded a file path (an absolute path, a Jest `moduleNameMapper`, a bundler alias, or a CDN URL), update it:
 
 | v3                        | v4                                          |
 | ------------------------- | ------------------------------------------- |

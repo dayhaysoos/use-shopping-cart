@@ -75,13 +75,13 @@ const entries = [
     name: 'react',
     input: './react/index.ts',
     external: ['react'],
-    clientOnly: true,
+    useClientDirective: true,
     umdName: 'UseShoppingCart'
   },
   {
     name: 'core',
     input: './core/index.ts',
-    clientOnly: true,
+    useClientDirective: true,
     umdName: 'UseShoppingCartCore'
   },
   {
@@ -95,7 +95,7 @@ const jsBuilds = entries.map((entry) => ({
   external: entry.external,
   plugins: [
     ...plugins,
-    ...(entry.clientOnly ? [addUseClientDirective()] : []),
+    ...(entry.useClientDirective ? [addUseClientDirective()] : []),
     ...(entry.umdName
       ? [visualizer({ filename: `stats/${entry.name}.html` })]
       : [])

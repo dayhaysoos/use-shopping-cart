@@ -1,7 +1,0 @@
-[build]
-  command = "vite build"
-  publish = "dist/client"
-
-[build.environment]
-  # @tanstack/react-start requires Node >= 22.12
-  NODE_VERSION = "24"

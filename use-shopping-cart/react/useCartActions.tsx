@@ -21,10 +21,8 @@ export type QuantityState = ActionState & {
   itemId: string | null
   quantity: number | null
 }
-export type ClearState = {
-  status: 'idle' | 'success' | 'error'
-  error: string | null
-}
+export type ClearState = Pick<ActionState, 'status' | 'error'>
+// Names kept from the v4 rc.1 type declarations.
 export type RemoveItemState = ItemState
 export type UpdateQuantityState = QuantityState
 

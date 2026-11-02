@@ -13,7 +13,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **Build files renamed**: the package now ships `dist/{react,core,utilities}.{mjs,cjs}` plus bundled `.d.ts`/`.d.mts`/`.d.cts` declarations
   - `dist/react.es.js` → `dist/react.mjs`, `dist/react.js` → `dist/react.cjs` (same for `core`)
   - `utilities/serverless.js` → `dist/utilities.mjs` / `dist/utilities.cjs`
-  - Imports through `use-shopping-cart`, `use-shopping-cart/core` and `use-shopping-cart/utilities` are unaffected; only hard-coded file paths break (deep imports, Jest `moduleNameMapper`, bundler aliases, CDN URLs pointing at `.es.js`)
+  - Imports through `use-shopping-cart`, `use-shopping-cart/core` and `use-shopping-cart/utilities` are unaffected; only tooling that bypasses the `exports` map and points at a file breaks (absolute paths, Jest `moduleNameMapper`, bundler aliases, CDN URLs pointing at `.es.js`)
 
 ### 🐛 Bug Fixes
 

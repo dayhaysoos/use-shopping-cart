@@ -50,7 +50,7 @@ The package now declares `"engines": { "node": ">=22" }`. This applies to the No
 
 ### Build File Paths Changed
 
-Imports through `use-shopping-cart`, `use-shopping-cart/core` and `use-shopping-cart/utilities` are unchanged. Only code that points at a file inside the package breaks: deep imports, a Jest `moduleNameMapper`, a bundler alias, or a CDN URL.
+Imports through `use-shopping-cart`, `use-shopping-cart/core` and `use-shopping-cart/utilities` are unchanged. Importing `use-shopping-cart/dist/...` was already blocked by the package's `exports` map. Only tooling that bypasses it and points at a file breaks: an absolute path, a Jest `moduleNameMapper`, a bundler alias, or a CDN URL.
 
 | v3                        | v4                                          |
 | ------------------------- | ------------------------------------------- |
