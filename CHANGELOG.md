@@ -20,6 +20,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **Published types fixed**: type declarations are now generated and bundled; rc.1 shipped `.d.ts` files that imported files missing from the tarball
 - `use-shopping-cart/utilities` now has an ESM build and full types (`ValidatedItem`, `LineItem`)
 - Removed runtime dependencies (`date-fns`, `@stripe/stripe-js`); the package has zero runtime dependencies
+- **Cart totals always match the items**: totals are now derived from `cartDetails` on every change. Previously a stored cart (or `cartDetails` passed as config) with stale `value`s loaded with wrong totals, and later changes compounded the error
+- `useOptimisticCart` shows the same entries the cart will: it used its own price formatting and dropped `price_metadata`/`product_metadata` on added items
+- A currency or language set while an async storage adapter is still loading is no longer overwritten by the stored one; the stored items are still restored
+- Storage is written only when the cart, currency or language changes, not on UI changes like `handleCartHover`; failed async writes now log a warning instead of an unhandled rejection
+- Changing currency or language keeps each item's `timestamp`
 
 ## [4.0.0-alpha.2] - 2025-12-26
 
