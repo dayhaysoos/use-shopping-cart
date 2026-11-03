@@ -2,8 +2,13 @@
 
 import { useActionState } from 'react'
 import { useShoppingCart } from './useShoppingCart'
-import { validateProduct } from '../core/validation'
 import { getProductId } from '../core/Entry'
+import {
+  decodeAddItem,
+  decodeCountChange,
+  decodeItemId,
+  decodeQuantity
+} from './formData'
 
 export interface ActionState {
   status: 'idle' | 'success' | 'error'
@@ -12,8 +17,6 @@ export interface ActionState {
   itemId?: string | null
   quantity?: number | null
 }
-
-const MAX_PRODUCT_JSON_LENGTH = 50_000
 
 export type AddItemState = ActionState & { productId: string | null }
 export type ItemState = ActionState & { itemId: string | null }
@@ -32,39 +35,30 @@ function getErrorMessage(error: unknown): string {
   return 'An unknown error occurred'
 }
 
-function parsePositiveInteger(
-  value: FormDataEntryValue | null,
-  fieldName: string
-): number | null {
-  if (value === null) return null
-  if (typeof value !== 'string') {
-    throw new Error(`${fieldName} must be a string`)
+/**
+ * Build a useActionState action: `perform` decodes the form, runs the cart
+ * operation and returns the success state; any thrown error becomes
+ * `{ ...idle, status: 'error', error }`.
+ */
+function createFormAction<S extends ActionState>(
+  idle: S,
+  fallbackError: string,
+  perform: (formData: FormData) => S
+) {
+  return async (_prevState: S, formData: FormData): Promise<S> => {
+    try {
+      return perform(formData)
+    } catch (error) {
+      return {
+        ...idle,
+        status: 'error',
+        error: getErrorMessage(error) || fallbackError
+      }
+    }
   }
-
-  const parsed = Number(value)
-  if (!Number.isFinite(parsed) || !Number.isInteger(parsed) || parsed <= 0) {
-    throw new Error(`${fieldName} must be a positive integer`)
-  }
-
-  return parsed
 }
 
-function parseNonNegativeInteger(
-  value: FormDataEntryValue | null,
-  fieldName: string
-): number | null {
-  if (value === null) return null
-  if (typeof value !== 'string') {
-    throw new Error(`${fieldName} must be a string`)
-  }
-
-  const parsed = Number(value)
-  if (!Number.isFinite(parsed) || !Number.isInteger(parsed) || parsed < 0) {
-    throw new Error(`${fieldName} must be a non-negative integer`)
-  }
-
-  return parsed
-}
+const idleItem: ItemState = { status: 'idle', error: null, itemId: null }
 
 /**
  * Form-friendly cart actions using React 19's useActionState.
@@ -89,218 +83,89 @@ function parseNonNegativeInteger(
 export function useCartActions() {
   const cart = useShoppingCart()
 
-  // Add to cart action
   const [addItemState, addToCartAction, addItemPending] = useActionState(
-    async (
-      _prevState: AddItemState,
-      formData: FormData
-    ): Promise<AddItemState> => {
-      try {
-        const productJSON = formData.get('product')
-        const countStr = formData.get('count')
-
-        if (!productJSON || typeof productJSON !== 'string') {
-          return {
-            status: 'error',
-            error: 'Product data is required',
-            productId: null
-          }
-        }
-
-        if (productJSON.length > MAX_PRODUCT_JSON_LENGTH) {
-          return {
-            status: 'error',
-            error: 'Product data is too large',
-            productId: null
-          }
-        }
-
-        let product: unknown
-        try {
-          product = JSON.parse(productJSON)
-        } catch (error) {
-          if (error instanceof SyntaxError) {
-            return {
-              status: 'error',
-              error: 'Product data must be valid JSON',
-              productId: null
-            }
-          }
-          throw error
-        }
-
-        validateProduct(product)
-        const count = parsePositiveInteger(countStr, 'count') ?? 1
-
-        const safeProduct = product as Parameters<typeof cart.addItem>[0]
-        cart.addItem(safeProduct, { count })
-
+    createFormAction<AddItemState>(
+      { status: 'idle', error: null, productId: null },
+      'Failed to add item to cart',
+      (formData) => {
+        const { product, count } = decodeAddItem(formData)
+        cart.addItem(product, { count })
         return {
           status: 'success',
           error: null,
-          productId: getProductId(safeProduct)
-        }
-      } catch (error) {
-        return {
-          status: 'error',
-          error: getErrorMessage(error) || 'Failed to add item to cart',
-          productId: null
+          productId: getProductId(product)
         }
       }
-    },
+    ),
     { status: 'idle', error: null, productId: null }
   )
 
-  // Remove from cart action
   const [removeItemState, removeFromCartAction, removeItemPending] =
     useActionState(
-      async (_prevState: ItemState, formData: FormData): Promise<ItemState> => {
-        try {
-          const itemId = formData.get('itemId')
-
-          if (!itemId || typeof itemId !== 'string') {
-            return {
-              status: 'error',
-              error: 'Item ID is required',
-              itemId: null
-            }
-          }
-
+      createFormAction<ItemState>(
+        idleItem,
+        'Failed to remove item',
+        (formData) => {
+          const itemId = decodeItemId(formData)
           cart.removeItem(itemId)
-
           return { status: 'success', error: null, itemId }
-        } catch (error) {
-          return {
-            status: 'error',
-            error: getErrorMessage(error) || 'Failed to remove item',
-            itemId: null
-          }
         }
-      },
-      { status: 'idle', error: null, itemId: null }
+      ),
+      idleItem
     )
 
-  // Update quantity action
   const [updateQuantityState, updateQuantityAction, updateQuantityPending] =
     useActionState(
-      async (
-        _prevState: QuantityState,
-        formData: FormData
-      ): Promise<QuantityState> => {
-        try {
-          const itemId = formData.get('itemId')
-          const quantityStr = formData.get('quantity')
-
-          if (
-            !itemId ||
-            typeof itemId !== 'string' ||
-            !quantityStr ||
-            typeof quantityStr !== 'string'
-          ) {
-            return {
-              status: 'error',
-              error: 'Item ID and quantity are required',
-              itemId: null,
-              quantity: null
-            }
-          }
-
-          const quantity = parseNonNegativeInteger(quantityStr, 'quantity')
-
-          cart.setItemQuantity(itemId, quantity!)
-
+      createFormAction<QuantityState>(
+        { status: 'idle', error: null, itemId: null, quantity: null },
+        'Failed to update quantity',
+        (formData) => {
+          const { itemId, quantity } = decodeQuantity(formData)
+          cart.setItemQuantity(itemId, quantity)
           return { status: 'success', error: null, itemId, quantity }
-        } catch (error) {
-          return {
-            status: 'error',
-            error: getErrorMessage(error) || 'Failed to update quantity',
-            itemId: null,
-            quantity: null
-          }
         }
-      },
+      ),
       { status: 'idle', error: null, itemId: null, quantity: null }
     )
 
-  // Clear cart action
   const [clearCartState, clearCartAction, clearCartPending] = useActionState(
-    async (
-      _prevState: ClearState,
-      _formData: FormData
-    ): Promise<ClearState> => {
-      try {
+    createFormAction<ClearState>(
+      { status: 'idle', error: null },
+      'Failed to clear cart',
+      () => {
         cart.clearCart()
         return { status: 'success', error: null }
-      } catch (error) {
-        return {
-          status: 'error',
-          error: getErrorMessage(error) || 'Failed to clear cart'
-        }
       }
-    },
+    ),
     { status: 'idle', error: null }
   )
 
-  // Increment item action
   const [incrementItemState, incrementItemAction, incrementItemPending] =
     useActionState(
-      async (_prevState: ItemState, formData: FormData): Promise<ItemState> => {
-        try {
-          const itemId = formData.get('itemId')
-          const countStr = formData.get('count')
-
-          if (!itemId || typeof itemId !== 'string') {
-            return {
-              status: 'error',
-              error: 'Item ID is required',
-              itemId: null
-            }
-          }
-
-          const count = parsePositiveInteger(countStr, 'count') ?? 1
+      createFormAction<ItemState>(
+        idleItem,
+        'Failed to increment item',
+        (formData) => {
+          const { itemId, count } = decodeCountChange(formData)
           cart.incrementItem(itemId, { count })
-
           return { status: 'success', error: null, itemId }
-        } catch (error) {
-          return {
-            status: 'error',
-            error: getErrorMessage(error) || 'Failed to increment item',
-            itemId: null
-          }
         }
-      },
-      { status: 'idle', error: null, itemId: null }
+      ),
+      idleItem
     )
 
-  // Decrement item action
   const [decrementItemState, decrementItemAction, decrementItemPending] =
     useActionState(
-      async (_prevState: ItemState, formData: FormData): Promise<ItemState> => {
-        try {
-          const itemId = formData.get('itemId')
-          const countStr = formData.get('count')
-
-          if (!itemId || typeof itemId !== 'string') {
-            return {
-              status: 'error',
-              error: 'Item ID is required',
-              itemId: null
-            }
-          }
-
-          const count = parsePositiveInteger(countStr, 'count') ?? 1
+      createFormAction<ItemState>(
+        idleItem,
+        'Failed to decrement item',
+        (formData) => {
+          const { itemId, count } = decodeCountChange(formData)
           cart.decrementItem(itemId, { count })
-
           return { status: 'success', error: null, itemId }
-        } catch (error) {
-          return {
-            status: 'error',
-            error: getErrorMessage(error) || 'Failed to decrement item',
-            itemId: null
-          }
         }
-      },
-      { status: 'idle', error: null, itemId: null }
+      ),
+      idleItem
     )
 
   // Return all actions and states
