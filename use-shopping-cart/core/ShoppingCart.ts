@@ -66,13 +66,41 @@ export class ShoppingCart {
     if (config.shouldPersist !== false && isClient) {
       this._persister = createCartPersister(
         config.storage ?? createLocalStorage(),
-        config.persistKey ?? STORAGE_KEY_PREFIX
+        config.persistKey ?? STORAGE_KEY_PREFIX,
+        this._state
       )
       this._persister.load((stored) => this._restore(stored))
     } else {
       this._persister = null
     }
   }
+
+  // ============================================================================
+  // STATE ACCESS
+  // ============================================================================
+
+  /**
+   * Get current cart state (readonly).
+   * Used by useSyncExternalStore.
+   */
+  getState(): Readonly<CartState> {
+    return this._state
+  }
+
+  /**
+   * Subscribe to cart state changes.
+   * Returns unsubscribe function.
+   */
+  subscribe(callback: SubscribeCallback): UnsubscribeFunction {
+    this._subscribers.add(callback)
+    return () => {
+      this._subscribers.delete(callback)
+    }
+  }
+
+  // ============================================================================
+  // PRIVATE HELPERS
+  // ============================================================================
 
   /**
    * Restore a stored cart. Ignored if the cart was changed before an async
@@ -118,33 +146,6 @@ export class ShoppingCart {
     )
   }
 
-  // ============================================================================
-  // STATE ACCESS
-  // ============================================================================
-
-  /**
-   * Get current cart state (readonly).
-   * Used by useSyncExternalStore.
-   */
-  getState(): Readonly<CartState> {
-    return this._state
-  }
-
-  /**
-   * Subscribe to cart state changes.
-   * Returns unsubscribe function.
-   */
-  subscribe(callback: SubscribeCallback): UnsubscribeFunction {
-    this._subscribers.add(callback)
-    return () => {
-      this._subscribers.delete(callback)
-    }
-  }
-
-  // ============================================================================
-  // PRIVATE HELPERS
-  // ============================================================================
-
   /**
    * Notify all subscribers of state change.
    * Called after EVERY state update.
@@ -170,7 +171,12 @@ export class ShoppingCart {
     const count = options.count ?? 1
     validateCount(count, 'addItem')
 
-    this._apply({ type: 'add', product, count, metadata: options })
+    this._apply({
+      type: 'add',
+      product,
+      count,
+      metadata: options
+    })
   }
 
   /**

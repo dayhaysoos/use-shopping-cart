@@ -2,17 +2,20 @@ import { createCartEntry, getProductId } from './Entry'
 import { calculateFormattedTotalPrice } from './formatters'
 import type { AddItemOptions, CartDetails, CartState, Product } from './types'
 
+export interface CartFormat {
+  currency: string
+  language: string
+}
+
 /**
- * Return `state` with `cartDetails` replaced and every derived field
- * (`cartCount`, `totalPrice`, `formattedTotalPrice`) recomputed from it.
- *
- * This is the only place cart totals are calculated, so totals always equal
- * the sum of the entries.
+ * The totals for `cartDetails`: `cartCount`, `totalPrice` and
+ * `formattedTotalPrice`. This is the only place cart totals are calculated,
+ * so totals always equal the sum of the entries.
  */
-export function withCartDetails<S extends CartState>(
-  state: S,
-  cartDetails: CartDetails
-): S {
+export function cartTotals(
+  cartDetails: CartDetails,
+  { currency, language }: CartFormat
+): Pick<CartState, 'cartCount' | 'totalPrice' | 'formattedTotalPrice'> {
   let totalPrice = 0
   let cartCount = 0
 
@@ -22,16 +25,22 @@ export function withCartDetails<S extends CartState>(
   }
 
   return {
-    ...state,
-    cartDetails,
     cartCount,
     totalPrice,
     formattedTotalPrice: calculateFormattedTotalPrice(
       totalPrice,
-      state.currency,
-      state.language
+      currency,
+      language
     )
   }
+}
+
+/** Return `state` with `cartDetails` replaced and its totals recomputed. */
+export function withCartDetails(
+  state: CartState,
+  cartDetails: CartDetails
+): CartState {
+  return { ...state, cartDetails, ...cartTotals(cartDetails, state) }
 }
 
 /**
@@ -59,11 +68,6 @@ export function normalizeCartDetails(
   }
 
   return normalized
-}
-
-export interface CartFormat {
-  currency: string
-  language: string
 }
 
 /** A change to cartDetails. Quantities that reach 0 or below remove the entry. */
@@ -100,7 +104,11 @@ export function applyCartChange(
         id,
         existing ?? change.product,
         (existing?.quantity ?? 0) + change.count,
-        { ...format, ...change.metadata }
+        {
+          ...format,
+          price_metadata: change.metadata?.price_metadata,
+          product_metadata: change.metadata?.product_metadata
+        }
       )
       return { ...cartDetails, [id]: entry }
     }
@@ -130,6 +138,13 @@ export function applyCartChange(
     case 'clear':
       return {}
   }
+}
+
+/** The id of the entry a change touches, or undefined for `clear`. */
+export function changedEntryId(change: CartChange): string | undefined {
+  if (change.type === 'add') return getProductId(change.product)
+  if (change.type === 'clear') return undefined
+  return change.id
 }
 
 function removeEntry(cartDetails: CartDetails, id: string): CartDetails {

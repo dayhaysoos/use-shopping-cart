@@ -1052,6 +1052,17 @@ describe('ShoppingCart', () => {
   })
 
   describe('storage writes', () => {
+    it('does not write when the first change is UI-only', () => {
+      const storage = createMemoryStorage()
+      const setItem = vi.spyOn(storage, 'setItem')
+      const cart = new ShoppingCart({ storage })
+
+      cart.handleCartHover()
+      cart.storeLastClicked('a')
+
+      expect(setItem).not.toHaveBeenCalled()
+    })
+
     it('does not write for UI-only changes', () => {
       const storage = createMemoryStorage()
       const setItem = vi.spyOn(storage, 'setItem')

@@ -14,18 +14,25 @@ export interface CartPersister {
    * nothing is stored or the data is unreadable.
    */
   load(onLoad: (stored: StoredCart) => void): void
-  /** Write the cart if anything that is persisted changed since the last write. */
+  /**
+   * Write the cart if anything that is persisted changed since the last
+   * write. A failed write is retried on the next save.
+   */
   save(state: Readonly<CartState>): void
 }
 
+type PersistedFields = Pick<CartState, 'cartDetails' | 'currency' | 'language'>
+
+/**
+ * `initial` is the cart's starting state: saves are skipped until the cart,
+ * currency or language differ from it, so UI-only changes never write.
+ */
 export function createCartPersister(
   storage: StorageAdapter,
-  key: string
+  key: string,
+  initial: Readonly<PersistedFields>
 ): CartPersister {
-  let lastSaved: Pick<
-    CartState,
-    'cartDetails' | 'currency' | 'language'
-  > | null = null
+  let lastSaved: Readonly<PersistedFields> | null = initial
 
   return {
     load(onLoad) {
@@ -59,16 +66,20 @@ export function createCartPersister(
       ) {
         return
       }
+      const previous = lastSaved
       lastSaved = state
 
       try {
         const result = storage.setItem(key, serializeCart(state))
         if (result instanceof Promise) {
           result.catch((error) => {
+            // Forget this write so the next save retries it
+            if (lastSaved === state) lastSaved = null
             console.warn('Failed to persist cart to storage:', error)
           })
         }
       } catch (error) {
+        lastSaved = previous
         console.warn('Failed to persist cart to storage:', error)
       }
     }

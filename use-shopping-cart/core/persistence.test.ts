@@ -73,7 +73,7 @@ describe('createCartPersister', () => {
     storage.setItem('k', JSON.stringify({ cartDetails: { a: entry } }))
     const onLoad = vi.fn()
 
-    createCartPersister(storage, 'k').load(onLoad)
+    createCartPersister(storage, 'k', initialState).load(onLoad)
 
     expect(onLoad).toHaveBeenCalledWith(
       expect.objectContaining({ cartDetails: { a: entry } })
@@ -83,7 +83,7 @@ describe('createCartPersister', () => {
   it('does not call onLoad when nothing is stored', () => {
     const onLoad = vi.fn()
 
-    createCartPersister(createMemoryStorage(), 'k').load(onLoad)
+    createCartPersister(createMemoryStorage(), 'k', initialState).load(onLoad)
 
     expect(onLoad).not.toHaveBeenCalled()
   })
@@ -96,7 +96,7 @@ describe('createCartPersister', () => {
     }
     const onLoad = vi.fn()
 
-    createCartPersister(storage, 'k').load(onLoad)
+    createCartPersister(storage, 'k', initialState).load(onLoad)
     expect(onLoad).not.toHaveBeenCalled()
 
     await vi.waitFor(() => expect(onLoad).toHaveBeenCalled())
@@ -105,7 +105,7 @@ describe('createCartPersister', () => {
   it('writes the same payload shape as earlier versions', () => {
     const storage = createMemoryStorage()
 
-    createCartPersister(storage, 'k').save(state)
+    createCartPersister(storage, 'k', initialState).save(state)
 
     expect(JSON.parse(storage.getItem('k') as string)).toEqual({
       cartDetails: state.cartDetails,
@@ -117,10 +117,57 @@ describe('createCartPersister', () => {
     })
   })
 
+  it('does not write until the cart differs from its initial state', () => {
+    const storage = createMemoryStorage()
+    const setItem = vi.spyOn(storage, 'setItem')
+    const persister = createCartPersister(storage, 'k', initialState)
+
+    persister.save({ ...initialState, shouldDisplayCart: true })
+    expect(setItem).not.toHaveBeenCalled()
+
+    persister.save(state)
+    expect(setItem).toHaveBeenCalledTimes(1)
+  })
+
+  it('retries a failed write on the next save', () => {
+    vi.spyOn(console, 'warn').mockImplementation(() => {})
+    const storage = createMemoryStorage()
+    const setItem = vi.spyOn(storage, 'setItem').mockImplementationOnce(() => {
+      throw new Error('quota')
+    })
+    const persister = createCartPersister(storage, 'k', initialState)
+
+    persister.save(state)
+    persister.save(state)
+
+    expect(setItem).toHaveBeenCalledTimes(2)
+    expect(storage.getItem('k')).not.toBeNull()
+  })
+
+  it('retries after an async write fails', async () => {
+    vi.spyOn(console, 'warn').mockImplementation(() => {})
+    const setItem = vi
+      .fn()
+      .mockReturnValueOnce(Promise.reject(new Error('quota')))
+      .mockReturnValue(undefined)
+    const storage: StorageAdapter = {
+      getItem: () => null,
+      setItem,
+      removeItem: () => {}
+    }
+    const persister = createCartPersister(storage, 'k', initialState)
+
+    persister.save(state)
+    await new Promise((r) => setTimeout(r, 0))
+    persister.save(state)
+
+    expect(setItem).toHaveBeenCalledTimes(2)
+  })
+
   it('skips writes when nothing persisted changed', () => {
     const storage = createMemoryStorage()
     const setItem = vi.spyOn(storage, 'setItem')
-    const persister = createCartPersister(storage, 'k')
+    const persister = createCartPersister(storage, 'k', initialState)
 
     persister.save(state)
     persister.save({ ...state, shouldDisplayCart: true, lastClicked: 'a' })
@@ -138,7 +185,7 @@ describe('createCartPersister', () => {
       removeItem: () => {}
     }
 
-    createCartPersister(storage, 'k').save(state)
+    createCartPersister(storage, 'k', initialState).save(state)
 
     await vi.waitFor(() =>
       expect(warn).toHaveBeenCalledWith(

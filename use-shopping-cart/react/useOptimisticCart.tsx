@@ -9,10 +9,10 @@ import type {
   AddItemOptions,
   IncrementOptions
 } from '../core/types'
-import { getProductId } from '../core/Entry'
 import {
   applyCartChange,
-  withCartDetails,
+  cartTotals,
+  changedEntryId,
   type CartChange
 } from '../core/cartState'
 
@@ -58,12 +58,7 @@ export function useOptimisticCart() {
       currency: cart.currency,
       language: cart.language
     })
-    const id =
-      change.type === 'add'
-        ? getProductId(change.product)
-        : 'id' in change
-          ? change.id
-          : undefined
+    const id = changedEntryId(change)
 
     return id && next !== state && next[id]
       ? { ...next, [id]: { ...next[id], _optimistic: true } }
@@ -75,7 +70,7 @@ export function useOptimisticCart() {
   )
 
   // Totals derived exactly as ShoppingCart derives them
-  const optimisticTotals = withCartDetails(cart, optimisticCartDetails)
+  const optimisticTotals = cartTotals(optimisticCartDetails, cart)
 
   // Wrap addItem with optimistic update
   const addItem = (product: Product, options: AddItemOptions = {}) => {

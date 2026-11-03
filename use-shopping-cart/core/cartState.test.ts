@@ -151,6 +151,21 @@ describe('applyCartChange', () => {
     expect(next.a.product_data).toEqual({ kind: 'x' })
   })
 
+  it('only takes price and product metadata from the add options', () => {
+    const next = applyCartChange(
+      {},
+      {
+        type: 'add',
+        product,
+        count: 1,
+        metadata: { currency: 'EUR', language: 'de-DE' } as any
+      },
+      format
+    )
+
+    expect(next.a.formattedValue).toBe('$1.50')
+  })
+
   it('adjusts quantity and removes the entry at zero or below', () => {
     expect(
       applyCartChange(withA, { type: 'adjust', id: 'a', by: 3 }, format).a.value

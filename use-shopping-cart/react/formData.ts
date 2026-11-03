@@ -1,15 +1,8 @@
 import type { Product } from '../core/types'
 import { validateProduct } from '../core/validation'
 
-// Decoders for useCartActions: FormData in, typed input out. Each throws a
-// FormInputError whose message is shown to the user as the action's error.
-
-export class FormInputError extends Error {
-  constructor(message: string) {
-    super(message)
-    this.name = 'FormInputError'
-  }
-}
+// Decoders for useCartActions: FormData in, typed input out. Invalid input
+// throws; the error message becomes the action's `error` state.
 
 const MAX_PRODUCT_JSON_LENGTH = 50_000
 
@@ -20,33 +13,26 @@ export function decodeAddItem(formData: FormData): {
 } {
   const productJSON = formData.get('product')
   if (!productJSON || typeof productJSON !== 'string') {
-    throw new FormInputError('Product data is required')
+    throw new Error('Product data is required')
   }
   if (productJSON.length > MAX_PRODUCT_JSON_LENGTH) {
-    throw new FormInputError('Product data is too large')
+    throw new Error('Product data is too large')
   }
 
-  let product: unknown
-  try {
-    product = JSON.parse(productJSON)
-  } catch (error) {
-    if (error instanceof SyntaxError) {
-      throw new FormInputError('Product data must be valid JSON')
-    }
-    throw error
+  const product = parseJSON(productJSON)
+  if (product === undefined) {
+    throw new Error('Product data must be valid JSON')
   }
 
   validateProduct(product)
-  const count = parsePositiveInteger(formData.get('count'), 'count') ?? 1
-
-  return { product: product as Product, count }
+  return { product: product as Product, count: decodeCount(formData) }
 }
 
 /** Fields: `itemId`. */
 export function decodeItemId(formData: FormData): string {
   const itemId = formData.get('itemId')
   if (!itemId || typeof itemId !== 'string') {
-    throw new FormInputError('Item ID is required')
+    throw new Error('Item ID is required')
   }
   return itemId
 }
@@ -57,8 +43,7 @@ export function decodeCountChange(formData: FormData): {
   count: number
 } {
   const itemId = decodeItemId(formData)
-  const count = parsePositiveInteger(formData.get('count'), 'count') ?? 1
-  return { itemId, count }
+  return { itemId, count: decodeCount(formData) }
 }
 
 /** Fields: `itemId`, `quantity` (0 removes the item). */
@@ -74,37 +59,38 @@ export function decodeQuantity(formData: FormData): {
     !quantity ||
     typeof quantity !== 'string'
   ) {
-    throw new FormInputError('Item ID and quantity are required')
+    throw new Error('Item ID and quantity are required')
   }
 
-  return {
-    itemId,
-    quantity: parseInteger(quantity, 'quantity', 'non-negative')!
+  return { itemId, quantity: toInteger(quantity, 'quantity', 'non-negative') }
+}
+
+/** Parsed JSON, or undefined if `text` isn't valid JSON. */
+function parseJSON(text: string): unknown {
+  try {
+    return JSON.parse(text)
+  } catch {
+    return undefined
   }
 }
 
-function parsePositiveInteger(
-  value: FormDataEntryValue | null,
-  fieldName: string
-): number | null {
-  return parseInteger(value, fieldName, 'positive')
+/** Optional `count` field; defaults to 1. */
+function decodeCount(formData: FormData): number {
+  const count = formData.get('count')
+  if (count === null) return 1
+  if (typeof count !== 'string') throw new Error('count must be a string')
+  return toInteger(count, 'count', 'positive')
 }
 
-function parseInteger(
-  value: FormDataEntryValue | null,
+function toInteger(
+  value: string,
   fieldName: string,
   kind: 'positive' | 'non-negative'
-): number | null {
-  if (value === null) return null
-  if (typeof value !== 'string') {
-    throw new FormInputError(`${fieldName} must be a string`)
-  }
-
+): number {
   const parsed = Number(value)
   const inRange = kind === 'positive' ? parsed > 0 : parsed >= 0
   if (!Number.isInteger(parsed) || !inRange) {
-    throw new FormInputError(`${fieldName} must be a ${kind} integer`)
+    throw new Error(`${fieldName} must be a ${kind} integer`)
   }
-
   return parsed
 }
