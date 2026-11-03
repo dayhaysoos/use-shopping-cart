@@ -5,22 +5,26 @@ import { useCartContext } from './CartProvider'
 import type { ShoppingCart } from '../core/ShoppingCart'
 import type { CartState } from '../core/types'
 
-type CartActionName =
-  | 'addItem'
-  | 'incrementItem'
-  | 'decrementItem'
-  | 'setItemQuantity'
-  | 'removeItem'
-  | 'clearCart'
-  | 'loadCart'
-  | 'handleCartHover'
-  | 'handleCartClick'
-  | 'handleCloseCart'
-  | 'storeLastClicked'
-  | 'changeStripeKey'
-  | 'changeLanguage'
-  | 'changeCurrency'
-  | 'redirectToCheckout'
+// The ShoppingCart methods useShoppingCart exposes, bound to the cart
+const cartActionNames = [
+  'addItem',
+  'incrementItem',
+  'decrementItem',
+  'setItemQuantity',
+  'removeItem',
+  'clearCart',
+  'loadCart',
+  'handleCartHover',
+  'handleCartClick',
+  'handleCloseCart',
+  'storeLastClicked',
+  'changeStripeKey',
+  'changeLanguage',
+  'changeCurrency',
+  'redirectToCheckout'
+] as const
+
+type CartActionName = (typeof cartActionNames)[number]
 
 /**
  * The cart methods returned by `useShoppingCart`, documented on `ShoppingCart`.
@@ -50,23 +54,9 @@ export function useShoppingCart(): UseShoppingCartReturn {
   // Memoize methods to prevent re-creating on every render
   const methods = useMemo(
     () =>
-      ({
-        addItem: cart.addItem.bind(cart),
-        incrementItem: cart.incrementItem.bind(cart),
-        decrementItem: cart.decrementItem.bind(cart),
-        setItemQuantity: cart.setItemQuantity.bind(cart),
-        removeItem: cart.removeItem.bind(cart),
-        clearCart: cart.clearCart.bind(cart),
-        loadCart: cart.loadCart.bind(cart),
-        handleCartHover: cart.handleCartHover.bind(cart),
-        handleCartClick: cart.handleCartClick.bind(cart),
-        handleCloseCart: cart.handleCloseCart.bind(cart),
-        storeLastClicked: cart.storeLastClicked.bind(cart),
-        changeStripeKey: cart.changeStripeKey.bind(cart),
-        changeLanguage: cart.changeLanguage.bind(cart),
-        changeCurrency: cart.changeCurrency.bind(cart),
-        redirectToCheckout: cart.redirectToCheckout.bind(cart)
-      }) satisfies CartActions,
+      Object.fromEntries(
+        cartActionNames.map((name) => [name, cart[name].bind(cart)])
+      ) as CartActions,
     [cart]
   )
 
