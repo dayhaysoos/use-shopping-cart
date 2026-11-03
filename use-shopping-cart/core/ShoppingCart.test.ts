@@ -984,6 +984,89 @@ describe('ShoppingCart', () => {
     })
   })
 
+  describe('async storage', () => {
+    function deferredStorage(stored: object) {
+      let resolve!: (value: string) => void
+      const storage = {
+        getItem: () =>
+          new Promise<string>((r) => {
+            resolve = r
+          }),
+        setItem: vi.fn(),
+        removeItem: () => {}
+      }
+      return { storage, finishLoad: () => resolve(JSON.stringify(stored)) }
+    }
+
+    const storedCart = {
+      cartDetails: {
+        a: {
+          id: 'a',
+          name: 'A',
+          price: 100,
+          currency: 'USD',
+          quantity: 2,
+          value: 200
+        }
+      },
+      currency: 'USD',
+      language: 'en-US'
+    }
+
+    it('restores the stored cart when the load finishes', async () => {
+      const { storage, finishLoad } = deferredStorage(storedCart)
+      const cart = new ShoppingCart({ storage, currency: 'EUR' })
+
+      finishLoad()
+
+      await vi.waitFor(() => expect(cart.getState().cartCount).toBe(2))
+      expect(cart.getState().currency).toBe('USD')
+    })
+
+    it('keeps cart changes made before the load finished', async () => {
+      const { storage, finishLoad } = deferredStorage(storedCart)
+      const cart = new ShoppingCart({ storage, currency: 'USD' })
+
+      cart.addItem({ id: 'b', name: 'B', price: 5, currency: 'USD' })
+      finishLoad()
+      await new Promise((r) => setTimeout(r, 0))
+
+      expect(Object.keys(cart.getState().cartDetails)).toEqual(['b'])
+    })
+
+    it('keeps a currency changed before the load finished', async () => {
+      const { storage, finishLoad } = deferredStorage(storedCart)
+      const cart = new ShoppingCart({
+        storage,
+        currency: 'USD',
+        language: 'en-US'
+      })
+
+      cart.changeCurrency('EUR')
+      finishLoad()
+
+      await vi.waitFor(() => expect(cart.getState().cartCount).toBe(2))
+      expect(cart.getState().currency).toBe('EUR')
+      expect(cart.getState().cartDetails.a.formattedValue).toMatch(/€/)
+    })
+  })
+
+  describe('storage writes', () => {
+    it('does not write for UI-only changes', () => {
+      const storage = createMemoryStorage()
+      const setItem = vi.spyOn(storage, 'setItem')
+      const cart = new ShoppingCart({ storage })
+
+      cart.addItem({ id: 'a', name: 'A', price: 5, currency: 'USD' })
+      expect(setItem).toHaveBeenCalledTimes(1)
+
+      cart.handleCartHover()
+      cart.handleCartClick()
+      cart.storeLastClicked('a')
+      expect(setItem).toHaveBeenCalledTimes(1)
+    })
+  })
+
   describe('totals invariant', () => {
     function expectTotalsMatchEntries(cart: ShoppingCart) {
       const { cartDetails, totalPrice, cartCount } = cart.getState()

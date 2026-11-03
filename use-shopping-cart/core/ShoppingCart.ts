@@ -3,16 +3,19 @@ import type {
   CartState,
   CartConfig,
   CartDetails,
-  CartEntry,
   Product,
   AddItemOptions,
   IncrementOptions,
   SubscribeCallback,
   UnsubscribeFunction,
-  StorageAdapter,
   RedirectToCheckoutInput
 } from './types'
 import { createLocalStorage } from './storage'
+import {
+  createCartPersister,
+  type CartPersister,
+  type StoredCart
+} from './persistence'
 import {
   withCartDetails,
   normalizeCartDetails,
@@ -44,9 +47,11 @@ export const initialState: CartState = {
 export class ShoppingCart {
   private _state: CartState
   private _subscribers: Set<SubscribeCallback>
-  private _storage: StorageAdapter | null
-  private _persistKey: string
+  private _persister: CartPersister | null
+  // Set once the user changes the cart / currency or language, so a late
+  // async storage load doesn't overwrite those changes
   private _hasBeenModified: boolean = false
+  private _settingsChanged: boolean = false
 
   constructor(config: CartConfig = {}) {
     // Initialize state; totals are always derived from cartDetails
@@ -56,15 +61,41 @@ export class ShoppingCart {
       normalizeCartDetails(state.cartDetails, state.currency, state.language)
     )
     this._subscribers = new Set()
-    this._persistKey = config.persistKey ?? STORAGE_KEY_PREFIX
 
     // Setup storage
     if (config.shouldPersist !== false && isClient) {
-      this._storage = config.storage ?? createLocalStorage()
-      this._loadFromStorage()
+      this._persister = createCartPersister(
+        config.storage ?? createLocalStorage(),
+        config.persistKey ?? STORAGE_KEY_PREFIX
+      )
+      this._persister.load((stored) => this._restore(stored))
     } else {
-      this._storage = null
+      this._persister = null
     }
+  }
+
+  /**
+   * Restore a stored cart. Ignored if the cart was changed before an async
+   * load finished; a currency or language set meanwhile is kept.
+   */
+  private _restore(stored: StoredCart): void {
+    if (this._hasBeenModified) return
+
+    if (!this._settingsChanged) {
+      this._state = {
+        ...this._state,
+        currency: stored.currency ?? this._state.currency,
+        language: stored.language ?? this._state.language
+      }
+    }
+    // Stored values and formatting are not trusted; rebuild from price × quantity
+    this._setCartDetails(
+      normalizeCartDetails(
+        stored.cartDetails,
+        this._state.currency,
+        this._state.language
+      )
+    )
   }
 
   /**
@@ -120,128 +151,7 @@ export class ShoppingCart {
    */
   private _notifySubscribers(): void {
     this._subscribers.forEach((callback) => callback(this._state))
-
-    if (this._storage) {
-      this._persistToStorage()
-    }
-  }
-
-  /**
-   * Load persisted cart from storage.
-   */
-  private _loadFromStorage(): void {
-    if (!this._storage) return
-
-    try {
-      const stored = this._storage.getItem(this._persistKey)
-
-      // Handle async storage
-      if (stored instanceof Promise) {
-        stored
-          .then((data) => {
-            // Only load if cart hasn't been modified since initialization
-            if (data && !this._hasBeenModified) {
-              this._parseAndLoadStoredData(data)
-            }
-          })
-          .catch((err) => {
-            console.warn('Failed to load cart from storage:', err)
-          })
-        return
-      }
-
-      if (!stored) return
-      this._parseAndLoadStoredData(stored)
-    } catch (error) {
-      console.warn('Failed to load cart from storage:', error)
-    }
-  }
-
-  /**
-   * Validate that a cart entry has all required fields and valid values.
-   */
-  private _isValidCartEntry(entry: unknown): entry is CartEntry {
-    if (!entry || typeof entry !== 'object') return false
-
-    const e = entry as Record<string, unknown>
-    return (
-      typeof e.id === 'string' &&
-      typeof e.price === 'number' &&
-      Number.isFinite(e.price) &&
-      typeof e.quantity === 'number' &&
-      Number.isFinite(e.quantity) &&
-      Number.isInteger(e.quantity) &&
-      e.quantity > 0 &&
-      typeof e.value === 'number' &&
-      Number.isFinite(e.value) &&
-      typeof e.name === 'string' &&
-      typeof e.currency === 'string'
-    )
-  }
-
-  private _parseAndLoadStoredData(stored: string): void {
-    try {
-      const parsed = JSON.parse(stored)
-
-      // Only restore specific fields
-      const { cartDetails, currency, language } = parsed
-
-      if (cartDetails && typeof cartDetails === 'object') {
-        // Validate each cart entry before loading
-        const validatedCartDetails: CartDetails = {}
-        for (const id in cartDetails) {
-          const entry = cartDetails[id]
-          if (this._isValidCartEntry(entry)) {
-            validatedCartDetails[id] = entry
-          } else {
-            console.warn(`Invalid cart entry "${id}" skipped during load`)
-          }
-        }
-
-        const nextCurrency =
-          typeof currency === 'string' && currency.length > 0
-            ? currency
-            : this._state.currency
-        const nextLanguage =
-          typeof language === 'string' && language.length > 0
-            ? language
-            : this._state.language
-
-        this._state = {
-          ...this._state,
-          currency: nextCurrency,
-          language: nextLanguage
-        }
-        // Stored values and formatting are not trusted; rebuild from price × quantity
-        this._setCartDetails(
-          normalizeCartDetails(validatedCartDetails, nextCurrency, nextLanguage)
-        )
-      }
-    } catch (error) {
-      console.warn('Failed to parse stored cart data:', error)
-    }
-  }
-
-  /**
-   * Persist cart to storage.
-   */
-  private _persistToStorage(): void {
-    if (!this._storage) return
-
-    try {
-      const toPersist = {
-        cartDetails: this._state.cartDetails,
-        cartCount: this._state.cartCount,
-        totalPrice: this._state.totalPrice,
-        formattedTotalPrice: this._state.formattedTotalPrice,
-        currency: this._state.currency,
-        language: this._state.language
-      }
-
-      this._storage.setItem(this._persistKey, JSON.stringify(toPersist))
-    } catch (error) {
-      console.warn('Failed to persist cart to storage:', error)
-    }
+    this._persister?.save(this._state)
   }
 
   // ============================================================================
@@ -410,6 +320,7 @@ export class ShoppingCart {
     if (language === this._state.language) return
 
     // Reformat all prices with the new language
+    this._settingsChanged = true
     this._state = { ...this._state, language }
     this._setCartDetails(
       normalizeCartDetails(
@@ -428,6 +339,7 @@ export class ShoppingCart {
     if (currency === this._state.currency) return
 
     // Reformat all prices with the new currency
+    this._settingsChanged = true
     this._state = { ...this._state, currency }
     this._setCartDetails(
       normalizeCartDetails(
