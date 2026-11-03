@@ -1,5 +1,5 @@
 import { formatCurrencyString } from './formatters'
-import type { Product, CartEntry, CartDetails } from './types'
+import type { Product, CartEntry } from './types'
 
 /**
  * Generate a UUID for products without an ID
@@ -38,17 +38,24 @@ export function getProductId(product: Product): string {
   return generatedId
 }
 
+export interface CartEntryOptions {
+  currency: string
+  language: string
+  /** Merged into the entry's `price_data` */
+  price_metadata?: Record<string, unknown>
+  /** Merged into the entry's `product_data` */
+  product_metadata?: Record<string, unknown>
+}
+
 /**
- * Create a new cart entry from a product
+ * Create a cart entry from a product. `value` and the formatted strings are
+ * derived from `price` and `quantity`.
  */
 export function createCartEntry(
   id: string,
   product: Product,
   quantity: number,
-  price_metadata: Record<string, unknown> = {},
-  product_metadata: Record<string, unknown> = {},
-  currency: string,
-  language: string
+  { currency, language, price_metadata, product_metadata }: CartEntryOptions
 ): CartEntry {
   const value = product.price * quantity
 
@@ -73,49 +80,4 @@ export function createCartEntry(
       ...product_metadata
     }
   }
-}
-
-/**
- * Immutably add an entry to cartDetails.
- * Returns a new cartDetails object.
- */
-export function addEntryToCart(
-  cartDetails: CartDetails,
-  entry: CartEntry
-): CartDetails {
-  return {
-    ...cartDetails,
-    [entry.id]: entry
-  }
-}
-
-/**
- * Immutably remove an entry from cartDetails.
- * Returns a new cartDetails object.
- */
-export function removeEntryFromCart(
-  cartDetails: CartDetails,
-  id: string
-): CartDetails {
-  const { [id]: removed, ...rest } = cartDetails
-  return rest
-}
-
-/**
- * Calculate total values from cartDetails.
- */
-export function calculateTotals(cartDetails: CartDetails): {
-  totalPrice: number
-  cartCount: number
-} {
-  let totalPrice = 0
-  let cartCount = 0
-
-  for (const id in cartDetails) {
-    const entry = cartDetails[id]
-    totalPrice += entry.value
-    cartCount += entry.quantity
-  }
-
-  return { totalPrice, cartCount }
 }

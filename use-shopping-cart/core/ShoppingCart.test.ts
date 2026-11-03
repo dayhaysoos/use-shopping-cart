@@ -948,6 +948,117 @@ describe('ShoppingCart', () => {
       expect(state.cartCount).toBe(2)
       expect(state.totalPrice).toBe(200)
     })
+
+    it('rebuilds stored values from price and quantity so totals stay consistent', () => {
+      const storage = createMemoryStorage()
+      storage.setItem(
+        'cart',
+        JSON.stringify({
+          cartDetails: {
+            a: {
+              id: 'a',
+              name: 'A',
+              price: 100,
+              currency: 'USD',
+              quantity: 2,
+              value: 999
+            }
+          },
+          totalPrice: 999
+        })
+      )
+
+      const cart = new ShoppingCart({
+        storage,
+        persistKey: 'cart',
+        currency: 'USD',
+        language: 'en-US'
+      })
+      expect(cart.getState().cartDetails.a.value).toBe(200)
+      expect(cart.getState().cartDetails.a.formattedValue).toBe('$2.00')
+      expect(cart.getState().totalPrice).toBe(200)
+
+      cart.incrementItem('a')
+      expect(cart.getState().cartDetails.a.value).toBe(300)
+      expect(cart.getState().totalPrice).toBe(300)
+    })
+  })
+
+  describe('totals invariant', () => {
+    function expectTotalsMatchEntries(cart: ShoppingCart) {
+      const { cartDetails, totalPrice, cartCount } = cart.getState()
+      const entries = Object.values(cartDetails)
+      for (const entry of entries) {
+        expect(entry.value).toBe(entry.price * entry.quantity)
+      }
+      expect(totalPrice).toBe(entries.reduce((sum, e) => sum + e.value, 0))
+      expect(cartCount).toBe(entries.reduce((sum, e) => sum + e.quantity, 0))
+    }
+
+    it('derives totals from cartDetails passed in config', () => {
+      const cart = new ShoppingCart({
+        shouldPersist: false,
+        currency: 'USD',
+        language: 'en-US',
+        cartDetails: {
+          a: {
+            id: 'a',
+            name: 'A',
+            price: 250,
+            currency: 'USD',
+            quantity: 2,
+            value: 500
+          } as any
+        }
+      })
+
+      expect(cart.getState().totalPrice).toBe(500)
+      expect(cart.getState().cartCount).toBe(2)
+      expect(cart.getState().formattedTotalPrice).toBe('$5.00')
+      expectTotalsMatchEntries(cart)
+    })
+
+    it('holds after every kind of cart change', () => {
+      const cart = new ShoppingCart({
+        shouldPersist: false,
+        currency: 'USD',
+        language: 'en-US'
+      })
+      const product = (id: string, price: number) => ({
+        id,
+        name: id,
+        price,
+        currency: 'USD'
+      })
+
+      const steps: Array<() => void> = [
+        () => cart.addItem(product('a', 150), { count: 2 }),
+        () => cart.addItem(product('b', 99)),
+        () => cart.addItem(product('a', 150)),
+        () => cart.incrementItem('b', { count: 4 }),
+        () => cart.decrementItem('a', { count: 2 }),
+        () => cart.setItemQuantity('b', 7),
+        () => cart.changeCurrency('EUR'),
+        () => cart.changeLanguage('de-DE'),
+        () =>
+          cart.loadCart({
+            c: { ...product('c', 1000), quantity: 3, value: 1 } as any
+          }),
+        () => cart.decrementItem('a', { count: 5 }),
+        () => cart.removeItem('b'),
+        () =>
+          cart.loadCart(
+            { d: { ...product('d', 5), quantity: 1, value: 5 } as any },
+            false
+          ),
+        () => cart.clearCart()
+      ]
+
+      for (const step of steps) {
+        step()
+        expectTotalsMatchEntries(cart)
+      }
+    })
   })
 
   describe('no-op optimizations', () => {

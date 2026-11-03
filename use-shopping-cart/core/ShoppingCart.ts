@@ -12,15 +12,9 @@ import type {
   StorageAdapter,
   RedirectToCheckoutInput
 } from './types'
-import { calculateFormattedTotalPrice } from './formatters'
 import { createLocalStorage } from './storage'
-import {
-  getProductId,
-  createCartEntry,
-  addEntryToCart,
-  removeEntryFromCart,
-  calculateTotals
-} from './Entry'
+import { getProductId, createCartEntry } from './Entry'
+import { withCartDetails, normalizeCartDetails } from './cartState'
 import {
   validateProduct,
   validateCount,
@@ -51,8 +45,12 @@ export class ShoppingCart {
   private _hasBeenModified: boolean = false
 
   constructor(config: CartConfig = {}) {
-    // Initialize state
-    this._state = { ...initialState, ...config }
+    // Initialize state; totals are always derived from cartDetails
+    const state = { ...initialState, ...config }
+    this._state = withCartDetails(
+      state,
+      normalizeCartDetails(state.cartDetails, state.currency, state.language)
+    )
     this._subscribers = new Set()
     this._persistKey = config.persistKey ?? STORAGE_KEY_PREFIX
 
@@ -63,16 +61,27 @@ export class ShoppingCart {
     } else {
       this._storage = null
     }
+  }
 
-    // Calculate initial formatted price
-    this._state = {
-      ...this._state,
-      formattedTotalPrice: calculateFormattedTotalPrice(
-        this._state.totalPrice,
-        this._state.currency,
-        this._state.language
-      )
-    }
+  /**
+   * Replace cartDetails (recomputing totals) and notify subscribers.
+   */
+  private _setCartDetails(cartDetails: CartDetails): void {
+    this._state = withCartDetails(this._state, cartDetails)
+    this._notifySubscribers()
+  }
+
+  private _createEntry(
+    id: string,
+    product: Product,
+    quantity: number,
+    metadata: Pick<AddItemOptions, 'price_metadata' | 'product_metadata'> = {}
+  ): CartEntry {
+    return createCartEntry(id, product, quantity, {
+      currency: this._state.currency,
+      language: this._state.language,
+      ...metadata
+    })
   }
 
   // ============================================================================
@@ -167,35 +176,6 @@ export class ShoppingCart {
     )
   }
 
-  private _normalizeCartDetails(
-    cartDetails: CartDetails,
-    currency: string,
-    language: string
-  ): CartDetails {
-    const normalizedCartDetails: CartDetails = {}
-
-    for (const id in cartDetails) {
-      const entry = cartDetails[id]
-      const baseEntry = createCartEntry(
-        id,
-        entry,
-        entry.quantity,
-        {},
-        {},
-        currency,
-        language
-      )
-
-      const normalizedEntry = entry.timestamp
-        ? { ...baseEntry, timestamp: entry.timestamp }
-        : baseEntry
-
-      normalizedCartDetails[id] = normalizedEntry
-    }
-
-    return normalizedCartDetails
-  }
-
   private _parseAndLoadStoredData(stored: string): void {
     try {
       const parsed = JSON.parse(stored)
@@ -224,24 +204,15 @@ export class ShoppingCart {
             ? language
             : this._state.language
 
-        // Recalculate totals from validated entries
-        const { totalPrice, cartCount } = calculateTotals(validatedCartDetails)
-
         this._state = {
           ...this._state,
           currency: nextCurrency,
-          language: nextLanguage,
-          cartDetails: validatedCartDetails,
-          cartCount,
-          totalPrice,
-          formattedTotalPrice: calculateFormattedTotalPrice(
-            totalPrice,
-            nextCurrency,
-            nextLanguage
-          )
+          language: nextLanguage
         }
-        // Notify subscribers so React components re-render with loaded cart data
-        this._notifySubscribers()
+        // Stored values and formatting are not trusted; rebuild from price × quantity
+        this._setCartDetails(
+          normalizeCartDetails(validatedCartDetails, nextCurrency, nextLanguage)
+        )
       }
     } catch (error) {
       console.warn('Failed to parse stored cart data:', error)
@@ -286,75 +257,16 @@ export class ShoppingCart {
     const count = options.count ?? 1
     validateCount(count, 'addItem')
 
-    const price_metadata = options.price_metadata ?? {}
-    const product_metadata = options.product_metadata ?? {}
-
     const id = getProductId(product)
+    const existingEntry = this._state.cartDetails[id]
+    const entry = this._createEntry(
+      id,
+      existingEntry ?? product,
+      (existingEntry?.quantity ?? 0) + count,
+      options
+    )
 
-    if (id in this._state.cartDetails) {
-      // Update existing entry
-      const existingEntry = this._state.cartDetails[id]
-      const newQuantity = existingEntry.quantity + count
-
-      const updatedEntry = createCartEntry(
-        id,
-        existingEntry,
-        newQuantity,
-        price_metadata,
-        product_metadata,
-        this._state.currency,
-        this._state.language
-      )
-
-      const newCartDetails = addEntryToCart(
-        this._state.cartDetails,
-        updatedEntry
-      )
-      const { totalPrice, cartCount } = calculateTotals(newCartDetails)
-
-      // ✅ IMMUTABLE - single state update
-      this._state = {
-        ...this._state,
-        cartDetails: newCartDetails,
-        totalPrice,
-        cartCount,
-        formattedTotalPrice: calculateFormattedTotalPrice(
-          totalPrice,
-          this._state.currency,
-          this._state.language
-        )
-      }
-    } else {
-      // Create new entry
-      const newEntry = createCartEntry(
-        id,
-        product,
-        count,
-        price_metadata,
-        product_metadata,
-        this._state.currency,
-        this._state.language
-      )
-
-      const newCartDetails = addEntryToCart(this._state.cartDetails, newEntry)
-      const newTotalPrice = this._state.totalPrice + newEntry.value
-      const newCartCount = this._state.cartCount + count
-
-      // ✅ IMMUTABLE - single state update
-      this._state = {
-        ...this._state,
-        cartDetails: newCartDetails,
-        totalPrice: newTotalPrice,
-        cartCount: newCartCount,
-        formattedTotalPrice: calculateFormattedTotalPrice(
-          newTotalPrice,
-          this._state.currency,
-          this._state.language
-        )
-      }
-    }
-
-    this._notifySubscribers()
+    this._setCartDetails({ ...this._state.cartDetails, [id]: entry })
   }
 
   /**
@@ -369,36 +281,10 @@ export class ShoppingCart {
     validateItemExists(id, this._state.cartDetails, 'incrementItem')
 
     const entry = this._state.cartDetails[id]
-    const newQuantity = entry.quantity + count
-
-    const updatedEntry = createCartEntry(
-      id,
-      entry,
-      newQuantity,
-      {},
-      {},
-      this._state.currency,
-      this._state.language
-    )
-
-    const newCartDetails = addEntryToCart(this._state.cartDetails, updatedEntry)
-    const newTotalPrice = this._state.totalPrice + entry.price * count
-    const newCartCount = this._state.cartCount + count
-
-    // ✅ IMMUTABLE - single state update
-    this._state = {
-      ...this._state,
-      cartDetails: newCartDetails,
-      totalPrice: newTotalPrice,
-      cartCount: newCartCount,
-      formattedTotalPrice: calculateFormattedTotalPrice(
-        newTotalPrice,
-        this._state.currency,
-        this._state.language
-      )
-    }
-
-    this._notifySubscribers()
+    this._setCartDetails({
+      ...this._state.cartDetails,
+      [id]: this._createEntry(id, entry, entry.quantity + count)
+    })
   }
 
   /**
@@ -417,56 +303,13 @@ export class ShoppingCart {
 
     // Remove if quantity would be <= 0
     if (newQuantity <= 0) {
-      const newCartDetails = removeEntryFromCart(this._state.cartDetails, id)
-      const newTotalPrice = this._state.totalPrice - entry.value
-      const newCartCount = this._state.cartCount - entry.quantity
-
-      // ✅ IMMUTABLE - single state update
-      this._state = {
-        ...this._state,
-        cartDetails: newCartDetails,
-        totalPrice: newTotalPrice,
-        cartCount: newCartCount,
-        formattedTotalPrice: calculateFormattedTotalPrice(
-          newTotalPrice,
-          this._state.currency,
-          this._state.language
-        )
-      }
-    } else {
-      // Decrement quantity
-      const updatedEntry = createCartEntry(
-        id,
-        entry,
-        newQuantity,
-        {},
-        {},
-        this._state.currency,
-        this._state.language
-      )
-
-      const newCartDetails = addEntryToCart(
-        this._state.cartDetails,
-        updatedEntry
-      )
-      const newTotalPrice = this._state.totalPrice - entry.price * count
-      const newCartCount = this._state.cartCount - count
-
-      // ✅ IMMUTABLE - single state update
-      this._state = {
-        ...this._state,
-        cartDetails: newCartDetails,
-        totalPrice: newTotalPrice,
-        cartCount: newCartCount,
-        formattedTotalPrice: calculateFormattedTotalPrice(
-          newTotalPrice,
-          this._state.currency,
-          this._state.language
-        )
-      }
+      return this.removeItem(id)
     }
 
-    this._notifySubscribers()
+    this._setCartDetails({
+      ...this._state.cartDetails,
+      [id]: this._createEntry(id, entry, newQuantity)
+    })
   }
 
   /**
@@ -485,36 +328,10 @@ export class ShoppingCart {
     }
 
     const entry = this._state.cartDetails[id]
-    const quantityDiff = quantity - entry.quantity
-
-    const updatedEntry = createCartEntry(
-      id,
-      entry,
-      quantity,
-      {},
-      {},
-      this._state.currency,
-      this._state.language
-    )
-
-    const newCartDetails = addEntryToCart(this._state.cartDetails, updatedEntry)
-    const newTotalPrice = this._state.totalPrice + entry.price * quantityDiff
-    const newCartCount = this._state.cartCount + quantityDiff
-
-    // ✅ IMMUTABLE - single state update
-    this._state = {
-      ...this._state,
-      cartDetails: newCartDetails,
-      totalPrice: newTotalPrice,
-      cartCount: newCartCount,
-      formattedTotalPrice: calculateFormattedTotalPrice(
-        newTotalPrice,
-        this._state.currency,
-        this._state.language
-      )
-    }
-
-    this._notifySubscribers()
+    this._setCartDetails({
+      ...this._state.cartDetails,
+      [id]: this._createEntry(id, entry, quantity)
+    })
   }
 
   /**
@@ -525,25 +342,8 @@ export class ShoppingCart {
     this._hasBeenModified = true
     validateItemExists(id, this._state.cartDetails, 'removeItem')
 
-    const entry = this._state.cartDetails[id]
-    const newCartDetails = removeEntryFromCart(this._state.cartDetails, id)
-    const newTotalPrice = this._state.totalPrice - entry.value
-    const newCartCount = this._state.cartCount - entry.quantity
-
-    // ✅ IMMUTABLE - single state update
-    this._state = {
-      ...this._state,
-      cartDetails: newCartDetails,
-      totalPrice: newTotalPrice,
-      cartCount: newCartCount,
-      formattedTotalPrice: calculateFormattedTotalPrice(
-        newTotalPrice,
-        this._state.currency,
-        this._state.language
-      )
-    }
-
-    this._notifySubscribers()
+    const { [id]: _removed, ...rest } = this._state.cartDetails
+    this._setCartDetails(rest)
   }
 
   /**
@@ -551,20 +351,7 @@ export class ShoppingCart {
    */
   clearCart(): void {
     this._hasBeenModified = true
-    // ✅ IMMUTABLE - single state update
-    this._state = {
-      ...this._state,
-      cartDetails: {},
-      cartCount: 0,
-      totalPrice: 0,
-      formattedTotalPrice: calculateFormattedTotalPrice(
-        0,
-        this._state.currency,
-        this._state.language
-      )
-    }
-
-    this._notifySubscribers()
+    this._setCartDetails({})
   }
 
   /**
@@ -575,40 +362,17 @@ export class ShoppingCart {
    */
   loadCart(cartDetails: CartDetails, shouldMerge = true): void {
     this._hasBeenModified = true
-    let newCartDetails: CartDetails
+    const newCartDetails = shouldMerge
+      ? { ...this._state.cartDetails, ...cartDetails }
+      : cartDetails
 
-    if (shouldMerge) {
-      // Merge with existing cart
-      newCartDetails = {
-        ...this._state.cartDetails,
-        ...cartDetails
-      }
-    } else {
-      // Replace existing cart
-      newCartDetails = { ...cartDetails }
-    }
-
-    const normalizedCartDetails = this._normalizeCartDetails(
-      newCartDetails,
-      this._state.currency,
-      this._state.language
-    )
-    const { totalPrice, cartCount } = calculateTotals(normalizedCartDetails)
-
-    // ✅ IMMUTABLE - single state update
-    this._state = {
-      ...this._state,
-      cartDetails: normalizedCartDetails,
-      totalPrice,
-      cartCount,
-      formattedTotalPrice: calculateFormattedTotalPrice(
-        totalPrice,
+    this._setCartDetails(
+      normalizeCartDetails(
+        newCartDetails,
         this._state.currency,
         this._state.language
       )
-    }
-
-    this._notifySubscribers()
+    )
   }
 
   // ============================================================================
@@ -674,35 +438,15 @@ export class ShoppingCart {
     // Early return if language hasn't changed
     if (language === this._state.language) return
 
-    // Recalculate all formatted prices with new language
-    const newCartDetails: CartDetails = {}
-
-    for (const id in this._state.cartDetails) {
-      const entry = this._state.cartDetails[id]
-      newCartDetails[id] = createCartEntry(
-        id,
-        entry,
-        entry.quantity,
-        {},
-        {},
+    // Reformat all prices with the new language
+    this._state = { ...this._state, language }
+    this._setCartDetails(
+      normalizeCartDetails(
+        this._state.cartDetails,
         this._state.currency,
         language
       )
-    }
-
-    // ✅ IMMUTABLE - single state update
-    this._state = {
-      ...this._state,
-      language,
-      cartDetails: newCartDetails,
-      formattedTotalPrice: calculateFormattedTotalPrice(
-        this._state.totalPrice,
-        this._state.currency,
-        language
-      )
-    }
-
-    this._notifySubscribers()
+    )
   }
 
   /**
@@ -712,35 +456,15 @@ export class ShoppingCart {
     // Early return if currency hasn't changed
     if (currency === this._state.currency) return
 
-    // Recalculate all formatted prices with new currency
-    const newCartDetails: CartDetails = {}
-
-    for (const id in this._state.cartDetails) {
-      const entry = this._state.cartDetails[id]
-      newCartDetails[id] = createCartEntry(
-        id,
-        entry,
-        entry.quantity,
-        {},
-        {},
+    // Reformat all prices with the new currency
+    this._state = { ...this._state, currency }
+    this._setCartDetails(
+      normalizeCartDetails(
+        this._state.cartDetails,
         currency,
         this._state.language
       )
-    }
-
-    // ✅ IMMUTABLE - single state update
-    this._state = {
-      ...this._state,
-      currency,
-      cartDetails: newCartDetails,
-      formattedTotalPrice: calculateFormattedTotalPrice(
-        this._state.totalPrice,
-        currency,
-        this._state.language
-      )
-    }
-
-    this._notifySubscribers()
+    )
   }
 
   // ============================================================================
