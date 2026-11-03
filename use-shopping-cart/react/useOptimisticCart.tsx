@@ -54,10 +54,7 @@ export function useOptimisticCart() {
     OptimisticCartDetails,
     CartChange
   >(cart.cartDetails as OptimisticCartDetails, (state, change) => {
-    const next: OptimisticCartDetails = applyCartChange(state, change, {
-      currency: cart.currency,
-      language: cart.language
-    })
+    const next: OptimisticCartDetails = applyCartChange(state, change, cart)
     const id = changedEntryId(change)
 
     return id && next !== state && next[id]

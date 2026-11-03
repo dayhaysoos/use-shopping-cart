@@ -139,10 +139,7 @@ export class ShoppingCart {
    */
   private _apply(change: CartChange): void {
     this._setCartDetails(
-      applyCartChange(this._state.cartDetails, change, {
-        currency: this._state.currency,
-        language: this._state.language
-      })
+      applyCartChange(this._state.cartDetails, change, this._state)
     )
   }
 
@@ -171,12 +168,7 @@ export class ShoppingCart {
     const count = options.count ?? 1
     validateCount(count, 'addItem')
 
-    this._apply({
-      type: 'add',
-      product,
-      count,
-      metadata: options
-    })
+    this._apply({ type: 'add', product, count, metadata: options })
   }
 
   /**

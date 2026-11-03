@@ -66,7 +66,6 @@ export function createCartPersister(
       ) {
         return
       }
-      const previous = lastSaved
       lastSaved = state
 
       try {
@@ -79,7 +78,7 @@ export function createCartPersister(
           })
         }
       } catch (error) {
-        lastSaved = previous
+        lastSaved = null // retry on the next save
         console.warn('Failed to persist cart to storage:', error)
       }
     }
