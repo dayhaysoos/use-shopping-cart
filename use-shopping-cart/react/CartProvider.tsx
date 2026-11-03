@@ -17,22 +17,15 @@ export function CartProvider({
   loading = null,
   ...config
 }: CartProviderProps) {
-  const cartRef = React.useRef<ShoppingCart | null>(null)
-
-  if (!cartRef.current) {
-    cartRef.current = new ShoppingCart(config)
-  }
+  // Created once per mount; later config changes are applied through cart actions.
+  const [cart] = React.useState(() => new ShoppingCart(config))
 
   // Server-side rendering guard: use global isClient to match ShoppingCart's storage initialization
   if (config.shouldPersist !== false && !isClient) {
     return <>{loading}</>
   }
 
-  return (
-    <CartContext.Provider value={cartRef.current}>
-      {children}
-    </CartContext.Provider>
-  )
+  return <CartContext.Provider value={cart}>{children}</CartContext.Provider>
 }
 
 export function useCartContext(): ShoppingCart {

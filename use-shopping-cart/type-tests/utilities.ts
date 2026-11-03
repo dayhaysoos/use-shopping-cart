@@ -1,12 +1,9 @@
-/* eslint-disable no-unused-expressions */
-/* eslint-disable no-unused-vars */
-/* eslint-disable camelcase */
 import {
   validateCartItems,
   formatLineItems,
   ValidatedItem,
   LineItem
-} from '../utilities/serverless.js'
+} from 'use-shopping-cart/utilities'
 
 const line_items1: ValidatedItem[] = validateCartItems(
   [

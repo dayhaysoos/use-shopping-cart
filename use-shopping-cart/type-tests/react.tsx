@@ -1,7 +1,3 @@
-/* eslint-disable dot-notation */
-/* eslint-disable no-unused-expressions */
-/* eslint-disable no-unused-vars */
-/* eslint-disable camelcase */
 import * as React from 'react'
 import { createRoot } from 'react-dom/client'
 import {
@@ -9,7 +5,7 @@ import {
   useShoppingCart,
   useOptimisticCart,
   useCartActions
-} from '../react/index'
+} from 'use-shopping-cart'
 
 /**
  * Test that useShoppingCart returns expected state properties
@@ -134,7 +130,7 @@ function TestUseShoppingCartActions() {
     cart
       .redirectToCheckout('https://checkout.stripe.com/pay/cs_test_123')
       .catch(() => {})
-  }, [])
+  }, [cart])
 
   return <p>Actions!</p>
 }

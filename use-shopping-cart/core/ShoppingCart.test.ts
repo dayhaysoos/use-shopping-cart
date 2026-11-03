@@ -236,7 +236,6 @@ describe('ShoppingCart', () => {
       }
 
       cart.addItem(product1)
-      const stateAfterFirst = cart.getState()
 
       cart.addItem(product2)
       const stateAfterSecond = cart.getState()

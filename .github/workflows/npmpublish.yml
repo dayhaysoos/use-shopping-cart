@@ -17,43 +17,46 @@ jobs:
   test:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
-      - uses: pnpm/action-setup@v4
-      - uses: actions/setup-node@v4
+      - uses: actions/checkout@v7
+      - uses: pnpm/action-setup@v6
+      - uses: actions/setup-node@v7
         with:
-          node-version: 20
+          node-version: 24
           cache: pnpm
 
       - run: pnpm install --frozen-lockfile
       - run: pnpm --filter use-shopping-cart run test
+      - run: pnpm --filter use-shopping-cart run typecheck
+      - run: pnpm --filter use-shopping-cart run build
       - run: pnpm --filter use-shopping-cart run test:types
 
   build:
     needs: test
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
-      - uses: pnpm/action-setup@v4
-      - uses: actions/setup-node@v4
+      - uses: actions/checkout@v7
+      - uses: pnpm/action-setup@v6
+      - uses: actions/setup-node@v7
         with:
-          node-version: 20
+          node-version: 24
           cache: pnpm
 
       - run: pnpm install --frozen-lockfile
       - run: pnpm --filter use-shopping-cart run build
+      - run: pnpm --filter use-shopping-cart run check:package
 
   publish-npm:
     needs: build
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
-      - uses: pnpm/action-setup@v4
-      - uses: actions/setup-node@v4
+      - uses: actions/checkout@v7
+      - uses: pnpm/action-setup@v6
+      - uses: actions/setup-node@v7
         with:
-          node-version: 20
+          node-version: 24
           registry-url: https://registry.npmjs.org/
           cache: pnpm
-      - run: npm install -g npm@11.5.1
+      - run: npm install -g npm@12.2.1
       - run: pnpm install --frozen-lockfile
       - name: Publish to npm
         working-directory: use-shopping-cart

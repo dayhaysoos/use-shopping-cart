@@ -53,7 +53,7 @@ https://github.com/dayhaysoos/use-shopping-cart/blob/master/use-shopping-cart/sr
 ### Other things to do:
 
 - Allow the developer to pass in the service object. It can be either the object itself or a promise resolving to that object.
-- Update TypeScript type definitions in the `.d.ts` file.
+- Update the TypeScript types in `core/types.ts` (declarations are generated from source at build time).
 - Update the documentation to explain how to use the added service with this library.
 
 And don't forget to make a Draft PR while you're working on all this so it's easier to track the progress 👍

@@ -39,7 +39,29 @@ You can continue using use-shopping-cart v3.x, which will receive critical bug f
 
 #### Node.js Version Requirement
 
-Node.js 18 or higher is now required (previously Node.js 8+).
+Node.js 22 or higher is now required (previously Node.js 8+).
+
+#### Build File Paths Changed
+
+Import from the package entry points, not from files inside `dist/`:
+
+```js
+import { CartProvider, useShoppingCart } from 'use-shopping-cart'
+import { ShoppingCart } from 'use-shopping-cart/core'
+import { validateCartItems } from 'use-shopping-cart/utilities'
+```
+
+These are unchanged. Importing `use-shopping-cart/dist/...` was already blocked by the package's `exports` map, but tooling that bypasses it can still point at a file. If you hard-coded a file path (an absolute path, a Jest `moduleNameMapper`, a bundler alias, or a CDN URL), update it:
+
+| v3                        | v4                                          |
+| ------------------------- | ------------------------------------------- |
+| `dist/react.es.js`        | `dist/react.mjs`                            |
+| `dist/react.js`           | `dist/react.cjs`                            |
+| `dist/core.es.js`         | `dist/core.mjs`                             |
+| `dist/core.js`            | `dist/core.cjs`                             |
+| `utilities/serverless.js` | `dist/utilities.mjs` / `dist/utilities.cjs` |
+
+`dist/react.umd.js` and `dist/core.umd.js` keep their names.
 
 ### Improvements and Bug Fixes
 

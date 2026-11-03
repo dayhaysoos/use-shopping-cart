@@ -22,17 +22,13 @@ Submit a PR and wait for approval/comments from the maintainers
 
 ## Getting your environment set up
 
-Before you run any of the examples be sure to set your environment variables at the root of
-the project in a `.env.development` file (or `documentation/.env.development` for the documentation workspace). There is a `.env.example` and a `documentation/.env.example` file with the example variables you'll need to run the examples and documentation workspaces in this project. You'll need to fill them in with your own API keys from Stripe.
+Before you run anything that talks to Stripe, set your environment variables at the root of
+the project in a `.env.development` file. `.env.example` lists the variables you'll need; fill them in with your own API keys from Stripe. The docs site's variables are listed in `docs/README.md`.
 
 ```dotenv
 # .env.example
 STRIPE_API_PUBLIC=
 STRIPE_API_SECRET=
-
-# documentation/.env.example
-STRIPE_PUBLISHABLE_KEY=
-
 ```
 
 The following tutorials teach how to set up your custom environment variables for your project for their respective frameworks.
@@ -41,21 +37,17 @@ The following tutorials teach how to set up your custom environment variables fo
 - [next.js](https://nextjs.org/docs/api-reference/next.config.js/environment-variables)
 - [react-static](https://github.com/react-static/react-static/blob/master/docs/concepts.md#environment-variables)
 
-Here are a couple commands to get you started in development:
+Here are a couple commands to get you started in development (run them from the repo root):
 
 ```bash
-# Run the development environment which builds use-shopping-cart in watch-mode
-# and starts the CRA example with Netlify functions
+# Builds use-shopping-cart in watch-mode and runs the documentation site locally
 pnpm dev
 
-# Runs tests in watch-mode
+# Builds the library, then runs the tests once
 pnpm test
 
-# Runs the documentation page locally
-pnpm dev:docs
-
-# Runs Next.js project locally
-pnpm dev:nextjs
+# Builds the library, then runs the tests in watch-mode
+pnpm test:watch
 ```
 
 ### Maintainer Release Process

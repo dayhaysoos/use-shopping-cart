@@ -1,7 +1,9 @@
-/* eslint-disable camelcase */
-/* eslint-disable no-unused-vars */
-import type { CartState, CartEntry, Product } from '../core/types'
-import { ShoppingCart, formatCurrencyString, filterCart } from '../core/index'
+import type { CartState, CartEntry, Product } from 'use-shopping-cart/core'
+import {
+  ShoppingCart,
+  formatCurrencyString,
+  filterCart
+} from 'use-shopping-cart/core'
 
 const cart = new ShoppingCart({
   stripe: '',
@@ -19,7 +21,7 @@ cart.addItem(
   { count: 2 }
 )
 cart.setItemQuantity('id_abc', 4)
-// @ts-ignore
+// @ts-expect-error quantity must be a number
 cart.setItemQuantity('id_abc', '1')
 cart.setItemQuantity('id_abc', -2)
 cart.incrementItem('id_abc')
@@ -75,7 +77,9 @@ cart.changeLanguage('es-MX')
 cart.changeCurrency('MXN')
 try {
   cart.redirectToCheckout('https://checkout.stripe.com/pay/cs_test_123')
-} catch {}
+} catch {
+  // redirectToCheckout requires a browser
+}
 
 cart.handleCartHover()
 cart.handleCartClick()

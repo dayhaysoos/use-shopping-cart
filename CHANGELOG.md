@@ -5,6 +5,22 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [Unreleased]
+
+### 🚨 Breaking Changes
+
+- **Node.js 22+ Required**: `engines.node` is now `>=22` (was `>=18` in earlier v4 prereleases)
+- **Build files renamed**: the package now ships `dist/{react,core,utilities}.{mjs,cjs}` plus bundled `.d.ts`/`.d.mts`/`.d.cts` declarations
+  - `dist/react.es.js` → `dist/react.mjs`, `dist/react.js` → `dist/react.cjs` (same for `core`)
+  - `utilities/serverless.js` → `dist/utilities.mjs` / `dist/utilities.cjs`
+  - Imports through `use-shopping-cart`, `use-shopping-cart/core` and `use-shopping-cart/utilities` are unaffected; only tooling that bypasses the `exports` map and points at a file breaks (absolute paths, Jest `moduleNameMapper`, bundler aliases, CDN URLs pointing at `.es.js`)
+
+### 🐛 Bug Fixes
+
+- **Published types fixed**: type declarations are now generated and bundled; rc.1 shipped `.d.ts` files that imported files missing from the tarball
+- `use-shopping-cart/utilities` now has an ESM build and full types (`ValidatedItem`, `LineItem`)
+- Removed runtime dependencies (`date-fns`, `@stripe/stripe-js`); the package has zero runtime dependencies
+
 ## [4.0.0-alpha.2] - 2025-12-26
 
 ### 🚨 Breaking Changes

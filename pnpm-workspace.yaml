@@ -1,3 +1,17 @@
 packages:
   - 'use-shopping-cart/**'
   - 'docs'
+
+# Dependencies allowed to run install scripts (pnpm blocks all others).
+allowBuilds:
+  # Verifies the platform-specific binary after install.
+  esbuild: true
+
+overrides:
+  # fumadocs-core lists Next.js as an optional peer; the docs use TanStack Start,
+  # so don't install it (and its vendored React Server Components runtime).
+  next: '-'
+  # Optional peer of @tanstack/router-plugin for webpack builds; the docs use Vite.
+  webpack: '-'
+  # Path traversal fix for rollup <4.59.0, pulled in by Netlify's function bundler.
+  '@netlify/zip-it-and-ship-it>rollup': ^4.59.0

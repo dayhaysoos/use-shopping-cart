@@ -1,4 +1,4 @@
-# For all pull requests made to master, next, dev branches, this workflow will:
+# For all pull requests made to master, next, dev, react-19 branches, this workflow will:
 # - install all dependencies
 # - run all tests for the 'use-shopping-cart' workspace with pnpm
 
@@ -6,7 +6,7 @@ name: Tests
 
 on:
   pull_request:
-    branches: [master, next, dev]
+    branches: [master, next, dev, react-19]
 
 jobs:
   test-package:
@@ -15,11 +15,11 @@ jobs:
     strategy:
       matrix:
         os: [ubuntu-latest, macos-latest]
-        node_version: ['18', '20', '22']
+        node_version: ['22', '24', '26']
     steps:
-      - uses: actions/checkout@v4
-      - uses: pnpm/action-setup@v4
-      - uses: actions/setup-node@v4
+      - uses: actions/checkout@v7
+      - uses: pnpm/action-setup@v6
+      - uses: actions/setup-node@v7
         with:
           # Version Spec of the version to use.  Examples: 12.x, 10.15.1, >=10.15.0
           node-version: ${{ matrix.node_version }}
@@ -30,38 +30,42 @@ jobs:
       - run: pnpm install --frozen-lockfile
       # Run integration and unit tests
       - run: pnpm --filter use-shopping-cart run test
-      # Run TypeScript type definition tests
+      # Type-check the library source
+      - run: pnpm --filter use-shopping-cart run typecheck
+      # Build, then run type tests against the published type definitions
+      - run: pnpm --filter use-shopping-cart run build
       - run: pnpm --filter use-shopping-cart run test:types
 
   build-package:
     name: Build
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
-      - uses: pnpm/action-setup@v4
-      - uses: actions/setup-node@v4
+      - uses: actions/checkout@v7
+      - uses: pnpm/action-setup@v6
+      - uses: actions/setup-node@v7
         with:
-          node-version: 20
+          node-version: 24
           cache: pnpm
 
       # Install dependencies
       - run: pnpm install --frozen-lockfile
       # Build package
       - run: pnpm --filter use-shopping-cart run build
+      # Lint the packed tarball (publint) and check type resolution (arethetypeswrong)
+      - run: pnpm --filter use-shopping-cart run check:package
 
   lint-package:
-    continue-on-error: true
     name: Lint
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
-      - uses: pnpm/action-setup@v4
-      - uses: actions/setup-node@v4
+      - uses: actions/checkout@v7
+      - uses: pnpm/action-setup@v6
+      - uses: actions/setup-node@v7
         with:
-          node-version: 20
+          node-version: 24
           cache: pnpm
 
       # Install dependencies
       - run: pnpm install --frozen-lockfile
-      # Lint soure code
+      # Lint source code
       - run: pnpm --filter use-shopping-cart run lint

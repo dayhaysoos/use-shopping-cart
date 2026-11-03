@@ -38,7 +38,7 @@ yarn add use-shopping-cart@rc
 **Requirements:**
 
 - React 19.0.0 or higher
-- Node.js 18 or higher
+- Node.js 22 or higher
 
 ## Documentation
 

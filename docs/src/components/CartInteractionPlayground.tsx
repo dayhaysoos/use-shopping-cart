@@ -434,8 +434,8 @@ function ActionButton({
         disabled
           ? 'cursor-not-allowed border-black/10 bg-black/5 text-neutral-400 dark:border-white/15 dark:bg-white/10 dark:text-white/60'
           : tone === 'danger'
-          ? 'border-red-200 bg-linear-to-r from-[#f8d7da] to-[#f3b3bb] text-[#5f0f1c] hover:border-red-300 dark:border-white/15 dark:from-[#2B0B0B] dark:to-[#3B0F0F] dark:text-white dark:hover:border-white/30'
-          : 'border-black/10 bg-black/4 text-[#0b1124] hover:border-black/30 dark:border-white/10 dark:bg-white/5 dark:text-white dark:hover:border-white/30'
+            ? 'border-red-200 bg-linear-to-r from-[#f8d7da] to-[#f3b3bb] text-[#5f0f1c] hover:border-red-300 dark:border-white/15 dark:from-[#2B0B0B] dark:to-[#3B0F0F] dark:text-white dark:hover:border-white/30'
+            : 'border-black/10 bg-black/4 text-[#0b1124] hover:border-black/30 dark:border-white/10 dark:bg-white/5 dark:text-white dark:hover:border-white/30'
       }`}
     >
       <span className="text-sm font-semibold">{label}</span>

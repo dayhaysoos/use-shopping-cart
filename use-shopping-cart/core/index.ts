@@ -1,4 +1,6 @@
-// Core exports for use-shopping-cart (runtime values only)
+// Core exports for use-shopping-cart
+import type { CartDetails, CartEntry } from './types'
+
 export { ShoppingCart, initialState } from './ShoppingCart'
 export { formatCurrencyString } from './formatters'
 export {
@@ -7,12 +9,29 @@ export {
   createMemoryStorage
 } from './storage'
 
+export type {
+  ProductAttributes,
+  Product,
+  CartEntry,
+  CartEntryAttributes,
+  CartDetails,
+  CartState,
+  RedirectToCheckoutInput,
+  CartConfig,
+  AddItemOptions,
+  IncrementOptions,
+  StorageAdapter,
+  SubscribeCallback,
+  UnsubscribeFunction,
+  FormatCurrencyStringOptions
+} from './types'
+
 // Helper function for filtering cart
 export async function filterCart(
-  cartDetails: Record<string, any>,
-  filter: (entry: any) => Promise<boolean> | boolean
-): Promise<Record<string, any>> {
-  const filteredCart: Record<string, any> = {}
+  cartDetails: CartDetails,
+  filter: (entry: CartEntry) => Promise<boolean> | boolean
+): Promise<CartDetails> {
+  const filteredCart: CartDetails = {}
 
   for (const sku in cartDetails) {
     const entry = cartDetails[sku]
@@ -21,5 +40,3 @@ export async function filterCart(
 
   return filteredCart
 }
-
-// Note: Types are exported via core/index.d.ts for TypeScript consumers
