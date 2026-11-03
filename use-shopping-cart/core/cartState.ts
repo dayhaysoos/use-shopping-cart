@@ -1,6 +1,6 @@
-import { createCartEntry } from './Entry'
+import { createCartEntry, getProductId } from './Entry'
 import { calculateFormattedTotalPrice } from './formatters'
-import type { CartDetails, CartState } from './types'
+import type { AddItemOptions, CartDetails, CartState, Product } from './types'
 
 /**
  * Return `state` with `cartDetails` replaced and every derived field
@@ -59,4 +59,80 @@ export function normalizeCartDetails(
   }
 
   return normalized
+}
+
+export interface CartFormat {
+  currency: string
+  language: string
+}
+
+/** A change to cartDetails. Quantities that reach 0 or below remove the entry. */
+export type CartChange =
+  | {
+      type: 'add'
+      product: Product
+      count: number
+      metadata?: Pick<AddItemOptions, 'price_metadata' | 'product_metadata'>
+    }
+  | { type: 'adjust'; id: string; by: number }
+  | { type: 'set'; id: string; quantity: number }
+  | { type: 'remove'; id: string }
+  | { type: 'clear' }
+
+/**
+ * Apply a change to cartDetails and return the new cartDetails.
+ * Changes to ids that aren't in the cart return `cartDetails` unchanged;
+ * callers that need to reject those validate first.
+ *
+ * Shared by `ShoppingCart` and `useOptimisticCart`, so optimistic entries
+ * match the real ones.
+ */
+export function applyCartChange(
+  cartDetails: CartDetails,
+  change: CartChange,
+  format: CartFormat
+): CartDetails {
+  switch (change.type) {
+    case 'add': {
+      const id = getProductId(change.product)
+      const existing = cartDetails[id]
+      const entry = createCartEntry(
+        id,
+        existing ?? change.product,
+        (existing?.quantity ?? 0) + change.count,
+        { ...format, ...change.metadata }
+      )
+      return { ...cartDetails, [id]: entry }
+    }
+
+    case 'adjust':
+    case 'set': {
+      const existing = cartDetails[change.id]
+      if (!existing) return cartDetails
+
+      const quantity =
+        change.type === 'adjust'
+          ? existing.quantity + change.by
+          : change.quantity
+      if (quantity <= 0) return removeEntry(cartDetails, change.id)
+
+      return {
+        ...cartDetails,
+        [change.id]: createCartEntry(change.id, existing, quantity, format)
+      }
+    }
+
+    case 'remove':
+      return change.id in cartDetails
+        ? removeEntry(cartDetails, change.id)
+        : cartDetails
+
+    case 'clear':
+      return {}
+  }
+}
+
+function removeEntry(cartDetails: CartDetails, id: string): CartDetails {
+  const { [id]: _removed, ...rest } = cartDetails
+  return rest
 }

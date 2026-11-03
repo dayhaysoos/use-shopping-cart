@@ -10,6 +10,11 @@ import type {
   IncrementOptions
 } from '../core/types'
 import { getProductId } from '../core/Entry'
+import {
+  applyCartChange,
+  withCartDetails,
+  type CartChange
+} from '../core/cartState'
 
 export interface OptimisticCartEntry extends CartEntry {
   _optimistic?: boolean
@@ -17,39 +22,6 @@ export interface OptimisticCartEntry extends CartEntry {
 
 export type OptimisticCartDetails = {
   [id: string]: OptimisticCartEntry
-}
-
-type OptimisticAction =
-  | { type: 'ADD_ITEM'; product: Product; options?: AddItemOptions }
-  | { type: 'REMOVE_ITEM'; id: string }
-  | { type: 'INCREMENT_ITEM'; id: string; count?: number }
-  | { type: 'DECREMENT_ITEM'; id: string; count?: number }
-  | { type: 'SET_QUANTITY'; id: string; quantity: number }
-  | { type: 'CLEAR_CART' }
-
-/**
- * Helper to format price
- */
-function formatPrice(
-  value: number,
-  currency: string,
-  language: string
-): string {
-  try {
-    const numberFormat = new Intl.NumberFormat(language, {
-      style: 'currency',
-      currency
-    })
-
-    // Determine if zero-decimal currency
-    const parts = numberFormat.formatToParts(value)
-    const hasDecimal = parts.some((part) => part.type === 'decimal')
-
-    const finalValue = hasDecimal ? value / 100 : value
-    return numberFormat.format(finalValue)
-  } catch {
-    return `${currency} ${value}`
-  }
 }
 
 /**
@@ -76,203 +48,45 @@ export function useOptimisticCart() {
   // Get the real cart state and actions
   const cart = useShoppingCart()
 
-  // Create optimistic version of cartDetails
+  // Optimistic cartDetails: the same change ShoppingCart applies, with the
+  // touched entry marked until the real state catches up
   const [optimisticCartDetails, updateOptimisticCart] = useOptimistic<
     OptimisticCartDetails,
-    OptimisticAction
-  >(cart.cartDetails as OptimisticCartDetails, (state, action) => {
-    switch (action.type) {
-      case 'ADD_ITEM': {
-        const { product, options } = action
-        // Use getProductId to ensure consistent ID resolution with ShoppingCart.
-        // If product has no ID, getProductId generates a UUID and mutates the product,
-        // ensuring both optimistic and real cart states use the same key.
-        const id = getProductId(product)
-        const count = options?.count ?? 1
+    CartChange
+  >(cart.cartDetails as OptimisticCartDetails, (state, change) => {
+    const next: OptimisticCartDetails = applyCartChange(state, change, {
+      currency: cart.currency,
+      language: cart.language
+    })
+    const id =
+      change.type === 'add'
+        ? getProductId(change.product)
+        : 'id' in change
+          ? change.id
+          : undefined
 
-        // Item already exists - increment it
-        if (state[id]) {
-          const nextQuantity = state[id].quantity + count
-          const nextValue = state[id].price * nextQuantity
-          return {
-            ...state,
-            [id]: {
-              ...state[id],
-              quantity: nextQuantity,
-              value: nextValue,
-              formattedValue: formatPrice(
-                nextValue,
-                cart.currency,
-                cart.language
-              ),
-              formattedPrice: formatPrice(
-                state[id].price,
-                cart.currency,
-                cart.language
-              ),
-              _optimistic: true
-            }
-          }
-        }
-
-        // New item - add it
-        return {
-          ...state,
-          [id]: {
-            ...product,
-            id,
-            quantity: count,
-            value: product.price * count,
-            formattedValue: formatPrice(
-              product.price * count,
-              cart.currency,
-              cart.language
-            ),
-            formattedPrice: formatPrice(
-              product.price,
-              cart.currency,
-              cart.language
-            ),
-            timestamp: new Date().toISOString(),
-            price_data: product.price_data || {},
-            product_data: product.product_data || {},
-            _optimistic: true
-          } as OptimisticCartEntry
-        }
-      }
-
-      case 'REMOVE_ITEM': {
-        const { id } = action
-        const { [id]: _removed, ...rest } = state
-        return rest
-      }
-
-      case 'INCREMENT_ITEM': {
-        const { id, count = 1 } = action
-        if (!state[id]) return state
-
-        const nextQuantity = state[id].quantity + count
-        const nextValue = state[id].price * nextQuantity
-
-        return {
-          ...state,
-          [id]: {
-            ...state[id],
-            quantity: nextQuantity,
-            value: nextValue,
-            formattedValue: formatPrice(
-              nextValue,
-              cart.currency,
-              cart.language
-            ),
-            formattedPrice: formatPrice(
-              state[id].price,
-              cart.currency,
-              cart.language
-            ),
-            _optimistic: true
-          }
-        }
-      }
-
-      case 'DECREMENT_ITEM': {
-        const { id, count = 1 } = action
-        if (!state[id]) return state
-
-        const newQuantity = state[id].quantity - count
-
-        // Remove if quantity would be 0 or less
-        if (newQuantity <= 0) {
-          const { [id]: _removed, ...rest } = state
-          return rest
-        }
-
-        const nextValue = state[id].price * newQuantity
-
-        return {
-          ...state,
-          [id]: {
-            ...state[id],
-            quantity: newQuantity,
-            value: nextValue,
-            formattedValue: formatPrice(
-              nextValue,
-              cart.currency,
-              cart.language
-            ),
-            formattedPrice: formatPrice(
-              state[id].price,
-              cart.currency,
-              cart.language
-            ),
-            _optimistic: true
-          }
-        }
-      }
-
-      case 'SET_QUANTITY': {
-        const { id, quantity } = action
-        if (!state[id]) return state
-
-        // Remove if quantity is 0
-        if (quantity === 0) {
-          const { [id]: _removed, ...rest } = state
-          return rest
-        }
-
-        const nextValue = state[id].price * quantity
-
-        return {
-          ...state,
-          [id]: {
-            ...state[id],
-            quantity,
-            value: nextValue,
-            formattedValue: formatPrice(
-              nextValue,
-              cart.currency,
-              cart.language
-            ),
-            formattedPrice: formatPrice(
-              state[id].price,
-              cart.currency,
-              cart.language
-            ),
-            _optimistic: true
-          }
-        }
-      }
-
-      case 'CLEAR_CART': {
-        return {}
-      }
-
-      default:
-        return state
-    }
+    return id && next !== state && next[id]
+      ? { ...next, [id]: { ...next[id], _optimistic: true } }
+      : next
   })
 
-  // Check if we're in an optimistic state
   const isOptimistic = Object.values(optimisticCartDetails).some(
     (item) => item._optimistic === true
   )
 
-  // Calculate optimistic totals
-  const optimisticCartCount = Object.values(optimisticCartDetails).reduce(
-    (sum, item) => sum + item.quantity,
-    0
-  )
-
-  const optimisticTotalPrice = Object.values(optimisticCartDetails).reduce(
-    (sum, item) => sum + item.value,
-    0
-  )
+  // Totals derived exactly as ShoppingCart derives them
+  const optimisticTotals = withCartDetails(cart, optimisticCartDetails)
 
   // Wrap addItem with optimistic update
   const addItem = (product: Product, options: AddItemOptions = {}) => {
     startTransition(() => {
       // Update optimistically and perform real update together
-      updateOptimisticCart({ type: 'ADD_ITEM', product, options })
+      updateOptimisticCart({
+        type: 'add',
+        product,
+        count: options.count ?? 1,
+        metadata: options
+      })
       cart.addItem(product, options)
     })
   }
@@ -280,7 +94,7 @@ export function useOptimisticCart() {
   // Wrap removeItem
   const removeItem = (id: string) => {
     startTransition(() => {
-      updateOptimisticCart({ type: 'REMOVE_ITEM', id })
+      updateOptimisticCart({ type: 'remove', id })
       cart.removeItem(id)
     })
   }
@@ -289,11 +103,7 @@ export function useOptimisticCart() {
   const incrementItem = (id: string, options: IncrementOptions = {}) => {
     const count = options.count ?? 1
     startTransition(() => {
-      updateOptimisticCart({
-        type: 'INCREMENT_ITEM',
-        id,
-        count
-      })
+      updateOptimisticCart({ type: 'adjust', id, by: count })
       cart.incrementItem(id, { ...options, count })
     })
   }
@@ -302,11 +112,7 @@ export function useOptimisticCart() {
   const decrementItem = (id: string, options: IncrementOptions = {}) => {
     const count = options.count ?? 1
     startTransition(() => {
-      updateOptimisticCart({
-        type: 'DECREMENT_ITEM',
-        id,
-        count
-      })
+      updateOptimisticCart({ type: 'adjust', id, by: -count })
       cart.decrementItem(id, { ...options, count })
     })
   }
@@ -314,7 +120,7 @@ export function useOptimisticCart() {
   // Wrap setItemQuantity
   const setItemQuantity = (id: string, quantity: number) => {
     startTransition(() => {
-      updateOptimisticCart({ type: 'SET_QUANTITY', id, quantity })
+      updateOptimisticCart({ type: 'set', id, quantity })
       cart.setItemQuantity(id, quantity)
     })
   }
@@ -322,7 +128,7 @@ export function useOptimisticCart() {
   // Wrap clearCart
   const clearCart = () => {
     startTransition(() => {
-      updateOptimisticCart({ type: 'CLEAR_CART' })
+      updateOptimisticCart({ type: 'clear' })
       cart.clearCart()
     })
   }
@@ -331,13 +137,9 @@ export function useOptimisticCart() {
   return {
     ...cart,
     cartDetails: optimisticCartDetails as CartDetails,
-    cartCount: optimisticCartCount,
-    totalPrice: optimisticTotalPrice,
-    formattedTotalPrice: formatPrice(
-      optimisticTotalPrice,
-      cart.currency,
-      cart.language
-    ),
+    cartCount: optimisticTotals.cartCount,
+    totalPrice: optimisticTotals.totalPrice,
+    formattedTotalPrice: optimisticTotals.formattedTotalPrice,
     isOptimistic, // New property - true when showing optimistic updates
     addItem,
     removeItem,

@@ -13,8 +13,12 @@ import type {
   RedirectToCheckoutInput
 } from './types'
 import { createLocalStorage } from './storage'
-import { getProductId, createCartEntry } from './Entry'
-import { withCartDetails, normalizeCartDetails } from './cartState'
+import {
+  withCartDetails,
+  normalizeCartDetails,
+  applyCartChange,
+  type CartChange
+} from './cartState'
 import {
   validateProduct,
   validateCount,
@@ -71,17 +75,16 @@ export class ShoppingCart {
     this._notifySubscribers()
   }
 
-  private _createEntry(
-    id: string,
-    product: Product,
-    quantity: number,
-    metadata: Pick<AddItemOptions, 'price_metadata' | 'product_metadata'> = {}
-  ): CartEntry {
-    return createCartEntry(id, product, quantity, {
-      currency: this._state.currency,
-      language: this._state.language,
-      ...metadata
-    })
+  /**
+   * Apply a change to cartDetails (shared with useOptimisticCart).
+   */
+  private _apply(change: CartChange): void {
+    this._setCartDetails(
+      applyCartChange(this._state.cartDetails, change, {
+        currency: this._state.currency,
+        language: this._state.language
+      })
+    )
   }
 
   // ============================================================================
@@ -257,16 +260,7 @@ export class ShoppingCart {
     const count = options.count ?? 1
     validateCount(count, 'addItem')
 
-    const id = getProductId(product)
-    const existingEntry = this._state.cartDetails[id]
-    const entry = this._createEntry(
-      id,
-      existingEntry ?? product,
-      (existingEntry?.quantity ?? 0) + count,
-      options
-    )
-
-    this._setCartDetails({ ...this._state.cartDetails, [id]: entry })
+    this._apply({ type: 'add', product, count, metadata: options })
   }
 
   /**
@@ -280,11 +274,7 @@ export class ShoppingCart {
     validateCount(count, 'incrementItem')
     validateItemExists(id, this._state.cartDetails, 'incrementItem')
 
-    const entry = this._state.cartDetails[id]
-    this._setCartDetails({
-      ...this._state.cartDetails,
-      [id]: this._createEntry(id, entry, entry.quantity + count)
-    })
+    this._apply({ type: 'adjust', id, by: count })
   }
 
   /**
@@ -298,18 +288,8 @@ export class ShoppingCart {
     validateCount(count, 'decrementItem')
     validateItemExists(id, this._state.cartDetails, 'decrementItem')
 
-    const entry = this._state.cartDetails[id]
-    const newQuantity = entry.quantity - count
-
-    // Remove if quantity would be <= 0
-    if (newQuantity <= 0) {
-      return this.removeItem(id)
-    }
-
-    this._setCartDetails({
-      ...this._state.cartDetails,
-      [id]: this._createEntry(id, entry, newQuantity)
-    })
+    // Removes the item if its quantity would reach 0 or below
+    this._apply({ type: 'adjust', id, by: -count })
   }
 
   /**
@@ -322,16 +302,8 @@ export class ShoppingCart {
     validateQuantity(quantity, 'setItemQuantity')
     validateItemExists(id, this._state.cartDetails, 'setItemQuantity')
 
-    // Remove if quantity is 0
-    if (quantity === 0) {
-      return this.removeItem(id)
-    }
-
-    const entry = this._state.cartDetails[id]
-    this._setCartDetails({
-      ...this._state.cartDetails,
-      [id]: this._createEntry(id, entry, quantity)
-    })
+    // Removes the item if quantity is 0
+    this._apply({ type: 'set', id, quantity })
   }
 
   /**
@@ -342,8 +314,7 @@ export class ShoppingCart {
     this._hasBeenModified = true
     validateItemExists(id, this._state.cartDetails, 'removeItem')
 
-    const { [id]: _removed, ...rest } = this._state.cartDetails
-    this._setCartDetails(rest)
+    this._apply({ type: 'remove', id })
   }
 
   /**
@@ -351,7 +322,7 @@ export class ShoppingCart {
    */
   clearCart(): void {
     this._hasBeenModified = true
-    this._setCartDetails({})
+    this._apply({ type: 'clear' })
   }
 
   /**

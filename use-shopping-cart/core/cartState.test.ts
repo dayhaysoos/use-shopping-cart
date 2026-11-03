@@ -1,5 +1,9 @@
 import { describe, it, expect } from 'vitest'
-import { withCartDetails, normalizeCartDetails } from './cartState'
+import {
+  withCartDetails,
+  normalizeCartDetails,
+  applyCartChange
+} from './cartState'
 import { initialState } from './ShoppingCart'
 import type { CartDetails, CartState } from './types'
 
@@ -108,5 +112,79 @@ describe('normalizeCartDetails', () => {
 
     expect(result.old.timestamp).toBe('2020-01-01T00:00:00.000Z')
     expect(result.fresh.timestamp).toBeTruthy()
+  })
+})
+
+describe('applyCartChange', () => {
+  const format = { currency: 'USD', language: 'en-US' }
+  const product = { id: 'a', name: 'A', price: 150, currency: 'USD' }
+  const withA = applyCartChange({}, { type: 'add', product, count: 2 }, format)
+
+  it('adds a new entry with derived value and formatting', () => {
+    expect(withA.a).toMatchObject({
+      id: 'a',
+      quantity: 2,
+      value: 300,
+      formattedValue: '$3.00',
+      formattedPrice: '$1.50'
+    })
+  })
+
+  it('adds to an existing entry and merges metadata', () => {
+    const next = applyCartChange(
+      withA,
+      {
+        type: 'add',
+        product,
+        count: 1,
+        metadata: {
+          price_metadata: { tax: 'incl' },
+          product_metadata: { kind: 'x' }
+        }
+      },
+      format
+    )
+
+    expect(next.a.quantity).toBe(3)
+    expect(next.a.value).toBe(450)
+    expect(next.a.price_data).toEqual({ tax: 'incl' })
+    expect(next.a.product_data).toEqual({ kind: 'x' })
+  })
+
+  it('adjusts quantity and removes the entry at zero or below', () => {
+    expect(
+      applyCartChange(withA, { type: 'adjust', id: 'a', by: 3 }, format).a.value
+    ).toBe(750)
+    expect(
+      applyCartChange(withA, { type: 'adjust', id: 'a', by: -2 }, format)
+    ).toEqual({})
+  })
+
+  it('sets quantity and removes the entry at zero', () => {
+    expect(
+      applyCartChange(withA, { type: 'set', id: 'a', quantity: 5 }, format).a
+        .quantity
+    ).toBe(5)
+    expect(
+      applyCartChange(withA, { type: 'set', id: 'a', quantity: 0 }, format)
+    ).toEqual({})
+  })
+
+  it('removes and clears without mutating the input', () => {
+    expect(applyCartChange(withA, { type: 'remove', id: 'a' }, format)).toEqual(
+      {}
+    )
+    expect(applyCartChange(withA, { type: 'clear' }, format)).toEqual({})
+    expect(withA.a).toBeDefined()
+  })
+
+  it('returns the same object for changes to ids not in the cart', () => {
+    for (const change of [
+      { type: 'adjust', id: 'missing', by: 1 },
+      { type: 'set', id: 'missing', quantity: 2 },
+      { type: 'remove', id: 'missing' }
+    ] as const) {
+      expect(applyCartChange(withA, change, format)).toBe(withA)
+    }
   })
 })
