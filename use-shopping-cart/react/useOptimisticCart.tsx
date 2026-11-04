@@ -24,32 +24,9 @@ export type OptimisticCartDetails = {
   [id: string]: OptimisticCartEntry
 }
 
-/**
- * Optimistic version of useShoppingCart that provides instant UI feedback
- * while cart operations complete in the background.
- *
- * @example
- * ```tsx
- * function ProductCard({ product }: { product: Product }) {
- *   const { addItem, cartDetails, isOptimistic } = useOptimisticCart()
- *
- *   return (
- *     <div>
- *       <button onClick={() => addItem(product)}>
- *         Add to Cart
- *       </button>
- *       {isOptimistic && <span>Updating...</span>}
- *     </div>
- *   )
- * }
- * ```
- */
 export function useOptimisticCart() {
-  // Get the real cart state and actions
   const cart = useShoppingCart()
 
-  // Optimistic cartDetails: the same change ShoppingCart applies, with the
-  // touched entry marked until the real state catches up
   const [optimisticCartDetails, updateOptimisticCart] = useOptimistic<
     OptimisticCartDetails,
     CartChange
@@ -66,13 +43,10 @@ export function useOptimisticCart() {
     (item) => item._optimistic === true
   )
 
-  // Totals derived exactly as ShoppingCart derives them
   const optimisticTotals = cartTotals(optimisticCartDetails, cart)
 
-  // Wrap addItem with optimistic update
   const addItem = (product: Product, options: AddItemOptions = {}) => {
     startTransition(() => {
-      // Update optimistically and perform real update together
       updateOptimisticCart({
         type: 'add',
         product,
@@ -83,7 +57,6 @@ export function useOptimisticCart() {
     })
   }
 
-  // Wrap removeItem
   const removeItem = (id: string) => {
     startTransition(() => {
       updateOptimisticCart({ type: 'remove', id })
@@ -91,7 +64,6 @@ export function useOptimisticCart() {
     })
   }
 
-  // Wrap incrementItem
   const incrementItem = (id: string, options: IncrementOptions = {}) => {
     const count = options.count ?? 1
     startTransition(() => {
@@ -100,7 +72,6 @@ export function useOptimisticCart() {
     })
   }
 
-  // Wrap decrementItem
   const decrementItem = (id: string, options: IncrementOptions = {}) => {
     const count = options.count ?? 1
     startTransition(() => {
@@ -109,7 +80,6 @@ export function useOptimisticCart() {
     })
   }
 
-  // Wrap setItemQuantity
   const setItemQuantity = (id: string, quantity: number) => {
     startTransition(() => {
       updateOptimisticCart({ type: 'set', id, quantity })
@@ -117,7 +87,6 @@ export function useOptimisticCart() {
     })
   }
 
-  // Wrap clearCart
   const clearCart = () => {
     startTransition(() => {
       updateOptimisticCart({ type: 'clear' })
@@ -125,14 +94,13 @@ export function useOptimisticCart() {
     })
   }
 
-  // Return the same API as useShoppingCart, but with optimistic updates
   return {
     ...cart,
     cartDetails: optimisticCartDetails as CartDetails,
     cartCount: optimisticTotals.cartCount,
     totalPrice: optimisticTotals.totalPrice,
     formattedTotalPrice: optimisticTotals.formattedTotalPrice,
-    isOptimistic, // New property - true when showing optimistic updates
+    isOptimistic,
     addItem,
     removeItem,
     incrementItem,

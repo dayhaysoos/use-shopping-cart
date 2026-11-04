@@ -9,7 +9,6 @@ export interface DebugCartProps extends React.DetailedHTMLProps<
 > {}
 
 export function DebugCart(props: DebugCartProps) {
-  // Show state only, not the cart's methods
   const state = Object.entries(useShoppingCart()).filter(
     ([, value]) => typeof value !== 'function'
   )

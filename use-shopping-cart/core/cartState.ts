@@ -7,11 +7,6 @@ export interface CartFormat {
   language: string
 }
 
-/**
- * The totals for `cartDetails`: `cartCount`, `totalPrice` and
- * `formattedTotalPrice`. This is the only place cart totals are calculated,
- * so totals always equal the sum of the entries.
- */
 export function cartTotals(
   cartDetails: CartDetails,
   { currency, language }: CartFormat
@@ -35,7 +30,6 @@ export function cartTotals(
   }
 }
 
-/** Return `state` with `cartDetails` replaced and its totals recomputed. */
 export function withCartDetails(
   state: CartState,
   cartDetails: CartDetails
@@ -43,12 +37,6 @@ export function withCartDetails(
   return { ...state, cartDetails, ...cartTotals(cartDetails, state) }
 }
 
-/**
- * Rebuild entries that came from outside the cart's own operations (storage,
- * config, `loadCart`) or whose formatting is stale after a currency or
- * language change. Each entry's `value` and formatted strings are derived
- * from its `price` and `quantity`; existing timestamps are kept.
- */
 export function normalizeCartDetails(
   cartDetails: CartDetails,
   currency: string,
@@ -70,7 +58,6 @@ export function normalizeCartDetails(
   return normalized
 }
 
-/** A change to cartDetails. Quantities that reach 0 or below remove the entry. */
 export type CartChange =
   | {
       type: 'add'
@@ -83,14 +70,6 @@ export type CartChange =
   | { type: 'remove'; id: string }
   | { type: 'clear' }
 
-/**
- * Apply a change to cartDetails and return the new cartDetails.
- * Changes to ids that aren't in the cart return `cartDetails` unchanged;
- * callers that need to reject those validate first.
- *
- * Shared by `ShoppingCart` and `useOptimisticCart`, so optimistic entries
- * match the real ones.
- */
 export function applyCartChange(
   cartDetails: CartDetails,
   change: CartChange,
@@ -140,7 +119,6 @@ export function applyCartChange(
   }
 }
 
-/** The id of the entry a change touches, or undefined for `clear`. */
 export function changedEntryId(change: CartChange): string | undefined {
   if (change.type === 'add') return getProductId(change.product)
   if (change.type === 'clear') return undefined

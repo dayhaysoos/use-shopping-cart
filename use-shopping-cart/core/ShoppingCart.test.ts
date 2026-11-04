@@ -43,7 +43,6 @@ describe('ShoppingCart', () => {
         storage
       })
 
-      // This will be tested more thoroughly when we implement cart methods
       expect(cart).toBeDefined()
     })
 
@@ -71,7 +70,6 @@ describe('ShoppingCart', () => {
       const cart = new ShoppingCart()
       const state = cart.getState()
 
-      // TypeScript enforces readonly, but at runtime we can still access properties
       expect(typeof state).toBe('object')
     })
   })
@@ -93,7 +91,6 @@ describe('ShoppingCart', () => {
       const unsubscribe = cart.subscribe(callback)
       unsubscribe()
 
-      // When we implement methods, we'll verify callback is not called
       expect(callback).not.toHaveBeenCalled()
     })
 
@@ -105,7 +102,6 @@ describe('ShoppingCart', () => {
       cart.subscribe(callback1)
       cart.subscribe(callback2)
 
-      // Both callbacks should exist (will be verified when methods are implemented)
       expect(callback1).toBeDefined()
       expect(callback2).toBeDefined()
     })
@@ -115,7 +111,6 @@ describe('ShoppingCart', () => {
     it('loads from storage on initialization', () => {
       const storage = createMemoryStorage()
 
-      // Pre-populate storage with valid cart entries
       storage.setItem(
         'test-cart',
         JSON.stringify({
@@ -173,7 +168,7 @@ describe('ShoppingCart', () => {
       })
 
       const state = cart.getState()
-      expect(state.cartCount).toBe(0) // Falls back to default
+      expect(state.cartCount).toBe(0)
     })
 
     it('does not use storage when shouldPersist is false', () => {
@@ -192,13 +187,9 @@ describe('ShoppingCart', () => {
       })
 
       const state = cart.getState()
-      expect(state.cartCount).toBe(0) // Should not load from storage
+      expect(state.cartCount).toBe(0)
     })
   })
-
-  // ============================================================================
-  // CART METHODS
-  // ============================================================================
 
   describe('addItem', () => {
     it('adds an entry to the cart', () => {
@@ -391,7 +382,7 @@ describe('ShoppingCart', () => {
         currency: 'USD'
       })
 
-      callback.mockClear() // Clear the addItem call
+      callback.mockClear()
       cart.subscribe(callback)
 
       cart.incrementItem('test')
@@ -581,7 +572,6 @@ describe('ShoppingCart', () => {
       expect(state.cartCount).toBe(0)
       expect(state.totalPrice).toBe(0)
       expect(state.formattedTotalPrice).toContain('0')
-      // Should keep other config
       expect(state.currency).toBe('EUR')
     })
   })
@@ -590,7 +580,6 @@ describe('ShoppingCart', () => {
     it('merges new cartDetails into current cartDetails', () => {
       const cart = new ShoppingCart({ shouldPersist: false })
 
-      // Add initial items
       cart.addItem(
         {
           id: 'item-1',
@@ -601,7 +590,6 @@ describe('ShoppingCart', () => {
         { count: 2 }
       )
 
-      // Load new items (merge mode)
       const newCartDetails = {
         'item-2': {
           id: 'item-2',
@@ -625,7 +613,6 @@ describe('ShoppingCart', () => {
     it('replaces cartDetails when shouldMerge is false', () => {
       const cart = new ShoppingCart({ shouldPersist: false })
 
-      // Add initial items
       cart.addItem(
         {
           id: 'item-1',
@@ -636,7 +623,6 @@ describe('ShoppingCart', () => {
         { count: 2 }
       )
 
-      // Load new items (replace mode)
       const newCartDetails = {
         'item-2': {
           id: 'item-2',
@@ -722,7 +708,7 @@ describe('ShoppingCart', () => {
     it('sets shouldDisplayCart to false', () => {
       const cart = new ShoppingCart({ shouldPersist: false })
 
-      cart.handleCartClick() // Open it first
+      cart.handleCartClick()
       expect(cart.getState().shouldDisplayCart).toBe(true)
 
       cart.handleCloseCart()
@@ -767,7 +753,6 @@ describe('ShoppingCart', () => {
 
       const state = cart.getState()
       expect(state.language).toBe('de-DE')
-      // Formatted prices should be updated
       expect(state.formattedTotalPrice).toBeTruthy()
     })
   })
@@ -823,20 +808,15 @@ describe('ShoppingCart', () => {
     })
   })
 
-  // ============================================================================
-  // EDGE CASE TESTS (Phase 7)
-  // ============================================================================
-
   describe('addItem edge cases', () => {
     it('handles product without any ID fields by generating consistent ID', () => {
       const cart = new ShoppingCart({ shouldPersist: false })
       const product = { name: 'No ID Product', price: 100, currency: 'USD' }
 
       cart.addItem(product)
-      cart.addItem(product) // Same product again - should increment, not duplicate
+      cart.addItem(product)
 
       const state = cart.getState()
-      // Should have only one entry that was incremented
       expect(Object.keys(state.cartDetails)).toHaveLength(1)
       expect(state.cartCount).toBe(2)
       expect(state.totalPrice).toBe(200)
@@ -904,7 +884,7 @@ describe('ShoppingCart', () => {
         'cart',
         JSON.stringify({
           cartDetails: {
-            incomplete: { id: 'incomplete' } // missing price, quantity, name, currency
+            incomplete: { id: 'incomplete' }
           },
           cartCount: 1,
           totalPrice: 100
@@ -932,7 +912,7 @@ describe('ShoppingCart', () => {
             },
             'invalid-item': {
               id: 'invalid-item',
-              quantity: -1 // Invalid
+              quantity: -1
             }
           },
           cartCount: 1,
@@ -1164,7 +1144,7 @@ describe('ShoppingCart', () => {
       const callback = vi.fn()
 
       cart.subscribe(callback)
-      cart.changeLanguage('en-US') // Same language
+      cart.changeLanguage('en-US')
 
       expect(callback).not.toHaveBeenCalled()
     })
@@ -1177,7 +1157,7 @@ describe('ShoppingCart', () => {
       const callback = vi.fn()
 
       cart.subscribe(callback)
-      cart.changeCurrency('USD') // Same currency
+      cart.changeCurrency('USD')
 
       expect(callback).not.toHaveBeenCalled()
     })

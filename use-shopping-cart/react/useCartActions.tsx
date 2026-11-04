@@ -25,7 +25,6 @@ export type QuantityState = ActionState & {
   quantity: number | null
 }
 export type ClearState = Pick<ActionState, 'status' | 'error'>
-// Names kept from the v4 rc.1 type declarations.
 export type RemoveItemState = ItemState
 export type UpdateQuantityState = QuantityState
 
@@ -35,11 +34,6 @@ function getErrorMessage(error: unknown): string {
   return 'An unknown error occurred'
 }
 
-/**
- * useActionState for a cart form: `perform` decodes the form, runs the cart
- * operation and returns the success state; any thrown error becomes
- * `{ ...idle, status: 'error', error }`.
- */
 function useFormAction<S extends ActionState>(
   idle: S,
   fallbackError: string,
@@ -60,26 +54,6 @@ function useFormAction<S extends ActionState>(
 
 const idleItem: ItemState = { status: 'idle', error: null, itemId: null }
 
-/**
- * Form-friendly cart actions using React 19's useActionState.
- * Perfect for progressive enhancement and form-based cart operations.
- *
- * @example
- * ```tsx
- * function ProductCard({ product }: { product: Product }) {
- *   const { addToCartAction, isPending } = useCartActions()
- *
- *   return (
- *     <form action={addToCartAction}>
- *       <input type="hidden" name="product" value={JSON.stringify(product)} />
- *       <button disabled={isPending}>
- *         {isPending ? 'Adding...' : 'Add to Cart'}
- *       </button>
- *     </form>
- *   )
- * }
- * ```
- */
 export function useCartActions() {
   const cart = useShoppingCart()
 
@@ -140,39 +114,31 @@ export function useCartActions() {
       return { status: 'success', error: null, itemId }
     })
 
-  // Return all actions and states
   return {
-    // Add item
     addToCartAction,
     addItemState,
     isAddingItem: addItemPending,
 
-    // Remove item
     removeFromCartAction,
     removeItemState,
     isRemovingItem: removeItemPending,
 
-    // Update quantity
     updateQuantityAction,
     updateQuantityState,
     isUpdatingQuantity: updateQuantityPending,
 
-    // Increment
     incrementItemAction,
     incrementItemState,
     isIncrementingItem: incrementItemPending,
 
-    // Decrement
     decrementItemAction,
     decrementItemState,
     isDecrementingItem: decrementItemPending,
 
-    // Clear cart
     clearCartAction,
     clearCartState,
     isClearingCart: clearCartPending,
 
-    // Global pending state (any action in progress)
     isPending:
       addItemPending ||
       removeItemPending ||

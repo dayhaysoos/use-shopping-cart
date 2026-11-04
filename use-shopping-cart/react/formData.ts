@@ -1,12 +1,8 @@
 import type { Product } from '../core/types'
 import { validateProduct } from '../core/validation'
 
-// Decoders for useCartActions: FormData in, typed input out. Invalid input
-// throws; the error message becomes the action's `error` state.
-
 const MAX_PRODUCT_JSON_LENGTH = 50_000
 
-/** Fields: `product` (JSON), optional `count`. */
 export function decodeAddItem(formData: FormData): {
   product: Product
   count: number
@@ -28,7 +24,6 @@ export function decodeAddItem(formData: FormData): {
   return { product: product as Product, count: decodeCount(formData) }
 }
 
-/** Fields: `itemId`. */
 export function decodeItemId(formData: FormData): string {
   const itemId = formData.get('itemId')
   if (!itemId || typeof itemId !== 'string') {
@@ -37,7 +32,6 @@ export function decodeItemId(formData: FormData): string {
   return itemId
 }
 
-/** Fields: `itemId`, optional `count` (defaults to 1). */
 export function decodeCountChange(formData: FormData): {
   itemId: string
   count: number
@@ -46,7 +40,6 @@ export function decodeCountChange(formData: FormData): {
   return { itemId, count: decodeCount(formData) }
 }
 
-/** Fields: `itemId`, `quantity` (0 removes the item). */
 export function decodeQuantity(formData: FormData): {
   itemId: string
   quantity: number
@@ -65,7 +58,6 @@ export function decodeQuantity(formData: FormData): {
   return { itemId, quantity: toInteger(quantity, 'quantity', 'non-negative') }
 }
 
-/** Parsed JSON, or undefined if `text` isn't valid JSON. */
 function parseJSON(text: string): unknown {
   try {
     return JSON.parse(text)
@@ -74,7 +66,6 @@ function parseJSON(text: string): unknown {
   }
 }
 
-/** Optional `count` field; defaults to 1. */
 function decodeCount(formData: FormData): number {
   const count = formData.get('count')
   if (count === null) return 1

@@ -1,6 +1,5 @@
 import type { CartDetails, CartEntry, CartState, StorageAdapter } from './types'
 
-/** The parts of a stored cart that are restored. Everything else is derived. */
 export interface StoredCart {
   cartDetails: CartDetails
   currency?: string
@@ -8,25 +7,12 @@ export interface StoredCart {
 }
 
 export interface CartPersister {
-  /**
-   * Read the stored cart and pass a validated snapshot to `onLoad`:
-   * synchronously for sync storage, later for async storage. Not called when
-   * nothing is stored or the data is unreadable.
-   */
   load(onLoad: (stored: StoredCart) => void): void
-  /**
-   * Write the cart if anything that is persisted changed since the last
-   * write. A failed write is retried on the next save.
-   */
   save(state: Readonly<CartState>): void
 }
 
 type PersistedFields = Pick<CartState, 'cartDetails' | 'currency' | 'language'>
 
-/**
- * `initial` is the cart's starting state: saves are skipped until the cart,
- * currency or language differ from it, so UI-only changes never write.
- */
 export function createCartPersister(
   storage: StorageAdapter,
   key: string,
@@ -72,23 +58,18 @@ export function createCartPersister(
         const result = storage.setItem(key, serializeCart(state))
         if (result instanceof Promise) {
           result.catch((error) => {
-            // Forget this write so the next save retries it
             if (lastSaved === state) lastSaved = null
             console.warn('Failed to persist cart to storage:', error)
           })
         }
       } catch (error) {
-        lastSaved = null // retry on the next save
+        lastSaved = null
         console.warn('Failed to persist cart to storage:', error)
       }
     }
   }
 }
 
-/**
- * Parse stored cart JSON. Invalid entries are skipped with a warning; returns
- * null when the data is unreadable or has no cartDetails.
- */
 export function parseStoredCart(raw: string): StoredCart | null {
   let parsed: unknown
   try {
@@ -119,7 +100,6 @@ export function parseStoredCart(raw: string): StoredCart | null {
   }
 }
 
-/** Same payload as earlier versions, so existing stored carts keep loading. */
 function serializeCart(state: Readonly<CartState>): string {
   return JSON.stringify({
     cartDetails: state.cartDetails,
