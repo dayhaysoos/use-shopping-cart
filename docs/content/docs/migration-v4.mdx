@@ -12,7 +12,9 @@ Version 4.0 brings significant improvements. Cart methods and state work as befo
 - **Redux Removal**: Now uses React's native `useSyncExternalStore`
 - **Modern Stripe Features**: Phone collection, promotion codes, automatic tax, etc.
 - **React 19 Support**: Full compatibility with React 19
-- **Client-Only Deprecation**: Client-only mode is deprecated (still works, but not recommended)
+- **Client-Only Mode Removed**: use checkout sessions created on your server
+- **Standalone `redirectToCheckout`**: import it and pass `session.url`; no Stripe key in the browser
+- **Typed Errors**: every error is a `CartError` with a `code`
 - **Improved TypeScript**: Better type inference and exported types
 - **Smaller Bundle**: Reduced bundle size without Redux
 
@@ -174,7 +176,6 @@ import { CartProvider } from 'use-shopping-cart'
 
 1. Create a server endpoint to generate checkout sessions
 2. Move `successUrl` and `cancelUrl` to server-side
-3. Update product data structure (use `id` instead of `price_id`)
 
 **See:** [Getting Started](/docs/getting-started) for detailed setup guide.
 
@@ -255,7 +256,7 @@ Object.values(cartDetails).forEach((item) => {
 
 ### Fewer Re-renders
 
-Thanks to React's `useSyncExternalStore`, components only re-render when the specific cart data they use changes.
+Pass a selector to `useShoppingCart` and a component re-renders only when the value it selects changes (see [`useShoppingCart`](/docs/hooks/useShoppingCart)).
 
 ## API Stability
 
@@ -374,5 +375,8 @@ npm install -D @types/react@19 @types/react-dom@19
 - All client-only mode props (`mode`, `cartMode`, `successUrl`, `cancelUrl`, `billingAddressCollection`, `allowedCountries`)
 - Support for Node.js versions below 22
 - The old `dist/*.es.js` / `dist/*.js` file names (use the package entry points)
+- `redirectToCheckout` as a cart method, session-ID redirects, and `RedirectToCheckoutInput` (import `redirectToCheckout` and pass `session.url`)
+- The `stripe` prop and `changeStripeKey`
+- `shouldPersist` in the cart state, and `CartState` fields as `CartProvider` props
 
-**If you're using checkout-session mode in v3.x, upgrading to v4.0 is seamless. If you're using client-only mode, migration is required but straightforward.**
+**Checkout-session apps mostly need to update how they redirect to checkout. Client-only apps need a server endpoint that creates checkout sessions. Both are covered under [Breaking Changes](#breaking-changes).**
