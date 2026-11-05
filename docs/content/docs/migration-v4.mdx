@@ -261,7 +261,7 @@ Thanks to React's `useSyncExternalStore`, components only re-render when the spe
 
 ### Unchanged APIs
 
-All existing APIs continue to work:
+These work as in v3:
 
 ✅ `addItem(product, options?)`
 ✅ `incrementItem(id, options?)`
@@ -269,12 +269,9 @@ All existing APIs continue to work:
 ✅ `setItemQuantity(id, quantity)`
 ✅ `removeItem(id)`
 ✅ `clearCart()`
-✅ All cart properties (cartCount, totalPrice, etc.)
+✅ Cart state (`cartCount`, `totalPrice`, `formattedTotalPrice`, `cartDetails`, `shouldDisplayCart`, `lastClicked`)
 
-### Deprecated (Still Works)
-
-⚠️ `cartMode="client-only"` - Use `checkout-session` instead
-⚠️ `checkoutSingleItem()` - Only works with client-only mode
+Everything else listed under [Breaking Changes](#breaking-changes) needs updating, including `redirectToCheckout`, the `stripe` prop and client-only mode.
 
 ## Step-by-Step Migration
 
@@ -286,7 +283,7 @@ npm install use-shopping-cart@rc react@19 react-dom@19
 
 ### Step 2: Test Your Application
 
-Run your application. Everything should work as before.
+Update anything listed under [Breaking Changes](#breaking-changes), then run your application and your tests.
 
 ### Step 3: Configure Stripe Features (Server-Side)
 

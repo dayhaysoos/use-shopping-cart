@@ -6,7 +6,9 @@ import {
   useOptimisticCart,
   useCartActions,
   redirectToCheckout,
-  type CartChange
+  type CartChange,
+  type CartDetails,
+  type UseShoppingCartReturn
 } from 'use-shopping-cart'
 
 /**
@@ -163,6 +165,12 @@ function TestUseOptimisticCart() {
   cart.clearCart()
 
   const error: unknown = cart.error
+  const optimisticDetails: CartDetails = cart.cartDetails
+  const flag: boolean | undefined = cart.cartDetails['x']?._optimistic
+  const asCart: UseShoppingCartReturn = cart
+  void optimisticDetails
+  void flag
+  void asCart
 
   const synced = useOptimisticCart({
     onChange: async (change: CartChange) => {
