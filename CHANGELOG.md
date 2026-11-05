@@ -23,7 +23,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - `CartError`, `isCartError` and the `CartErrorCode` type are exported from `use-shopping-cart`, `/core` and `/utilities`. Use `isCartError` rather than `instanceof`, since each entry point bundles its own copy
 - `useShoppingCart(selector)`: re-render only when the selected value changes (#357)
-- `useOptimisticCart({ onChange })`: pass an async function to sync each cart change with your backend. Changes show immediately, run through `onChange` one at a time, are applied to the cart when it resolves and rolled back (with `error` set) when it rejects. `CartChange` and `UseOptimisticCartOptions` types are exported (#361)
+- `useOptimisticCart({ onChange })`: pass an async function to sync each cart change with your backend. Changes show immediately in every `useOptimisticCart` on the cart, run through `onChange` one at a time, are applied to the cart when it resolves and rolled back (with `error` set) when it rejects. `CartChange` and `UseOptimisticCartOptions` types are exported (#361)
 - `useCartActions` states have an `errorCode` field (`UNKNOWN` for errors that aren't `CartError`s) (#359)
 
 ### 🐛 Bug Fixes

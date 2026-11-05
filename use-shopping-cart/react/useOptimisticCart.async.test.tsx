@@ -253,6 +253,44 @@ describe('useOptimisticCart with onChange', () => {
     expect(apis[0].cartCount).toBe(2)
   })
 
+  it('shows a pending change in every useOptimisticCart on the same cart', async () => {
+    const pending = deferred()
+    const onChange = vi.fn(() => pending.promise)
+    const views: Record<string, ReturnType<typeof useOptimisticCart>> = {}
+    let real = -1
+
+    function Item() {
+      views.item = useOptimisticCart({ onChange })
+      return null
+    }
+    function Summary() {
+      views.summary = useOptimisticCart({ onChange })
+      real = useShoppingCart((cart) => cart.cartCount)
+      return null
+    }
+
+    render(
+      <CartProvider shouldPersist={false} currency="USD" language="en-US">
+        <Item />
+        <Summary />
+      </CartProvider>
+    )
+
+    await act(async () => views.item.addItem(product, { count: 2 }))
+
+    expect(views.summary.cartCount).toBe(2)
+    expect(views.summary.isOptimistic).toBe(true)
+    expect(views.summary.cartDetails.a._optimistic).toBe(true)
+    expect(real).toBe(0)
+
+    await act(async () => pending.resolve())
+
+    expect(views.summary.cartCount).toBe(2)
+    expect(views.summary.isOptimistic).toBe(false)
+    expect(views.item.isOptimistic).toBe(false)
+    expect(real).toBe(2)
+  })
+
   it('throws invalid input synchronously without calling onChange', () => {
     const onChange = vi.fn(async () => {})
     vi.spyOn(console, 'warn').mockImplementation(() => {})

@@ -3,7 +3,7 @@ title: useOptimisticCart()
 sidebar_position: 2
 ---
 
-**New in v4.0.0** - Optimistic version of `useShoppingCart()` that provides instant UI feedback using React 19's `useOptimistic` hook.
+**New in v4.0.0** - Optimistic version of `useShoppingCart()` that shows cart changes instantly while your backend confirms them.
 
 ## Overview
 
@@ -87,7 +87,8 @@ function Cart() {
 
 How it behaves:
 
-- **Order:** changes wait for the previous `onChange` to settle, so three quick clicks send three requests, one after another. Every component using `useOptimisticCart` with the same cart shares this queue.
+- **Every component:** a pending change shows in every component that calls `useOptimisticCart` on the same cart, so a total in one component updates when an item in another changes. `useShoppingCart` shows only confirmed changes.
+- **Order:** changes wait for the previous `onChange` to settle, so three quick clicks send three requests, one after another.
 - **Success:** the change is applied to the real cart (and saved to `storage`).
 - **Failure:** the change is dropped and `error` holds what `onChange` threw. Later queued changes still run, but each is checked against the real cart first: one that depended on the failed change (incrementing an item whose add failed) is dropped with an `ITEM_NOT_IN_CART` error and never reaches `onChange`.
 - **Invalid input** (bad count, product without a price) throws immediately and never reaches `onChange`.
@@ -310,4 +311,3 @@ Try adding items and watch the instant UI feedback! The demo's `onChange` simula
 ## See Also
 
 - [useShoppingCart()](/docs/hooks/useShoppingCart) - Standard cart hook without optimistic updates
-- [React 19 useOptimistic](https://react.dev/reference/react/useOptimistic) - React's official documentation

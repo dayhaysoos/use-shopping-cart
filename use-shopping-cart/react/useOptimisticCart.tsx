@@ -1,6 +1,6 @@
 'use client'
 
-import { useOptimistic, startTransition, useState } from 'react'
+import { useCallback, useMemo, useState, useSyncExternalStore } from 'react'
 import { useShoppingCart } from './useShoppingCart'
 import { useCartContext } from './CartProvider'
 import type { ShoppingCart } from '../core/ShoppingCart'
@@ -15,7 +15,8 @@ import {
   applyCartChange,
   cartTotals,
   changedEntryId,
-  type CartChange
+  type CartChange,
+  type CartFormat
 } from '../core/cartState'
 import {
   validateProduct,
@@ -43,6 +44,7 @@ const committedChanges = new WeakSet<CartChange>()
 interface ChangeQueue {
   tail: Promise<unknown>
   queued: CartChange[]
+  listeners: Set<() => void>
 }
 
 const changeQueues = new WeakMap<ShoppingCart, ChangeQueue>()
@@ -50,10 +52,61 @@ const changeQueues = new WeakMap<ShoppingCart, ChangeQueue>()
 function getChangeQueue(store: ShoppingCart): ChangeQueue {
   let queue = changeQueues.get(store)
   if (!queue) {
-    queue = { tail: Promise.resolve(), queued: [] }
+    queue = { tail: Promise.resolve(), queued: [], listeners: new Set() }
     changeQueues.set(store, queue)
   }
   return queue
+}
+
+function setQueued(queue: ChangeQueue, queued: CartChange[]): void {
+  queue.queued = queued
+  queue.listeners.forEach((listener) => listener())
+}
+
+function applyPending(
+  cartDetails: CartDetails,
+  queued: CartChange[],
+  format: CartFormat
+): OptimisticCartDetails {
+  return queued.reduce<OptimisticCartDetails>((details, change) => {
+    if (committedChanges.has(change)) return details
+    const next: OptimisticCartDetails = applyCartChange(details, change, format)
+    const id = changedEntryId(change)
+    return id && next !== details && next[id]
+      ? { ...next, [id]: { ...next[id], _optimistic: true } }
+      : next
+  }, cartDetails)
+}
+
+function enqueueChange(
+  store: ShoppingCart,
+  change: CartChange,
+  validate: (expectedCartDetails: () => CartDetails) => void,
+  onChange: (change: CartChange) => unknown,
+  commit: () => void
+): Promise<void> {
+  const queue = getChangeQueue(store)
+  validate(() => {
+    const state = store.getState()
+    return applyPending(state.cartDetails, queue.queued, state)
+  })
+  setQueued(queue, [...queue.queued, change])
+
+  const task = queue.tail
+    .then(async () => {
+      validate(() => store.getState().cartDetails)
+      await onChange(change)
+      committedChanges.add(change)
+      commit()
+    })
+    .finally(() => {
+      setQueued(
+        queue,
+        queue.queued.filter((c) => c !== change)
+      )
+    })
+  queue.tail = task.catch(() => {})
+  return task
 }
 
 export function useOptimisticCart({ onChange }: UseOptimisticCartOptions = {}) {
@@ -61,18 +114,27 @@ export function useOptimisticCart({ onChange }: UseOptimisticCartOptions = {}) {
   const store = useCartContext()
   const [error, setError] = useState<unknown>(null)
 
-  const [optimisticCartDetails, showChange] = useOptimistic<
-    OptimisticCartDetails,
-    CartChange
-  >(cart.cartDetails as OptimisticCartDetails, (state, change) => {
-    if (committedChanges.has(change)) return state
-    const next: OptimisticCartDetails = applyCartChange(state, change, cart)
-    const id = changedEntryId(change)
+  const queue = getChangeQueue(store)
+  const subscribe = useCallback(
+    (listener: () => void) => {
+      queue.listeners.add(listener)
+      return () => {
+        queue.listeners.delete(listener)
+      }
+    },
+    [queue]
+  )
+  const queued = useSyncExternalStore(
+    subscribe,
+    () => queue.queued,
+    () => queue.queued
+  )
 
-    return id && next !== state && next[id]
-      ? { ...next, [id]: { ...next[id], _optimistic: true } }
-      : next
-  })
+  const { currency, language } = cart
+  const optimisticCartDetails = useMemo(
+    () => applyPending(cart.cartDetails, queued, { currency, language }),
+    [cart.cartDetails, queued, currency, language]
+  )
 
   const isOptimistic = optimisticCartDetails !== cart.cartDetails
 
@@ -88,37 +150,10 @@ export function useOptimisticCart({ onChange }: UseOptimisticCartOptions = {}) {
       return
     }
 
-    const queue = getChangeQueue(store)
-    validate(() => {
-      const state = store.getState()
-      return queue.queued.reduce(
-        (details, queuedChange) =>
-          applyCartChange(details, queuedChange, state),
-        state.cartDetails
-      )
-    })
-    queue.queued = [...queue.queued, change]
-
-    startTransition(async () => {
-      showChange(change)
-      const task = queue.tail
-        .then(async () => {
-          validate(() => store.getState().cartDetails)
-          await onChange(change)
-          committedChanges.add(change)
-          commit()
-        })
-        .finally(() => {
-          queue.queued = queue.queued.filter((c) => c !== change)
-        })
-      queue.tail = task.catch(() => {})
-      try {
-        await task
-        setError(null)
-      } catch (caught) {
-        setError(caught)
-      }
-    })
+    enqueueChange(store, change, validate, onChange, commit).then(
+      () => setError(null),
+      (caught: unknown) => setError(caught)
+    )
   }
 
   const addItem = (product: Product, options: AddItemOptions = {}) => {
