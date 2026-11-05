@@ -7,7 +7,7 @@ id: validate-cart-items
 
 validateCartItems checks the items in the current cart and compares them with a source of truth to
 make sure that the prices and quantities are correct. This is necessary because it's possible that
-malicious users could manipulate the values of prices in the DOM before sending to `redirectToCheckout`.
+malicious users could change the prices in `cartDetails` before sending the cart to your checkout endpoint.
 
 It also validates input shapes and throws if inventory/cart items are not objects or if the inventory
 source is not iterable.
