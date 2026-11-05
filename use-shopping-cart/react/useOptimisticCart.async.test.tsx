@@ -73,6 +73,38 @@ describe('useOptimisticCart with onChange', () => {
     expect(frames.every((f) => f.shown <= 2)).toBe(true)
   })
 
+  it.each([
+    [
+      'removeItem',
+      (api: ReturnType<typeof useOptimisticCart>) => api.removeItem('a')
+    ],
+    [
+      'clearCart',
+      (api: ReturnType<typeof useOptimisticCart>) => api.clearCart()
+    ],
+    [
+      'decrementItem to zero',
+      (api: ReturnType<typeof useOptimisticCart>) => api.decrementItem('a')
+    ]
+  ])('is optimistic while %s is pending', async (_name, change) => {
+    const calls: Array<ReturnType<typeof deferred>> = []
+    const { api, last } = setup(() => {
+      const d = deferred()
+      calls.push(d)
+      return d.promise
+    })
+
+    await act(async () => api.current.addItem(product))
+    await act(async () => calls[0].resolve())
+    expect(last()).toEqual({ shown: 1, real: 1, optimistic: false })
+
+    await act(async () => change(api.current))
+    expect(last()).toEqual({ shown: 0, real: 1, optimistic: true })
+
+    await act(async () => calls[1].resolve())
+    expect(last()).toEqual({ shown: 0, real: 0, optimistic: false })
+  })
+
   it('rolls back and reports the error when onChange rejects', async () => {
     const pending = deferred()
     const { api, last } = setup(() => pending.promise)

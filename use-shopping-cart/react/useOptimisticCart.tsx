@@ -74,9 +74,7 @@ export function useOptimisticCart({ onChange }: UseOptimisticCartOptions = {}) {
       : next
   })
 
-  const isOptimistic = Object.values(optimisticCartDetails).some(
-    (item) => item._optimistic === true
-  )
+  const isOptimistic = optimisticCartDetails !== cart.cartDetails
 
   const optimisticTotals = cartTotals(optimisticCartDetails, cart)
 
