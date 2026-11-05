@@ -193,8 +193,14 @@ export function OptimisticCartDemo() {
             <div className="mt-4 p-4 bg-fd-secondary/50 rounded-md text-sm">
               <p className="font-semibold mb-2">💡 What's happening?</p>
               <ul className="list-disc list-inside space-y-1 text-fd-muted-foreground">
-                <li>Cart count increases instantly (optimistic update)</li>
-                <li>Shows "Confirming..." while syncing in background</li>
+                <li>
+                  The quantity under the product updates instantly, marked
+                  "confirming..."
+                </li>
+                <li>
+                  The cart on the left uses useShoppingCart, so it updates once
+                  the simulated server confirms
+                </li>
                 <li>
                   <strong>Try the error button</strong> - UI automatically rolls
                   back on failure
