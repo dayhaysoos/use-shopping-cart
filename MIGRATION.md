@@ -81,6 +81,10 @@ if (isCartError(error) && error.code === 'ITEM_NOT_IN_CART') {
 
 `CartProvider` props and the `ShoppingCart` constructor take only `cartDetails`, `currency`, `language`, `shouldPersist`, `persistKey` and `storage`. Passing other state fields (`cartCount`, `shouldDisplayCart`, ...) is now a type error; they were ignored or copied into state before. `shouldPersist` is no longer in the cart state, so read it from your own config instead of `useShoppingCart().shouldPersist`.
 
+#### `validateCartItems` Matches More ID Fields
+
+Inventory is now matched by `id`, `price_id`, `sku_id` and `sku` (first match in `inventory` wins), the same fields the cart uses for item IDs. Carts with items added by `price_id` or `sku_id` alone now validate instead of failing with "not in your inventory". Check your inventory if one product's `price_id` or `sku_id` can equal another product's `id` or `sku`: the earlier product now matches.
+
 #### `redirectToCheckout` Is a Standalone Function
 
 Import it instead of reading it from the cart, and pass the Checkout Session URL. Session IDs, the `stripe` prop and `changeStripeKey` are gone: Stripe removed `redirectToCheckout({ sessionId })` from Stripe.js, and a session URL needs no publishable key.

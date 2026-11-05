@@ -11,6 +11,9 @@ import {
 import * as core from './index'
 import * as react from '../react/index'
 import * as utilities from '../utilities/serverless'
+import { createElement } from 'react'
+import { render } from '@testing-library/react'
+import { useCartContext } from '../react/CartProvider'
 
 function codeOf(fn: () => unknown): CartErrorCode | undefined {
   try {
@@ -64,6 +67,17 @@ describe('CartError', () => {
     expect(react.isCartError).toBe(isCartError)
     expect(utilities.CartError).toBe(CartError)
     expect(utilities.isCartError).toBe(isCartError)
+  })
+})
+
+describe('useCartContext outside a provider', () => {
+  it('throws NO_CART_PROVIDER', () => {
+    vi.spyOn(console, 'error').mockImplementation(() => {})
+    function Orphan() {
+      useCartContext()
+      return null
+    }
+    expect(codeOf(() => render(createElement(Orphan)))).toBe('NO_CART_PROVIDER')
   })
 })
 

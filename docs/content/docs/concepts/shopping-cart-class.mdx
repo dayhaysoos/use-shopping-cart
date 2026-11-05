@@ -212,6 +212,7 @@ Use `isCartError(error)` rather than `instanceof CartError`: each entry point (`
 | `INVALID_CART`         | `validateCartItems` with malformed `cartDetails`                                             |
 | `NOT_IN_INVENTORY`     | `validateCartItems` with a cart item that isn't in the inventory                             |
 | `INVALID_CHECKOUT_URL` | `redirectToCheckout` with anything other than an `http(s)` session URL                       |
+| `NO_CART_PROVIDER`     | `useShoppingCart` and the other hooks outside `<CartProvider>`                               |
 | `NOT_IN_BROWSER`       | `redirectToCheckout` called on the server                                                    |
 | `UNKNOWN`              | only in `useCartActions` state, for errors that aren't `CartError`s                          |
 

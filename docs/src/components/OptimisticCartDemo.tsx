@@ -1,6 +1,6 @@
 'use client'
 
-import React, { useState } from 'react'
+import { useRef, useState } from 'react'
 import { useOptimisticCart, formatCurrencyString } from 'use-shopping-cart'
 import type { Product } from 'use-shopping-cart/core'
 import { CartDisplay } from './CartDisplay'
@@ -35,47 +35,25 @@ const sampleProducts: Product[] = [
   }
 ]
 
+function simulateServer(shouldFail: boolean) {
+  return new Promise<void>((resolve, reject) =>
+    setTimeout(
+      () => (shouldFail ? reject(new Error('Server rejected')) : resolve()),
+      shouldFail ? 1500 : 2500
+    )
+  )
+}
+
 export function OptimisticCartDemo() {
-  const { addItem, cartDetails, decrementItem } = useOptimisticCart()
-  const [selectedProduct, setSelectedProduct] = React.useState(
-    sampleProducts[0]
-  )
-  const [processingItems, setProcessingItems] = React.useState<Set<string>>(
-    new Set()
-  )
-
-  // Create delayed version of addItem that shows immediate optimistic update
-  const addItemWithDelay = async (product: Product, options = {}) => {
-    const id = product.id as string
-
-    // Mark this item as processing
-    setProcessingItems((prev) => new Set(prev).add(id))
-
-    // Call the actual cart update immediately for optimistic UI
-    addItem(product, options)
-
-    // Keep the loading state visible for 2.5 seconds
-    setTimeout(() => {
-      setProcessingItems((prev) => {
-        const next = new Set(prev)
-        next.delete(id)
-        return next
-      })
-    }, 2500)
-  }
-
-  // Merge cart details with processing state
-  const enhancedCartDetails = Object.fromEntries(
-    Object.entries(cartDetails).map(([id, item]) => [
-      id,
-      {
-        ...item,
-        _optimistic: processingItems.has(id)
-      }
-    ])
-  )
-
-  const isOptimistic = processingItems.size > 0
+  const failNext = useRef(false)
+  const { addItem, cartDetails, isOptimistic, error } = useOptimisticCart({
+    onChange: () => {
+      const shouldFail = failNext.current
+      failNext.current = false
+      return simulateServer(shouldFail)
+    }
+  })
+  const [selectedProduct, setSelectedProduct] = useState(sampleProducts[0])
 
   const price = formatCurrencyString({
     value: selectedProduct.price,
@@ -83,19 +61,15 @@ export function OptimisticCartDemo() {
     language: 'en-US'
   })
 
-  const itemInCart =
-    selectedProduct.id && enhancedCartDetails
-      ? enhancedCartDetails[selectedProduct.id]
-      : undefined
-
-  // Check if this specific item is optimistic
-  const isThisItemOptimistic = selectedProduct.id
-    ? processingItems.has(selectedProduct.id)
-    : false
+  const itemInCart = selectedProduct.id
+    ? cartDetails[selectedProduct.id]
+    : undefined
+  const isThisItemOptimistic = Boolean(
+    itemInCart && '_optimistic' in itemInCart && itemInCart._optimistic
+  )
 
   return (
     <div className="not-prose my-8 border rounded-lg p-6 bg-fd-card">
-      {/* Syncing State Indicator */}
       {isOptimistic && (
         <div className="mb-4 p-3 bg-blue-500/10 border border-blue-500/20 rounded-md flex items-center gap-2">
           <svg
@@ -124,15 +98,18 @@ export function OptimisticCartDemo() {
         </div>
       )}
 
+      {error != null && !isOptimistic && (
+        <div className="mb-4 p-3 bg-red-500/10 border border-red-500/20 rounded-md text-sm text-red-600 dark:text-red-400">
+          The server rejected the last change, so it was rolled back.
+        </div>
+      )}
+
       <div className="flex flex-col md:flex-row gap-6">
-        {/* Left Side: Cart Display */}
         <div className="flex-1">
           <CartDisplay />
         </div>
 
-        {/* Right Side: Products + Buttons */}
         <div className="flex-1 flex flex-col gap-4">
-          {/* Product Selector */}
           <div className="grid grid-cols-3 gap-2">
             {sampleProducts.map((product) => (
               <button
@@ -156,7 +133,6 @@ export function OptimisticCartDemo() {
             ))}
           </div>
 
-          {/* Selected Product Display */}
           <div className="flex flex-col items-center">
             <img
               src={selectedProduct.image}
@@ -185,12 +161,11 @@ export function OptimisticCartDemo() {
             )}
           </div>
 
-          {/* Action Buttons */}
           <div className="flex flex-col gap-3">
             <h4 className="font-semibold mb-2">Try Optimistic Updates:</h4>
 
             <button
-              onClick={() => addItemWithDelay(selectedProduct)}
+              onClick={() => addItem(selectedProduct)}
               disabled={isThisItemOptimistic}
               className="px-4 py-2 bg-fd-primary text-fd-primary-foreground rounded-md hover:bg-fd-primary/90 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
             >
@@ -198,7 +173,7 @@ export function OptimisticCartDemo() {
             </button>
 
             <button
-              onClick={() => addItemWithDelay(selectedProduct, { count: 5 })}
+              onClick={() => addItem(selectedProduct, { count: 5 })}
               disabled={isThisItemOptimistic}
               className="px-4 py-2 bg-fd-primary text-fd-primary-foreground rounded-md hover:bg-fd-primary/90 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
             >
@@ -206,29 +181,9 @@ export function OptimisticCartDemo() {
             </button>
 
             <button
-              onClick={async () => {
-                if (!selectedProduct.id) return
-                const id = selectedProduct.id
-                setProcessingItems((prev) => new Set(prev).add(id))
-
-                try {
-                  // Add item optimistically
-                  addItem(selectedProduct)
-
-                  // Simulate failed async operation
-                  await new Promise((_, reject) =>
-                    setTimeout(() => reject(new Error('Failed')), 1500)
-                  )
-                } catch {
-                  // On error, rollback the optimistic update
-                  decrementItem(id)
-                } finally {
-                  setProcessingItems((prev) => {
-                    const next = new Set(prev)
-                    next.delete(id)
-                    return next
-                  })
-                }
+              onClick={() => {
+                failNext.current = true
+                addItem(selectedProduct)
               }}
               disabled={isThisItemOptimistic}
               className="px-4 py-2 bg-red-600 text-white rounded-md hover:bg-red-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
@@ -245,7 +200,10 @@ export function OptimisticCartDemo() {
                   <strong>Try the error button</strong> - UI automatically rolls
                   back on failure
                 </li>
-                <li>Uses React 19's useOptimistic hook</li>
+                <li>
+                  Uses <code>useOptimisticCart(&#123; onChange &#125;)</code>{' '}
+                  with a simulated server
+                </li>
               </ul>
               <p className="mt-2 text-xs text-fd-muted-foreground italic">
                 Note: 2.5 second delay added to this demo to showcase the

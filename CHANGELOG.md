@@ -14,8 +14,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - `dist/react.es.js` → `dist/react.mjs`, `dist/react.js` → `dist/react.cjs` (same for `core`)
   - `utilities/serverless.js` → `dist/utilities.mjs` / `dist/utilities.cjs`
   - Imports through `use-shopping-cart`, `use-shopping-cart/core` and `use-shopping-cart/utilities` are unaffected; only tooling that bypasses the `exports` map and points at a file breaks (absolute paths, Jest `moduleNameMapper`, bundler aliases, CDN URLs pointing at `.es.js`)
-- **Errors are `CartError`s**: everything the library throws is a `CartError` with a `code` (`INVALID_PRODUCT`, `INVALID_COUNT`, `INVALID_QUANTITY`, `ITEM_NOT_IN_CART`, `INVALID_FORM_DATA`, `INVALID_INVENTORY`, `INVALID_CART`, `NOT_IN_INVENTORY`, `INVALID_CHECKOUT_URL`, `NOT_IN_BROWSER`). Messages are unchanged; validation errors' `name` changed from `ValidationError` to `CartError` (#359)
+- **Errors are `CartError`s**: everything the library throws is a `CartError` with a `code` (`INVALID_PRODUCT`, `INVALID_COUNT`, `INVALID_QUANTITY`, `ITEM_NOT_IN_CART`, `INVALID_FORM_DATA`, `INVALID_INVENTORY`, `INVALID_CART`, `NOT_IN_INVENTORY`, `INVALID_CHECKOUT_URL`, `NOT_IN_BROWSER`, `NO_CART_PROVIDER`). Messages are unchanged; validation errors' `name` changed from `ValidationError` to `CartError` (#359)
 - **`CartConfig` is explicit**: `CartProvider` and `new ShoppingCart()` accept `cartDetails`, `currency`, `language`, `shouldPersist`, `persistKey` and `storage`. Other `CartState` fields are no longer accepted, and config (`shouldPersist`, `storage`, `persistKey`) no longer leaks into `getState()` (#357)
+- **`validateCartItems` matches every product ID field**: inventory is indexed by `id`, `price_id`, `sku_id` and `sku`, the same fields the cart uses for item IDs (first match wins). Previously items added by `price_id` or `sku_id` alone failed with "not in your inventory". If one product's `price_id`/`sku_id` equals another product's `id`/`sku`, the earlier product in `inventory` now matches (#358)
 - **`redirectToCheckout` is a standalone function**: `import { redirectToCheckout } from 'use-shopping-cart'` (or `/core`) and pass `session.url`. Removed: the cart method, session-ID redirects, the `stripe` prop/config/state, `changeStripeKey`, the `RedirectToCheckoutInput` type, and the Stripe.js loader. Stripe removed `redirectToCheckout({ sessionId })` from Stripe.js (#360)
 
 ### ✨ Features
@@ -36,7 +37,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Storage is written only when the cart, currency or language changes, not on UI changes like `handleCartHover`; failed async writes now log a warning instead of an unhandled rejection
 - Changing currency or language keeps each item's `timestamp`
 - `useOptimisticCart` no longer shows each change twice for one render (adding one item briefly showed two) (#361)
-- `validateCartItems` matches inventory by `id`, `price_id`, `sku_id` and `sku`, the same fields the cart uses for item IDs. Previously items added by `price_id` or `sku_id` alone failed with "not in your inventory" (#358)
 
 ## [4.0.0-alpha.2] - 2025-12-26
 

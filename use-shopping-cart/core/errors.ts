@@ -9,6 +9,7 @@ export type CartErrorCode =
   | 'NOT_IN_INVENTORY'
   | 'INVALID_CHECKOUT_URL'
   | 'NOT_IN_BROWSER'
+  | 'NO_CART_PROVIDER'
   | 'UNKNOWN'
 
 export class CartError extends Error {

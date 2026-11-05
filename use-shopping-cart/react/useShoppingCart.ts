@@ -1,6 +1,6 @@
 'use client'
 
-import { useSyncExternalStore, useCallback, useRef } from 'react'
+import { useSyncExternalStore, useCallback } from 'react'
 import { useCartContext } from './CartProvider'
 import type { ShoppingCart } from '../core/ShoppingCart'
 import type { CartState } from '../core/types'
@@ -55,19 +55,27 @@ function getCartView(cart: ShoppingCart): UseShoppingCartReturn {
   return view
 }
 
+type CartSelector<T> = (cart: UseShoppingCartReturn) => T
+
+const selectionCache = new WeakMap<
+  CartSelector<unknown>,
+  { view: UseShoppingCartReturn; selected: unknown }
+>()
+
+function select<T>(view: UseShoppingCartReturn, selector: CartSelector<T>): T {
+  const cached = selectionCache.get(selector)
+  if (cached?.view === view) return cached.selected as T
+  const selected = selector(view)
+  selectionCache.set(selector, { view, selected })
+  return selected
+}
+
 export function useShoppingCart(): UseShoppingCartReturn
+export function useShoppingCart<T>(selector: CartSelector<T>): T
 export function useShoppingCart<T>(
-  selector: (cart: UseShoppingCartReturn) => T
-): T
-export function useShoppingCart<T>(
-  selector: (cart: UseShoppingCartReturn) => T = (cart) => cart as unknown as T
-): T {
+  selector?: CartSelector<T>
+): T | UseShoppingCartReturn {
   const cart = useCartContext()
-  const last = useRef<{
-    view: UseShoppingCartReturn
-    selector: (cart: UseShoppingCartReturn) => T
-    selected: T
-  } | null>(null)
 
   const subscribe = useCallback(
     (callback: () => void) => cart.subscribe(callback),
@@ -76,12 +84,7 @@ export function useShoppingCart<T>(
 
   const getSnapshot = () => {
     const view = getCartView(cart)
-    if (last.current?.view === view && last.current.selector === selector) {
-      return last.current.selected
-    }
-    const selected = selector(view)
-    last.current = { view, selector, selected }
-    return selected
+    return selector ? select(view, selector) : view
   }
 
   return useSyncExternalStore(subscribe, getSnapshot, getSnapshot)

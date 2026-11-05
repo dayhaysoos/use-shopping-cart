@@ -4,6 +4,7 @@ import * as React from 'react'
 import { ShoppingCart } from '../core/ShoppingCart'
 import type { CartConfig } from '../core/types'
 import { isClient } from '../utilities/SSR'
+import { CartError } from '../core/errors'
 
 const CartContext = React.createContext<ShoppingCart | null>(null)
 
@@ -32,7 +33,10 @@ export function useCartContext(): ShoppingCart {
   const cart = React.useContext(CartContext)
 
   if (!cart) {
-    throw new Error('useCartContext must be used within CartProvider')
+    throw new CartError(
+      'NO_CART_PROVIDER',
+      'useCartContext must be used within CartProvider'
+    )
   }
 
   return cart

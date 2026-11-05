@@ -14,8 +14,6 @@ import ReactDOM from 'react-dom'
 import { CartProvider } from 'use-shopping-cart'
 import App from './App'
 
-const stripeKey = process.env.YOUR_STRIPE_PUBLIC_KEY
-
 ReactDOM.render(
   <CartProvider currency="USD">
     <App />

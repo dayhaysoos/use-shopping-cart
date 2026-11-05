@@ -74,9 +74,9 @@ function Cart() {
 
 How it behaves:
 
-- **Order:** changes wait for the previous `onChange` to settle, so three quick clicks send three requests, one after another.
+- **Order:** changes wait for the previous `onChange` to settle, so three quick clicks send three requests, one after another. Every component using `useOptimisticCart` with the same cart shares this queue.
 - **Success:** the change is applied to the real cart (and saved to `storage`).
-- **Failure:** the change is dropped and `error` holds what `onChange` threw. Later queued changes still run.
+- **Failure:** the change is dropped and `error` holds what `onChange` threw. Later queued changes still run, but each is checked against the real cart first: one that depended on the failed change (incrementing an item whose add failed) is dropped with an `ITEM_NOT_IN_CART` error and never reaches `onChange`.
 - **Invalid input** (bad count, product without a price) throws immediately and never reaches `onChange`.
 
 What the server does with the change, and whether the cart is loaded from the server (for example with [`loadCart`](/docs/actions/loadCart)), is up to you.

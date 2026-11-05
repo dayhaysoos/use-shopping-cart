@@ -165,6 +165,62 @@ describe('useOptimisticCart with onChange', () => {
     expect(last()).toEqual({ shown: 5, real: 5, optimistic: false })
   })
 
+  it('drops a queued change that depends on a failed one without calling onChange', async () => {
+    const calls: Array<ReturnType<typeof deferred>> = []
+    const onChange = vi.fn(() => {
+      const d = deferred()
+      calls.push(d)
+      return d.promise
+    })
+    vi.spyOn(console, 'warn').mockImplementation(() => {})
+    const { api, last } = setup(onChange)
+
+    await act(async () => {
+      api.current.addItem(product)
+      api.current.incrementItem('a')
+    })
+    await act(async () => calls[0].reject(new Error('no stock')))
+
+    expect(onChange).toHaveBeenCalledTimes(1)
+    expect(last()).toEqual({ shown: 0, real: 0, optimistic: false })
+    expect(api.current.error).toEqual(
+      expect.objectContaining({ code: 'ITEM_NOT_IN_CART' })
+    )
+    vi.restoreAllMocks()
+  })
+
+  it('shares one queue between components using the same cart', async () => {
+    const calls: Array<ReturnType<typeof deferred>> = []
+    const onChange = vi.fn(() => {
+      const d = deferred()
+      calls.push(d)
+      return d.promise
+    })
+    const apis: Array<ReturnType<typeof useOptimisticCart>> = []
+    function Button({ index }: { index: number }) {
+      apis[index] = useOptimisticCart({ onChange })
+      return null
+    }
+    render(
+      <CartProvider shouldPersist={false} currency="USD" language="en-US">
+        <Button index={0} />
+        <Button index={1} />
+      </CartProvider>
+    )
+
+    await act(async () => {
+      apis[0].addItem(product)
+      apis[1].incrementItem('a')
+    })
+    expect(onChange).toHaveBeenCalledTimes(1)
+
+    await act(async () => calls[0].resolve())
+    expect(onChange).toHaveBeenCalledTimes(2)
+    await act(async () => calls[1].resolve())
+
+    expect(apis[0].cartCount).toBe(2)
+  })
+
   it('throws invalid input synchronously without calling onChange', () => {
     const onChange = vi.fn(async () => {})
     vi.spyOn(console, 'warn').mockImplementation(() => {})
