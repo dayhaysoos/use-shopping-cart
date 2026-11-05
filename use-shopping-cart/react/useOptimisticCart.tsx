@@ -1,8 +1,16 @@
 'use client'
 
-import { useCallback, useMemo, useState, useSyncExternalStore } from 'react'
+import {
+  createContext,
+  startTransition,
+  useContext,
+  useMemo,
+  useOptimistic,
+  useState,
+  type ReactNode
+} from 'react'
 import { useShoppingCart } from './useShoppingCart'
-import { useCartContext } from './CartProvider'
+import { useCartContext } from './cartContext'
 import type { ShoppingCart } from '../core/ShoppingCart'
 import type {
   CartDetails,
@@ -39,10 +47,55 @@ export interface UseOptimisticCartOptions {
   onChange?: (change: CartChange) => Promise<unknown> | unknown
 }
 
+const committedChanges = new WeakSet<CartChange>()
+
+function showPendingChange(
+  details: OptimisticCartDetails,
+  change: CartChange,
+  format: CartFormat
+): OptimisticCartDetails {
+  if (committedChanges.has(change)) return details
+  const next: OptimisticCartDetails = applyCartChange(details, change, format)
+  const id = changedEntryId(change)
+  return id && next !== details && next[id]
+    ? { ...next, [id]: { ...next[id], _optimistic: true } }
+    : next
+}
+
+interface OptimisticCart {
+  cartDetails: OptimisticCartDetails
+  showChange: (change: CartChange) => void
+}
+
+const OptimisticCartContext = createContext<OptimisticCart | null>(null)
+
+export function OptimisticCartLayer({ children }: { children: ReactNode }) {
+  const cartDetails = useShoppingCart((cart) => cart.cartDetails)
+  const currency = useShoppingCart((cart) => cart.currency)
+  const language = useShoppingCart((cart) => cart.language)
+
+  const [optimisticCartDetails, showChange] = useOptimistic<
+    OptimisticCartDetails,
+    CartChange
+  >(cartDetails, (state, change) =>
+    showPendingChange(state, change, { currency, language })
+  )
+
+  const value = useMemo(
+    () => ({ cartDetails: optimisticCartDetails, showChange }),
+    [optimisticCartDetails, showChange]
+  )
+
+  return (
+    <OptimisticCartContext.Provider value={value}>
+      {children}
+    </OptimisticCartContext.Provider>
+  )
+}
+
 interface ChangeQueue {
   tail: Promise<unknown>
   queued: CartChange[]
-  listeners: Set<() => void>
 }
 
 const changeQueues = new WeakMap<ShoppingCart, ChangeQueue>()
@@ -50,29 +103,10 @@ const changeQueues = new WeakMap<ShoppingCart, ChangeQueue>()
 function getChangeQueue(store: ShoppingCart): ChangeQueue {
   let queue = changeQueues.get(store)
   if (!queue) {
-    queue = { tail: Promise.resolve(), queued: [], listeners: new Set() }
+    queue = { tail: Promise.resolve(), queued: [] }
     changeQueues.set(store, queue)
   }
   return queue
-}
-
-function setQueued(queue: ChangeQueue, queued: CartChange[]): void {
-  queue.queued = queued
-  queue.listeners.forEach((listener) => listener())
-}
-
-function applyPending(
-  cartDetails: CartDetails,
-  queued: CartChange[],
-  format: CartFormat
-): OptimisticCartDetails {
-  return queued.reduce<OptimisticCartDetails>((details, change) => {
-    const next: OptimisticCartDetails = applyCartChange(details, change, format)
-    const id = changedEntryId(change)
-    return id && next !== details && next[id]
-      ? { ...next, [id]: { ...next[id], _optimistic: true } }
-      : next
-  }, cartDetails)
 }
 
 function enqueueChange(
@@ -85,20 +119,21 @@ function enqueueChange(
   const queue = getChangeQueue(store)
   validate(() => {
     const state = store.getState()
-    return applyPending(state.cartDetails, queue.queued, state)
+    return queue.queued.reduce(
+      (details, queuedChange) => applyCartChange(details, queuedChange, state),
+      state.cartDetails
+    )
   })
-  setQueued(queue, [...queue.queued, change])
+  queue.queued = [...queue.queued, change]
 
   const task = queue.tail.then(async () => {
     try {
       validate(() => store.getState().cartDetails)
       await onChange(change)
+      committedChanges.add(change)
       commit()
     } finally {
-      setQueued(
-        queue,
-        queue.queued.filter((c) => c !== change)
-      )
+      queue.queued = queue.queued.filter((c) => c !== change)
     }
   })
   queue.tail = task.catch(() => {})
@@ -108,32 +143,11 @@ function enqueueChange(
 export function useOptimisticCart({ onChange }: UseOptimisticCartOptions = {}) {
   const cart = useShoppingCart()
   const store = useCartContext()
+  const optimistic = useContext(OptimisticCartContext)
   const [error, setError] = useState<unknown>(null)
 
-  const queue = getChangeQueue(store)
-  const subscribe = useCallback(
-    (listener: () => void) => {
-      queue.listeners.add(listener)
-      return () => {
-        queue.listeners.delete(listener)
-      }
-    },
-    [queue]
-  )
-  const queued = useSyncExternalStore(
-    subscribe,
-    () => queue.queued,
-    () => queue.queued
-  )
-
-  const { currency, language } = cart
-  const optimisticCartDetails = useMemo(
-    () => applyPending(cart.cartDetails, queued, { currency, language }),
-    [cart.cartDetails, queued, currency, language]
-  )
-
+  const optimisticCartDetails = optimistic?.cartDetails ?? cart.cartDetails
   const isOptimistic = optimisticCartDetails !== cart.cartDetails
-
   const optimisticTotals = cartTotals(optimisticCartDetails, cart)
 
   const run = (
@@ -146,10 +160,16 @@ export function useOptimisticCart({ onChange }: UseOptimisticCartOptions = {}) {
       return
     }
 
-    enqueueChange(store, change, validate, onChange, commit).then(
-      () => setError(null),
-      (caught: unknown) => setError(caught)
-    )
+    const task = enqueueChange(store, change, validate, onChange, commit)
+    startTransition(async () => {
+      optimistic?.showChange(change)
+      try {
+        await task
+        startTransition(() => setError(null))
+      } catch (caught) {
+        startTransition(() => setError(caught))
+      }
+    })
   }
 
   const addItem = (product: Product, options: AddItemOptions = {}) => {

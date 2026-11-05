@@ -4,9 +4,10 @@ import * as React from 'react'
 import { ShoppingCart } from '../core/ShoppingCart'
 import type { CartConfig } from '../core/types'
 import { isClient } from '../utilities/SSR'
-import { CartError } from '../core/errors'
+import { CartContext } from './cartContext'
+import { OptimisticCartLayer } from './useOptimisticCart'
 
-const CartContext = React.createContext<ShoppingCart | null>(null)
+export { useCartContext } from './cartContext'
 
 export interface CartProviderProps extends CartConfig {
   children: React.ReactNode
@@ -26,18 +27,9 @@ export function CartProvider({
     return <>{loading}</>
   }
 
-  return <CartContext.Provider value={cart}>{children}</CartContext.Provider>
-}
-
-export function useCartContext(): ShoppingCart {
-  const cart = React.useContext(CartContext)
-
-  if (!cart) {
-    throw new CartError(
-      'NO_CART_PROVIDER',
-      'useCartContext must be used within CartProvider'
-    )
-  }
-
-  return cart
+  return (
+    <CartContext.Provider value={cart}>
+      <OptimisticCartLayer>{children}</OptimisticCartLayer>
+    </CartContext.Provider>
+  )
 }

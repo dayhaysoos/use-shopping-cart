@@ -1,7 +1,7 @@
 'use client'
 
 import { useSyncExternalStore, useCallback } from 'react'
-import { useCartContext } from './CartProvider'
+import { useCartContext } from './cartContext'
 import type { ShoppingCart } from '../core/ShoppingCart'
 import type { CartState } from '../core/types'
 
