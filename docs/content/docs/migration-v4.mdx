@@ -84,6 +84,14 @@ import { redirectToCheckout } from 'use-shopping-cart'
 redirectToCheckout(sessionUrl)
 ```
 
+### `useShoppingCart(selector)` Is Back
+
+As in v3, `useShoppingCart` takes an optional selector, and the component re-renders only when the selected value changes:
+
+```js
+const cartCount = useShoppingCart((cart) => cart.cartCount)
+```
+
 **All other APIs**: backward compatible for checkout-session mode users.
 
 ## What's New in v4.0

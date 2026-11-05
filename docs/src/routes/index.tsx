@@ -18,7 +18,7 @@ type HomeLoaderData = {
   metrics: HomeMetrics
 }
 
-const INSTALL_SNIPPET = 'npm install @stripe/stripe-js use-shopping-cart'
+const INSTALL_SNIPPET = 'npm install use-shopping-cart'
 const CODE_THEME = themes.nightOwl
 
 const PRIMARY_FEATURES = [

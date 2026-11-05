@@ -135,6 +135,36 @@ describe('useOptimisticCart with onChange', () => {
     expect(api.current.cartCount).toBe(1)
   })
 
+  it('rejects a change to an item that will not be in the cart, before calling onChange', () => {
+    const onChange = vi.fn(async () => {})
+    vi.spyOn(console, 'warn').mockImplementation(() => {})
+    const { api } = setup(onChange)
+
+    expect(() => api.current.incrementItem('missing')).toThrow(
+      expect.objectContaining({ code: 'ITEM_NOT_IN_CART' })
+    )
+    expect(() => api.current.removeItem('missing')).toThrow(
+      expect.objectContaining({ code: 'ITEM_NOT_IN_CART' })
+    )
+    expect(onChange).not.toHaveBeenCalled()
+    vi.restoreAllMocks()
+  })
+
+  it('accepts changes to an item that a queued change adds', async () => {
+    const pending = deferred()
+    const { api, last } = setup(() => pending.promise)
+
+    await act(async () => {
+      api.current.addItem(product)
+      api.current.incrementItem('a')
+      api.current.setItemQuantity('a', 5)
+    })
+    expect(last().shown).toBe(5)
+
+    await act(async () => pending.resolve())
+    expect(last()).toEqual({ shown: 5, real: 5, optimistic: false })
+  })
+
   it('throws invalid input synchronously without calling onChange', () => {
     const onChange = vi.fn(async () => {})
     vi.spyOn(console, 'warn').mockImplementation(() => {})

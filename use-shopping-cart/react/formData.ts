@@ -61,12 +61,7 @@ export function decodeQuantity(formData: FormData): {
 
   return {
     itemId,
-    quantity: toInteger(
-      quantity,
-      'quantity',
-      'non-negative',
-      'INVALID_QUANTITY'
-    )
+    quantity: toInteger(quantity, 'quantity')
   }
 }
 
@@ -83,19 +78,20 @@ function decodeCount(formData: FormData): number {
   if (count === null) return 1
   if (typeof count !== 'string')
     throw new CartError('INVALID_COUNT', 'count must be a string')
-  return toInteger(count, 'count', 'positive', 'INVALID_COUNT')
+  return toInteger(count, 'count')
 }
 
-function toInteger(
-  value: string,
-  fieldName: string,
-  kind: 'positive' | 'non-negative',
-  code: CartErrorCode
-): number {
+const integerFields = {
+  count: { kind: 'positive', code: 'INVALID_COUNT' },
+  quantity: { kind: 'non-negative', code: 'INVALID_QUANTITY' }
+} as const satisfies Record<string, { kind: string; code: CartErrorCode }>
+
+function toInteger(value: string, field: keyof typeof integerFields): number {
+  const { kind, code } = integerFields[field]
   const parsed = Number(value)
   const inRange = kind === 'positive' ? parsed > 0 : parsed >= 0
   if (!Number.isInteger(parsed) || !inRange) {
-    throw new CartError(code, `${fieldName} must be a ${kind} integer`)
+    throw new CartError(code, `${field} must be a ${kind} integer`)
   }
   return parsed
 }

@@ -2,6 +2,7 @@
 
 import { useOptimistic, startTransition, useRef, useState } from 'react'
 import { useShoppingCart } from './useShoppingCart'
+import { useCartContext } from './CartProvider'
 import type {
   CartDetails,
   CartEntry,
@@ -18,7 +19,8 @@ import {
 import {
   validateProduct,
   validateCount,
-  validateQuantity
+  validateQuantity,
+  validateItemExists
 } from '../core/validation'
 
 export interface OptimisticCartEntry extends CartEntry {
@@ -39,7 +41,9 @@ const committedChanges = new WeakSet<CartChange>()
 
 export function useOptimisticCart({ onChange }: UseOptimisticCartOptions = {}) {
   const cart = useShoppingCart()
+  const store = useCartContext()
   const queue = useRef<Promise<unknown>>(Promise.resolve())
+  const queued = useRef<CartChange[]>([])
   const [error, setError] = useState<unknown>(null)
 
   const [optimisticCartDetails, showChange] = useOptimistic<
@@ -61,9 +65,17 @@ export function useOptimisticCart({ onChange }: UseOptimisticCartOptions = {}) {
 
   const optimisticTotals = cartTotals(optimisticCartDetails, cart)
 
+  const expectedCartDetails = () => {
+    const state = store.getState()
+    return queued.current.reduce(
+      (details, change) => applyCartChange(details, change, state),
+      state.cartDetails
+    )
+  }
+
   const run = (
     change: CartChange,
-    validate: () => void,
+    validate: (expected: () => CartDetails) => void,
     commit: () => void
   ) => {
     if (!onChange) {
@@ -71,14 +83,19 @@ export function useOptimisticCart({ onChange }: UseOptimisticCartOptions = {}) {
       return
     }
 
-    validate()
+    validate(expectedCartDetails)
+    queued.current = [...queued.current, change]
     startTransition(async () => {
       showChange(change)
-      const task = queue.current.then(async () => {
-        await onChange(change)
-        committedChanges.add(change)
-        commit()
-      })
+      const task = queue.current
+        .then(async () => {
+          await onChange(change)
+          committedChanges.add(change)
+          commit()
+        })
+        .finally(() => {
+          queued.current = queued.current.filter((c) => c !== change)
+        })
       queue.current = task.catch(() => {})
       try {
         await task
@@ -104,7 +121,7 @@ export function useOptimisticCart({ onChange }: UseOptimisticCartOptions = {}) {
   const removeItem = (id: string) => {
     run(
       { type: 'remove', id },
-      () => {},
+      (expected) => validateItemExists(id, expected(), 'removeItem'),
       () => cart.removeItem(id)
     )
   }
@@ -113,7 +130,10 @@ export function useOptimisticCart({ onChange }: UseOptimisticCartOptions = {}) {
     const count = options.count ?? 1
     run(
       { type: 'adjust', id, by: count },
-      () => validateCount(count, 'incrementItem'),
+      (expected) => {
+        validateCount(count, 'incrementItem')
+        validateItemExists(id, expected(), 'incrementItem')
+      },
       () => cart.incrementItem(id, { ...options, count })
     )
   }
@@ -122,7 +142,10 @@ export function useOptimisticCart({ onChange }: UseOptimisticCartOptions = {}) {
     const count = options.count ?? 1
     run(
       { type: 'adjust', id, by: -count },
-      () => validateCount(count, 'decrementItem'),
+      (expected) => {
+        validateCount(count, 'decrementItem')
+        validateItemExists(id, expected(), 'decrementItem')
+      },
       () => cart.decrementItem(id, { ...options, count })
     )
   }
@@ -130,7 +153,10 @@ export function useOptimisticCart({ onChange }: UseOptimisticCartOptions = {}) {
   const setItemQuantity = (id: string, quantity: number) => {
     run(
       { type: 'set', id, quantity },
-      () => validateQuantity(quantity, 'setItemQuantity'),
+      (expected) => {
+        validateQuantity(quantity, 'setItemQuantity')
+        validateItemExists(id, expected(), 'setItemQuantity')
+      },
       () => cart.setItemQuantity(id, quantity)
     )
   }

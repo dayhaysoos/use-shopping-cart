@@ -32,7 +32,7 @@ export type CartActions = {
 export interface UseShoppingCartReturn extends CartState, CartActions {}
 
 const methodsCache = new WeakMap<ShoppingCart, CartActions>()
-const fullCache = new WeakMap<CartState, UseShoppingCartReturn>()
+const cartViewCache = new WeakMap<CartState, UseShoppingCartReturn>()
 
 function getMethods(cart: ShoppingCart): CartActions {
   let methods = methodsCache.get(cart)
@@ -45,14 +45,14 @@ function getMethods(cart: ShoppingCart): CartActions {
   return methods
 }
 
-function getFull(cart: ShoppingCart): UseShoppingCartReturn {
+function getCartView(cart: ShoppingCart): UseShoppingCartReturn {
   const state = cart.getState()
-  let full = fullCache.get(state)
-  if (!full) {
-    full = { ...state, ...getMethods(cart) }
-    fullCache.set(state, full)
+  let view = cartViewCache.get(state)
+  if (!view) {
+    view = { ...state, ...getMethods(cart) }
+    cartViewCache.set(state, view)
   }
-  return full
+  return view
 }
 
 export function useShoppingCart(): UseShoppingCartReturn
@@ -64,7 +64,7 @@ export function useShoppingCart<T>(
 ): T {
   const cart = useCartContext()
   const last = useRef<{
-    full: UseShoppingCartReturn
+    view: UseShoppingCartReturn
     selector: (cart: UseShoppingCartReturn) => T
     selected: T
   } | null>(null)
@@ -75,12 +75,12 @@ export function useShoppingCart<T>(
   )
 
   const getSnapshot = () => {
-    const full = getFull(cart)
-    if (last.current?.full === full && last.current.selector === selector) {
+    const view = getCartView(cart)
+    if (last.current?.view === view && last.current.selector === selector) {
       return last.current.selected
     }
-    const selected = selector(full)
-    last.current = { full, selector, selected }
+    const selected = selector(view)
+    last.current = { view, selector, selected }
     return selected
   }
 
