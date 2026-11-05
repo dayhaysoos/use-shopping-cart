@@ -12,11 +12,7 @@ import { CartProvider } from 'use-shopping-cart/react'
 import App from './App'
 
 ReactDOM.render(
-  <CartProvider
-    stripe={process.env.REACT_APP_STRIPE_API_PUBLIC}
-    currency="USD"
-    shouldPersist={false}
-  >
+  <CartProvider currency="USD" shouldPersist={false}>
     <App />
   </CartProvider>,
   document.getElementById('root')

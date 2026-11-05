@@ -73,25 +73,16 @@ export interface CartState {
   formattedTotalPrice: string
   cartCount: number
   cartDetails: CartDetails
-  stripe?: string
   currency: string
   language: string
   shouldDisplayCart: boolean
   lastClicked: string
 }
 
-export type RedirectToCheckoutInput =
-  | string
-  | {
-      sessionId?: string
-      sessionUrl?: string
-    }
-
 export interface CartConfig {
   cartDetails?: CartDetails
   currency?: string
   language?: string
-  stripe?: string
   shouldPersist?: boolean
   persistKey?: string
   storage?: StorageAdapter

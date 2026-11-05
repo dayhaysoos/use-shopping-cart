@@ -60,19 +60,13 @@ const SECONDARY_FEATURES = [
 const WORKFLOW_STEPS = [
   {
     title: 'Wrap your app',
-    description:
-      'Drop `<CartProvider>` at the root and pass your Stripe publishable key.',
+    description: 'Drop `<CartProvider>` at the root and pick a currency.',
     language: 'tsx',
     code: `import { CartProvider } from 'use-shopping-cart'
 
 export function Root() {
   return (
-    <CartProvider
-      mode="payment"
-      cartMode="checkout-session"
-      stripe={import.meta.env.VITE_STRIPE_KEY}
-      currency="USD"
-    >
+    <CartProvider currency="USD">
       <App />
     </CartProvider>
   )
@@ -134,7 +128,7 @@ export const handler = async (event) => {
     cancel_url: process.env.CANCEL_URL
   })
 
-  return { statusCode: 200, body: JSON.stringify({ sessionId: session.id }) }
+  return { statusCode: 200, body: JSON.stringify({ sessionUrl: session.url }) }
 }`
   }
 ]
@@ -154,11 +148,7 @@ import App from './App'
 
 export function Root() {
   return (
-    <CartProvider
-      stripe={import.meta.env.VITE_STRIPE_KEY}
-      currency="USD"
-      shouldPersist
-    >
+    <CartProvider currency="USD" shouldPersist>
       <App />
     </CartProvider>
   )
@@ -167,7 +157,7 @@ export function Root() {
   {
     id: 'next',
     label: 'Next.js',
-    description: 'App Router layout with checkout-session mode.',
+    description: 'App Router layout.',
     language: 'tsx',
     code: `'use client'
 import { CartProvider } from 'use-shopping-cart'
@@ -178,11 +168,7 @@ export default function RootLayout({
   children: React.ReactNode
 }) {
   return (
-    <CartProvider
-      stripe={process.env.NEXT_PUBLIC_STRIPE_KEY!}
-      currency="USD"
-      shouldPersist
-    >
+    <CartProvider currency="USD" shouldPersist>
       {children}
     </CartProvider>
   )
@@ -199,7 +185,7 @@ import { CartProvider } from 'use-shopping-cart'
 export default function App() {
   return (
     <Document>
-      <CartProvider stripe={process.env.STRIPE_KEY!} currency="USD">
+      <CartProvider currency="USD">
         <Outlet />
       </CartProvider>
     </Document>

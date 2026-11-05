@@ -4,7 +4,8 @@ import {
   CartProvider,
   useShoppingCart,
   useOptimisticCart,
-  useCartActions
+  useCartActions,
+  redirectToCheckout
 } from 'use-shopping-cart'
 
 /**
@@ -32,9 +33,6 @@ function TestUseShoppingCartState() {
   const lastClicked: string = cart.lastClicked
   // @ts-expect-error shouldPersist is config, not state
   cart.shouldPersist
-
-  // Optional stripe key
-  const stripeKey: string | undefined = cart.stripe
 
   // Cart details
   const details = cart.cartDetails
@@ -132,14 +130,10 @@ function TestUseShoppingCartActions() {
     cart.handleCartClick()
 
     // Config changes
-    cart.changeStripeKey('pk_test_123')
     cart.changeLanguage('ja')
     cart.changeCurrency('JPY')
 
-    // Redirect to checkout (use session.url)
-    cart
-      .redirectToCheckout('https://checkout.stripe.com/pay/cs_test_123')
-      .catch(() => {})
+    redirectToCheckout('https://checkout.stripe.com/c/pay/cs_test_123')
   }, [cart])
 
   return <p>Actions!</p>
@@ -259,7 +253,6 @@ function TestCartProviderProps() {
 
       {/* With all props */}
       <CartProvider
-        stripe="pk_test_123"
         currency="USD"
         language="en-US"
         shouldPersist={true}

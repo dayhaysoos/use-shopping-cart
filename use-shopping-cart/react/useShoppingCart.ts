@@ -17,10 +17,8 @@ const cartActionNames = [
   'handleCartClick',
   'handleCloseCart',
   'storeLastClicked',
-  'changeStripeKey',
   'changeLanguage',
-  'changeCurrency',
-  'redirectToCheckout'
+  'changeCurrency'
 ] as const
 
 type CartActionName = (typeof cartActionNames)[number]

@@ -7,9 +7,8 @@ export type CartErrorCode =
   | 'INVALID_INVENTORY'
   | 'INVALID_CART'
   | 'NOT_IN_INVENTORY'
-  | 'MISSING_CHECKOUT_SESSION'
-  | 'INVALID_STRIPE_KEY'
-  | 'STRIPE_UNAVAILABLE'
+  | 'INVALID_CHECKOUT_URL'
+  | 'NOT_IN_BROWSER'
   | 'UNKNOWN'
 
 export class CartError extends Error {

@@ -30,10 +30,7 @@ function MyComponent() {
     removeItem,
     incrementItem,
     decrementItem,
-    clearCart,
-
-    // Checkout
-    redirectToCheckout
+    clearCart
   } = useShoppingCart()
 
   // Use cart state and methods
@@ -85,12 +82,6 @@ The hook returns an object with all cart state and methods:
 | [`clearCart()`](/docs/actions/clearCart)                         | Remove all items               |
 | [`loadCart(cartDetails)`](/docs/actions/loadCart)                | Load cart from external source |
 
-### Checkout Methods
-
-| Method                                                               | Description                                                 |
-| -------------------------------------------------------------------- | ----------------------------------------------------------- |
-| [`redirectToCheckout(sessionUrl)`](/docs/actions/redirectToCheckout) | Redirect to Stripe checkout with server-created session URL |
-
 ### UI Helper Methods
 
 | Method                                                          | Description                |
@@ -105,8 +96,10 @@ The hook returns an object with all cart state and methods:
 ### Basic Cart Operations
 
 ```jsx
+import { redirectToCheckout, useShoppingCart } from 'use-shopping-cart'
+
 function ProductCard({ product }) {
-  const { addItem, cartDetails, redirectToCheckout } = useShoppingCart()
+  const { addItem, cartDetails } = useShoppingCart()
 
   const itemInCart = cartDetails[product.id]
 
@@ -118,7 +111,7 @@ function ProductCard({ product }) {
     })
 
     const { sessionUrl } = await response.json()
-    await redirectToCheckout(sessionUrl)
+    redirectToCheckout(sessionUrl)
   }
 
   return (
@@ -139,6 +132,8 @@ function ProductCard({ product }) {
 ### Cart Display Component
 
 ```jsx
+import { redirectToCheckout, useShoppingCart } from 'use-shopping-cart'
+
 function CartSummary() {
   const {
     cartCount,
@@ -146,8 +141,7 @@ function CartSummary() {
     cartDetails,
     incrementItem,
     decrementItem,
-    removeItem,
-    redirectToCheckout
+    removeItem
   } = useShoppingCart()
 
   const handleCheckout = async () => {
@@ -158,7 +152,7 @@ function CartSummary() {
     })
 
     const { sessionUrl } = await response.json()
-    await redirectToCheckout(sessionUrl)
+    redirectToCheckout(sessionUrl)
   }
 
   if (cartCount === 0) {

@@ -4,6 +4,7 @@ import type { CartDetails, CartEntry } from './types'
 export { ShoppingCart, initialState } from './ShoppingCart'
 export { formatCurrencyString } from './formatters'
 export { CartError, isCartError } from './errors'
+export { redirectToCheckout } from './checkout'
 export type { CartErrorCode } from './errors'
 export {
   createLocalStorage,
@@ -18,7 +19,6 @@ export type {
   CartEntryAttributes,
   CartDetails,
   CartState,
-  RedirectToCheckoutInput,
   CartConfig,
   AddItemOptions,
   IncrementOptions,

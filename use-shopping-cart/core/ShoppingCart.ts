@@ -7,8 +7,7 @@ import type {
   AddItemOptions,
   IncrementOptions,
   SubscribeCallback,
-  UnsubscribeFunction,
-  RedirectToCheckoutInput
+  UnsubscribeFunction
 } from './types'
 import { createLocalStorage } from './storage'
 import {
@@ -28,7 +27,6 @@ import {
   validateItemExists,
   validateQuantity
 } from './validation'
-import { redirectToCheckout as stripeRedirect } from './stripe'
 
 const STORAGE_KEY_PREFIX = 'use-shopping-cart'
 
@@ -54,14 +52,12 @@ export class ShoppingCart {
     const {
       cartDetails = {},
       currency = initialState.currency,
-      language = initialState.language,
-      stripe
+      language = initialState.language
     } = config
     const state: CartState = {
       ...initialState,
       currency,
-      language,
-      ...(stripe !== undefined && { stripe })
+      language
     }
     this._state = withCartDetails(
       state,
@@ -213,11 +209,6 @@ export class ShoppingCart {
     this._notifySubscribers()
   }
 
-  changeStripeKey(key: string): void {
-    this._state = { ...this._state, stripe: key }
-    this._notifySubscribers()
-  }
-
   changeLanguage(language: string): void {
     if (language === this._state.language) return
 
@@ -244,11 +235,5 @@ export class ShoppingCart {
         this._state.language
       )
     )
-  }
-
-  async redirectToCheckout(
-    input: RedirectToCheckoutInput
-  ): Promise<{ error: any } | undefined> {
-    return stripeRedirect(this._state, input)
   }
 }

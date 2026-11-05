@@ -25,7 +25,6 @@ interface Storage {
 
 ```jsx
 <CartProvider
-  stripe={STRIPE_KEY}
   currency="USD"
   // Uses localStorage by default
 >
@@ -37,11 +36,7 @@ interface Storage {
 
 ```jsx
 import { createSessionStorage } from 'use-shopping-cart/core'
-;<CartProvider
-  stripe={STRIPE_KEY}
-  currency="USD"
-  storage={createSessionStorage()}
->
+;<CartProvider currency="USD" storage={createSessionStorage()}>
   <App />
 </CartProvider>
 ```
@@ -50,11 +45,7 @@ import { createSessionStorage } from 'use-shopping-cart/core'
 
 ```jsx
 import { createMemoryStorage } from 'use-shopping-cart/core'
-;<CartProvider
-  stripe={STRIPE_KEY}
-  currency="USD"
-  storage={createMemoryStorage()}
->
+;<CartProvider currency="USD" storage={createMemoryStorage()}>
   <App />
 </CartProvider>
 ```
@@ -64,7 +55,6 @@ import { createMemoryStorage } from 'use-shopping-cart/core'
 ```jsx
 import { createNoopStorage } from 'use-shopping-cart/core'
 ;<CartProvider
-  stripe={STRIPE_KEY}
   currency="USD"
   storage={createNoopStorage()}
   // Or simply:

@@ -44,7 +44,6 @@ const wrapper = ({ children }) => (
   <CartProvider
     mode="payment"
     cartMode="client-only"
-    stripe="pk_test_123"
     successUrl="https://example.com/success"
     cancelUrl="https://example.com/cancel"
     currency="USD"

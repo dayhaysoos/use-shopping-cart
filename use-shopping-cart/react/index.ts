@@ -10,7 +10,8 @@ export {
   formatCurrencyString,
   filterCart,
   CartError,
-  isCartError
+  isCartError,
+  redirectToCheckout
 } from '../core/index'
 export type { CartErrorCode } from '../core/errors'
 
@@ -37,7 +38,6 @@ export type {
   CartEntryAttributes,
   CartDetails,
   CartState,
-  RedirectToCheckoutInput,
   CartConfig,
   AddItemOptions,
   IncrementOptions,

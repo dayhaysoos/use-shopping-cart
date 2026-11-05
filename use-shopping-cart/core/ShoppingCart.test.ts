@@ -19,14 +19,12 @@ describe('ShoppingCart', () => {
     it('merges config with initial state', () => {
       const cart = new ShoppingCart({
         currency: 'EUR',
-        language: 'de-DE',
-        stripe: 'pk_test_123'
+        language: 'de-DE'
       })
 
       const state = cart.getState()
       expect(state.currency).toBe('EUR')
       expect(state.language).toBe('de-DE')
-      expect(state.stripe).toBe('pk_test_123')
     })
 
     it('keeps config options out of state', () => {
@@ -757,17 +755,6 @@ describe('ShoppingCart', () => {
     })
   })
 
-  describe('changeStripeKey', () => {
-    it('updates the stripe key', () => {
-      const cart = new ShoppingCart({ shouldPersist: false })
-
-      cart.changeStripeKey('pk_test_new_key')
-
-      const state = cart.getState()
-      expect(state.stripe).toBe('pk_test_new_key')
-    })
-  })
-
   describe('changeLanguage', () => {
     it('updates the language and recalculates formatted prices', () => {
       const cart = new ShoppingCart({ shouldPersist: false })
@@ -803,38 +790,6 @@ describe('ShoppingCart', () => {
       const state = cart.getState()
       expect(state.currency).toBe('EUR')
       expect(state.formattedTotalPrice).toContain('€')
-    })
-  })
-
-  describe('redirectToCheckout', () => {
-    it('throws when stripe key not configured', async () => {
-      const cart = new ShoppingCart({ shouldPersist: false })
-
-      await expect(cart.redirectToCheckout('sess_123')).rejects.toThrow(
-        'Stripe publishable key not configured'
-      )
-    })
-
-    it('throws when session input is missing', async () => {
-      const cart = new ShoppingCart({
-        shouldPersist: false,
-        stripe: 'pk_test_123'
-      })
-
-      await expect(cart.redirectToCheckout('' as any)).rejects.toThrow(
-        'sessionUrl or sessionId is required'
-      )
-    })
-
-    it('throws when stripe key has invalid format', async () => {
-      const cart = new ShoppingCart({
-        shouldPersist: false,
-        stripe: 'invalid_key_123'
-      })
-
-      await expect(cart.redirectToCheckout('sess_123')).rejects.toThrow(
-        'Invalid Stripe publishable key format'
-      )
     })
   })
 

@@ -99,11 +99,6 @@ describe('useShoppingCart', () => {
     const { result } = renderHook(() => useShoppingCart(), { wrapper })
 
     act(() => {
-      result.current.changeStripeKey('pk_test_new')
-    })
-    expect(result.current.stripe).toBe('pk_test_new')
-
-    act(() => {
       result.current.changeCurrency('EUR')
     })
     expect(result.current.currency).toBe('EUR')

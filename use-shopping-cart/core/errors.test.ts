@@ -1,8 +1,6 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest'
 import { CartError, isCartError, type CartErrorCode } from './errors'
 import { ShoppingCart } from './ShoppingCart'
-import { redirectToCheckout } from './stripe'
-import type { CartState } from './types'
 import { validateCartItems } from '../utilities/serverless'
 import {
   decodeAddItem,
@@ -22,18 +20,6 @@ function codeOf(fn: () => unknown): CartErrorCode | undefined {
     return (error as CartError).code
   }
   throw new Error('expected a throw')
-}
-
-async function asyncCodeOf(
-  fn: () => Promise<unknown>
-): Promise<CartErrorCode | undefined> {
-  try {
-    await fn()
-  } catch (error) {
-    expect(isCartError(error)).toBe(true)
-    return (error as CartError).code
-  }
-  throw new Error('expected a rejection')
 }
 
 function form(fields: Record<string, string>): FormData {
@@ -215,33 +201,5 @@ describe('validateCartItems error codes', () => {
     ]
   ])('%s → %s', (_name, act, code) => {
     expect(codeOf(act)).toBe(code)
-  })
-})
-
-describe('redirectToCheckout error codes', () => {
-  const state = (stripe?: string) => ({ stripe }) as unknown as CartState
-
-  it('missing session → MISSING_CHECKOUT_SESSION', async () => {
-    expect(
-      await asyncCodeOf(() => redirectToCheckout(state('pk_test_1'), ''))
-    ).toBe('MISSING_CHECKOUT_SESSION')
-  })
-
-  it('missing key → INVALID_STRIPE_KEY', async () => {
-    expect(await asyncCodeOf(() => redirectToCheckout(state(), 'sess_1'))).toBe(
-      'INVALID_STRIPE_KEY'
-    )
-  })
-
-  it('malformed key → INVALID_STRIPE_KEY', async () => {
-    expect(
-      await asyncCodeOf(() => redirectToCheckout(state('sk_live_1'), 'sess_1'))
-    ).toBe('INVALID_STRIPE_KEY')
-  })
-
-  it('Stripe.js not loaded → STRIPE_UNAVAILABLE', async () => {
-    expect(
-      await asyncCodeOf(() => redirectToCheckout(state('pk_test_1'), 'sess_1'))
-    ).toBe('STRIPE_UNAVAILABLE')
   })
 })

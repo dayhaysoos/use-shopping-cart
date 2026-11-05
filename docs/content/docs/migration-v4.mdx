@@ -68,7 +68,21 @@ Errors thrown by the cart, `useCartActions` forms, `validateCartItems` and `redi
 
 ### `CartConfig` Is Its Own Type
 
-`CartProvider` props and the `ShoppingCart` constructor take only `cartDetails`, `currency`, `language`, `stripe`, `shouldPersist`, `persistKey` and `storage`. Other fields, like `cartCount` or `shouldDisplayCart`, were accepted before and silently ignored or copied into state; they're now type errors. `shouldPersist` is no longer part of the cart state (`useShoppingCart().shouldPersist` and `initialState.shouldPersist` are gone).
+`CartProvider` props and the `ShoppingCart` constructor take only `cartDetails`, `currency`, `language`, `shouldPersist`, `persistKey` and `storage`. Other fields, like `cartCount` or `shouldDisplayCart`, were accepted before and silently ignored or copied into state; they're now type errors. `shouldPersist` is no longer part of the cart state (`useShoppingCart().shouldPersist` and `initialState.shouldPersist` are gone).
+
+### `redirectToCheckout` Is a Standalone Function
+
+Import it instead of reading it from the cart, and pass the Checkout Session URL. Session IDs, the `stripe` prop and `changeStripeKey` are gone: Stripe removed `redirectToCheckout({ sessionId })` from Stripe.js, and a session URL needs no publishable key.
+
+```jsx
+// Before
+const { redirectToCheckout } = useShoppingCart()
+await redirectToCheckout(sessionId)
+
+// After: return session.url from your server
+import { redirectToCheckout } from 'use-shopping-cart'
+redirectToCheckout(sessionUrl)
+```
 
 **All other APIs**: backward compatible for checkout-session mode users.
 
@@ -139,7 +153,7 @@ import { CartProvider } from 'use-shopping-cart'
 
 ```jsx
 import { CartProvider } from 'use-shopping-cart'
-;<CartProvider stripe={STRIPE_KEY} currency="USD">
+;<CartProvider currency="USD">
   <App />
 </CartProvider>
 ```
@@ -243,7 +257,6 @@ All existing APIs continue to work:
 ✅ `setItemQuantity(id, quantity)`
 ✅ `removeItem(id)`
 ✅ `clearCart()`
-✅ `redirectToCheckout()`
 ✅ All cart properties (cartCount, totalPrice, etc.)
 
 ### Deprecated (Still Works)
@@ -321,10 +334,8 @@ npm install -D @types/react@19 @types/react-dom@19
 
 **Check:**
 
-1. `cartMode` is set correctly
-2. For checkout-session: Server endpoint is configured
-3. For client-only: `successUrl` and `cancelUrl` are set
-4. Stripe key is valid
+1. Your server endpoint returns `session.url` (not `session.id`)
+2. You pass that URL to `redirectToCheckout`
 
 ## Getting Help
 
