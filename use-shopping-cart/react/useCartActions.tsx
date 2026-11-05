@@ -2,8 +2,13 @@
 
 import { useActionState } from 'react'
 import { useShoppingCart } from './useShoppingCart'
-import { validateProduct } from '../core/validation'
 import { getProductId } from '../core/Entry'
+import {
+  decodeAddItem,
+  decodeCountChange,
+  decodeItemId,
+  decodeQuantity
+} from './formData'
 
 export interface ActionState {
   status: 'idle' | 'success' | 'error'
@@ -13,8 +18,6 @@ export interface ActionState {
   quantity?: number | null
 }
 
-const MAX_PRODUCT_JSON_LENGTH = 50_000
-
 export type AddItemState = ActionState & { productId: string | null }
 export type ItemState = ActionState & { itemId: string | null }
 export type QuantityState = ActionState & {
@@ -22,7 +25,6 @@ export type QuantityState = ActionState & {
   quantity: number | null
 }
 export type ClearState = Pick<ActionState, 'status' | 'error'>
-// Names kept from the v4 rc.1 type declarations.
 export type RemoveItemState = ItemState
 export type UpdateQuantityState = QuantityState
 
@@ -32,310 +34,111 @@ function getErrorMessage(error: unknown): string {
   return 'An unknown error occurred'
 }
 
-function parsePositiveInteger(
-  value: FormDataEntryValue | null,
-  fieldName: string
-): number | null {
-  if (value === null) return null
-  if (typeof value !== 'string') {
-    throw new Error(`${fieldName} must be a string`)
-  }
-
-  const parsed = Number(value)
-  if (!Number.isFinite(parsed) || !Number.isInteger(parsed) || parsed <= 0) {
-    throw new Error(`${fieldName} must be a positive integer`)
-  }
-
-  return parsed
+function useFormAction<S extends ActionState>(
+  idle: S,
+  fallbackError: string,
+  perform: (formData: FormData) => S
+) {
+  return useActionState<S, FormData>(async (_prevState, formData) => {
+    try {
+      return perform(formData)
+    } catch (error) {
+      return {
+        ...idle,
+        status: 'error',
+        error: getErrorMessage(error) || fallbackError
+      }
+    }
+  }, idle as Awaited<S>)
 }
 
-function parseNonNegativeInteger(
-  value: FormDataEntryValue | null,
-  fieldName: string
-): number | null {
-  if (value === null) return null
-  if (typeof value !== 'string') {
-    throw new Error(`${fieldName} must be a string`)
-  }
+const idleItem: ItemState = { status: 'idle', error: null, itemId: null }
 
-  const parsed = Number(value)
-  if (!Number.isFinite(parsed) || !Number.isInteger(parsed) || parsed < 0) {
-    throw new Error(`${fieldName} must be a non-negative integer`)
-  }
-
-  return parsed
-}
-
-/**
- * Form-friendly cart actions using React 19's useActionState.
- * Perfect for progressive enhancement and form-based cart operations.
- *
- * @example
- * ```tsx
- * function ProductCard({ product }: { product: Product }) {
- *   const { addToCartAction, isPending } = useCartActions()
- *
- *   return (
- *     <form action={addToCartAction}>
- *       <input type="hidden" name="product" value={JSON.stringify(product)} />
- *       <button disabled={isPending}>
- *         {isPending ? 'Adding...' : 'Add to Cart'}
- *       </button>
- *     </form>
- *   )
- * }
- * ```
- */
 export function useCartActions() {
   const cart = useShoppingCart()
 
-  // Add to cart action
-  const [addItemState, addToCartAction, addItemPending] = useActionState(
-    async (
-      _prevState: AddItemState,
-      formData: FormData
-    ): Promise<AddItemState> => {
-      try {
-        const productJSON = formData.get('product')
-        const countStr = formData.get('count')
-
-        if (!productJSON || typeof productJSON !== 'string') {
-          return {
-            status: 'error',
-            error: 'Product data is required',
-            productId: null
-          }
-        }
-
-        if (productJSON.length > MAX_PRODUCT_JSON_LENGTH) {
-          return {
-            status: 'error',
-            error: 'Product data is too large',
-            productId: null
-          }
-        }
-
-        let product: unknown
-        try {
-          product = JSON.parse(productJSON)
-        } catch (error) {
-          if (error instanceof SyntaxError) {
-            return {
-              status: 'error',
-              error: 'Product data must be valid JSON',
-              productId: null
-            }
-          }
-          throw error
-        }
-
-        validateProduct(product)
-        const count = parsePositiveInteger(countStr, 'count') ?? 1
-
-        const safeProduct = product as Parameters<typeof cart.addItem>[0]
-        cart.addItem(safeProduct, { count })
-
+  const [addItemState, addToCartAction, addItemPending] =
+    useFormAction<AddItemState>(
+      { status: 'idle', error: null, productId: null },
+      'Failed to add item to cart',
+      (formData) => {
+        const { product, count } = decodeAddItem(formData)
+        cart.addItem(product, { count })
         return {
           status: 'success',
           error: null,
-          productId: getProductId(safeProduct)
-        }
-      } catch (error) {
-        return {
-          status: 'error',
-          error: getErrorMessage(error) || 'Failed to add item to cart',
-          productId: null
+          productId: getProductId(product)
         }
       }
-    },
-    { status: 'idle', error: null, productId: null }
-  )
+    )
 
-  // Remove from cart action
   const [removeItemState, removeFromCartAction, removeItemPending] =
-    useActionState(
-      async (_prevState: ItemState, formData: FormData): Promise<ItemState> => {
-        try {
-          const itemId = formData.get('itemId')
+    useFormAction(idleItem, 'Failed to remove item', (formData) => {
+      const itemId = decodeItemId(formData)
+      cart.removeItem(itemId)
+      return { status: 'success', error: null, itemId }
+    })
 
-          if (!itemId || typeof itemId !== 'string') {
-            return {
-              status: 'error',
-              error: 'Item ID is required',
-              itemId: null
-            }
-          }
-
-          cart.removeItem(itemId)
-
-          return { status: 'success', error: null, itemId }
-        } catch (error) {
-          return {
-            status: 'error',
-            error: getErrorMessage(error) || 'Failed to remove item',
-            itemId: null
-          }
-        }
-      },
-      { status: 'idle', error: null, itemId: null }
-    )
-
-  // Update quantity action
   const [updateQuantityState, updateQuantityAction, updateQuantityPending] =
-    useActionState(
-      async (
-        _prevState: QuantityState,
-        formData: FormData
-      ): Promise<QuantityState> => {
-        try {
-          const itemId = formData.get('itemId')
-          const quantityStr = formData.get('quantity')
-
-          if (
-            !itemId ||
-            typeof itemId !== 'string' ||
-            !quantityStr ||
-            typeof quantityStr !== 'string'
-          ) {
-            return {
-              status: 'error',
-              error: 'Item ID and quantity are required',
-              itemId: null,
-              quantity: null
-            }
-          }
-
-          const quantity = parseNonNegativeInteger(quantityStr, 'quantity')
-
-          cart.setItemQuantity(itemId, quantity!)
-
-          return { status: 'success', error: null, itemId, quantity }
-        } catch (error) {
-          return {
-            status: 'error',
-            error: getErrorMessage(error) || 'Failed to update quantity',
-            itemId: null,
-            quantity: null
-          }
-        }
-      },
-      { status: 'idle', error: null, itemId: null, quantity: null }
+    useFormAction<QuantityState>(
+      { status: 'idle', error: null, itemId: null, quantity: null },
+      'Failed to update quantity',
+      (formData) => {
+        const { itemId, quantity } = decodeQuantity(formData)
+        cart.setItemQuantity(itemId, quantity)
+        return { status: 'success', error: null, itemId, quantity }
+      }
     )
 
-  // Clear cart action
-  const [clearCartState, clearCartAction, clearCartPending] = useActionState(
-    async (
-      _prevState: ClearState,
-      _formData: FormData
-    ): Promise<ClearState> => {
-      try {
+  const [clearCartState, clearCartAction, clearCartPending] =
+    useFormAction<ClearState>(
+      { status: 'idle', error: null },
+      'Failed to clear cart',
+      () => {
         cart.clearCart()
         return { status: 'success', error: null }
-      } catch (error) {
-        return {
-          status: 'error',
-          error: getErrorMessage(error) || 'Failed to clear cart'
-        }
       }
-    },
-    { status: 'idle', error: null }
-  )
+    )
 
-  // Increment item action
   const [incrementItemState, incrementItemAction, incrementItemPending] =
-    useActionState(
-      async (_prevState: ItemState, formData: FormData): Promise<ItemState> => {
-        try {
-          const itemId = formData.get('itemId')
-          const countStr = formData.get('count')
+    useFormAction(idleItem, 'Failed to increment item', (formData) => {
+      const { itemId, count } = decodeCountChange(formData)
+      cart.incrementItem(itemId, { count })
+      return { status: 'success', error: null, itemId }
+    })
 
-          if (!itemId || typeof itemId !== 'string') {
-            return {
-              status: 'error',
-              error: 'Item ID is required',
-              itemId: null
-            }
-          }
-
-          const count = parsePositiveInteger(countStr, 'count') ?? 1
-          cart.incrementItem(itemId, { count })
-
-          return { status: 'success', error: null, itemId }
-        } catch (error) {
-          return {
-            status: 'error',
-            error: getErrorMessage(error) || 'Failed to increment item',
-            itemId: null
-          }
-        }
-      },
-      { status: 'idle', error: null, itemId: null }
-    )
-
-  // Decrement item action
   const [decrementItemState, decrementItemAction, decrementItemPending] =
-    useActionState(
-      async (_prevState: ItemState, formData: FormData): Promise<ItemState> => {
-        try {
-          const itemId = formData.get('itemId')
-          const countStr = formData.get('count')
+    useFormAction(idleItem, 'Failed to decrement item', (formData) => {
+      const { itemId, count } = decodeCountChange(formData)
+      cart.decrementItem(itemId, { count })
+      return { status: 'success', error: null, itemId }
+    })
 
-          if (!itemId || typeof itemId !== 'string') {
-            return {
-              status: 'error',
-              error: 'Item ID is required',
-              itemId: null
-            }
-          }
-
-          const count = parsePositiveInteger(countStr, 'count') ?? 1
-          cart.decrementItem(itemId, { count })
-
-          return { status: 'success', error: null, itemId }
-        } catch (error) {
-          return {
-            status: 'error',
-            error: getErrorMessage(error) || 'Failed to decrement item',
-            itemId: null
-          }
-        }
-      },
-      { status: 'idle', error: null, itemId: null }
-    )
-
-  // Return all actions and states
   return {
-    // Add item
     addToCartAction,
     addItemState,
     isAddingItem: addItemPending,
 
-    // Remove item
     removeFromCartAction,
     removeItemState,
     isRemovingItem: removeItemPending,
 
-    // Update quantity
     updateQuantityAction,
     updateQuantityState,
     isUpdatingQuantity: updateQuantityPending,
 
-    // Increment
     incrementItemAction,
     incrementItemState,
     isIncrementingItem: incrementItemPending,
 
-    // Decrement
     decrementItemAction,
     decrementItemState,
     isDecrementingItem: decrementItemPending,
 
-    // Clear cart
     clearCartAction,
     clearCartState,
     isClearingCart: clearCartPending,
 
-    // Global pending state (any action in progress)
     isPending:
       addItemPending ||
       removeItemPending ||

@@ -1,14 +1,10 @@
 import { formatCurrencyString } from './formatters'
-import type { Product, CartEntry, CartDetails } from './types'
+import type { Product, CartEntry } from './types'
 
-/**
- * Generate a UUID for products without an ID
- */
 function generateUUID(): string {
   if (typeof crypto !== 'undefined' && crypto.randomUUID) {
     return crypto.randomUUID()
   }
-  // Fallback for older environments
   return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, (c) => {
     const r = (Math.random() * 16) | 0
     const v = c === 'x' ? r : (r & 0x3) | 0x8
@@ -18,9 +14,6 @@ function generateUUID(): string {
 
 const generatedIdCache = new WeakMap<object, string>()
 
-/**
- * Extract the ID from a product (or generate one if missing).
- */
 export function getProductId(product: Product): string {
   const existingId =
     ('id' in product && product.id) ||
@@ -38,17 +31,18 @@ export function getProductId(product: Product): string {
   return generatedId
 }
 
-/**
- * Create a new cart entry from a product
- */
+export interface CartEntryOptions {
+  currency: string
+  language: string
+  price_metadata?: Record<string, unknown>
+  product_metadata?: Record<string, unknown>
+}
+
 export function createCartEntry(
   id: string,
   product: Product,
   quantity: number,
-  price_metadata: Record<string, unknown> = {},
-  product_metadata: Record<string, unknown> = {},
-  currency: string,
-  language: string
+  { currency, language, price_metadata, product_metadata }: CartEntryOptions
 ): CartEntry {
   const value = product.price * quantity
 
@@ -73,49 +67,4 @@ export function createCartEntry(
       ...product_metadata
     }
   }
-}
-
-/**
- * Immutably add an entry to cartDetails.
- * Returns a new cartDetails object.
- */
-export function addEntryToCart(
-  cartDetails: CartDetails,
-  entry: CartEntry
-): CartDetails {
-  return {
-    ...cartDetails,
-    [entry.id]: entry
-  }
-}
-
-/**
- * Immutably remove an entry from cartDetails.
- * Returns a new cartDetails object.
- */
-export function removeEntryFromCart(
-  cartDetails: CartDetails,
-  id: string
-): CartDetails {
-  const { [id]: removed, ...rest } = cartDetails
-  return rest
-}
-
-/**
- * Calculate total values from cartDetails.
- */
-export function calculateTotals(cartDetails: CartDetails): {
-  totalPrice: number
-  cartCount: number
-} {
-  let totalPrice = 0
-  let cartCount = 0
-
-  for (const id in cartDetails) {
-    const entry = cartDetails[id]
-    totalPrice += entry.value
-    cartCount += entry.quantity
-  }
-
-  return { totalPrice, cartCount }
 }

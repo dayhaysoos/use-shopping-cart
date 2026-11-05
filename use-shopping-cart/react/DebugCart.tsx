@@ -9,27 +9,9 @@ export interface DebugCartProps extends React.DetailedHTMLProps<
 > {}
 
 export function DebugCart(props: DebugCartProps) {
-  const cart = useShoppingCart()
-
-  const {
-    // Extract methods so we don't display them
-    addItem,
-    incrementItem,
-    decrementItem,
-    setItemQuantity,
-    removeItem,
-    clearCart,
-    loadCart,
-    handleCartHover,
-    handleCartClick,
-    handleCloseCart,
-    storeLastClicked,
-    changeStripeKey,
-    changeLanguage,
-    changeCurrency,
-    redirectToCheckout,
-    ...state
-  } = cart
+  const state = Object.entries(useShoppingCart()).filter(
+    ([, value]) => typeof value !== 'function'
+  )
 
   return (
     <table
@@ -54,7 +36,7 @@ export function DebugCart(props: DebugCartProps) {
         </tr>
       </thead>
       <tbody>
-        {Object.entries(state).map(([key, value]) => (
+        {state.map(([key, value]) => (
           <tr key={key}>
             <td style={{ padding: '0.5rem', fontWeight: 'bold' }}>{key}</td>
             <td
