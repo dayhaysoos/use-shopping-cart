@@ -1,4 +1,5 @@
 import type { Product, CartDetails } from '../core/types'
+import { productIdFields } from '../core/productId'
 
 export interface ValidatedItem {
   price_data: {
@@ -35,20 +36,15 @@ export function validateCartItems(
     throw new Error('Invalid Cart: cartDetails must be an object.')
   }
 
-  // Build a Map for O(1) lookups instead of O(n) find() calls
-  // Only set a key if it doesn't exist to preserve "first match wins" semantics
-  // from the original find() implementation
   const inventoryMap = new Map<string, Product>()
   for (const product of inventorySrc) {
     if (!product || typeof product !== 'object') {
       throw new Error('Invalid Cart: inventory items must be objects.')
     }
 
-    if (product.id && !inventoryMap.has(product.id)) {
-      inventoryMap.set(product.id, product)
-    }
-    if (product.sku && !inventoryMap.has(product.sku)) {
-      inventoryMap.set(product.sku, product)
+    for (const field of productIdFields) {
+      const id = product[field]
+      if (id && !inventoryMap.has(id)) inventoryMap.set(id, product)
     }
   }
 

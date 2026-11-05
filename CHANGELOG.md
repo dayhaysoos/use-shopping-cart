@@ -25,6 +25,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - A currency or language set while an async storage adapter is still loading is no longer overwritten by the stored one; the stored items are still restored
 - Storage is written only when the cart, currency or language changes, not on UI changes like `handleCartHover`; failed async writes now log a warning instead of an unhandled rejection
 - Changing currency or language keeps each item's `timestamp`
+- `validateCartItems` matches inventory by `id`, `price_id`, `sku_id` and `sku`, the same fields the cart uses for item IDs. Previously items added by `price_id` or `sku_id` alone failed with "not in your inventory" (#358)
 
 ## [4.0.0-alpha.2] - 2025-12-26
 

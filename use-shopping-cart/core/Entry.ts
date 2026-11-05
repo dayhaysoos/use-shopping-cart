@@ -1,5 +1,6 @@
 import { formatCurrencyString } from './formatters'
 import type { Product, CartEntry } from './types'
+import { findProductId } from './productId'
 
 function generateUUID(): string {
   if (typeof crypto !== 'undefined' && crypto.randomUUID) {
@@ -15,11 +16,7 @@ function generateUUID(): string {
 const generatedIdCache = new WeakMap<object, string>()
 
 export function getProductId(product: Product): string {
-  const existingId =
-    ('id' in product && product.id) ||
-    ('price_id' in product && product.price_id) ||
-    ('sku_id' in product && product.sku_id) ||
-    ('sku' in product && product.sku)
+  const existingId = findProductId(product)
 
   if (existingId) return existingId
 
