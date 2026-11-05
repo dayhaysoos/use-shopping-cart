@@ -96,7 +96,7 @@ As in v3, `useShoppingCart` takes an optional selector, and the component re-ren
 const cartCount = useShoppingCart((cart) => cart.cartCount)
 ```
 
-**All other APIs**: backward compatible for checkout-session mode users.
+Cart methods (`addItem`, `incrementItem`, `removeItem`, ...) and cart state (`cartCount`, `cartDetails`, ...) are unchanged.
 
 ## What's New in v4.0
 
@@ -359,8 +359,8 @@ npm install -D @types/react@19 @types/react-dom@19
 
 ### Mostly Compatible ✅
 
-- Public APIs are backward compatible for checkout-session mode users
-- Existing imports from the package entry points work without changes
+- Cart methods and cart state work as before
+- Check the [breaking changes](#breaking-changes): `redirectToCheckout` is now an import that takes `session.url`, `CartConfig` is narrower, and errors are `CartError`s
 - Opt in to new features when ready
 
 ### Major Improvements ✨

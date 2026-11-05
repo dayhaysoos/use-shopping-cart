@@ -58,15 +58,19 @@ function getCartView(cart: ShoppingCart): UseShoppingCartReturn {
 type CartSelector<T> = (cart: UseShoppingCartReturn) => T
 
 const selectionCache = new WeakMap<
-  CartSelector<unknown>,
-  { view: UseShoppingCartReturn; selected: unknown }
+  UseShoppingCartReturn,
+  WeakMap<CartSelector<unknown>, unknown>
 >()
 
 function select<T>(view: UseShoppingCartReturn, selector: CartSelector<T>): T {
-  const cached = selectionCache.get(selector)
-  if (cached?.view === view) return cached.selected as T
+  let selections = selectionCache.get(view)
+  if (!selections) {
+    selections = new WeakMap()
+    selectionCache.set(view, selections)
+  }
+  if (selections.has(selector)) return selections.get(selector) as T
   const selected = selector(view)
-  selectionCache.set(selector, { view, selected })
+  selections.set(selector, selected)
   return selected
 }
 

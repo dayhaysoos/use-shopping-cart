@@ -173,6 +173,40 @@ describe('useShoppingCart', () => {
       errors.mockRestore()
     })
 
+    it('shares a module-level selector between carts without re-render loops', () => {
+      const errors = vi.spyOn(console, 'error').mockImplementation(() => {})
+      const selectCount = (cart: ReturnType<typeof useShoppingCart>) => ({
+        count: cart.cartCount
+      })
+      const seen: Record<string, number> = {}
+      const adders: Record<string, (p: typeof product) => void> = {}
+
+      function Count({ name }: { name: string }) {
+        seen[name] = useShoppingCart(selectCount).count
+        adders[name] = useShoppingCart((cart) => cart.addItem)
+        return null
+      }
+
+      render(
+        <>
+          <CartProvider shouldPersist={false}>
+            <Count name="left" />
+          </CartProvider>
+          <CartProvider shouldPersist={false}>
+            <Count name="right" />
+          </CartProvider>
+        </>
+      )
+
+      act(() => adders.left(product))
+      act(() => adders.right(product))
+      act(() => adders.right(product))
+
+      expect(seen).toEqual({ left: 1, right: 2 })
+      expect(errors).not.toHaveBeenCalled()
+      errors.mockRestore()
+    })
+
     it('does not re-render a component that only selects actions', () => {
       let renders = 0
       let addItem: ((p: typeof product) => void) | undefined

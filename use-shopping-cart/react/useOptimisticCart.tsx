@@ -83,7 +83,7 @@ export function useOptimisticCart({ onChange }: UseOptimisticCartOptions = {}) {
   const run = (
     change: CartChange,
     commit: () => void,
-    validate: (cartDetails: () => CartDetails) => void = () => {}
+    validate: (expectedCartDetails: () => CartDetails) => void = () => {}
   ) => {
     if (!onChange) {
       commit()
@@ -139,7 +139,8 @@ export function useOptimisticCart({ onChange }: UseOptimisticCartOptions = {}) {
     run(
       { type: 'remove', id },
       () => cart.removeItem(id),
-      (cartDetails) => validateItemExists(id, cartDetails(), 'removeItem')
+      (expectedCartDetails) =>
+        validateItemExists(id, expectedCartDetails(), 'removeItem')
     )
   }
 
@@ -148,9 +149,9 @@ export function useOptimisticCart({ onChange }: UseOptimisticCartOptions = {}) {
     run(
       { type: 'adjust', id, by: count },
       () => cart.incrementItem(id, { ...options, count }),
-      (cartDetails) => {
+      (expectedCartDetails) => {
         validateCount(count, 'incrementItem')
-        validateItemExists(id, cartDetails(), 'incrementItem')
+        validateItemExists(id, expectedCartDetails(), 'incrementItem')
       }
     )
   }
@@ -160,9 +161,9 @@ export function useOptimisticCart({ onChange }: UseOptimisticCartOptions = {}) {
     run(
       { type: 'adjust', id, by: -count },
       () => cart.decrementItem(id, { ...options, count }),
-      (cartDetails) => {
+      (expectedCartDetails) => {
         validateCount(count, 'decrementItem')
-        validateItemExists(id, cartDetails(), 'decrementItem')
+        validateItemExists(id, expectedCartDetails(), 'decrementItem')
       }
     )
   }
@@ -171,9 +172,9 @@ export function useOptimisticCart({ onChange }: UseOptimisticCartOptions = {}) {
     run(
       { type: 'set', id, quantity },
       () => cart.setItemQuantity(id, quantity),
-      (cartDetails) => {
+      (expectedCartDetails) => {
         validateQuantity(quantity, 'setItemQuantity')
-        validateItemExists(id, cartDetails(), 'setItemQuantity')
+        validateItemExists(id, expectedCartDetails(), 'setItemQuantity')
       }
     )
   }

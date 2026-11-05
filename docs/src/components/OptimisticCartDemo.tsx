@@ -1,6 +1,6 @@
 'use client'
 
-import { useRef, useState } from 'react'
+import { useState } from 'react'
 import { useOptimisticCart, formatCurrencyString } from 'use-shopping-cart'
 import type { Product } from 'use-shopping-cart/core'
 import { CartDisplay } from './CartDisplay'
@@ -45,13 +45,12 @@ function simulateServer(shouldFail: boolean) {
 }
 
 export function OptimisticCartDemo() {
-  const failNext = useRef(false)
   const { addItem, cartDetails, isOptimistic, error } = useOptimisticCart({
-    onChange: () => {
-      const shouldFail = failNext.current
-      failNext.current = false
-      return simulateServer(shouldFail)
-    }
+    onChange: (change) =>
+      simulateServer(
+        change.type === 'add' &&
+          change.metadata?.product_metadata?.simulateFailure === true
+      )
   })
   const [selectedProduct, setSelectedProduct] = useState(sampleProducts[0])
 
@@ -100,7 +99,7 @@ export function OptimisticCartDemo() {
 
       {error != null && !isOptimistic && (
         <div className="mb-4 p-3 bg-red-500/10 border border-red-500/20 rounded-md text-sm text-red-600 dark:text-red-400">
-          The server rejected the last change, so it was rolled back.
+          The last change failed, so it was rolled back.
         </div>
       )}
 
@@ -181,10 +180,11 @@ export function OptimisticCartDemo() {
             </button>
 
             <button
-              onClick={() => {
-                failNext.current = true
-                addItem(selectedProduct)
-              }}
+              onClick={() =>
+                addItem(selectedProduct, {
+                  product_metadata: { simulateFailure: true }
+                })
+              }
               disabled={isThisItemOptimistic}
               className="px-4 py-2 bg-red-600 text-white rounded-md hover:bg-red-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
             >
