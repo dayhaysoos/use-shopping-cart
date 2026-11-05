@@ -90,7 +90,7 @@ How it behaves:
 - **Every component:** a pending change shows in every component that calls `useOptimisticCart` on the same cart, so a total in one component updates when an item in another changes. `useShoppingCart` shows only confirmed changes.
 - **Order:** changes wait for the previous `onChange` to settle, so three quick clicks send three requests, one after another.
 - **Success:** the change is applied to the real cart (and saved to `storage`).
-- **Failure:** the change is dropped and `error` holds what `onChange` threw. Later queued changes still run, but each is checked against the real cart first: one that depended on the failed change (incrementing an item whose add failed) is dropped with an `ITEM_NOT_IN_CART` error and never reaches `onChange`.
+- **Failure:** the change is dropped and `error` holds what `onChange` threw, in the component that made the change. Later queued changes still run, but each is checked against the real cart first: one that depended on the failed change (incrementing an item whose add failed) is dropped with an `ITEM_NOT_IN_CART` error and never reaches `onChange`.
 - **Invalid input** (bad count, product without a price) throws immediately and never reaches `onChange`.
 
 What the server does with the change, and whether the cart is loaded from the server (for example with [`loadCart`](/docs/actions/loadCart)), is up to you.
@@ -123,7 +123,7 @@ const { isOptimistic } = useOptimisticCart({ onChange: syncCart })
 #### `error`
 
 - **Type:** `unknown`
-- **Description:** what the last failed `onChange` threw; `null` after a change succeeds
+- **Description:** what `onChange` threw for the last change this component made; `null` after one succeeds
 
 ### Item-Level Optimistic Indicator
 

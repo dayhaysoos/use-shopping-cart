@@ -39,8 +39,6 @@ export interface UseOptimisticCartOptions {
   onChange?: (change: CartChange) => Promise<unknown> | unknown
 }
 
-const committedChanges = new WeakSet<CartChange>()
-
 interface ChangeQueue {
   tail: Promise<unknown>
   queued: CartChange[]
@@ -69,7 +67,6 @@ function applyPending(
   format: CartFormat
 ): OptimisticCartDetails {
   return queued.reduce<OptimisticCartDetails>((details, change) => {
-    if (committedChanges.has(change)) return details
     const next: OptimisticCartDetails = applyCartChange(details, change, format)
     const id = changedEntryId(change)
     return id && next !== details && next[id]
@@ -92,19 +89,18 @@ function enqueueChange(
   })
   setQueued(queue, [...queue.queued, change])
 
-  const task = queue.tail
-    .then(async () => {
+  const task = queue.tail.then(async () => {
+    try {
       validate(() => store.getState().cartDetails)
       await onChange(change)
-      committedChanges.add(change)
       commit()
-    })
-    .finally(() => {
+    } finally {
       setQueued(
         queue,
         queue.queued.filter((c) => c !== change)
       )
-    })
+    }
+  })
   queue.tail = task.catch(() => {})
   return task
 }

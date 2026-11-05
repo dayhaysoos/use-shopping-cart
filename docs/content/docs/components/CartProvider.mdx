@@ -67,13 +67,15 @@ Additionally, you must verify the cartItems on the server-side before creating t
 
 ## Complete Props Reference
 
-| Prop            | Type             | Required | Default               | Description                                               |
-| --------------- | ---------------- | -------- | --------------------- | --------------------------------------------------------- |
-| `currency`      | `string`         | No       | `'USD'`               | ISO currency code (e.g., 'USD', 'EUR', 'GBP')             |
-| `language`      | `string`         | No       | Browser language      | Language for currency formatting (e.g., 'en-US', 'fr-FR') |
-| `shouldPersist` | `boolean`        | No       | `true`                | Enable cart persistence in localStorage                   |
-| `persistKey`    | `string`         | No       | `'use-shopping-cart'` | localStorage key name for cart data                       |
-| `storage`       | `StorageAdapter` | No       | `localStorage`        | Custom storage adapter for persistence                    |
+| Prop            | Type             | Required | Default               | Description                                                            |
+| --------------- | ---------------- | -------- | --------------------- | ---------------------------------------------------------------------- |
+| `currency`      | `string`         | No       | `'USD'`               | ISO currency code (e.g., 'USD', 'EUR', 'GBP')                          |
+| `language`      | `string`         | No       | Browser language      | Language for currency formatting (e.g., 'en-US', 'fr-FR')              |
+| `shouldPersist` | `boolean`        | No       | `true`                | Enable cart persistence in localStorage                                |
+| `persistKey`    | `string`         | No       | `'use-shopping-cart'` | localStorage key name for cart data                                    |
+| `storage`       | `StorageAdapter` | No       | `localStorage`        | Custom storage adapter for persistence                                 |
+| `cartDetails`   | `CartDetails`    | No       | `{}`                  | Initial cart items; totals are computed from them                      |
+| `loading`       | `ReactNode`      | No       | `null`                | Rendered on the server instead of children while `shouldPersist` is on |
 
 ### Configuring Checkout Features
 
