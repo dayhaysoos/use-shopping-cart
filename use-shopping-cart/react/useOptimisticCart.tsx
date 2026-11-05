@@ -47,11 +47,11 @@ interface ChangeQueue {
 
 const changeQueues = new WeakMap<ShoppingCart, ChangeQueue>()
 
-function getChangeQueue(cart: ShoppingCart): ChangeQueue {
-  let queue = changeQueues.get(cart)
+function getChangeQueue(store: ShoppingCart): ChangeQueue {
+  let queue = changeQueues.get(store)
   if (!queue) {
     queue = { tail: Promise.resolve(), queued: [] }
-    changeQueues.set(cart, queue)
+    changeQueues.set(store, queue)
   }
   return queue
 }
@@ -185,7 +185,7 @@ export function useOptimisticCart({ onChange }: UseOptimisticCartOptions = {}) {
 
   return {
     ...cart,
-    cartDetails: optimisticCartDetails as CartDetails,
+    cartDetails: optimisticCartDetails,
     cartCount: optimisticTotals.cartCount,
     totalPrice: optimisticTotals.totalPrice,
     formattedTotalPrice: optimisticTotals.formattedTotalPrice,

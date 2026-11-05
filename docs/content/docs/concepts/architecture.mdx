@@ -7,7 +7,7 @@ Understanding how use-shopping-cart works internally in v4.0.
 
 ## Overview
 
-Version 4.0 represents a complete architectural overhaul while maintaining 100% backward compatibility. The library moved from Redux to React's native state management, resulting in a simpler, lighter, and more performant solution.
+Version 4.0 represents a complete architectural overhaul. The library moved from Redux to React's native state management, resulting in a simpler, lighter, and more performant solution.
 
 ## Redux Removal
 
@@ -243,14 +243,9 @@ get formattedTotalPrice(): string {
 
 ## Migration Impact
 
-### No Code Changes Required
+### Code Changes
 
-Thanks to careful API design, v4.0 is 100% backward compatible:
-
-✅ All hooks work the same
-✅ All methods have identical signatures
-✅ All props are supported
-✅ State structure is unchanged
+Cart methods (`addItem`, `incrementItem`, `removeItem`, ...) and cart state (`cartCount`, `cartDetails`, ...) work as before. A few APIs changed; see the [migration guide](/docs/migration-v4#breaking-changes).
 
 ### What Changed Internally
 

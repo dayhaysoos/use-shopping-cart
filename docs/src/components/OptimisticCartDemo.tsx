@@ -35,6 +35,8 @@ const sampleProducts: Product[] = [
   }
 ]
 
+const failingProducts = new WeakSet<Product>()
+
 function simulateServer(shouldFail: boolean) {
   return new Promise<void>((resolve, reject) =>
     setTimeout(
@@ -48,8 +50,7 @@ export function OptimisticCartDemo() {
   const { addItem, cartDetails, isOptimistic, error } = useOptimisticCart({
     onChange: (change) =>
       simulateServer(
-        change.type === 'add' &&
-          change.metadata?.product_metadata?.simulateFailure === true
+        change.type === 'add' && failingProducts.has(change.product)
       )
   })
   const [selectedProduct, setSelectedProduct] = useState(sampleProducts[0])
@@ -63,9 +64,7 @@ export function OptimisticCartDemo() {
   const itemInCart = selectedProduct.id
     ? cartDetails[selectedProduct.id]
     : undefined
-  const isThisItemOptimistic = Boolean(
-    itemInCart && '_optimistic' in itemInCart && itemInCart._optimistic
-  )
+  const isThisItemOptimistic = itemInCart?._optimistic === true
 
   return (
     <div className="not-prose my-8 border rounded-lg p-6 bg-fd-card">
@@ -180,11 +179,11 @@ export function OptimisticCartDemo() {
             </button>
 
             <button
-              onClick={() =>
-                addItem(selectedProduct, {
-                  product_metadata: { simulateFailure: true }
-                })
-              }
+              onClick={() => {
+                const product = { ...selectedProduct }
+                failingProducts.add(product)
+                addItem(product)
+              }}
               disabled={isThisItemOptimistic}
               className="px-4 py-2 bg-red-600 text-white rounded-md hover:bg-red-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
             >
