@@ -25,11 +25,24 @@ Without `onChange`, it behaves exactly like `useShoppingCart()`: the cart itself
 
 ## Basic Usage
 
+The examples on this page use a `syncCart` function that sends each change to your backend:
+
+```jsx
+async function syncCart(change) {
+  const res = await fetch('/api/cart', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(change)
+  })
+  if (!res.ok) throw new Error('Could not update cart')
+}
+```
+
 ```jsx
 import { useOptimisticCart } from 'use-shopping-cart'
 
 function ProductCard({ product }) {
-  const { addItem, isOptimistic } = useOptimisticCart()
+  const { addItem, isOptimistic } = useOptimisticCart({ onChange: syncCart })
 
   return (
     <button onClick={() => addItem(product)} disabled={isOptimistic}>
@@ -99,7 +112,7 @@ What the server does with the change, and whether the cart is loaded from the se
 - **Description:** `true` when the cart is showing optimistic updates that haven't been confirmed yet
 
 ```jsx
-const { isOptimistic } = useOptimisticCart()
+const { isOptimistic } = useOptimisticCart({ onChange: syncCart })
 
 {
   isOptimistic && <span>Syncing changes...</span>
@@ -116,7 +129,7 @@ const { isOptimistic } = useOptimisticCart()
 Each cart item has an `_optimistic` property when it's being optimistically updated:
 
 ```jsx
-const { cartDetails } = useOptimisticCart()
+const { cartDetails } = useOptimisticCart({ onChange: syncCart })
 
 Object.values(cartDetails).map((item) => (
   <div key={item.id}>
@@ -138,7 +151,7 @@ function ShoppingCart() {
     formattedTotalPrice,
     clearCart,
     isOptimistic
-  } = useOptimisticCart()
+  } = useOptimisticCart({ onChange: syncCart })
 
   return (
     <div className="cart">
@@ -172,7 +185,7 @@ function ShoppingCart() {
 ```jsx
 function CartItem({ item }) {
   const { incrementItem, decrementItem, removeItem, isOptimistic } =
-    useOptimisticCart()
+    useOptimisticCart({ onChange: syncCart })
 
   return (
     <div className="cart-item">
@@ -207,7 +220,7 @@ function CartItem({ item }) {
 
 ```jsx
 function ProductCard({ product }) {
-  const { addItem, cartDetails } = useOptimisticCart()
+  const { addItem, cartDetails } = useOptimisticCart({ onChange: syncCart })
 
   const itemInCart = cartDetails[product.id]
   const isThisItemOptimistic = itemInCart?._optimistic === true
@@ -234,7 +247,7 @@ function ProductCard({ product }) {
 
 ## Migration from useShoppingCart()
 
-Migrating is simple - just replace `useShoppingCart` with `useOptimisticCart`:
+Replace `useShoppingCart` with `useOptimisticCart` and pass the function that syncs with your backend:
 
 ```diff
 - import { useShoppingCart } from 'use-shopping-cart'
@@ -242,7 +255,9 @@ Migrating is simple - just replace `useShoppingCart` with `useOptimisticCart`:
 
 function MyComponent() {
 -  const { addItem, cartCount } = useShoppingCart()
-+  const { addItem, cartCount, isOptimistic } = useOptimisticCart()
++  const { addItem, cartCount, isOptimistic } = useOptimisticCart({
++    onChange: syncCart
++  })
 
   return (
     <button onClick={() => addItem(product)}>
@@ -267,10 +282,14 @@ Stick with `useShoppingCart()` when:
 ## TypeScript
 
 ```typescript
-import { useOptimisticCart } from 'use-shopping-cart'
+import { useOptimisticCart, type CartChange, type Product } from 'use-shopping-cart'
+
+async function syncCart(change: CartChange): Promise<void> {
+  await fetch('/api/cart', { method: 'POST', body: JSON.stringify(change) })
+}
 
 function ProductCard({ product }: { product: Product }) {
-  const { addItem, isOptimistic } = useOptimisticCart()
+  const { addItem, isOptimistic } = useOptimisticCart({ onChange: syncCart })
 
   return (
     <button onClick={() => addItem(product)} disabled={isOptimistic}>
@@ -286,7 +305,7 @@ import { OptimisticCartDemo } from '../../../src/components/OptimisticCartDemo'
 
 <OptimisticCartDemo />
 
-Try adding items and watch the instant UI feedback! Notice how the interface updates immediately, and the "updating..." indicator shows while the cart syncs in the background.
+Try adding items and watch the instant UI feedback! The demo's `onChange` simulates a server that takes a couple of seconds. The item shows immediately with a "confirming" state, and the cart on the left updates once the simulated server confirms. "Add with Error" shows the rollback.
 
 ## See Also
 

@@ -117,7 +117,7 @@ function useShoppingCart() {
 ### Benefits
 
 1. **Automatic Re-renders**: Components re-render when cart changes
-2. **Selective Updates**: Only components using changed data re-render
+2. **Selective Updates**: With a selector, a component re-renders only when the value it selects changes
 3. **No Provider Nesting**: Single CartProvider at the root
 4. **Concurrent Safe**: Works with React 19 concurrent features
 
@@ -202,22 +202,19 @@ const customStorage = {
 
 ### 1. Memoized Methods
 
-All cart methods are memoized to prevent unnecessary re-renders:
+Cart methods are bound once per cart, so `addItem` and the others keep the same identity across renders and components. A component that selects only an action never re-renders:
 
 ```typescript
-const addItem = useMemo(() => cart.addItem.bind(cart), [cart])
+const addItem = useShoppingCart((cart) => cart.addItem)
 ```
 
 ### 2. Selective Subscriptions
 
-Components only re-render when their used data changes:
+Pass a selector and a component re-renders only when the selected value changes. Without one, it re-renders on every cart change.
 
 ```typescript
-// Only re-renders when cartCount changes
-const { cartCount } = useShoppingCart()
-
-// Only re-renders when totalPrice changes
-const { totalPrice } = useShoppingCart()
+const cartCount = useShoppingCart((cart) => cart.cartCount)
+const totalPrice = useShoppingCart((cart) => cart.totalPrice)
 ```
 
 ### 3. Computed Values
@@ -245,7 +242,7 @@ get formattedTotalPrice(): string {
 
 ### Code Changes
 
-Cart methods (`addItem`, `incrementItem`, `removeItem`, ...) and cart state (`cartCount`, `cartDetails`, ...) work as before. A few APIs changed; see the [migration guide](/docs/migration-v4#breaking-changes).
+Cart methods (`addItem`, `incrementItem`, `removeItem`, ...) work as before, and so does cart state (`cartCount`, `cartDetails`, ...) apart from `shouldPersist` (now config only) and `stripe` (removed). A few APIs changed; see the [migration guide](/docs/migration-v4#breaking-changes).
 
 ### What Changed Internally
 
