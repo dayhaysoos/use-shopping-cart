@@ -29,7 +29,9 @@ export type {
 export type { DebugCartProps } from './DebugCart'
 export type {
   OptimisticCartEntry,
-  OptimisticCartDetails
+  OptimisticCartDetails,
+  UseOptimisticCartOptions,
+  CartChange
 } from './useOptimisticCart'
 export type {
   ProductAttributes,

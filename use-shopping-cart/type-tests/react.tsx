@@ -5,7 +5,8 @@ import {
   useShoppingCart,
   useOptimisticCart,
   useCartActions,
-  redirectToCheckout
+  redirectToCheckout,
+  type CartChange
 } from 'use-shopping-cart'
 
 /**
@@ -160,6 +161,29 @@ function TestUseOptimisticCart() {
   cart.decrementItem('test')
   cart.setItemQuantity('test', 5)
   cart.clearCart()
+
+  const error: unknown = cart.error
+
+  const synced = useOptimisticCart({
+    onChange: async (change: CartChange) => {
+      if (change.type === 'add') {
+        const id: string | undefined = change.product.id
+        const count: number = change.count
+        await fetch('/api/cart', {
+          method: 'POST',
+          body: JSON.stringify({ id, count })
+        })
+      }
+      if (change.type === 'adjust') {
+        const by: number = change.by
+        void by
+      }
+    }
+  })
+  synced.addItem({ name: 'Test', price: 100, currency: 'USD' })
+
+  // @ts-expect-error onChange must be a function
+  useOptimisticCart({ onChange: 'nope' })
 
   return null
 }

@@ -7,13 +7,15 @@ sidebar_position: 2
 
 ## Overview
 
-`useOptimisticCart()` wraps `useShoppingCart()` and adds optimistic updates. When users perform cart operations (add, remove, update quantity), they see instant feedback in the UI while the actual cart operation completes in the background.
+`useOptimisticCart()` wraps `useShoppingCart()` for carts that sync with your backend. Pass an async `onChange` and every cart change shows in the UI immediately, is sent to `onChange`, and is applied to the real cart once `onChange` resolves. If it rejects, the change is rolled back.
+
+Without `onChange`, it behaves exactly like `useShoppingCart()`: the cart itself is synchronous, so there is nothing to wait for.
 
 ## Benefits
 
-✅ **Instant UI feedback** - No waiting for cart updates  
-✅ **Better perceived performance** - Feels faster even if localStorage sync takes time  
-✅ **Automatic rollback** - If an operation fails, the UI automatically reverts  
+✅ **Instant UI feedback** - Changes show while your backend request is in flight  
+✅ **Automatic rollback** - If `onChange` rejects, the UI reverts and `error` is set  
+✅ **In order** - Changes are sent to `onChange` one at a time, in the order they were made  
 ✅ **Drop-in replacement** - Same API as `useShoppingCart()`
 
 ## Requirements
@@ -37,7 +39,55 @@ function ProductCard({ product }) {
 }
 ```
 
+## Syncing with Your Backend
+
+```jsx
+import { useOptimisticCart } from 'use-shopping-cart'
+
+function Cart() {
+  const { cartDetails, incrementItem, isOptimistic, error } = useOptimisticCart(
+    {
+      onChange: async (change) => {
+        const res = await fetch('/api/cart', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(change)
+        })
+        if (!res.ok) throw new Error('Could not update cart')
+      }
+    }
+  )
+
+  // ...
+}
+```
+
+`change` describes what happened:
+
+| `type`     | Fields                               | From                             |
+| ---------- | ------------------------------------ | -------------------------------- |
+| `'add'`    | `product`, `count`, `metadata`       | `addItem`                        |
+| `'adjust'` | `id`, `by` (negative for decrements) | `incrementItem`, `decrementItem` |
+| `'set'`    | `id`, `quantity`                     | `setItemQuantity`                |
+| `'remove'` | `id`                                 | `removeItem`                     |
+| `'clear'`  |                                      | `clearCart`                      |
+
+How it behaves:
+
+- **Order:** changes wait for the previous `onChange` to settle, so three quick clicks send three requests, one after another.
+- **Success:** the change is applied to the real cart (and saved to `storage`).
+- **Failure:** the change is dropped and `error` holds what `onChange` threw. Later queued changes still run.
+- **Invalid input** (bad count, product without a price) throws immediately and never reaches `onChange`.
+
+What the server does with the change, and whether the cart is loaded from the server (for example with [`loadCart`](/docs/actions/loadCart)), is up to you.
+
 ## API
+
+### Options
+
+| Option     | Type                                       | Description                                       |
+| ---------- | ------------------------------------------ | ------------------------------------------------- |
+| `onChange` | `(change: CartChange) => Promise<unknown>` | Called for each change before it reaches the cart |
 
 `useOptimisticCart()` returns the same properties and methods as `useShoppingCart()`, plus:
 
@@ -55,6 +105,11 @@ const { isOptimistic } = useOptimisticCart()
   isOptimistic && <span>Syncing changes...</span>
 }
 ```
+
+#### `error`
+
+- **Type:** `unknown`
+- **Description:** what the last failed `onChange` threw; `null` after a change succeeds
 
 ### Item-Level Optimistic Indicator
 
@@ -202,15 +257,12 @@ function MyComponent() {
 
 Use `useOptimisticCart()` when:
 
-- You want instant UI feedback for cart operations
-- You're dealing with slow network or localStorage operations
-- You want to improve perceived performance
+- Your cart syncs with a backend and you want changes to show before the request finishes
 
 Stick with `useShoppingCart()` when:
 
-- You prefer simpler code without optimistic updates
-- You don't need loading states
-- You're migrating from older versions and want minimal changes
+- The cart lives only in the browser (it's already instant)
+- You sync with a backend some other way, for example with `subscribe`
 
 ## TypeScript
 

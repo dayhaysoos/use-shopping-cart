@@ -22,6 +22,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - `CartError`, `isCartError` and the `CartErrorCode` type are exported from `use-shopping-cart`, `/core` and `/utilities`. Use `isCartError` rather than `instanceof`, since each entry point bundles its own copy
 - `useShoppingCart(selector)`: re-render only when the selected value changes (#357)
+- `useOptimisticCart({ onChange })`: pass an async function to sync each cart change with your backend. Changes show immediately, run through `onChange` one at a time, are applied to the cart when it resolves and rolled back (with `error` set) when it rejects. `CartChange` and `UseOptimisticCartOptions` types are exported (#361)
 - `useCartActions` states have an `errorCode` field (`UNKNOWN` for errors that aren't `CartError`s) (#359)
 
 ### 🐛 Bug Fixes
@@ -34,6 +35,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - A currency or language set while an async storage adapter is still loading is no longer overwritten by the stored one; the stored items are still restored
 - Storage is written only when the cart, currency or language changes, not on UI changes like `handleCartHover`; failed async writes now log a warning instead of an unhandled rejection
 - Changing currency or language keeps each item's `timestamp`
+- `useOptimisticCart` no longer shows each change twice for one render (adding one item briefly showed two) (#361)
 - `validateCartItems` matches inventory by `id`, `price_id`, `sku_id` and `sku`, the same fields the cart uses for item IDs. Previously items added by `price_id` or `sku_id` alone failed with "not in your inventory" (#358)
 
 ## [4.0.0-alpha.2] - 2025-12-26
