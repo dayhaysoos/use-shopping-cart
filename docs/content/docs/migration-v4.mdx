@@ -98,7 +98,7 @@ As in v3, `useShoppingCart` takes an optional selector, and the component re-ren
 const cartCount = useShoppingCart((cart) => cart.cartCount)
 ```
 
-Cart methods (`addItem`, `incrementItem`, `removeItem`, ...) are unchanged, and so is cart state (`cartCount`, `cartDetails`, ...) apart from `shouldPersist`, which is now config only.
+Cart methods (`addItem`, `incrementItem`, `removeItem`, ...) are unchanged, and so is cart state (`cartCount`, `cartDetails`, ...) apart from `shouldPersist` (now config only) and `stripe` (removed).
 
 ## What's New in v4.0
 
@@ -357,7 +357,7 @@ npm install -D @types/react@19 @types/react-dom@19
 
 ### Mostly Compatible ✅
 
-- Cart methods and cart state work as before (except `shouldPersist`, now config only)
+- Cart methods and cart state work as before (except `shouldPersist`, now config only, and `stripe`, removed)
 - Check the [breaking changes](#breaking-changes): `redirectToCheckout` is now an import that takes `session.url`, `CartConfig` is narrower, and errors are `CartError`s
 - Opt in to new features when ready
 
@@ -377,6 +377,6 @@ npm install -D @types/react@19 @types/react-dom@19
 - The old `dist/*.es.js` / `dist/*.js` file names (use the package entry points)
 - `redirectToCheckout` as a cart method, session-ID redirects, and `RedirectToCheckoutInput` (import `redirectToCheckout` and pass `session.url`)
 - The `stripe` prop and `changeStripeKey`
-- `shouldPersist` in the cart state, and `CartState` fields as `CartProvider` props
+- `shouldPersist` and `stripe` in the cart state, and `CartState` fields as `CartProvider` props
 
 **Checkout-session apps mostly need to update how they redirect to checkout. Client-only apps need a server endpoint that creates checkout sessions. Both are covered under [Breaking Changes](#breaking-changes).**
