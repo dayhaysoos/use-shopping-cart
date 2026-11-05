@@ -183,28 +183,38 @@ private loadInitialState(): CartState {
 
 ## Error Handling
 
-The class includes built-in error handling:
+Invalid input throws a `CartError` and leaves the cart unchanged. Branch on `error.code` rather than the message:
 
 ```typescript
-addItem(product: Product): void {
-  try {
-    this.validateProduct(product)
-    // ... add item logic
-  } catch (error) {
-    console.error('Failed to add item:', error)
-    // State remains unchanged
-  }
-}
+import { ShoppingCart, isCartError } from 'use-shopping-cart/core'
 
-private validateProduct(product: Product): void {
-  if (!product.id) {
-    throw new Error('Product must have an id')
-  }
-  if (!product.price || product.price < 0) {
-    throw new Error('Product must have a valid price')
+try {
+  cart.incrementItem(id)
+} catch (error) {
+  if (isCartError(error) && error.code === 'ITEM_NOT_IN_CART') {
+    cart.addItem(product)
+  } else {
+    throw error
   }
 }
 ```
+
+Use `isCartError(error)` rather than `instanceof CartError`: each entry point (`use-shopping-cart`, `/core`, `/utilities`) bundles its own copy of the class, so `instanceof` fails across them.
+
+| Code                       | Thrown by                                                                                    |
+| -------------------------- | -------------------------------------------------------------------------------------------- |
+| `INVALID_PRODUCT`          | `addItem` and `addToCartAction` with a product missing `name`, `price` or `currency`         |
+| `INVALID_COUNT`            | a `count` that isn't a positive integer                                                      |
+| `INVALID_QUANTITY`         | a `quantity` that isn't a non-negative integer (or positive, in `validateCartItems`)         |
+| `ITEM_NOT_IN_CART`         | `incrementItem`, `decrementItem`, `setItemQuantity`, `removeItem` with an ID not in the cart |
+| `INVALID_FORM_DATA`        | `useCartActions` forms with missing or unreadable fields                                     |
+| `INVALID_INVENTORY`        | `validateCartItems` with an inventory that isn't a list of objects                           |
+| `INVALID_CART`             | `validateCartItems` with malformed `cartDetails`                                             |
+| `NOT_IN_INVENTORY`         | `validateCartItems` with a cart item that isn't in the inventory                             |
+| `MISSING_CHECKOUT_SESSION` | `redirectToCheckout` without a session URL or ID                                             |
+| `INVALID_STRIPE_KEY`       | `redirectToCheckout` with a session ID and a missing or malformed publishable key            |
+| `STRIPE_UNAVAILABLE`       | `redirectToCheckout` outside the browser or before Stripe.js loads                           |
+| `UNKNOWN`                  | only in `useCartActions` state, for errors that aren't `CartError`s                          |
 
 ## Testing
 

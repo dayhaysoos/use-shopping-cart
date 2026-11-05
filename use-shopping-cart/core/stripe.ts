@@ -1,5 +1,6 @@
 import type { Stripe as StripeType } from '@stripe/stripe-js'
 import type { CartState, RedirectToCheckoutInput } from './types'
+import { CartError } from './errors'
 
 type RedirectToCheckoutOptions = {
   sessionId?: string
@@ -52,17 +53,24 @@ function hasLegacyRedirect(stripe: StripeType): stripe is StripeLegacyRedirect {
 
 function assertBrowser(): void {
   if (typeof window === 'undefined') {
-    throw new Error('Checkout redirects can only be initiated in the browser')
+    throw new CartError(
+      'STRIPE_UNAVAILABLE',
+      'Checkout redirects can only be initiated in the browser'
+    )
   }
 }
 
 function initializeStripe(publicKey: string): StripeType {
   if (typeof window === 'undefined') {
-    throw new Error('Stripe can only be initialized on the client')
+    throw new CartError(
+      'STRIPE_UNAVAILABLE',
+      'Stripe can only be initialized on the client'
+    )
   }
 
   if (!window.Stripe) {
-    throw new Error(
+    throw new CartError(
+      'STRIPE_UNAVAILABLE',
       'Stripe.js has not been loaded. Make sure to include the Stripe.js script tag.'
     )
   }
@@ -98,7 +106,10 @@ export async function redirectToCheckout(
   const { sessionId, sessionUrl } = resolveCheckoutRedirectInput(input)
 
   if (!sessionId && !sessionUrl) {
-    throw new Error('sessionUrl or sessionId is required')
+    throw new CartError(
+      'MISSING_CHECKOUT_SESSION',
+      'sessionUrl or sessionId is required'
+    )
   }
 
   if (sessionUrl) {
@@ -108,7 +119,10 @@ export async function redirectToCheckout(
   }
 
   if (!sessionId) {
-    throw new Error('sessionUrl or sessionId is required')
+    throw new CartError(
+      'MISSING_CHECKOUT_SESSION',
+      'sessionUrl or sessionId is required'
+    )
   }
 
   if (
@@ -116,21 +130,26 @@ export async function redirectToCheckout(
     typeof state.stripe !== 'string' ||
     state.stripe.length === 0
   ) {
-    throw new Error('Stripe publishable key not configured')
+    throw new CartError(
+      'INVALID_STRIPE_KEY',
+      'Stripe publishable key not configured'
+    )
   }
 
   if (
     !state.stripe.startsWith('pk_test_') &&
     !state.stripe.startsWith('pk_live_')
   ) {
-    throw new Error(
+    throw new CartError(
+      'INVALID_STRIPE_KEY',
       'Invalid Stripe publishable key format. Key must start with pk_test_ or pk_live_'
     )
   }
 
   const stripe = initializeStripe(state.stripe)
   if (!hasLegacyRedirect(stripe)) {
-    throw new Error(
+    throw new CartError(
+      'STRIPE_UNAVAILABLE',
       'Stripe.js redirectToCheckout is not available. Pass sessionUrl instead.'
     )
   }

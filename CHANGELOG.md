@@ -15,6 +15,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - `utilities/serverless.js` → `dist/utilities.mjs` / `dist/utilities.cjs`
   - Imports through `use-shopping-cart`, `use-shopping-cart/core` and `use-shopping-cart/utilities` are unaffected; only tooling that bypasses the `exports` map and points at a file breaks (absolute paths, Jest `moduleNameMapper`, bundler aliases, CDN URLs pointing at `.es.js`)
 
+- **Errors are `CartError`s**: everything the library throws is a `CartError` with a `code` (`INVALID_PRODUCT`, `INVALID_COUNT`, `INVALID_QUANTITY`, `ITEM_NOT_IN_CART`, `INVALID_FORM_DATA`, `INVALID_INVENTORY`, `INVALID_CART`, `NOT_IN_INVENTORY`, `MISSING_CHECKOUT_SESSION`, `INVALID_STRIPE_KEY`, `STRIPE_UNAVAILABLE`). Messages are unchanged; validation errors' `name` changed from `ValidationError` to `CartError` (#359)
+
+### ✨ Features
+
+- `CartError`, `isCartError` and the `CartErrorCode` type are exported from `use-shopping-cart`, `/core` and `/utilities`. Use `isCartError` rather than `instanceof`, since each entry point bundles its own copy
+- `useCartActions` states have an `errorCode` field (`UNKNOWN` for errors that aren't `CartError`s) (#359)
+
 ### 🐛 Bug Fixes
 
 - **Published types fixed**: type declarations are now generated and bundled; rc.1 shipped `.d.ts` files that imported files missing from the tarball

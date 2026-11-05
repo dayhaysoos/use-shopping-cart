@@ -56,7 +56,7 @@ function ProductCard({ product }) {
 #### Add Item
 
 - **`addToCartAction`**: Form action for adding items
-- **`addItemState`**: `{ status, error, productId }`
+- **`addItemState`**: `{ status, error, errorCode, productId }`
 - **`isAddingItem`**: Boolean pending state
 
 **Form fields:**
@@ -75,7 +75,7 @@ function ProductCard({ product }) {
 #### Remove Item
 
 - **`removeFromCartAction`**: Form action for removing items
-- **`removeItemState`**: `{ status, error, itemId }`
+- **`removeItemState`**: `{ status, error, errorCode, itemId }`
 - **`isRemovingItem`**: Boolean pending state
 
 **Form fields:**
@@ -92,7 +92,7 @@ function ProductCard({ product }) {
 #### Update Quantity
 
 - **`updateQuantityAction`**: Form action for setting quantity
-- **`updateQuantityState`**: `{ status, error, itemId, quantity }`
+- **`updateQuantityState`**: `{ status, error, errorCode, itemId, quantity }`
 - **`isUpdatingQuantity`**: Boolean pending state
 
 **Form fields:**
@@ -111,7 +111,7 @@ function ProductCard({ product }) {
 #### Increment Item
 
 - **`incrementItemAction`**: Form action for incrementing
-- **`incrementItemState`**: `{ status, error, itemId }`
+- **`incrementItemState`**: `{ status, error, errorCode, itemId }`
 - **`isIncrementingItem`**: Boolean pending state
 
 **Form fields:**
@@ -122,7 +122,7 @@ function ProductCard({ product }) {
 #### Decrement Item
 
 - **`decrementItemAction`**: Form action for decrementing
-- **`decrementItemState`**: `{ status, error, itemId }`
+- **`decrementItemState`**: `{ status, error, errorCode, itemId }`
 - **`isDecrementingItem`**: Boolean pending state
 
 **Form fields:**
@@ -133,7 +133,7 @@ function ProductCard({ product }) {
 #### Clear Cart
 
 - **`clearCartAction`**: Form action for clearing cart
-- **`clearCartState`**: `{ status, error }`
+- **`clearCartState`**: `{ status, error, errorCode }`
 - **`isClearingCart`**: Boolean pending state
 
 #### Global State
@@ -281,7 +281,7 @@ function ProductCard({ product }) {
 
 ## Error Handling
 
-All actions return state with error handling:
+When an action fails, its state has `status: 'error'`, a readable `error` message, and an `errorCode` to branch on (see [error codes](/docs/concepts/shopping-cart-class#error-handling)). Both are `null` otherwise.
 
 ```jsx
 function ProductCard({ product }) {
@@ -295,12 +295,15 @@ function ProductCard({ product }) {
         {isAddingItem ? 'Adding...' : 'Add to Cart'}
       </button>
 
-      {/* Error display */}
-      {addItemState.status === 'error' && (
-        <div className="error-message">
-          <strong>Error:</strong> {addItemState.error}
-        </div>
+      {addItemState.errorCode === 'INVALID_PRODUCT' && (
+        <div className="error-message">This product can't be added.</div>
       )}
+      {addItemState.status === 'error' &&
+        addItemState.errorCode !== 'INVALID_PRODUCT' && (
+          <div className="error-message">
+            <strong>Error:</strong> {addItemState.error}
+          </div>
+        )}
 
       {/* Success feedback */}
       {addItemState.status === 'success' && (

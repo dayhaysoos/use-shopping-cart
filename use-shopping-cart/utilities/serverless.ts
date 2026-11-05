@@ -1,5 +1,9 @@
 import type { Product, CartDetails } from '../core/types'
 import { productIdFields } from '../core/productId'
+import { CartError } from '../core/errors'
+
+export { CartError, isCartError } from '../core/errors'
+export type { CartErrorCode } from '../core/errors'
 
 export interface ValidatedItem {
   price_data: {
@@ -29,17 +33,26 @@ export function validateCartItems(
   const validatedItems: ValidatedItem[] = []
 
   if (!inventorySrc || typeof inventorySrc[Symbol.iterator] !== 'function') {
-    throw new Error('Invalid Cart: inventory must be an iterable collection.')
+    throw new CartError(
+      'INVALID_INVENTORY',
+      'Invalid Cart: inventory must be an iterable collection.'
+    )
   }
 
   if (!cartDetails || typeof cartDetails !== 'object') {
-    throw new Error('Invalid Cart: cartDetails must be an object.')
+    throw new CartError(
+      'INVALID_CART',
+      'Invalid Cart: cartDetails must be an object.'
+    )
   }
 
   const inventoryMap = new Map<string, Product>()
   for (const product of inventorySrc) {
     if (!product || typeof product !== 'object') {
-      throw new Error('Invalid Cart: inventory items must be objects.')
+      throw new CartError(
+        'INVALID_INVENTORY',
+        'Invalid Cart: inventory items must be objects.'
+      )
     }
 
     for (const field of productIdFields) {
@@ -51,12 +64,16 @@ export function validateCartItems(
   for (const id in cartDetails) {
     const cartItem = cartDetails[id]
     if (!cartItem || typeof cartItem !== 'object') {
-      throw new Error(`Invalid Cart: cart item "${id}" must be an object.`)
+      throw new CartError(
+        'INVALID_CART',
+        `Invalid Cart: cart item "${id}" must be an object.`
+      )
     }
 
     const inventoryItem = inventoryMap.get(id)
     if (inventoryItem === undefined) {
-      throw new Error(
+      throw new CartError(
+        'NOT_IN_INVENTORY',
         `Invalid Cart: product with id "${id}" is not in your inventory.`
       )
     }
@@ -68,7 +85,8 @@ export function validateCartItems(
       !Number.isInteger(quantity) ||
       quantity <= 0
     ) {
-      throw new Error(
+      throw new CartError(
+        'INVALID_QUANTITY',
         `Invalid Cart: product "${id}" has invalid quantity "${quantity}". Quantity must be a positive integer.`
       )
     }

@@ -63,6 +63,20 @@ These are unchanged. Importing `use-shopping-cart/dist/...` was already blocked 
 
 `dist/react.umd.js` and `dist/core.umd.js` keep their names.
 
+#### Errors Are `CartError`s
+
+Errors thrown by the cart, `useCartActions` forms, `validateCartItems` and `redirectToCheckout` are now `CartError`s with a `code`. Messages are unchanged, so code that only displays `error.message` keeps working. If you check `error.name === 'ValidationError'`, switch to the code:
+
+```js
+import { isCartError } from 'use-shopping-cart/core'
+
+if (isCartError(error) && error.code === 'ITEM_NOT_IN_CART') {
+  // ...
+}
+```
+
+`useCartActions` states have a new `errorCode` field next to `error`.
+
 ### Improvements and Bug Fixes
 
 #### Fixed: CartProvider Store Recreation Bug

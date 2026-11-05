@@ -6,7 +6,13 @@ export { useShoppingCart } from './useShoppingCart'
 export { useOptimisticCart } from './useOptimisticCart'
 export { useCartActions } from './useCartActions'
 export { DebugCart } from './DebugCart'
-export { formatCurrencyString, filterCart } from '../core/index'
+export {
+  formatCurrencyString,
+  filterCart,
+  CartError,
+  isCartError
+} from '../core/index'
+export type { CartErrorCode } from '../core/errors'
 
 export type { CartProviderProps } from './CartProvider'
 export type { CartActions, UseShoppingCartReturn } from './useShoppingCart'

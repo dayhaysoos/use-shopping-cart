@@ -62,6 +62,10 @@ Imports through `use-shopping-cart`, `use-shopping-cart/core` and `use-shopping-
 
 `dist/react.umd.js` and `dist/core.umd.js` keep their names.
 
+### Errors Are `CartError`s
+
+Errors thrown by the cart, `useCartActions` forms, `validateCartItems` and `redirectToCheckout` are now `CartError`s with a `code` (for example `ITEM_NOT_IN_CART`, `NOT_IN_INVENTORY`). Messages are unchanged. Validation errors previously had `name: 'ValidationError'`; they now have `name: 'CartError'`. `useCartActions` states have a new `errorCode` field. See [error codes](/docs/concepts/shopping-cart-class#error-handling).
+
 **All other APIs**: backward compatible for checkout-session mode users.
 
 ## What's New in v4.0

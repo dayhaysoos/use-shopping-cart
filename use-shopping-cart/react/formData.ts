@@ -1,5 +1,6 @@
 import type { Product } from '../core/types'
 import { validateProduct } from '../core/validation'
+import { CartError, type CartErrorCode } from '../core/errors'
 
 const MAX_PRODUCT_JSON_LENGTH = 50_000
 
@@ -9,15 +10,15 @@ export function decodeAddItem(formData: FormData): {
 } {
   const productJSON = formData.get('product')
   if (!productJSON || typeof productJSON !== 'string') {
-    throw new Error('Product data is required')
+    throw new CartError('INVALID_FORM_DATA', 'Product data is required')
   }
   if (productJSON.length > MAX_PRODUCT_JSON_LENGTH) {
-    throw new Error('Product data is too large')
+    throw new CartError('INVALID_FORM_DATA', 'Product data is too large')
   }
 
   const product = parseJSON(productJSON)
   if (product === undefined) {
-    throw new Error('Product data must be valid JSON')
+    throw new CartError('INVALID_FORM_DATA', 'Product data must be valid JSON')
   }
 
   validateProduct(product)
@@ -27,7 +28,7 @@ export function decodeAddItem(formData: FormData): {
 export function decodeItemId(formData: FormData): string {
   const itemId = formData.get('itemId')
   if (!itemId || typeof itemId !== 'string') {
-    throw new Error('Item ID is required')
+    throw new CartError('INVALID_FORM_DATA', 'Item ID is required')
   }
   return itemId
 }
@@ -52,10 +53,21 @@ export function decodeQuantity(formData: FormData): {
     !quantity ||
     typeof quantity !== 'string'
   ) {
-    throw new Error('Item ID and quantity are required')
+    throw new CartError(
+      'INVALID_FORM_DATA',
+      'Item ID and quantity are required'
+    )
   }
 
-  return { itemId, quantity: toInteger(quantity, 'quantity', 'non-negative') }
+  return {
+    itemId,
+    quantity: toInteger(
+      quantity,
+      'quantity',
+      'non-negative',
+      'INVALID_QUANTITY'
+    )
+  }
 }
 
 function parseJSON(text: string): unknown {
@@ -69,19 +81,21 @@ function parseJSON(text: string): unknown {
 function decodeCount(formData: FormData): number {
   const count = formData.get('count')
   if (count === null) return 1
-  if (typeof count !== 'string') throw new Error('count must be a string')
-  return toInteger(count, 'count', 'positive')
+  if (typeof count !== 'string')
+    throw new CartError('INVALID_COUNT', 'count must be a string')
+  return toInteger(count, 'count', 'positive', 'INVALID_COUNT')
 }
 
 function toInteger(
   value: string,
   fieldName: string,
-  kind: 'positive' | 'non-negative'
+  kind: 'positive' | 'non-negative',
+  code: CartErrorCode
 ): number {
   const parsed = Number(value)
   const inRange = kind === 'positive' ? parsed > 0 : parsed >= 0
   if (!Number.isInteger(parsed) || !inRange) {
-    throw new Error(`${fieldName} must be a ${kind} integer`)
+    throw new CartError(code, `${fieldName} must be a ${kind} integer`)
   }
   return parsed
 }

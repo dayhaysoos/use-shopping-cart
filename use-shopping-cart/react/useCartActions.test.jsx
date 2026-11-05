@@ -84,10 +84,13 @@ describe('useCartActions', () => {
 
       expect(result.current.addItemState.error).toBeNull()
       expect(result.current.addItemState.productId).toBe(mockProduct.id)
+      expect(result.current.addItemState.errorCode).toBeNull()
     })
 
     test('should handle missing product data', async () => {
       const { result } = renderHook(() => useCartActions(), { wrapper })
+
+      expect(result.current.addItemState.errorCode).toBeNull()
 
       const formData = new FormData()
       // No product data
@@ -101,6 +104,7 @@ describe('useCartActions', () => {
       })
 
       expect(result.current.addItemState.error).toBe('Product data is required')
+      expect(result.current.addItemState.errorCode).toBe('INVALID_FORM_DATA')
     })
 
     test('should reject invalid JSON product data', async () => {
@@ -657,6 +661,27 @@ describe('useCartActions', () => {
       // Other action states should still be idle
       expect(result.current.removeItemState.status).toBe('idle')
       expect(result.current.clearCartState.status).toBe('idle')
+    })
+  })
+
+  describe('errorCode', () => {
+    test('carries the CartError code from the cart', async () => {
+      const { result } = renderHook(() => useCartActions(), { wrapper })
+
+      const formData = new FormData()
+      formData.append('itemId', 'missing')
+
+      await act(async () => {
+        await result.current.incrementItemAction(formData)
+      })
+
+      await waitFor(() => {
+        expect(result.current.incrementItemState.status).toBe('error')
+      })
+
+      expect(result.current.incrementItemState.errorCode).toBe(
+        'ITEM_NOT_IN_CART'
+      )
     })
   })
 })
