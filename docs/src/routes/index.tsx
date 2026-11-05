@@ -25,7 +25,7 @@ const PRIMARY_FEATURES = [
   {
     title: 'Optimistic cart UX',
     description:
-      'useOptimisticCart mirrors server state so quantity and price changes feel instant while requests settle.'
+      'useOptimisticCart shows each change instantly while your backend request settles, and rolls it back if the request fails.'
   },
   {
     title: 'State persistence controls',

@@ -98,7 +98,7 @@ As in v3, `useShoppingCart` takes an optional selector, and the component re-ren
 const cartCount = useShoppingCart((cart) => cart.cartCount)
 ```
 
-Cart methods (`addItem`, `incrementItem`, `removeItem`, ...) and cart state (`cartCount`, `cartDetails`, ...) are unchanged.
+Cart methods (`addItem`, `incrementItem`, `removeItem`, ...) are unchanged, and so is cart state (`cartCount`, `cartDetails`, ...) apart from `shouldPersist`, which is now config only.
 
 ## What's New in v4.0
 
@@ -357,7 +357,7 @@ npm install -D @types/react@19 @types/react-dom@19
 
 ### Mostly Compatible ✅
 
-- Cart methods and cart state work as before
+- Cart methods and cart state work as before (except `shouldPersist`, now config only)
 - Check the [breaking changes](#breaking-changes): `redirectToCheckout` is now an import that takes `session.url`, `CartConfig` is narrower, and errors are `CartError`s
 - Opt in to new features when ready
 
