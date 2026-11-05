@@ -9,6 +9,7 @@ The main hook for accessing shopping cart state and methods. Returns all cart pr
 
 ```typescript
 function useShoppingCart(): UseShoppingCartReturn
+function useShoppingCart<T>(selector: (cart: UseShoppingCartReturn) => T): T
 ```
 
 ## Usage
@@ -38,6 +39,24 @@ function MyComponent() {
   // Use cart state and methods
 }
 ```
+
+## Selecting Part of the Cart
+
+Pass a selector to read one value. The component re-renders only when that value changes, so a cart badge doesn't re-render when the drawer opens, and a button that only needs `addItem` never re-renders:
+
+```jsx
+function CartBadge() {
+  const cartCount = useShoppingCart((cart) => cart.cartCount)
+  return <span>{cartCount}</span>
+}
+
+function AddToCart({ product }) {
+  const addItem = useShoppingCart((cart) => cart.addItem)
+  return <button onClick={() => addItem(product)}>Add</button>
+}
+```
+
+Select a single value. A selector that builds a new object (`(cart) => ({ a: cart.a })`) re-renders on every change.
 
 ## Return Value
 
@@ -198,6 +217,7 @@ function TypeSafeComponent() {
 
 - Must be used within a `<CartProvider>` component
 - Returns stable references (safe to use in dependency arrays)
+- Without a selector, the component re-renders on every cart change, including `shouldDisplayCart` and `lastClicked`
 - All methods are memoized
 - State updates trigger re-renders
 - Works with React 19+ features

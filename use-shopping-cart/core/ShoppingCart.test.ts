@@ -29,11 +29,41 @@ describe('ShoppingCart', () => {
       expect(state.stripe).toBe('pk_test_123')
     })
 
-    it('respects shouldPersist false', () => {
-      const cart = new ShoppingCart({ shouldPersist: false })
-      const state = cart.getState()
+    it('keeps config options out of state', () => {
+      const cart = new ShoppingCart({
+        shouldPersist: false,
+        persistKey: 'k',
+        storage: createMemoryStorage(),
+        currency: 'EUR',
+        language: 'de-DE'
+      })
 
-      expect(state.shouldPersist).toBe(false)
+      expect(Object.keys(cart.getState()).sort()).toEqual(
+        [
+          'cartCount',
+          'cartDetails',
+          'currency',
+          'formattedTotalPrice',
+          'language',
+          'lastClicked',
+          'shouldDisplayCart',
+          'totalPrice'
+        ].sort()
+      )
+    })
+
+    it('ignores derived and unknown fields passed as config', () => {
+      const cart = new ShoppingCart({
+        shouldPersist: false,
+        cartCount: 99,
+        totalPrice: 5,
+        mode: 'payment'
+      } as never)
+      const state = cart.getState() as unknown as Record<string, unknown>
+
+      expect(state.cartCount).toBe(0)
+      expect(state.totalPrice).toBe(0)
+      expect(state).not.toHaveProperty('mode')
     })
 
     it('uses custom persistKey', () => {

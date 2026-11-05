@@ -40,8 +40,7 @@ export const initialState: CartState = {
   cartCount: 0,
   totalPrice: 0,
   formattedTotalPrice: '$0.00',
-  cartDetails: {},
-  shouldPersist: true
+  cartDetails: {}
 }
 
 export class ShoppingCart {
@@ -52,10 +51,21 @@ export class ShoppingCart {
   private _settingsChanged: boolean = false
 
   constructor(config: CartConfig = {}) {
-    const state = { ...initialState, ...config }
+    const {
+      cartDetails = {},
+      currency = initialState.currency,
+      language = initialState.language,
+      stripe
+    } = config
+    const state: CartState = {
+      ...initialState,
+      currency,
+      language,
+      ...(stripe !== undefined && { stripe })
+    }
     this._state = withCartDetails(
       state,
-      normalizeCartDetails(state.cartDetails, state.currency, state.language)
+      normalizeCartDetails(cartDetails, currency, language)
     )
     this._subscribers = new Set()
 

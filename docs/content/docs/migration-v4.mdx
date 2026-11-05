@@ -66,6 +66,10 @@ Imports through `use-shopping-cart`, `use-shopping-cart/core` and `use-shopping-
 
 Errors thrown by the cart, `useCartActions` forms, `validateCartItems` and `redirectToCheckout` are now `CartError`s with a `code` (for example `ITEM_NOT_IN_CART`, `NOT_IN_INVENTORY`). Messages are unchanged. Validation errors previously had `name: 'ValidationError'`; they now have `name: 'CartError'`. `useCartActions` states have a new `errorCode` field. See [error codes](/docs/concepts/shopping-cart-class#error-handling).
 
+### `CartConfig` Is Its Own Type
+
+`CartProvider` props and the `ShoppingCart` constructor take only `cartDetails`, `currency`, `language`, `stripe`, `shouldPersist`, `persistKey` and `storage`. Other fields, like `cartCount` or `shouldDisplayCart`, were accepted before and silently ignored or copied into state; they're now type errors. `shouldPersist` is no longer part of the cart state (`useShoppingCart().shouldPersist` and `initialState.shouldPersist` are gone).
+
 **All other APIs**: backward compatible for checkout-session mode users.
 
 ## What's New in v4.0

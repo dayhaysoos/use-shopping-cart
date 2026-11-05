@@ -77,6 +77,18 @@ if (isCartError(error) && error.code === 'ITEM_NOT_IN_CART') {
 
 `useCartActions` states have a new `errorCode` field next to `error`.
 
+#### `CartConfig` Is Its Own Type
+
+`CartProvider` props and the `ShoppingCart` constructor take only `cartDetails`, `currency`, `language`, `stripe`, `shouldPersist`, `persistKey` and `storage`. Passing other state fields (`cartCount`, `shouldDisplayCart`, ...) is now a type error; they were ignored or copied into state before. `shouldPersist` is no longer in the cart state, so read it from your own config instead of `useShoppingCart().shouldPersist`.
+
+#### `useShoppingCart(selector)` Is Back
+
+As in v3, `useShoppingCart` takes an optional selector, and the component re-renders only when the selected value changes:
+
+```js
+const cartCount = useShoppingCart((cart) => cart.cartCount)
+```
+
 ### Improvements and Bug Fixes
 
 #### Fixed: CartProvider Store Recreation Bug

@@ -14,12 +14,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - `dist/react.es.js` → `dist/react.mjs`, `dist/react.js` → `dist/react.cjs` (same for `core`)
   - `utilities/serverless.js` → `dist/utilities.mjs` / `dist/utilities.cjs`
   - Imports through `use-shopping-cart`, `use-shopping-cart/core` and `use-shopping-cart/utilities` are unaffected; only tooling that bypasses the `exports` map and points at a file breaks (absolute paths, Jest `moduleNameMapper`, bundler aliases, CDN URLs pointing at `.es.js`)
-
 - **Errors are `CartError`s**: everything the library throws is a `CartError` with a `code` (`INVALID_PRODUCT`, `INVALID_COUNT`, `INVALID_QUANTITY`, `ITEM_NOT_IN_CART`, `INVALID_FORM_DATA`, `INVALID_INVENTORY`, `INVALID_CART`, `NOT_IN_INVENTORY`, `MISSING_CHECKOUT_SESSION`, `INVALID_STRIPE_KEY`, `STRIPE_UNAVAILABLE`). Messages are unchanged; validation errors' `name` changed from `ValidationError` to `CartError` (#359)
+- **`CartConfig` is explicit**: `CartProvider` and `new ShoppingCart()` accept `cartDetails`, `currency`, `language`, `stripe`, `shouldPersist`, `persistKey` and `storage`. Other `CartState` fields are no longer accepted, and config (`shouldPersist`, `storage`, `persistKey`) no longer leaks into `getState()` (#357)
 
 ### ✨ Features
 
 - `CartError`, `isCartError` and the `CartErrorCode` type are exported from `use-shopping-cart`, `/core` and `/utilities`. Use `isCartError` rather than `instanceof`, since each entry point bundles its own copy
+- `useShoppingCart(selector)`: re-render only when the selected value changes (#357)
 - `useCartActions` states have an `errorCode` field (`UNKNOWN` for errors that aren't `CartError`s) (#359)
 
 ### 🐛 Bug Fixes

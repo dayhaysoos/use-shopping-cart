@@ -10,6 +10,15 @@ import {
 /**
  * Test that useShoppingCart returns expected state properties
  */
+function TestUseShoppingCartSelector() {
+  const count: number = useShoppingCart((cart) => cart.cartCount)
+  const addItem = useShoppingCart((cart) => cart.addItem)
+  addItem({ id: 'a', name: 'A', price: 1, currency: 'USD' })
+  // @ts-expect-error the selector's return type is inferred
+  const wrong: string = useShoppingCart((cart) => cart.cartCount)
+  return <span>{count + wrong}</span>
+}
+
 function TestUseShoppingCartState() {
   const cart = useShoppingCart()
 
@@ -21,7 +30,8 @@ function TestUseShoppingCartState() {
   const language: string = cart.language
   const displayCart: boolean = cart.shouldDisplayCart
   const lastClicked: string = cart.lastClicked
-  const shouldPersist: boolean = cart.shouldPersist
+  // @ts-expect-error shouldPersist is config, not state
+  cart.shouldPersist
 
   // Optional stripe key
   const stripeKey: string | undefined = cart.stripe
@@ -133,20 +143,6 @@ function TestUseShoppingCartActions() {
   }, [cart])
 
   return <p>Actions!</p>
-}
-
-/**
- * Test that useShoppingCart does NOT accept a selector parameter
- * (The old API had a selector, but the new implementation doesn't)
- */
-function TestNoSelector() {
-  // This should work - no selector
-  const cart = useShoppingCart()
-
-  // @ts-expect-error - selector param should NOT exist in new API
-  const cartWithSelector = useShoppingCart((state) => state.cartCount)
-
-  return null
 }
 
 /**

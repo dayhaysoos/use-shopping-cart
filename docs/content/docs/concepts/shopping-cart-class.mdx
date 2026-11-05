@@ -254,7 +254,23 @@ const cart = new ShoppingCart({
   currency: 'USD',
   stripe: 'pk_test_...'
 })
+```
 
+The constructor takes a `CartConfig`:
+
+| Option          | Default               | Description                                           |
+| --------------- | --------------------- | ----------------------------------------------------- |
+| `cartDetails`   | `{}`                  | Initial items; totals are computed from them          |
+| `currency`      | `'USD'`               | ISO 4217 currency code                                |
+| `language`      | `navigator.language`  | Locale for formatting                                 |
+| `stripe`        |                       | Publishable key, only needed for session-ID redirects |
+| `shouldPersist` | `true`                | Save the cart to `storage`                            |
+| `persistKey`    | `'use-shopping-cart'` | Storage key                                           |
+| `storage`       | `localStorage`        | A `StorageAdapter`                                    |
+
+Config options aren't part of `getState()`. `getState()` returns `cartDetails`, `cartCount`, `totalPrice`, `formattedTotalPrice`, `currency`, `language`, `shouldDisplayCart` and `lastClicked`.
+
+```typescript
 // Subscribe to changes
 cart.subscribe(() => {
   updateUI(cart.getState())

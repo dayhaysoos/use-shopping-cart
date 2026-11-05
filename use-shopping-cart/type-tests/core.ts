@@ -11,6 +11,11 @@ const cart = new ShoppingCart({
   shouldPersist: true
 })
 
+new ShoppingCart({
+  // @ts-expect-error totals are derived, not config
+  cartCount: 3
+})
+
 let state: CartState = cart.getState()
 cart.subscribe(() => {
   state = cart.getState()
