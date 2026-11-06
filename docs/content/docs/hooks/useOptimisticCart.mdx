@@ -9,7 +9,7 @@ sidebar_position: 2
 
 `useOptimisticCart()` wraps `useShoppingCart()` for carts that sync with your backend. Pass an async `onChange` and every cart change shows in the UI immediately, is sent to `onChange`, and is applied to the real cart once `onChange` resolves. If it rejects, the change is rolled back.
 
-Without `onChange`, it behaves exactly like `useShoppingCart()`: the cart itself is synchronous, so there is nothing to wait for.
+Without `onChange`, its actions apply to the cart immediately, like `useShoppingCart()`. It still shows changes that other `useOptimisticCart({ onChange })` calls on the same cart are waiting on.
 
 ## Benefits
 
@@ -88,7 +88,7 @@ function Cart() {
 How it behaves:
 
 - **Every component:** `<CartProvider>` holds one `useOptimistic` state per cart, so a pending change shows in every component that calls `useOptimisticCart`. A total in one component updates when an item in another changes. `useShoppingCart` shows only confirmed changes.
-- **Order:** changes wait for the previous `onChange` to settle, so three quick clicks send three requests, one after another.
+- **Order:** changes wait for the previous `onChange` to settle, so three quick clicks send three requests, one after another. Changes made without `onChange` don't wait: they apply to the cart straight away.
 - **Success:** the change is applied to the real cart (and saved to `storage`).
 - **Failure:** the change is dropped and `error` holds what `onChange` threw, in the component that made the change. Later queued changes still run, but each is checked against the real cart first: one that depended on the failed change (incrementing an item whose add failed) is dropped with an `ITEM_NOT_IN_CART` error and never reaches `onChange`.
 - **Rollback timing:** React batches pending transitions together, so if one change fails while others are still pending, its rollback shows once they settle.

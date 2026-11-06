@@ -2,7 +2,8 @@
 import { describe, it, expect, vi } from 'vitest'
 import React from 'react'
 import { render, screen, waitFor } from '@testing-library/react'
-import { CartProvider, useCartContext } from './CartProvider'
+import { CartProvider } from './CartProvider'
+import { useCartContext } from './cartContext'
 
 describe('CartProvider', () => {
   it('provides ShoppingCart instance to children', () => {

@@ -13,7 +13,7 @@ import * as react from '../react/index'
 import * as utilities from '../utilities/serverless'
 import { createElement } from 'react'
 import { render } from '@testing-library/react'
-import { useCartContext } from '../react/CartProvider'
+import { useCartContext } from '../react/cartContext'
 
 function codeOf(fn: () => unknown): CartErrorCode | undefined {
   try {
