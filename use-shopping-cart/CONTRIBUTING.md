@@ -43,7 +43,7 @@ Here are a couple commands to get you started in development (run them from the 
 # Builds use-shopping-cart in watch-mode and runs the documentation site locally
 pnpm dev
 
-# Builds the library, then runs the tests once
+# Builds the library, then runs the unit and dist smoke tests once
 pnpm test
 
 # Builds the library, then runs the tests in watch-mode
