@@ -6,7 +6,7 @@ export default defineConfig({
     environment: 'jsdom',
     setupFiles: ['./vitest.setup.ts'],
     include: ['**/*.test.{ts,tsx,js,jsx}'],
-    exclude: ['node_modules', 'dist']
+    exclude: ['node_modules', 'dist', 'dist-tests']
   },
   esbuild: {
     jsx: 'automatic'
