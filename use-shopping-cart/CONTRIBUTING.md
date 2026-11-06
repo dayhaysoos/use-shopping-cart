@@ -60,6 +60,7 @@ Local validation:
 pnpm --filter use-shopping-cart run test
 pnpm --filter use-shopping-cart run test:types
 pnpm --filter use-shopping-cart run build
+pnpm --filter use-shopping-cart run test:dist
 pnpm --filter use-shopping-cart publish --dry-run
 ```
 
