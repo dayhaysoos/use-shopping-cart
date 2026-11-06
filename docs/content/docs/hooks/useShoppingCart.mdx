@@ -9,7 +9,10 @@ The main hook for accessing shopping cart state and methods. Returns all cart pr
 
 ```typescript
 function useShoppingCart(): UseShoppingCartReturn
-function useShoppingCart<T>(selector: (cart: UseShoppingCartReturn) => T): T
+function useShoppingCart<T>(
+  selector: (cart: UseShoppingCartReturn) => T,
+  isEqual?: (previous: T, next: T) => boolean
+): T
 ```
 
 ## Usage
@@ -53,7 +56,15 @@ function AddToCart({ product }) {
 }
 ```
 
-Select a single value. A selector that builds a new object (`(cart) => ({ a: cart.a })`) re-renders on every change.
+A selector that builds a new object (`(cart) => ({ a: cart.a })`) re-renders on every change. Pass `isEqual` to keep the previous result when nothing you care about changed:
+
+```jsx
+const totals = useShoppingCart(
+  (cart) => ({ count: cart.cartCount, total: cart.formattedTotalPrice }),
+  (previous, next) =>
+    previous.count === next.count && previous.total === next.total
+)
+```
 
 ## Return Value
 

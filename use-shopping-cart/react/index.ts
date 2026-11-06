@@ -22,9 +22,7 @@ export type {
   AddItemState,
   ItemState,
   QuantityState,
-  ClearState,
-  RemoveItemState,
-  UpdateQuantityState
+  ClearState
 } from './useCartActions'
 export type { DebugCartProps } from './DebugCart'
 export type {

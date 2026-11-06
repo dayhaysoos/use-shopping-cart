@@ -1,6 +1,12 @@
 'use client'
 
-import { startTransition, useState } from 'react'
+import {
+  startTransition,
+  useLayoutEffect,
+  useMemo,
+  useRef,
+  useState
+} from 'react'
 import { useShoppingCart } from './useShoppingCart'
 import { useCartContext } from './cartContext'
 import { markCommitted, useOptimisticCartContext } from './optimisticCartLayer'
@@ -79,55 +85,54 @@ export function useOptimisticCart({ onChange }: UseOptimisticCartOptions = {}) {
     ? cartTotals(optimisticCartDetails, cart)
     : cart
 
-  const run = (call: CartCall, commit: () => void) => {
-    if (!onChange) {
-      commit()
-      return
+  const onChangeRef = useRef(onChange)
+  useLayoutEffect(() => {
+    onChangeRef.current = onChange
+  })
+
+  const { showChange } = optimistic
+  const actions = useMemo(() => {
+    const run = (call: CartCall, commit: () => void) => {
+      const onChange = onChangeRef.current
+      if (!onChange) {
+        commit()
+        return
+      }
+
+      const { change, task } = enqueueChange(store, call, onChange, commit)
+      startTransition(async () => {
+        showChange(change)
+        try {
+          await task
+          startTransition(() => setError(null))
+        } catch (caught) {
+          startTransition(() => setError(caught))
+        }
+      })
     }
 
-    const { change, task } = enqueueChange(store, call, onChange, commit)
-    startTransition(async () => {
-      optimistic.showChange(change)
-      try {
-        await task
-        startTransition(() => setError(null))
-      } catch (caught) {
-        startTransition(() => setError(caught))
-      }
-    })
-  }
-
-  const addItem = (product: Product, options: AddItemOptions = {}) => {
-    run({ action: 'addItem', product, options }, () =>
-      cart.addItem(product, options)
-    )
-  }
-
-  const removeItem = (id: string) => {
-    run({ action: 'removeItem', id }, () => cart.removeItem(id))
-  }
-
-  const incrementItem = (id: string, options: IncrementOptions = {}) => {
-    run({ action: 'incrementItem', id, options }, () =>
-      cart.incrementItem(id, options)
-    )
-  }
-
-  const decrementItem = (id: string, options: IncrementOptions = {}) => {
-    run({ action: 'decrementItem', id, options }, () =>
-      cart.decrementItem(id, options)
-    )
-  }
-
-  const setItemQuantity = (id: string, quantity: number) => {
-    run({ action: 'setItemQuantity', id, quantity }, () =>
-      cart.setItemQuantity(id, quantity)
-    )
-  }
-
-  const clearCart = () => {
-    run({ action: 'clearCart' }, () => cart.clearCart())
-  }
+    return {
+      addItem: (product: Product, options: AddItemOptions = {}) =>
+        run({ action: 'addItem', product, options }, () =>
+          store.addItem(product, options)
+        ),
+      removeItem: (id: string) =>
+        run({ action: 'removeItem', id }, () => store.removeItem(id)),
+      incrementItem: (id: string, options: IncrementOptions = {}) =>
+        run({ action: 'incrementItem', id, options }, () =>
+          store.incrementItem(id, options)
+        ),
+      decrementItem: (id: string, options: IncrementOptions = {}) =>
+        run({ action: 'decrementItem', id, options }, () =>
+          store.decrementItem(id, options)
+        ),
+      setItemQuantity: (id: string, quantity: number) =>
+        run({ action: 'setItemQuantity', id, quantity }, () =>
+          store.setItemQuantity(id, quantity)
+        ),
+      clearCart: () => run({ action: 'clearCart' }, () => store.clearCart())
+    }
+  }, [store, showChange])
 
   return {
     ...cart,
@@ -137,11 +142,6 @@ export function useOptimisticCart({ onChange }: UseOptimisticCartOptions = {}) {
     formattedTotalPrice: optimisticTotals.formattedTotalPrice,
     isOptimistic,
     error,
-    addItem,
-    removeItem,
-    incrementItem,
-    decrementItem,
-    setItemQuantity,
-    clearCart
+    ...actions
   }
 }

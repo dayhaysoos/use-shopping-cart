@@ -159,8 +159,8 @@ describe('useCartActions', () => {
         expect(result.current.addItemState.status).toBe('error')
       })
 
-      expect(result.current.addItemState.error).toBe(
-        'count must be a positive integer'
+      expect(result.current.addItemState.error).toContain(
+        'count must be an integer'
       )
     })
 
@@ -179,8 +179,8 @@ describe('useCartActions', () => {
         expect(result.current.addItemState.status).toBe('error')
       })
 
-      expect(result.current.addItemState.error).toBe(
-        'count must be a positive integer'
+      expect(result.current.addItemState.error).toContain(
+        'count must be a finite number'
       )
     })
 
@@ -199,8 +199,8 @@ describe('useCartActions', () => {
         expect(result.current.addItemState.status).toBe('error')
       })
 
-      expect(result.current.addItemState.error).toBe(
-        'count must be a positive integer'
+      expect(result.current.addItemState.error).toContain(
+        'count must be greater than 0'
       )
     })
 
@@ -317,7 +317,7 @@ describe('useCartActions', () => {
       })
 
       expect(result.current.updateQuantityState.error).toBe(
-        'Item ID and quantity are required'
+        'Item ID is required'
       )
     })
 
@@ -336,8 +336,8 @@ describe('useCartActions', () => {
         expect(result.current.updateQuantityState.status).toBe('error')
       })
 
-      expect(result.current.updateQuantityState.error).toBe(
-        'quantity must be a non-negative integer'
+      expect(result.current.updateQuantityState.error).toContain(
+        'quantity must be a finite number'
       )
     })
 
@@ -356,8 +356,8 @@ describe('useCartActions', () => {
         expect(result.current.updateQuantityState.status).toBe('error')
       })
 
-      expect(result.current.updateQuantityState.error).toBe(
-        'quantity must be a non-negative integer'
+      expect(result.current.updateQuantityState.error).toContain(
+        'quantity must be greater than or equal to 0'
       )
     })
 
@@ -376,8 +376,8 @@ describe('useCartActions', () => {
         expect(result.current.updateQuantityState.status).toBe('error')
       })
 
-      expect(result.current.updateQuantityState.error).toBe(
-        'quantity must be a non-negative integer'
+      expect(result.current.updateQuantityState.error).toContain(
+        'quantity must be an integer'
       )
     })
 
@@ -396,8 +396,8 @@ describe('useCartActions', () => {
         expect(result.current.updateQuantityState.status).toBe('error')
       })
 
-      expect(result.current.updateQuantityState.error).toBe(
-        'quantity must be a non-negative integer'
+      expect(result.current.updateQuantityState.error).toContain(
+        'quantity must be a finite number'
       )
     })
   })
@@ -495,8 +495,8 @@ describe('useCartActions', () => {
         expect(result.current.incrementItemState.status).toBe('error')
       })
 
-      expect(result.current.incrementItemState.error).toBe(
-        'count must be a positive integer'
+      expect(result.current.incrementItemState.error).toContain(
+        'count must be greater than 0'
       )
     })
   })
@@ -566,8 +566,8 @@ describe('useCartActions', () => {
         expect(result.current.decrementItemState.status).toBe('error')
       })
 
-      expect(result.current.decrementItemState.error).toBe(
-        'count must be a positive integer'
+      expect(result.current.decrementItemState.error).toContain(
+        'count must be greater than 0'
       )
     })
   })

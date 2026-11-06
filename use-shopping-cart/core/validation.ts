@@ -15,42 +15,42 @@ function fail(code: CartErrorCode, message: string): never {
   throw new CartError(code, message)
 }
 
-export function validateCount(count: unknown, actionName: string): void {
-  if (typeof count !== 'number' || !Number.isFinite(count)) {
-    const error = `Invalid count in ${actionName}: count must be a finite number. The current type is ${typeOf(
-      count
-    )}.`
-    fail('INVALID_COUNT', error)
+export function validateInteger(
+  value: unknown,
+  name: string,
+  min: 0 | 1,
+  code: CartErrorCode,
+  where: string
+): asserts value is number {
+  if (typeof value !== 'number' || !Number.isFinite(value)) {
+    fail(
+      code,
+      `Invalid ${name} in ${where}: ${name} must be a finite number. The current type is ${typeOf(value)}.`
+    )
   }
 
-  if (!Number.isInteger(count)) {
-    const error = `Invalid count in ${actionName}: count must be an integer. The current value is ${count}.`
-    fail('INVALID_COUNT', error)
+  if (!Number.isInteger(value)) {
+    fail(
+      code,
+      `Invalid ${name} in ${where}: ${name} must be an integer. The current value is ${value}.`
+    )
   }
 
-  if (count <= 0) {
-    const error = `Invalid count in ${actionName}: count must be greater than 0. The current value is ${count}.`
-    fail('INVALID_COUNT', error)
+  if (value < min) {
+    const bound = min === 1 ? 'greater than 0' : 'greater than or equal to 0'
+    fail(
+      code,
+      `Invalid ${name} in ${where}: ${name} must be ${bound}. The current value is ${value}.`
+    )
   }
 }
 
+export function validateCount(count: unknown, actionName: string): void {
+  validateInteger(count, 'count', 1, 'INVALID_COUNT', actionName)
+}
+
 export function validateQuantity(quantity: unknown, actionName: string): void {
-  if (typeof quantity !== 'number' || !Number.isFinite(quantity)) {
-    const error = `Invalid quantity in ${actionName}: quantity must be a finite number. The current type is ${typeOf(
-      quantity
-    )}.`
-    fail('INVALID_QUANTITY', error)
-  }
-
-  if (!Number.isInteger(quantity)) {
-    const error = `Invalid quantity in ${actionName}: quantity must be an integer. The current value is ${quantity}.`
-    fail('INVALID_QUANTITY', error)
-  }
-
-  if (quantity < 0) {
-    const error = `Invalid quantity in ${actionName}: quantity must be greater than or equal to 0. The current value is ${quantity}.`
-    fail('INVALID_QUANTITY', error)
-  }
+  validateInteger(quantity, 'quantity', 0, 'INVALID_QUANTITY', actionName)
 }
 
 export function validateItemExists(

@@ -158,6 +158,38 @@ describe('useShoppingCart', () => {
       expect(countRenders).toBe(2)
     })
 
+    it('skips re-renders when isEqual says the selection is unchanged', () => {
+      let renders = 0
+      let actions: ReturnType<typeof useShoppingCart> | undefined
+
+      function Totals() {
+        renders++
+        const totals = useShoppingCart(
+          (cart) => ({ count: cart.cartCount }),
+          (previous, next) => previous.count === next.count
+        )
+        return <span>{totals.count}</span>
+      }
+      function Actions() {
+        actions = useShoppingCart()
+        return null
+      }
+
+      render(
+        <CartProvider shouldPersist={false}>
+          <Totals />
+          <Actions />
+        </CartProvider>
+      )
+      expect(renders).toBe(1)
+
+      act(() => actions!.handleCartClick())
+      expect(renders).toBe(1)
+
+      act(() => actions!.addItem(product))
+      expect(renders).toBe(2)
+    })
+
     it('handles a selector that returns a new object', () => {
       const errors = vi.spyOn(console, 'error').mockImplementation(() => {})
       const { result } = renderHook(

@@ -2,12 +2,7 @@ import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest'
 import { CartError, isCartError, type CartErrorCode } from './errors'
 import { ShoppingCart } from './ShoppingCart'
 import { validateCartItems } from '../utilities/serverless'
-import {
-  decodeAddItem,
-  decodeCountChange,
-  decodeItemId,
-  decodeQuantity
-} from '../react/formData'
+import { decodeAddItem, decodeItemId, decodeQuantity } from '../react/formData'
 import * as core from './index'
 import * as react from '../react/index'
 import * as utilities from '../utilities/serverless'
@@ -152,27 +147,11 @@ describe('form decoding error codes', () => {
       () => decodeAddItem(form({ product: '{"name":"A"}' })),
       'INVALID_PRODUCT'
     ],
-    [
-      'bad count',
-      () =>
-        decodeAddItem(form({ product: JSON.stringify(product), count: '0' })),
-      'INVALID_COUNT'
-    ],
     ['missing itemId', () => decodeItemId(form({})), 'INVALID_FORM_DATA'],
-    [
-      'bad change count',
-      () => decodeCountChange(form({ itemId: 'a', count: 'x' })),
-      'INVALID_COUNT'
-    ],
     [
       'missing quantity',
       () => decodeQuantity(form({ itemId: 'a' })),
       'INVALID_FORM_DATA'
-    ],
-    [
-      'bad quantity',
-      () => decodeQuantity(form({ itemId: 'a', quantity: '-1' })),
-      'INVALID_QUANTITY'
     ]
   ])('%s → %s', (_name, act, code) => {
     expect(codeOf(act)).toBe(code)

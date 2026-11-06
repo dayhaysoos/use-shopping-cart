@@ -68,6 +68,18 @@ describe('useOptimisticCart without onChange', () => {
 })
 
 describe('useOptimisticCart with onChange', () => {
+  it('keeps the same action functions across renders', async () => {
+    const { calls, onChange } = queuedOnChange()
+    const { api } = setup(onChange)
+    const { addItem, clearCart } = api.current
+
+    await act(async () => api.current.addItem(product))
+    await act(async () => calls[0].resolve())
+
+    expect(api.current.addItem).toBe(addItem)
+    expect(api.current.clearCart).toBe(clearCart)
+  })
+
   it('shows the change while onChange is pending, then applies it to the cart', async () => {
     const pending = deferred()
     const onChange = vi.fn(() => pending.promise)

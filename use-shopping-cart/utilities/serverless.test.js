@@ -1,3 +1,4 @@
+import { vi } from 'vitest'
 import { validateCartItems, formatLineItems } from './serverless'
 import { ShoppingCart } from '../core/ShoppingCart'
 
@@ -222,6 +223,19 @@ describe('validateCartItems', () => {
     expect(() => {
       validateCartItems(inventory, { bad: 'item' })
     }).toThrow('Invalid Cart: cart item "bad" must be an object.')
+  })
+
+  it('throws an error when a quantity is not a positive integer', () => {
+    vi.spyOn(console, 'warn').mockImplementation(() => {})
+    const [id] = Object.keys(cartDetails)
+    expect(() => {
+      validateCartItems(inventory, {
+        [id]: { ...cartDetails[id], quantity: 0 }
+      })
+    }).toThrow(
+      `Invalid quantity in cart item "${id}": quantity must be greater than 0. The current value is 0.`
+    )
+    vi.restoreAllMocks()
   })
 
   it('throws an error when inventory items are not objects', () => {

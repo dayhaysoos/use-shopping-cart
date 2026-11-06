@@ -1,6 +1,6 @@
 'use client'
 
-import { useSyncExternalStore, useCallback } from 'react'
+import { useSyncExternalStore, useCallback, useRef } from 'react'
 import { useCartContext } from './cartContext'
 import type { ShoppingCart } from '../core/ShoppingCart'
 import type { CartState } from '../core/types'
@@ -75,11 +75,16 @@ function select<T>(view: UseShoppingCartReturn, selector: CartSelector<T>): T {
 }
 
 export function useShoppingCart(): UseShoppingCartReturn
-export function useShoppingCart<T>(selector: CartSelector<T>): T
 export function useShoppingCart<T>(
-  selector?: CartSelector<T>
+  selector: CartSelector<T>,
+  isEqual?: (previous: T, next: T) => boolean
+): T
+export function useShoppingCart<T>(
+  selector?: CartSelector<T>,
+  isEqual?: (previous: T, next: T) => boolean
 ): T | UseShoppingCartReturn {
   const cart = useCartContext()
+  const lastSelection = useRef<{ value: T } | null>(null)
 
   const subscribe = useCallback(
     (callback: () => void) => cart.subscribe(callback),
@@ -88,7 +93,12 @@ export function useShoppingCart<T>(
 
   const getSnapshot = () => {
     const view = getCartView(cart)
-    return selector ? select(view, selector) : view
+    if (!selector) return view
+    const selected = select(view, selector)
+    const last = lastSelection.current
+    if (isEqual && last && isEqual(last.value, selected)) return last.value
+    lastSelection.current = { value: selected }
+    return selected
   }
 
   return useSyncExternalStore(subscribe, getSnapshot, getSnapshot)

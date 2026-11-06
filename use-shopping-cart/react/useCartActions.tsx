@@ -15,9 +15,6 @@ export interface ActionState {
   status: 'idle' | 'success' | 'error'
   error: string | null
   errorCode: CartErrorCode | null
-  productId?: string | null
-  itemId?: string | null
-  quantity?: number | null
 }
 
 export type AddItemState = ActionState & { productId: string | null }
@@ -26,11 +23,9 @@ export type QuantityState = ActionState & {
   itemId: string | null
   quantity: number | null
 }
-export type ClearState = Pick<ActionState, 'status' | 'error' | 'errorCode'>
-export type RemoveItemState = ItemState
-export type UpdateQuantityState = QuantityState
+export type ClearState = ActionState
 
-type ActionFields<S> = Omit<S, keyof ClearState>
+type ActionFields<S> = Omit<S, keyof ActionState>
 
 function getErrorMessage(error: unknown): string {
   if (error instanceof Error) return error.message
@@ -38,7 +33,7 @@ function getErrorMessage(error: unknown): string {
   return 'An unknown error occurred'
 }
 
-function useFormAction<S extends ClearState>(
+function useFormAction<S extends ActionState>(
   idleFields: ActionFields<S>,
   fallbackError: string,
   perform: (formData: FormData) => ActionFields<S>

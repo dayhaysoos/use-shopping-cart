@@ -1,6 +1,7 @@
 import type { Product, CartDetails } from '../core/types'
 import { productIdFields } from '../core/productId'
 import { CartError } from '../core/errors'
+import { validateInteger } from '../core/validation'
 
 export { CartError, isCartError } from '../core/errors'
 export type { CartErrorCode } from '../core/errors'
@@ -78,18 +79,14 @@ export function validateCartItems(
       )
     }
 
-    // Validate quantity is a positive integer
     const quantity = cartItem.quantity
-    if (
-      typeof quantity !== 'number' ||
-      !Number.isInteger(quantity) ||
-      quantity <= 0
-    ) {
-      throw new CartError(
-        'INVALID_QUANTITY',
-        `Invalid Cart: product "${id}" has invalid quantity "${quantity}". Quantity must be a positive integer.`
-      )
-    }
+    validateInteger(
+      quantity,
+      'quantity',
+      1,
+      'INVALID_QUANTITY',
+      `cart item "${id}"`
+    )
 
     const item: ValidatedItem = {
       price_data: {
