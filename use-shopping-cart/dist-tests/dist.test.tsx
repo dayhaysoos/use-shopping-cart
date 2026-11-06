@@ -102,8 +102,15 @@ describe.each(utilitiesBuilds)('%s', (_name, load) => {
   it('validates cart items against inventory', async () => {
     const { validateCartItems } = await load()
     const items = validateCartItems([product], {
-      a: { ...product, quantity: 2, value: 200, formattedValue: '$2.00' }
-    } as never)
+      a: {
+        ...product,
+        quantity: 2,
+        value: 200,
+        formattedValue: '$2.00',
+        formattedPrice: '$1.00',
+        timestamp: '2026-01-01T00:00:00.000Z'
+      }
+    })
     expect(items[0]).toEqual(
       expect.objectContaining({ quantity: 2, price_data: expect.anything() })
     )
