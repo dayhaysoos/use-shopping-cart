@@ -5,7 +5,7 @@ import { ShoppingCart } from '../core/ShoppingCart'
 import type { CartConfig } from '../core/types'
 import { isClient } from '../utilities/SSR'
 import { CartContext } from './cartContext'
-import { OptimisticCartLayer } from './optimisticCartContext'
+import { OptimisticCartLayer } from './optimisticCartLayer'
 
 export interface CartProviderProps extends CartConfig {
   children: React.ReactNode

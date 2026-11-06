@@ -3,10 +3,7 @@
 import { startTransition, useState } from 'react'
 import { useShoppingCart } from './useShoppingCart'
 import { useCartContext } from './cartContext'
-import {
-  committedChanges,
-  useOptimisticCartContext
-} from './optimisticCartContext'
+import { markCommitted, useOptimisticCartContext } from './optimisticCartLayer'
 import type { ShoppingCart } from '../core/ShoppingCart'
 import type {
   CartDetails,
@@ -25,7 +22,7 @@ import {
 export type {
   OptimisticCartEntry,
   OptimisticCartDetails
-} from './optimisticCartContext'
+} from './optimisticCartLayer'
 
 export type { CartChange }
 
@@ -70,7 +67,7 @@ function enqueueChange(
     try {
       validate(() => store.getState().cartDetails)
       await onChange(change)
-      committedChanges.add(change)
+      markCommitted(change)
       commit()
     } finally {
       queue.queued = queue.queued.filter((c) => c !== change)

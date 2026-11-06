@@ -25,7 +25,11 @@ export type OptimisticCartDetails = {
   [id: string]: OptimisticCartEntry
 }
 
-export const committedChanges = new WeakSet<CartChange>()
+const committedChanges = new WeakSet<CartChange>()
+
+export function markCommitted(change: CartChange): void {
+  committedChanges.add(change)
+}
 
 function showPendingChange(
   details: OptimisticCartDetails,
@@ -76,7 +80,7 @@ export function useOptimisticCartContext(): OptimisticCart {
   if (!optimistic) {
     throw new CartError(
       'NO_CART_PROVIDER',
-      'useOptimisticCart must be used within CartProvider'
+      'useOptimisticCartContext must be used within CartProvider'
     )
   }
   return optimistic
