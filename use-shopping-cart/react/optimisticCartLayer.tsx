@@ -1,12 +1,6 @@
 'use client'
 
-import {
-  createContext,
-  useContext,
-  useMemo,
-  useOptimistic,
-  type ReactNode
-} from 'react'
+import * as React from 'react'
 import { useShoppingCart } from './useShoppingCart'
 import type { CartEntry } from '../core/types'
 import {
@@ -49,21 +43,25 @@ interface OptimisticCart {
   showChange: (change: CartChange) => void
 }
 
-const OptimisticCartContext = createContext<OptimisticCart | null>(null)
+const OptimisticCartContext = React.createContext<OptimisticCart | null>(null)
 
-export function OptimisticCartLayer({ children }: { children: ReactNode }) {
+export function OptimisticCartLayer({
+  children
+}: {
+  children: React.ReactNode
+}) {
   const cartDetails = useShoppingCart((cart) => cart.cartDetails)
   const currency = useShoppingCart((cart) => cart.currency)
   const language = useShoppingCart((cart) => cart.language)
 
-  const [optimisticCartDetails, showChange] = useOptimistic<
+  const [optimisticCartDetails, showChange] = React.useOptimistic<
     OptimisticCartDetails,
     CartChange
   >(cartDetails, (state, change) =>
     showPendingChange(state, change, { currency, language })
   )
 
-  const value = useMemo(
+  const value = React.useMemo(
     () => ({ cartDetails: optimisticCartDetails, showChange }),
     [optimisticCartDetails, showChange]
   )
@@ -76,7 +74,7 @@ export function OptimisticCartLayer({ children }: { children: ReactNode }) {
 }
 
 export function useOptimisticCartContext(): OptimisticCart {
-  const optimistic = useContext(OptimisticCartContext)
+  const optimistic = React.useContext(OptimisticCartContext)
   if (!optimistic) {
     throw new CartError(
       'NO_CART_PROVIDER',
