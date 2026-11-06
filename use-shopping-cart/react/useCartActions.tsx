@@ -1,7 +1,7 @@
 'use client'
 
 import { useActionState } from 'react'
-import { useShoppingCart } from './useShoppingCart'
+import { useCartContext } from './cartContext'
 import { getProductId } from '../core/Entry'
 import { isCartError, type CartErrorCode } from '../core/errors'
 import {
@@ -70,7 +70,7 @@ function useFormAction<S extends ClearState>(
 }
 
 export function useCartActions() {
-  const cart = useShoppingCart()
+  const cart = useCartContext()
 
   const [addItemState, addToCartAction, addItemPending] =
     useFormAction<AddItemState>(

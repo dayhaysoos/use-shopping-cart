@@ -15,7 +15,6 @@ import {
   type CartChange,
   type CartFormat
 } from '../core/cartState'
-import { CartError } from '../core/errors'
 
 export interface OptimisticCartEntry extends CartEntry {
   _optimistic?: boolean
@@ -76,12 +75,5 @@ export function OptimisticCartLayer({ children }: { children: ReactNode }) {
 }
 
 export function useOptimisticCartContext(): OptimisticCart {
-  const optimistic = useContext(OptimisticCartContext)
-  if (!optimistic) {
-    throw new CartError(
-      'NO_CART_PROVIDER',
-      'useOptimisticCartContext must be used within CartProvider'
-    )
-  }
-  return optimistic
+  return useContext(OptimisticCartContext)!
 }

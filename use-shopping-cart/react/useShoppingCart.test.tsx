@@ -1,4 +1,4 @@
-import { describe, it, expect, vi } from 'vitest'
+import { describe, it, expect, vi, afterEach } from 'vitest'
 import React from 'react'
 import { renderHook, act, render } from '@testing-library/react'
 import { CartProvider } from './CartProvider'
@@ -112,6 +112,8 @@ describe('useShoppingCart', () => {
   describe('with a selector', () => {
     const product = { id: 'a', name: 'A', price: 100, currency: 'USD' }
 
+    afterEach(() => vi.restoreAllMocks())
+
     it('returns the selected value', () => {
       const { result } = renderHook(
         () => ({
@@ -170,7 +172,6 @@ describe('useShoppingCart', () => {
 
       expect(result.current.picked).toEqual({ count: 1 })
       expect(errors).not.toHaveBeenCalled()
-      errors.mockRestore()
     })
 
     it('shares a module-level selector between carts without re-render loops', () => {
@@ -204,7 +205,6 @@ describe('useShoppingCart', () => {
 
       expect(seen).toEqual({ left: 1, right: 2 })
       expect(errors).not.toHaveBeenCalled()
-      errors.mockRestore()
     })
 
     it('does not re-render a component that only selects actions', () => {

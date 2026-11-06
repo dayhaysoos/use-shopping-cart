@@ -21,12 +21,7 @@ import {
   applyCartChange,
   type CartChange
 } from './cartState'
-import {
-  validateProduct,
-  validateCount,
-  validateItemExists,
-  validateQuantity
-} from './validation'
+import { toCartChange, type CartCall } from './cartCall'
 
 const STORAGE_KEY_PREFIX = 'use-shopping-cart'
 
@@ -123,52 +118,33 @@ export class ShoppingCart {
     this._persister?.save(this._state)
   }
 
-  addItem(product: Product, options: AddItemOptions = {}): void {
+  private _run(call: CartCall): void {
     this._hasBeenModified = true
-    validateProduct(product)
+    this._apply(toCartChange(call, this._state.cartDetails))
+  }
 
-    const count = options.count ?? 1
-    validateCount(count, 'addItem')
-
-    this._apply({ type: 'add', product, count, metadata: options })
+  addItem(product: Product, options: AddItemOptions = {}): void {
+    this._run({ action: 'addItem', product, options })
   }
 
   incrementItem(id: string, options: IncrementOptions = {}): void {
-    this._hasBeenModified = true
-    const count = options.count ?? 1
-    validateCount(count, 'incrementItem')
-    validateItemExists(id, this._state.cartDetails, 'incrementItem')
-
-    this._apply({ type: 'adjust', id, by: count })
+    this._run({ action: 'incrementItem', id, options })
   }
 
   decrementItem(id: string, options: IncrementOptions = {}): void {
-    this._hasBeenModified = true
-    const count = options.count ?? 1
-    validateCount(count, 'decrementItem')
-    validateItemExists(id, this._state.cartDetails, 'decrementItem')
-
-    this._apply({ type: 'adjust', id, by: -count })
+    this._run({ action: 'decrementItem', id, options })
   }
 
   setItemQuantity(id: string, quantity: number): void {
-    this._hasBeenModified = true
-    validateQuantity(quantity, 'setItemQuantity')
-    validateItemExists(id, this._state.cartDetails, 'setItemQuantity')
-
-    this._apply({ type: 'set', id, quantity })
+    this._run({ action: 'setItemQuantity', id, quantity })
   }
 
   removeItem(id: string): void {
-    this._hasBeenModified = true
-    validateItemExists(id, this._state.cartDetails, 'removeItem')
-
-    this._apply({ type: 'remove', id })
+    this._run({ action: 'removeItem', id })
   }
 
   clearCart(): void {
-    this._hasBeenModified = true
-    this._apply({ type: 'clear' })
+    this._run({ action: 'clearCart' })
   }
 
   loadCart(cartDetails: CartDetails, shouldMerge = true): void {

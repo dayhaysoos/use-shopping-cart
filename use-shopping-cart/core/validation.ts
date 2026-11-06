@@ -1,5 +1,5 @@
 import type { CartDetails } from './types'
-import { CartError } from './errors'
+import { CartError, type CartErrorCode } from './errors'
 
 /**
  * Returns the constructor name of any value.
@@ -10,25 +10,27 @@ function typeOf(value: unknown): string {
   return (value as any).constructor.name
 }
 
+function fail(code: CartErrorCode, message: string): never {
+  console.warn(message)
+  throw new CartError(code, message)
+}
+
 export function validateCount(count: unknown, actionName: string): void {
   if (typeof count !== 'number' || !Number.isFinite(count)) {
     const error = `Invalid count in ${actionName}: count must be a finite number. The current type is ${typeOf(
       count
     )}.`
-    console.warn(error)
-    throw new CartError('INVALID_COUNT', error)
+    fail('INVALID_COUNT', error)
   }
 
   if (!Number.isInteger(count)) {
     const error = `Invalid count in ${actionName}: count must be an integer. The current value is ${count}.`
-    console.warn(error)
-    throw new CartError('INVALID_COUNT', error)
+    fail('INVALID_COUNT', error)
   }
 
   if (count <= 0) {
     const error = `Invalid count in ${actionName}: count must be greater than 0. The current value is ${count}.`
-    console.warn(error)
-    throw new CartError('INVALID_COUNT', error)
+    fail('INVALID_COUNT', error)
   }
 }
 
@@ -37,20 +39,17 @@ export function validateQuantity(quantity: unknown, actionName: string): void {
     const error = `Invalid quantity in ${actionName}: quantity must be a finite number. The current type is ${typeOf(
       quantity
     )}.`
-    console.warn(error)
-    throw new CartError('INVALID_QUANTITY', error)
+    fail('INVALID_QUANTITY', error)
   }
 
   if (!Number.isInteger(quantity)) {
     const error = `Invalid quantity in ${actionName}: quantity must be an integer. The current value is ${quantity}.`
-    console.warn(error)
-    throw new CartError('INVALID_QUANTITY', error)
+    fail('INVALID_QUANTITY', error)
   }
 
   if (quantity < 0) {
     const error = `Invalid quantity in ${actionName}: quantity must be greater than or equal to 0. The current value is ${quantity}.`
-    console.warn(error)
-    throw new CartError('INVALID_QUANTITY', error)
+    fail('INVALID_QUANTITY', error)
   }
 }
 
@@ -61,8 +60,7 @@ export function validateItemExists(
 ): void {
   if (!(id in cartDetails)) {
     const error = `Invalid product ID in ${actionName}: the ID "${id}" must already be in the cart.`
-    console.warn(error)
-    throw new CartError('ITEM_NOT_IN_CART', error)
+    fail('ITEM_NOT_IN_CART', error)
   }
 }
 

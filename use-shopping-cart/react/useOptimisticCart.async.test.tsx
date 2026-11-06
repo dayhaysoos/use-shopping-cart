@@ -1,4 +1,4 @@
-import { describe, it, expect, vi } from 'vitest'
+import { describe, it, expect, vi, afterEach } from 'vitest'
 import React, { act } from 'react'
 import { render } from '@testing-library/react'
 import { CartProvider } from './CartProvider'
@@ -8,6 +8,7 @@ import { useShoppingCart } from './useShoppingCart'
 const product = { id: 'a', name: 'A', price: 100, currency: 'USD' }
 
 type Frame = { shown: number; real: number; optimistic: boolean }
+type Api = ReturnType<typeof useOptimisticCart>
 
 function deferred() {
   let resolve!: () => void
@@ -19,9 +20,19 @@ function deferred() {
   return { promise, resolve, reject }
 }
 
+function queuedOnChange() {
+  const calls: Array<ReturnType<typeof deferred>> = []
+  const onChange = vi.fn((_change: CartChange) => {
+    const d = deferred()
+    calls.push(d)
+    return d.promise
+  })
+  return { calls, onChange }
+}
+
 function setup(onChange?: (change: CartChange) => Promise<void>) {
   const frames: Frame[] = []
-  const api = {} as { current: ReturnType<typeof useOptimisticCart> }
+  const api = {} as { current: Api }
 
   function Probe() {
     api.current = useOptimisticCart(onChange ? { onChange } : undefined)
@@ -41,6 +52,8 @@ function setup(onChange?: (change: CartChange) => Promise<void>) {
   )
   return { frames, api, last: () => frames[frames.length - 1] }
 }
+
+afterEach(() => vi.restoreAllMocks())
 
 describe('useOptimisticCart without onChange', () => {
   it('never shows a change twice', async () => {
@@ -74,25 +87,12 @@ describe('useOptimisticCart with onChange', () => {
   })
 
   it.each([
-    [
-      'removeItem',
-      (api: ReturnType<typeof useOptimisticCart>) => api.removeItem('a')
-    ],
-    [
-      'clearCart',
-      (api: ReturnType<typeof useOptimisticCart>) => api.clearCart()
-    ],
-    [
-      'decrementItem to zero',
-      (api: ReturnType<typeof useOptimisticCart>) => api.decrementItem('a')
-    ]
+    ['removeItem', (api: Api) => api.removeItem('a')],
+    ['clearCart', (api: Api) => api.clearCart()],
+    ['decrementItem to zero', (api: Api) => api.decrementItem('a')]
   ])('is optimistic while %s is pending', async (_name, change) => {
-    const calls: Array<ReturnType<typeof deferred>> = []
-    const { api, last } = setup(() => {
-      const d = deferred()
-      calls.push(d)
-      return d.promise
-    })
+    const { calls, onChange } = queuedOnChange()
+    const { api, last } = setup(onChange)
 
     await act(async () => api.current.addItem(product))
     await act(async () => calls[0].resolve())
@@ -120,12 +120,7 @@ describe('useOptimisticCart with onChange', () => {
   })
 
   it('runs changes one after another, in order', async () => {
-    const calls: Array<ReturnType<typeof deferred>> = []
-    const onChange = vi.fn(() => {
-      const d = deferred()
-      calls.push(d)
-      return d.promise
-    })
+    const { calls, onChange } = queuedOnChange()
     const { api, last } = setup(onChange)
 
     await act(async () => {
@@ -179,7 +174,6 @@ describe('useOptimisticCart with onChange', () => {
       expect.objectContaining({ code: 'ITEM_NOT_IN_CART' })
     )
     expect(onChange).not.toHaveBeenCalled()
-    vi.restoreAllMocks()
   })
 
   it('accepts changes to an item that a queued change adds', async () => {
@@ -198,12 +192,7 @@ describe('useOptimisticCart with onChange', () => {
   })
 
   it('drops a queued change that depends on a failed one without calling onChange', async () => {
-    const calls: Array<ReturnType<typeof deferred>> = []
-    const onChange = vi.fn(() => {
-      const d = deferred()
-      calls.push(d)
-      return d.promise
-    })
+    const { calls, onChange } = queuedOnChange()
     vi.spyOn(console, 'warn').mockImplementation(() => {})
     const { api, last } = setup(onChange)
 
@@ -218,17 +207,11 @@ describe('useOptimisticCart with onChange', () => {
     expect(api.current.error).toEqual(
       expect.objectContaining({ code: 'ITEM_NOT_IN_CART' })
     )
-    vi.restoreAllMocks()
   })
 
   it('shares one queue between components using the same cart', async () => {
-    const calls: Array<ReturnType<typeof deferred>> = []
-    const onChange = vi.fn(() => {
-      const d = deferred()
-      calls.push(d)
-      return d.promise
-    })
-    const apis: Array<ReturnType<typeof useOptimisticCart>> = []
+    const { calls, onChange } = queuedOnChange()
+    const apis: Array<Api> = []
     function Button({ index }: { index: number }) {
       apis[index] = useOptimisticCart({ onChange })
       return null
@@ -256,7 +239,7 @@ describe('useOptimisticCart with onChange', () => {
   it('shows a pending change in every useOptimisticCart on the same cart', async () => {
     const pending = deferred()
     const onChange = vi.fn(() => pending.promise)
-    const views: Record<string, ReturnType<typeof useOptimisticCart>> = {}
+    const views: Record<string, Api> = {}
     let real = -1
 
     function Item() {
@@ -301,6 +284,5 @@ describe('useOptimisticCart with onChange', () => {
       api.current.addItem({ ...product, price: 'x' } as never)
     ).toThrow()
     expect(onChange).not.toHaveBeenCalled()
-    vi.restoreAllMocks()
   })
 })

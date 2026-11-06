@@ -5,19 +5,9 @@ import { useShoppingCart } from './useShoppingCart'
 import { useCartContext } from './cartContext'
 import { markCommitted, useOptimisticCartContext } from './optimisticCartLayer'
 import type { ShoppingCart } from '../core/ShoppingCart'
-import type {
-  CartDetails,
-  Product,
-  AddItemOptions,
-  IncrementOptions
-} from '../core/types'
+import type { Product, AddItemOptions, IncrementOptions } from '../core/types'
 import { applyCartChange, cartTotals, type CartChange } from '../core/cartState'
-import {
-  validateProduct,
-  validateCount,
-  validateQuantity,
-  validateItemExists
-} from '../core/validation'
+import { toCartChange, type CartCall } from '../core/cartCall'
 
 export type {
   OptimisticCartEntry,
@@ -48,24 +38,24 @@ function getChangeQueue(store: ShoppingCart): ChangeQueue {
 
 function enqueueChange(
   store: ShoppingCart,
-  change: CartChange,
-  validate: (expectedCartDetails: () => CartDetails) => void,
+  call: CartCall,
   onChange: (change: CartChange) => unknown,
   commit: () => void
-): Promise<void> {
+): { change: CartChange; task: Promise<void> } {
   const queue = getChangeQueue(store)
-  validate(() => {
-    const state = store.getState()
-    return queue.queued.reduce(
+  const state = store.getState()
+  const change = toCartChange(
+    call,
+    queue.queued.reduce(
       (details, queuedChange) => applyCartChange(details, queuedChange, state),
       state.cartDetails
     )
-  })
+  )
   queue.queued = [...queue.queued, change]
 
   const task = queue.tail.then(async () => {
     try {
-      validate(() => store.getState().cartDetails)
+      toCartChange(call, store.getState().cartDetails)
       await onChange(change)
       markCommitted(change)
       commit()
@@ -74,7 +64,7 @@ function enqueueChange(
     }
   })
   queue.tail = task.catch(() => {})
-  return task
+  return { change, task }
 }
 
 export function useOptimisticCart({ onChange }: UseOptimisticCartOptions = {}) {
@@ -85,19 +75,17 @@ export function useOptimisticCart({ onChange }: UseOptimisticCartOptions = {}) {
 
   const optimisticCartDetails = optimistic.cartDetails
   const isOptimistic = optimisticCartDetails !== cart.cartDetails
-  const optimisticTotals = cartTotals(optimisticCartDetails, cart)
+  const optimisticTotals = isOptimistic
+    ? cartTotals(optimisticCartDetails, cart)
+    : cart
 
-  const run = (
-    change: CartChange,
-    commit: () => void,
-    validate: (expectedCartDetails: () => CartDetails) => void = () => {}
-  ) => {
+  const run = (call: CartCall, commit: () => void) => {
     if (!onChange) {
       commit()
       return
     }
 
-    const task = enqueueChange(store, change, validate, onChange, commit)
+    const { change, task } = enqueueChange(store, call, onChange, commit)
     startTransition(async () => {
       optimistic.showChange(change)
       try {
@@ -110,63 +98,35 @@ export function useOptimisticCart({ onChange }: UseOptimisticCartOptions = {}) {
   }
 
   const addItem = (product: Product, options: AddItemOptions = {}) => {
-    const count = options.count ?? 1
-    run(
-      { type: 'add', product, count, metadata: options },
-      () => cart.addItem(product, options),
-      () => {
-        validateProduct(product)
-        validateCount(count, 'addItem')
-      }
+    run({ action: 'addItem', product, options }, () =>
+      cart.addItem(product, options)
     )
   }
 
   const removeItem = (id: string) => {
-    run(
-      { type: 'remove', id },
-      () => cart.removeItem(id),
-      (expectedCartDetails) =>
-        validateItemExists(id, expectedCartDetails(), 'removeItem')
-    )
+    run({ action: 'removeItem', id }, () => cart.removeItem(id))
   }
 
   const incrementItem = (id: string, options: IncrementOptions = {}) => {
-    const count = options.count ?? 1
-    run(
-      { type: 'adjust', id, by: count },
-      () => cart.incrementItem(id, { ...options, count }),
-      (expectedCartDetails) => {
-        validateCount(count, 'incrementItem')
-        validateItemExists(id, expectedCartDetails(), 'incrementItem')
-      }
+    run({ action: 'incrementItem', id, options }, () =>
+      cart.incrementItem(id, options)
     )
   }
 
   const decrementItem = (id: string, options: IncrementOptions = {}) => {
-    const count = options.count ?? 1
-    run(
-      { type: 'adjust', id, by: -count },
-      () => cart.decrementItem(id, { ...options, count }),
-      (expectedCartDetails) => {
-        validateCount(count, 'decrementItem')
-        validateItemExists(id, expectedCartDetails(), 'decrementItem')
-      }
+    run({ action: 'decrementItem', id, options }, () =>
+      cart.decrementItem(id, options)
     )
   }
 
   const setItemQuantity = (id: string, quantity: number) => {
-    run(
-      { type: 'set', id, quantity },
-      () => cart.setItemQuantity(id, quantity),
-      (expectedCartDetails) => {
-        validateQuantity(quantity, 'setItemQuantity')
-        validateItemExists(id, expectedCartDetails(), 'setItemQuantity')
-      }
+    run({ action: 'setItemQuantity', id, quantity }, () =>
+      cart.setItemQuantity(id, quantity)
     )
   }
 
   const clearCart = () => {
-    run({ type: 'clear' }, () => cart.clearCart())
+    run({ action: 'clearCart' }, () => cart.clearCart())
   }
 
   return {
