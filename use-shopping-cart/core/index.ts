@@ -8,6 +8,7 @@ export { redirectToCheckout } from './checkout'
 export type { CartErrorCode } from './errors'
 export {
   createLocalStorage,
+  createSessionStorage,
   createNoopStorage,
   createMemoryStorage
 } from './storage'

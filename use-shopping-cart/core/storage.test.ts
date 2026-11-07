@@ -1,6 +1,7 @@
 import { describe, it, expect, beforeEach } from 'vitest'
 import {
   createLocalStorage,
+  createSessionStorage,
   createNoopStorage,
   createMemoryStorage
 } from './storage'
@@ -62,6 +63,19 @@ describe('createLocalStorage', () => {
     storage.setItem('test-key', 'value1')
     storage.setItem('test-key', 'value2')
     expect(storage.getItem('test-key')).toBe('value2')
+  })
+})
+
+describe('createSessionStorage', () => {
+  beforeEach(() => sessionStorage.clear())
+
+  it('stores items in sessionStorage, not localStorage', () => {
+    localStorage.clear()
+    createSessionStorage().setItem('test-key', 'test-value')
+
+    expect(sessionStorage.getItem('test-key')).toBe('test-value')
+    expect(localStorage.getItem('test-key')).toBeNull()
+    expect(createSessionStorage().getItem('test-key')).toBe('test-value')
   })
 })
 

@@ -36,6 +36,17 @@ export const initialState: CartState = {
   cartDetails: {}
 }
 
+export function createCartState({
+  cartDetails = {},
+  currency = initialState.currency,
+  language = initialState.language
+}: CartConfig): CartState {
+  return withCartDetails(
+    { ...initialState, currency, language },
+    normalizeCartDetails(cartDetails, currency, language)
+  )
+}
+
 export class ShoppingCart {
   private _state: CartState
   private _subscribers: Set<SubscribeCallback>
@@ -44,20 +55,7 @@ export class ShoppingCart {
   private _settingsChanged: boolean = false
 
   constructor(config: CartConfig = {}) {
-    const {
-      cartDetails = {},
-      currency = initialState.currency,
-      language = initialState.language
-    } = config
-    const state: CartState = {
-      ...initialState,
-      currency,
-      language
-    }
-    this._state = withCartDetails(
-      state,
-      normalizeCartDetails(cartDetails, currency, language)
-    )
+    this._state = createCartState(config)
     this._subscribers = new Set()
 
     if (config.shouldPersist !== false && isClient) {

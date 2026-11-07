@@ -16,7 +16,7 @@ Version 4.0 brings significant improvements. Cart methods and state work as befo
 - **Standalone `redirectToCheckout`**: import it and pass `session.url`; no Stripe key in the browser
 - **Typed Errors**: every error is a `CartError` with a `code`
 - **Improved TypeScript**: Better type inference and exported types
-- **Smaller Bundle**: Reduced bundle size without Redux
+- **Smaller Bundle**: no Redux; the React entry is about 8 KB gzipped
 
 ## Quick Start
 
@@ -76,6 +76,10 @@ Errors thrown by the cart, `useCartActions` forms, `validateCartItems` and `redi
 
 Inventory is now matched by `id`, `price_id`, `sku_id` and `sku` (first match in `inventory` wins), the same fields the cart uses for item IDs. Carts with items added by `price_id` or `sku_id` alone now validate instead of failing with "not in your inventory". Check your inventory if one product's `price_id` or `sku_id` can equal another product's `id` or `sku`: the earlier product now matches.
 
+### `CartProvider` Renders on the Server; `loading` Removed
+
+`CartProvider` now renders its children during server rendering. The server and the first client render show the cart from your props (`cartDetails`, formatted with `language`, or `en-US` if you don't set it); the cart saved in storage and the browser's language apply right after hydration. Before, the server rendered the `loading` prop instead, which made hydration fail. Remove `loading` from `<CartProvider>`.
+
 ### Item Metadata Moved Under `metadata`
 
 `product_metadata` and `price_metadata` from `addItem` are now stored as the entry's `product_data.metadata` and `price_data.metadata`, instead of being spread into `product_data` and `price_data`. This is what makes `validateCartItems` send `product_metadata` to Stripe Checkout; before, it was silently dropped. `price_metadata` stays in the cart, because Checkout's inline prices can't carry metadata.
@@ -124,8 +128,7 @@ Full compatibility with React 19, including support for:
 
 ### Improved Performance
 
-- 40% smaller bundle size
-- Faster cart operations
+- No Redux: the React entry is about 8 KB gzipped
 - Better TypeScript support
 
 ## What's Changed
@@ -142,7 +145,7 @@ Full compatibility with React 19, including support for:
 
 **Benefits:**
 
-- **Smaller bundle size**: ~40% smaller
+- **Smaller bundle size**: no Redux, React-Redux or Redux Toolkit
 - **Better performance**: Fewer re-renders
 - **Simpler mental model**: No Redux concepts to understand
 - **React 19 compatible**: Works with React's latest features
@@ -163,25 +166,29 @@ Full compatibility with React 19, including support for:
 
 ```jsx
 import { CartProvider } from 'use-shopping-cart'
-;<CartProvider
-  mode="payment"
-  cartMode="client-only"
-  stripe={STRIPE_KEY}
-  successUrl="https://yoursite.com/success"
-  cancelUrl="https://yoursite.com/cancel"
-  currency="USD"
->
-  <App />
-</CartProvider>
+export const Root = () => (
+  <CartProvider
+    mode="payment"
+    cartMode="client-only"
+    stripe={STRIPE_KEY}
+    successUrl="https://yoursite.com/success"
+    cancelUrl="https://yoursite.com/cancel"
+    currency="USD"
+  >
+    <App />
+  </CartProvider>
+)
 ```
 
 **After (Checkout-Session - v4.0):**
 
 ```jsx
 import { CartProvider } from 'use-shopping-cart'
-;<CartProvider currency="USD">
-  <App />
-</CartProvider>
+export const Root = () => (
+  <CartProvider currency="USD">
+    <App />
+  </CartProvider>
+)
 ```
 
 **Additional Steps Required:**
@@ -189,7 +196,7 @@ import { CartProvider } from 'use-shopping-cart'
 1. Create a server endpoint to generate checkout sessions
 2. Move `successUrl` and `cancelUrl` to server-side
 
-**See:** [Getting Started with Checkout Sessions](/docs/getting-started-serverless) for detailed migration guide.
+**See:** [Getting Started](/docs/getting-started) for detailed setup guide.
 
 ### 3. React Version Requirement
 
@@ -262,9 +269,7 @@ Object.values(cartDetails).forEach((item) => {
 
 ### Reduced Bundle Size
 
-- **Before (v3.x):** ~45 KB (minified + gzipped)
-- **After (v4.0):** ~27 KB (minified + gzipped)
-- **Savings:** ~40% smaller
+v4 drops Redux, React-Redux and Redux Toolkit. The `use-shopping-cart` entry is about 8 KB minified and gzipped, with React as its only dependency.
 
 ### Fewer Re-renders
 
@@ -276,7 +281,7 @@ Pass a selector to `useShoppingCart` and a component re-renders only when the va
 
 These work as in v3:
 
-✅ `addItem(product, options?)`
+✅ `addItem(product, options?)` (metadata now lives under `metadata`, see [above](#item-metadata-moved-under-metadata))
 ✅ `incrementItem(id, options?)`
 ✅ `decrementItem(id, options?)`
 ✅ `setItemQuantity(id, quantity)`
@@ -326,7 +331,7 @@ If using `cartMode="client-only"`, plan migration to `checkout-session`:
 3. Test checkout flow
 4. Deploy
 
-**See:** [Getting Started (Client Mode)](/docs/welcome/getting-started-client-mode#migration-from-client-only)
+**See:** [Getting Started](/docs/getting-started) for complete setup guide
 
 ## Troubleshooting
 
@@ -375,7 +380,7 @@ npm install -D @types/react@19 @types/react-dom@19
 
 ### Major Improvements ✨
 
-- 40% smaller bundle size
+- Smaller bundle (no Redux)
 - Better performance
 - React 19 support
 - Improved TypeScript

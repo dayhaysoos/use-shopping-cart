@@ -1,7 +1,7 @@
 'use client'
 
 import { useSyncExternalStore, useCallback, useRef } from 'react'
-import { useCartContext } from './cartContext'
+import { getServerState, useCartContext } from './cartContext'
 import type { ShoppingCart } from '../core/ShoppingCart'
 import type { CartState } from '../core/types'
 
@@ -45,8 +45,10 @@ function getMethods(cart: ShoppingCart): CartActions {
   return methods
 }
 
-function getCartView(cart: ShoppingCart): UseShoppingCartReturn {
-  const state = cart.getState()
+function getCartView(
+  cart: ShoppingCart,
+  state: CartState
+): UseShoppingCartReturn {
   let view = cartViewCache.get(state)
   if (!view) {
     view = { ...state, ...getMethods(cart) }
@@ -91,8 +93,8 @@ export function useShoppingCart<T>(
     [cart]
   )
 
-  const getSnapshot = () => {
-    const view = getCartView(cart)
+  const snapshotOf = (state: CartState) => {
+    const view = getCartView(cart, state)
     if (!selector) return view
     const selected = select(view, selector)
     const last = lastSelection.current
@@ -101,5 +103,9 @@ export function useShoppingCart<T>(
     return selected
   }
 
-  return useSyncExternalStore(subscribe, getSnapshot, getSnapshot)
+  return useSyncExternalStore(
+    subscribe,
+    () => snapshotOf(cart.getState()),
+    () => snapshotOf(getServerState(cart))
+  )
 }

@@ -1,27 +1,24 @@
 'use client'
 
 import * as React from 'react'
-import { ShoppingCart } from '../core/ShoppingCart'
+import { ShoppingCart, createCartState } from '../core/ShoppingCart'
 import type { CartConfig } from '../core/types'
-import { isClient } from '../utilities/SSR'
-import { CartContext } from './cartContext'
+import { CartContext, setServerState } from './cartContext'
 import { OptimisticCartLayer } from './optimisticCartLayer'
 
 export interface CartProviderProps extends CartConfig {
   children: React.ReactNode
-  loading?: React.ReactNode
 }
 
-export function CartProvider({
-  children,
-  loading = null,
-  ...config
-}: CartProviderProps) {
-  const [cart] = React.useState(() => new ShoppingCart(config))
-
-  if (config.shouldPersist !== false && !isClient) {
-    return <>{loading}</>
-  }
+export function CartProvider({ children, ...config }: CartProviderProps) {
+  const [cart] = React.useState(() => {
+    const created = new ShoppingCart(config)
+    setServerState(
+      created,
+      createCartState({ ...config, language: config.language ?? 'en-US' })
+    )
+    return created
+  })
 
   return (
     <CartContext.Provider value={cart}>
