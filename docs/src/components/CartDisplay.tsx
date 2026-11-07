@@ -50,29 +50,27 @@ export function CartDisplay() {
                   <span className="text-fd-muted-foreground">Currency:</span>
                   <span className="font-mono">{cartDetails[key].currency}</span>
 
-                  {cartDetails[key].price_data &&
-                    Object.keys(cartDetails[key].price_data).length > 0 && (
-                      <>
-                        <span className="text-fd-muted-foreground">
-                          Price Metadata:
-                        </span>
-                        <span className="font-mono text-[10px]">
-                          {JSON.stringify(cartDetails[key].price_data)}
-                        </span>
-                      </>
-                    )}
+                  {cartDetails[key].price_data?.metadata && (
+                    <>
+                      <span className="text-fd-muted-foreground">
+                        Price Metadata:
+                      </span>
+                      <span className="font-mono text-[10px]">
+                        {JSON.stringify(cartDetails[key].price_data.metadata)}
+                      </span>
+                    </>
+                  )}
 
-                  {cartDetails[key].product_data &&
-                    Object.keys(cartDetails[key].product_data).length > 0 && (
-                      <>
-                        <span className="text-fd-muted-foreground">
-                          Product Metadata:
-                        </span>
-                        <span className="font-mono text-[10px]">
-                          {JSON.stringify(cartDetails[key].product_data)}
-                        </span>
-                      </>
-                    )}
+                  {cartDetails[key].product_data?.metadata && (
+                    <>
+                      <span className="text-fd-muted-foreground">
+                        Product Metadata:
+                      </span>
+                      <span className="font-mono text-[10px]">
+                        {JSON.stringify(cartDetails[key].product_data.metadata)}
+                      </span>
+                    </>
+                  )}
 
                   <span className="text-fd-muted-foreground text-[10px]">
                     Added:
