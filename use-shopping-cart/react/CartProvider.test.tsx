@@ -1,8 +1,9 @@
 /// <reference types="@testing-library/jest-dom" />
 import { describe, it, expect, vi } from 'vitest'
 import React from 'react'
-import { render, screen, waitFor } from '@testing-library/react'
-import { CartProvider, useCartContext } from './CartProvider'
+import { render, screen } from '@testing-library/react'
+import { CartProvider } from './CartProvider'
+import { useCartContext } from './cartContext'
 
 describe('CartProvider', () => {
   it('provides ShoppingCart instance to children', () => {
@@ -61,19 +62,14 @@ describe('CartProvider', () => {
     expect(instances[0]).toBe(instances[1]) // Same instance
   })
 
-  it('shows loading initially when persistence enabled', async () => {
+  it('shows content immediately when persistence is enabled', () => {
     render(
-      <CartProvider shouldPersist={true} loading={<div>Loading...</div>}>
+      <CartProvider shouldPersist={true}>
         <div>Content</div>
       </CartProvider>
     )
 
-    // In jsdom, useEffect runs, so we need to wait
-    // Initially might show loading, then shows content after effect
-    await waitFor(() => {
-      const content = screen.queryByText('Content')
-      expect(content).toBeInTheDocument()
-    })
+    expect(screen.getByText('Content')).toBeInTheDocument()
   })
 
   it('shows content immediately when persistence disabled', () => {

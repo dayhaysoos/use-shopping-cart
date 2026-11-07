@@ -20,7 +20,7 @@ pnpm add use-shopping-cart@rc
 ## Requirements
 
 - React 19+
-- A Stripe account with your publishable key
+- A Stripe account (for creating Checkout Sessions on your server)
 
 ## Basic Setup
 
@@ -31,10 +31,7 @@ import { CartProvider } from 'use-shopping-cart'
 
 function App() {
   return (
-    <CartProvider
-      stripe={process.env.REACT_APP_STRIPE_PUBLISHABLE_KEY}
-      currency="USD"
-    >
+    <CartProvider currency="USD">
       <YourApp />
     </CartProvider>
   )
@@ -114,28 +111,20 @@ function Cart() {
 
 ### 4. Create a server endpoint for checkout
 
-Create an API endpoint that creates a Stripe checkout session:
+Create an API endpoint that creates a Stripe checkout session. Never price the session from the `cartDetails` the browser sends, because anyone can edit it. Pass it to `validateCartItems` with your own product list, which takes prices from your inventory:
 
 ```js
 // pages/api/create-checkout-session.js (Next.js)
 import Stripe from 'stripe'
+import { validateCartItems } from 'use-shopping-cart/utilities'
+import { inventory } from '../../data/products'
+
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY)
 
 export default async function handler(req, res) {
   try {
     const { cartDetails } = req.body
-
-    const line_items = Object.values(cartDetails).map((item) => ({
-      price_data: {
-        currency: 'usd',
-        product_data: {
-          name: item.name,
-          images: [item.image]
-        },
-        unit_amount: item.price
-      },
-      quantity: item.quantity
-    }))
+    const line_items = validateCartItems(inventory, cartDetails)
 
     const session = await stripe.checkout.sessions.create({
       mode: 'payment',
@@ -151,13 +140,15 @@ export default async function handler(req, res) {
 }
 ```
 
+`inventory` is the same list of products you add to the cart, loaded somewhere the browser can't change it: a file on the server, a database or your product API.
+
 ### 5. Redirect to checkout
 
 ```jsx
-import { useShoppingCart } from 'use-shopping-cart'
+import { redirectToCheckout, useShoppingCart } from 'use-shopping-cart'
 
 function CheckoutButton() {
-  const { cartDetails, redirectToCheckout } = useShoppingCart()
+  const cartDetails = useShoppingCart((cart) => cart.cartDetails)
 
   const handleCheckout = async () => {
     // Call your server to create a session
@@ -170,7 +161,7 @@ function CheckoutButton() {
     const { sessionUrl } = await response.json()
 
     // Redirect to Stripe checkout
-    await redirectToCheckout(sessionUrl)
+    redirectToCheckout(sessionUrl)
   }
 
   return <button onClick={handleCheckout}>Checkout</button>

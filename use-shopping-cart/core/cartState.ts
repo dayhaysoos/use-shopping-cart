@@ -1,4 +1,5 @@
-import { createCartEntry, getProductId } from './Entry'
+import { createCartEntry, updateCartEntry } from './Entry'
+import { getProductId } from './productId'
 import { calculateFormattedTotalPrice } from './formatters'
 import type { AddItemOptions, CartDetails, CartState, Product } from './types'
 
@@ -45,14 +46,10 @@ export function normalizeCartDetails(
   const normalized: CartDetails = {}
 
   for (const id in cartDetails) {
-    const entry = cartDetails[id]
-    const rebuilt = createCartEntry(id, entry, entry.quantity, {
+    normalized[id] = updateCartEntry(id, cartDetails[id], {
       currency,
       language
     })
-    normalized[id] = entry.timestamp
-      ? { ...rebuilt, timestamp: entry.timestamp }
-      : rebuilt
   }
 
   return normalized
@@ -79,16 +76,17 @@ export function applyCartChange(
     case 'add': {
       const id = getProductId(change.product)
       const existing = cartDetails[id]
-      const entry = createCartEntry(
-        id,
-        existing ?? change.product,
-        (existing?.quantity ?? 0) + change.count,
-        {
-          ...format,
-          price_metadata: change.metadata?.price_metadata,
-          product_metadata: change.metadata?.product_metadata
-        }
-      )
+      const options = {
+        ...format,
+        price_metadata: change.metadata?.price_metadata,
+        product_metadata: change.metadata?.product_metadata
+      }
+      const entry = existing
+        ? updateCartEntry(id, existing, {
+            ...options,
+            quantity: existing.quantity + change.count
+          })
+        : createCartEntry(id, change.product, change.count, options)
       return { ...cartDetails, [id]: entry }
     }
 
@@ -105,7 +103,10 @@ export function applyCartChange(
 
       return {
         ...cartDetails,
-        [change.id]: createCartEntry(change.id, existing, quantity, format)
+        [change.id]: updateCartEntry(change.id, existing, {
+          ...format,
+          quantity
+        })
       }
     }
 

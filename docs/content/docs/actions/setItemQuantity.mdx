@@ -21,7 +21,12 @@ function CartItem({ itemId }: { itemId: string }) {
       <input
         type="number"
         value={item.quantity}
-        onChange={(e) => setItemQuantity(itemId, parseInt(e.target.value))}
+        onChange={(e) => {
+          const quantity = e.target.valueAsNumber
+          if (Number.isInteger(quantity) && quantity >= 0) {
+            setItemQuantity(itemId, quantity)
+          }
+        }}
         min="0"
       />
     </div>
@@ -42,7 +47,7 @@ function CartItem({ itemId }: { itemId: string }) {
 
       <select
         value={item.quantity}
-        onChange={(e) => setItemQuantity(itemId, parseInt(e.target.value))}
+        onChange={(e) => setItemQuantity(itemId, Number(e.target.value))}
       >
         {[1, 2, 3, 4, 5, 10, 15, 20].map((qty) => (
           <option key={qty} value={qty}>
@@ -77,9 +82,12 @@ function Cart() {
             <input
               type="number"
               value={item.quantity}
-              onChange={(e) =>
-                setItemQuantity(id, parseInt(e.target.value) || 0)
-              }
+              onChange={(e) => {
+                const quantity = e.target.valueAsNumber
+                if (Number.isInteger(quantity) && quantity >= 0) {
+                  setItemQuantity(id, quantity)
+                }
+              }}
               min="0"
             />
           </label>
@@ -92,7 +100,7 @@ function Cart() {
 
 ## Notes
 
-- Quantity must be a non-negative integer
+- Quantity must be a non-negative integer; anything else throws a `CartError` with code `INVALID_QUANTITY`, so check input fields before calling it (the examples skip the call while the field is empty)
 - Setting quantity to 0 removes the item from cart
 - Useful for quantity pickers and dropdowns
 - Replaces the current quantity (doesn't add or subtract)

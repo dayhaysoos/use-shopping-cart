@@ -65,7 +65,7 @@ addItem(product, { count: 10 })
 
 ## Adding with Metadata
 
-Stripe allows you to attach custom metadata to products and prices. This metadata will be passed through to your Stripe Checkout session and webhooks:
+`product_metadata` is stored as the entry's `product_data.metadata`, and `validateCartItems` sends it to Stripe Checkout, so it shows up on the session's line items and in webhooks. `price_metadata` is stored as `price_data.metadata` and stays in the cart, because Checkout's inline prices can't carry metadata:
 
 ```typescript
 addItem(product, {

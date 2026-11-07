@@ -1,5 +1,5 @@
 #!/usr/bin/env sh
 set -e
 
-pnpm test
+pnpm check
 pnpm exec lint-staged

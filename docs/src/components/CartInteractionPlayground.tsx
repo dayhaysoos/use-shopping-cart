@@ -34,7 +34,6 @@ type ShippingTier = 'standard' | 'priority'
 export function CartInteractionPlayground() {
   return (
     <CartProvider
-      stripe=""
       currency="USD"
       language="en-US"
       shouldPersist={false}

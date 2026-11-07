@@ -47,23 +47,31 @@ function addUseClientDirective() {
   }
 }
 
-const plugins = [
-  clearDist(),
-  replace({
-    preventAssignment: true,
-    values: {
-      'process.env.__buildVersion__': JSON.stringify(pkg.version)
-    }
-  }),
-  // We are using Sucrase to compile TypeScript and JSX
-  sucrase({
-    exclude: 'node_modules/**/*',
-    transforms: ['typescript', 'jsx']
-  }),
-  nodeExternals(), // automatically externalizes dependencies in package.json
-  nodeResolve({ extensions: ['.ts', '.tsx', '.js', '.jsx'] }),
-  commonjs()
-]
+const clearDistPlugin = clearDist()
+
+function plugins({ bundleJsxRuntime = false } = {}) {
+  return [
+    clearDistPlugin,
+    replace({
+      preventAssignment: true,
+      values: {
+        'process.env.__buildVersion__': JSON.stringify(pkg.version),
+        ...(bundleJsxRuntime
+          ? { 'process.env.NODE_ENV': JSON.stringify('production') }
+          : {})
+      }
+    }),
+    sucrase({
+      exclude: 'node_modules/**/*',
+      transforms: ['typescript', 'jsx'],
+      jsxRuntime: 'automatic',
+      production: true
+    }),
+    nodeExternals({ exclude: bundleJsxRuntime ? ['react/jsx-runtime'] : [] }),
+    nodeResolve({ extensions: ['.ts', '.tsx', '.js', '.jsx'] }),
+    commonjs()
+  ]
+}
 
 /**
  * Each entry is built as ESM (.mjs), CommonJS (.cjs) and optionally UMD, plus a
@@ -89,41 +97,53 @@ const entries = [
   }
 ]
 
-const jsBuilds = entries.map((entry) => ({
-  input: entry.input,
-  plugins: [
-    ...plugins,
-    ...(entry.useClientDirective ? [addUseClientDirective()] : []),
-    ...(entry.umdName
-      ? [visualizer({ filename: `stats/${entry.name}.html` })]
-      : [])
-  ],
-  output: [
+const jsBuilds = entries.flatMap((entry) => {
+  const entryPlugins = (options) => [
+    ...plugins(options),
+    ...(entry.useClientDirective ? [addUseClientDirective()] : [])
+  ]
+
+  return [
     {
-      file: `./dist/${entry.name}.mjs`,
-      format: 'es',
-      sourcemap: true
-    },
-    {
-      file: `./dist/${entry.name}.cjs`,
-      format: 'cjs',
-      sourcemap: true,
-      exports: 'named'
+      input: entry.input,
+      plugins: [
+        ...entryPlugins(),
+        ...(entry.umdName
+          ? [visualizer({ filename: `stats/${entry.name}.html` })]
+          : [])
+      ],
+      output: [
+        {
+          file: `./dist/${entry.name}.mjs`,
+          format: 'es',
+          sourcemap: true
+        },
+        {
+          file: `./dist/${entry.name}.cjs`,
+          format: 'cjs',
+          sourcemap: true,
+          exports: 'named'
+        }
+      ]
     },
     ...(entry.umdName
       ? [
           {
-            name: entry.umdName,
-            file: `./dist/${entry.name}.umd.js`,
-            format: 'umd',
-            sourcemap: true,
-            exports: 'named',
-            globals: { react: 'React' }
+            input: entry.input,
+            plugins: entryPlugins({ bundleJsxRuntime: true }),
+            output: {
+              name: entry.umdName,
+              file: `./dist/${entry.name}.umd.js`,
+              format: 'umd',
+              sourcemap: true,
+              exports: 'named',
+              globals: { react: 'React' }
+            }
           }
         ]
       : [])
   ]
-}))
+})
 
 const typeBuilds = entries.map((entry) => ({
   input: entry.input,

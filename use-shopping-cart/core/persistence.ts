@@ -19,6 +19,21 @@ export function createCartPersister(
   initial: Readonly<PersistedFields>
 ): CartPersister {
   let lastSaved: Readonly<PersistedFields> | null = initial
+  let lastSeen: Readonly<PersistedFields> = initial
+  let loading = true
+  let itemsChanged = false
+  let settingsChanged = false
+
+  function finishLoad(
+    raw: string | null,
+    onLoad: (stored: StoredCart) => void
+  ) {
+    loading = false
+    if (itemsChanged) return
+    const stored = raw ? parseStoredCart(raw) : null
+    if (!stored) return
+    onLoad(settingsChanged ? { cartDetails: stored.cartDetails } : stored)
+  }
 
   return {
     load(onLoad) {
@@ -26,24 +41,34 @@ export function createCartPersister(
         const raw = storage.getItem(key)
         if (raw instanceof Promise) {
           raw
-            .then((data) => {
-              const stored = data ? parseStoredCart(data) : null
-              if (stored) onLoad(stored)
-            })
+            .then((data) => finishLoad(data, onLoad))
             .catch((error) => {
+              loading = false
               console.warn('Failed to load cart from storage:', error)
             })
           return
         }
 
-        const stored = raw ? parseStoredCart(raw) : null
-        if (stored) onLoad(stored)
+        finishLoad(raw, onLoad)
       } catch (error) {
+        loading = false
         console.warn('Failed to load cart from storage:', error)
       }
     },
 
     save(state) {
+      if (loading) {
+        if (
+          state.currency !== lastSeen.currency ||
+          state.language !== lastSeen.language
+        ) {
+          settingsChanged = true
+        } else if (state.cartDetails !== lastSeen.cartDetails) {
+          itemsChanged = true
+        }
+      }
+      lastSeen = state
+
       if (
         lastSaved &&
         lastSaved.cartDetails === state.cartDetails &&

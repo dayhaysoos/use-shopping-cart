@@ -1,8 +1,9 @@
 'use client'
 
 import { useActionState } from 'react'
-import { useShoppingCart } from './useShoppingCart'
-import { getProductId } from '../core/Entry'
+import { useCartContext } from './cartContext'
+import { getProductId } from '../core/productId'
+import { isCartError, type CartErrorCode } from '../core/errors'
 import {
   decodeAddItem,
   decodeCountChange,
@@ -13,9 +14,7 @@ import {
 export interface ActionState {
   status: 'idle' | 'success' | 'error'
   error: string | null
-  productId?: string | null
-  itemId?: string | null
-  quantity?: number | null
+  errorCode: CartErrorCode | null
 }
 
 export type AddItemState = ActionState & { productId: string | null }
@@ -24,9 +23,9 @@ export type QuantityState = ActionState & {
   itemId: string | null
   quantity: number | null
 }
-export type ClearState = Pick<ActionState, 'status' | 'error'>
-export type RemoveItemState = ItemState
-export type UpdateQuantityState = QuantityState
+export type ClearState = ActionState
+
+type ActionFields<S> = Omit<S, keyof ActionState>
 
 function getErrorMessage(error: unknown): string {
   if (error instanceof Error) return error.message
@@ -35,84 +34,99 @@ function getErrorMessage(error: unknown): string {
 }
 
 function useFormAction<S extends ActionState>(
-  idle: S,
+  idleFields: ActionFields<S>,
   fallbackError: string,
-  perform: (formData: FormData) => S
+  perform: (formData: FormData) => ActionFields<S>
 ) {
+  const idle = {
+    ...idleFields,
+    status: 'idle',
+    error: null,
+    errorCode: null
+  } as S
+
   return useActionState<S, FormData>(async (_prevState, formData) => {
     try {
-      return perform(formData)
+      return {
+        ...perform(formData),
+        status: 'success',
+        error: null,
+        errorCode: null
+      } as S
     } catch (error) {
       return {
-        ...idle,
+        ...idleFields,
         status: 'error',
-        error: getErrorMessage(error) || fallbackError
-      }
+        error: getErrorMessage(error) || fallbackError,
+        errorCode: isCartError(error) ? error.code : 'UNKNOWN'
+      } as S
     }
   }, idle as Awaited<S>)
 }
 
-const idleItem: ItemState = { status: 'idle', error: null, itemId: null }
-
 export function useCartActions() {
-  const cart = useShoppingCart()
+  const cart = useCartContext()
 
   const [addItemState, addToCartAction, addItemPending] =
     useFormAction<AddItemState>(
-      { status: 'idle', error: null, productId: null },
+      { productId: null },
       'Failed to add item to cart',
       (formData) => {
         const { product, count } = decodeAddItem(formData)
         cart.addItem(product, { count })
-        return {
-          status: 'success',
-          error: null,
-          productId: getProductId(product)
-        }
+        return { productId: getProductId(product) }
       }
     )
 
   const [removeItemState, removeFromCartAction, removeItemPending] =
-    useFormAction(idleItem, 'Failed to remove item', (formData) => {
-      const itemId = decodeItemId(formData)
-      cart.removeItem(itemId)
-      return { status: 'success', error: null, itemId }
-    })
+    useFormAction<ItemState>(
+      { itemId: null },
+      'Failed to remove item',
+      (formData) => {
+        const itemId = decodeItemId(formData)
+        cart.removeItem(itemId)
+        return { itemId }
+      }
+    )
 
   const [updateQuantityState, updateQuantityAction, updateQuantityPending] =
     useFormAction<QuantityState>(
-      { status: 'idle', error: null, itemId: null, quantity: null },
+      { itemId: null, quantity: null },
       'Failed to update quantity',
       (formData) => {
         const { itemId, quantity } = decodeQuantity(formData)
         cart.setItemQuantity(itemId, quantity)
-        return { status: 'success', error: null, itemId, quantity }
+        return { itemId, quantity }
       }
     )
 
   const [clearCartState, clearCartAction, clearCartPending] =
-    useFormAction<ClearState>(
-      { status: 'idle', error: null },
-      'Failed to clear cart',
-      () => {
-        cart.clearCart()
-        return { status: 'success', error: null }
+    useFormAction<ClearState>({}, 'Failed to clear cart', () => {
+      cart.clearCart()
+      return {}
+    })
+
+  const [incrementItemState, incrementItemAction, incrementItemPending] =
+    useFormAction<ItemState>(
+      { itemId: null },
+      'Failed to increment item',
+      (formData) => {
+        const { itemId, count } = decodeCountChange(formData)
+        cart.incrementItem(itemId, { count })
+        return { itemId }
       }
     )
 
-  const [incrementItemState, incrementItemAction, incrementItemPending] =
-    useFormAction(idleItem, 'Failed to increment item', (formData) => {
-      const { itemId, count } = decodeCountChange(formData)
-      cart.incrementItem(itemId, { count })
-      return { status: 'success', error: null, itemId }
-    })
-
   const [decrementItemState, decrementItemAction, decrementItemPending] =
-    useFormAction(idleItem, 'Failed to decrement item', (formData) => {
-      const { itemId, count } = decodeCountChange(formData)
-      cart.decrementItem(itemId, { count })
-      return { status: 'success', error: null, itemId }
-    })
+    useFormAction<ItemState>(
+      { itemId: null },
+      'Failed to decrement item',
+      (formData) => {
+        const { itemId, count } = decodeCountChange(formData)
+        cart.decrementItem(itemId, { count })
+        return { itemId }
+      }
+    )
 
   return {
     addToCartAction,

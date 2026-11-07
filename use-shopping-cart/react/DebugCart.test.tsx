@@ -31,7 +31,7 @@ describe('DebugCart', () => {
   it('does not list the cart methods', () => {
     renderDebugCart()
 
-    for (const method of ['addItem', 'redirectToCheckout', 'loadCart']) {
+    for (const method of ['addItem', 'clearCart', 'loadCart']) {
       expect(screen.queryByText(method)).not.toBeInTheDocument()
     }
     expect(screen.getByTestId('debug')).not.toHaveTextContent('=>')

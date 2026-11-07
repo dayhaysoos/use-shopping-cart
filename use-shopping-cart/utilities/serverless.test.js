@@ -1,4 +1,6 @@
+import { vi } from 'vitest'
 import { validateCartItems, formatLineItems } from './serverless'
+import { ShoppingCart } from '../core/ShoppingCart'
 
 const inventory = [
   {
@@ -223,6 +225,19 @@ describe('validateCartItems', () => {
     }).toThrow('Invalid Cart: cart item "bad" must be an object.')
   })
 
+  it('throws an error when a quantity is not a positive integer', () => {
+    vi.spyOn(console, 'warn').mockImplementation(() => {})
+    const [id] = Object.keys(cartDetails)
+    expect(() => {
+      validateCartItems(inventory, {
+        [id]: { ...cartDetails[id], quantity: 0 }
+      })
+    }).toThrow(
+      `Invalid quantity in cart item "${id}": quantity must be greater than 0. The current value is 0.`
+    )
+    vi.restoreAllMocks()
+  })
+
   it('throws an error when inventory items are not objects', () => {
     expect(() => {
       validateCartItems([null], cartDetails)
@@ -264,6 +279,67 @@ describe('validateCartItems', () => {
     // Should use ProductA's data (first match), not ProductB
     expect(result[0].price_data.unit_amount).toBe(500)
     expect(result[0].price_data.product_data.name).toBe('ProductA (via SKU)')
+  })
+})
+
+describe('validateCartItems with carts built by ShoppingCart', () => {
+  const base = { price: 250, currency: 'USD' }
+
+  it.each([
+    ['id', { id: 'prod_id', name: 'By id' }],
+    ['price_id', { price_id: 'price_123', name: 'By price_id' }],
+    ['sku_id', { sku_id: 'sku_123', name: 'By sku_id' }],
+    ['sku', { sku: 'SKU-123', name: 'By sku' }]
+  ])('accepts a product identified by %s', (_field, fields) => {
+    const product = { ...base, ...fields }
+    const cart = new ShoppingCart({ shouldPersist: false })
+    cart.addItem(product, { count: 2 })
+
+    const [item] = validateCartItems([product], cart.getState().cartDetails)
+
+    expect(item.quantity).toBe(2)
+    expect(item.price_data.unit_amount).toBe(250)
+    expect(item.price_data.product_data.name).toBe(fields.name)
+  })
+
+  it('matches a product that has several ID fields by the one the cart used', () => {
+    const product = {
+      ...base,
+      price_id: 'price_abc',
+      sku: 'SKU-ABC',
+      name: 'Both'
+    }
+    const cart = new ShoppingCart({ shouldPersist: false })
+    cart.addItem(product)
+
+    const [item] = validateCartItems([product], cart.getState().cartDetails)
+
+    expect(item.price_data.product_data.name).toBe('Both')
+  })
+
+  it('sends product_metadata from addItem to Stripe', () => {
+    const product = { ...base, id: 'prod_meta', name: 'Meta' }
+    const cart = new ShoppingCart({ shouldPersist: false })
+    cart.addItem(product, {
+      product_metadata: { gift_wrap: 'yes' },
+      price_metadata: { billing_cycle: 'monthly' }
+    })
+
+    const [item] = validateCartItems([product], cart.getState().cartDetails)
+
+    expect(item.price_data.product_data.metadata).toEqual({ gift_wrap: 'yes' })
+    expect(item.price_data).not.toHaveProperty('metadata')
+  })
+
+  it('still accepts carts keyed by a secondary ID field', () => {
+    const product = { ...base, id: 'prod_1', sku: 'SKU-1', name: 'Secondary' }
+    const cartDetails = {
+      'SKU-1': { ...product, quantity: 1, value: 250, formattedValue: '$2.50' }
+    }
+
+    const [item] = validateCartItems([product], cartDetails)
+
+    expect(item.price_data.product_data.name).toBe('Secondary')
   })
 })
 

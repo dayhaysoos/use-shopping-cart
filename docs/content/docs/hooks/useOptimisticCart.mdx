@@ -3,18 +3,20 @@ title: useOptimisticCart()
 sidebar_position: 2
 ---
 
-**New in v4.0.0** - Optimistic version of `useShoppingCart()` that provides instant UI feedback using React 19's `useOptimistic` hook.
+**New in v4.0.0** - Optimistic version of `useShoppingCart()` built on React 19's `useOptimistic`. It shows cart changes instantly while your backend confirms them.
 
 ## Overview
 
-`useOptimisticCart()` wraps `useShoppingCart()` and adds optimistic updates. When users perform cart operations (add, remove, update quantity), they see instant feedback in the UI while the actual cart operation completes in the background.
+`useOptimisticCart()` wraps `useShoppingCart()` for carts that sync with your backend. Pass an async `onChange` and every cart change shows in the UI immediately, is sent to `onChange`, and is applied to the real cart once `onChange` resolves. If it rejects, the change is rolled back.
+
+Without `onChange`, its actions apply to the cart immediately, like `useShoppingCart()`. It still shows changes that other `useOptimisticCart({ onChange })` calls on the same cart are waiting on.
 
 ## Benefits
 
-✅ **Instant UI feedback** - No waiting for cart updates  
-✅ **Better perceived performance** - Feels faster even if localStorage sync takes time  
-✅ **Automatic rollback** - If an operation fails, the UI automatically reverts  
-✅ **Drop-in replacement** - Same API as `useShoppingCart()`
+✅ **Instant UI feedback** - Changes show while your backend request is in flight  
+✅ **Automatic rollback** - If `onChange` rejects, the UI reverts and `error` is set  
+✅ **In order** - Changes are sent to `onChange` one at a time, in the order they were made  
+✅ **Drop-in replacement** - Returns the same values and actions as `useShoppingCart()` (it takes options, not a selector)
 
 ## Requirements
 
@@ -23,11 +25,24 @@ sidebar_position: 2
 
 ## Basic Usage
 
+The examples on this page use a `syncCart` function that sends each change to your backend:
+
+```jsx
+async function syncCart(change) {
+  const res = await fetch('/api/cart', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(change)
+  })
+  if (!res.ok) throw new Error('Could not update cart')
+}
+```
+
 ```jsx
 import { useOptimisticCart } from 'use-shopping-cart'
 
 function ProductCard({ product }) {
-  const { addItem, isOptimistic } = useOptimisticCart()
+  const { addItem, isOptimistic } = useOptimisticCart({ onChange: syncCart })
 
   return (
     <button onClick={() => addItem(product)} disabled={isOptimistic}>
@@ -37,7 +52,57 @@ function ProductCard({ product }) {
 }
 ```
 
+## Syncing with Your Backend
+
+```jsx
+import { useOptimisticCart } from 'use-shopping-cart'
+
+function Cart() {
+  const { cartDetails, incrementItem, isOptimistic, error } = useOptimisticCart(
+    {
+      onChange: async (change) => {
+        const res = await fetch('/api/cart', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(change)
+        })
+        if (!res.ok) throw new Error('Could not update cart')
+      }
+    }
+  )
+
+  // ...
+}
+```
+
+`change` describes what happened:
+
+| `type`     | Fields                               | From                             |
+| ---------- | ------------------------------------ | -------------------------------- |
+| `'add'`    | `product`, `count`, `metadata`       | `addItem`                        |
+| `'adjust'` | `id`, `by` (negative for decrements) | `incrementItem`, `decrementItem` |
+| `'set'`    | `id`, `quantity`                     | `setItemQuantity`                |
+| `'remove'` | `id`                                 | `removeItem`                     |
+| `'clear'`  |                                      | `clearCart`                      |
+
+How it behaves:
+
+- **Every component:** `<CartProvider>` holds one `useOptimistic` state per cart, so a pending change shows in every component that calls `useOptimisticCart`. A total in one component updates when an item in another changes. `useShoppingCart` shows only confirmed changes.
+- **Order:** changes wait for the previous `onChange` to settle, so three quick clicks send three requests, one after another. Changes made without `onChange` don't wait: they apply to the cart straight away.
+- **Success:** the change is applied to the real cart (and saved to `storage`).
+- **Failure:** the change is dropped and `error` holds what `onChange` threw, in the component that made the change. Later queued changes still run, but each is checked against the real cart first: one that depended on the failed change (incrementing an item whose add failed) is dropped with an `ITEM_NOT_IN_CART` error and never reaches `onChange`.
+- **Rollback timing:** React batches pending transitions together, so if one change fails while others are still pending, its rollback shows once they settle.
+- **Invalid input** (bad count, product without a price) throws immediately and never reaches `onChange`.
+
+What the server does with the change, and whether the cart is loaded from the server (for example with [`loadCart`](/docs/actions/loadCart)), is up to you.
+
 ## API
+
+### Options
+
+| Option     | Type                                       | Description                                       |
+| ---------- | ------------------------------------------ | ------------------------------------------------- |
+| `onChange` | `(change: CartChange) => Promise<unknown>` | Called for each change before it reaches the cart |
 
 `useOptimisticCart()` returns the same properties and methods as `useShoppingCart()`, plus:
 
@@ -49,19 +114,24 @@ function ProductCard({ product }) {
 - **Description:** `true` when the cart is showing optimistic updates that haven't been confirmed yet
 
 ```jsx
-const { isOptimistic } = useOptimisticCart()
+const { isOptimistic } = useOptimisticCart({ onChange: syncCart })
 
 {
   isOptimistic && <span>Syncing changes...</span>
 }
 ```
 
+#### `error`
+
+- **Type:** `unknown`
+- **Description:** what `onChange` threw for the last change this component made; `null` after one succeeds
+
 ### Item-Level Optimistic Indicator
 
 Each cart item has an `_optimistic` property when it's being optimistically updated:
 
 ```jsx
-const { cartDetails } = useOptimisticCart()
+const { cartDetails } = useOptimisticCart({ onChange: syncCart })
 
 Object.values(cartDetails).map((item) => (
   <div key={item.id}>
@@ -83,7 +153,7 @@ function ShoppingCart() {
     formattedTotalPrice,
     clearCart,
     isOptimistic
-  } = useOptimisticCart()
+  } = useOptimisticCart({ onChange: syncCart })
 
   return (
     <div className="cart">
@@ -117,7 +187,7 @@ function ShoppingCart() {
 ```jsx
 function CartItem({ item }) {
   const { incrementItem, decrementItem, removeItem, isOptimistic } =
-    useOptimisticCart()
+    useOptimisticCart({ onChange: syncCart })
 
   return (
     <div className="cart-item">
@@ -152,7 +222,7 @@ function CartItem({ item }) {
 
 ```jsx
 function ProductCard({ product }) {
-  const { addItem, cartDetails } = useOptimisticCart()
+  const { addItem, cartDetails } = useOptimisticCart({ onChange: syncCart })
 
   const itemInCart = cartDetails[product.id]
   const isThisItemOptimistic = itemInCart?._optimistic === true
@@ -179,7 +249,7 @@ function ProductCard({ product }) {
 
 ## Migration from useShoppingCart()
 
-Migrating is simple - just replace `useShoppingCart` with `useOptimisticCart`:
+Replace `useShoppingCart` with `useOptimisticCart` and pass the function that syncs with your backend:
 
 ```diff
 - import { useShoppingCart } from 'use-shopping-cart'
@@ -187,7 +257,9 @@ Migrating is simple - just replace `useShoppingCart` with `useOptimisticCart`:
 
 function MyComponent() {
 -  const { addItem, cartCount } = useShoppingCart()
-+  const { addItem, cartCount, isOptimistic } = useOptimisticCart()
++  const { addItem, cartCount, isOptimistic } = useOptimisticCart({
++    onChange: syncCart
++  })
 
   return (
     <button onClick={() => addItem(product)}>
@@ -202,23 +274,24 @@ function MyComponent() {
 
 Use `useOptimisticCart()` when:
 
-- You want instant UI feedback for cart operations
-- You're dealing with slow network or localStorage operations
-- You want to improve perceived performance
+- Your cart syncs with a backend and you want changes to show before the request finishes
 
 Stick with `useShoppingCart()` when:
 
-- You prefer simpler code without optimistic updates
-- You don't need loading states
-- You're migrating from older versions and want minimal changes
+- The cart lives only in the browser (it's already instant)
+- You sync with a backend some other way, for example with `subscribe`
 
 ## TypeScript
 
 ```typescript
-import { useOptimisticCart } from 'use-shopping-cart'
+import { useOptimisticCart, type CartChange, type Product } from 'use-shopping-cart'
+
+async function syncCart(change: CartChange): Promise<void> {
+  await fetch('/api/cart', { method: 'POST', body: JSON.stringify(change) })
+}
 
 function ProductCard({ product }: { product: Product }) {
-  const { addItem, isOptimistic } = useOptimisticCart()
+  const { addItem, isOptimistic } = useOptimisticCart({ onChange: syncCart })
 
   return (
     <button onClick={() => addItem(product)} disabled={isOptimistic}>
@@ -234,7 +307,7 @@ import { OptimisticCartDemo } from '../../../src/components/OptimisticCartDemo'
 
 <OptimisticCartDemo />
 
-Try adding items and watch the instant UI feedback! Notice how the interface updates immediately, and the "updating..." indicator shows while the cart syncs in the background.
+Try adding items and watch the instant UI feedback! The demo's `onChange` simulates a server that takes a couple of seconds. The item shows immediately with a "confirming" state, and the cart on the left updates once the simulated server confirms. "Add with Error" shows the rollback.
 
 ## See Also
 

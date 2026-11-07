@@ -7,7 +7,7 @@ id: validate-cart-items
 
 validateCartItems checks the items in the current cart and compares them with a source of truth to
 make sure that the prices and quantities are correct. This is necessary because it's possible that
-malicious users could manipulate the values of prices in the DOM before sending to `redirectToCheckout`.
+malicious users could change the prices in `cartDetails` before sending the cart to your checkout endpoint.
 
 It also validates input shapes and throws if inventory/cart items are not objects or if the inventory
 source is not iterable.
@@ -63,6 +63,30 @@ exports.handler = async (event) => {
   }
 }
 ```
+
+### Errors
+
+`validateCartItems` throws a `CartError` when the cart can't be trusted. Use `error.code` to choose a response:
+
+```js
+import { validateCartItems, isCartError } from 'use-shopping-cart/utilities'
+
+try {
+  const line_items = validateCartItems(inventory, cartDetails)
+} catch (error) {
+  if (isCartError(error)) {
+    return { statusCode: 400, body: JSON.stringify({ code: error.code }) }
+  }
+  throw error
+}
+```
+
+| Code                | Cause                                                                            |
+| ------------------- | -------------------------------------------------------------------------------- |
+| `INVALID_INVENTORY` | `inventory` isn't an iterable of objects                                         |
+| `INVALID_CART`      | `cartDetails` or one of its items isn't an object                                |
+| `NOT_IN_INVENTORY`  | a cart item's ID doesn't match any product's `id`, `price_id`, `sku_id` or `sku` |
+| `INVALID_QUANTITY`  | a cart item's quantity isn't a positive integer                                  |
 
 Take a look at the Netlify example here:
 

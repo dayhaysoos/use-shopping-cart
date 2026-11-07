@@ -63,6 +63,70 @@ These are unchanged. Importing `use-shopping-cart/dist/...` was already blocked 
 
 `dist/react.umd.js` and `dist/core.umd.js` keep their names.
 
+#### Errors Are `CartError`s
+
+Errors thrown by the cart, `useCartActions` forms, `validateCartItems` and `redirectToCheckout` are now `CartError`s with a `code`. Messages are unchanged, so code that only displays `error.message` keeps working. If you check `error.name === 'ValidationError'`, switch to the code:
+
+```js
+import { isCartError } from 'use-shopping-cart/core'
+
+if (isCartError(error) && error.code === 'ITEM_NOT_IN_CART') {
+  // ...
+}
+```
+
+`useCartActions` states have a new `errorCode` field next to `error`.
+
+#### `CartConfig` Is Its Own Type
+
+`CartProvider` props and the `ShoppingCart` constructor take only `cartDetails`, `currency`, `language`, `shouldPersist`, `persistKey` and `storage`. Passing other state fields (`cartCount`, `shouldDisplayCart`, ...) is now a type error; they were ignored or copied into state before. `shouldPersist` is no longer in the cart state, so read it from your own config instead of `useShoppingCart().shouldPersist`.
+
+#### `validateCartItems` Matches More ID Fields
+
+Inventory is now matched by `id`, `price_id`, `sku_id` and `sku` (first match in `inventory` wins), the same fields the cart uses for item IDs. Carts with items added by `price_id` or `sku_id` alone now validate instead of failing with "not in your inventory". Check your inventory if one product's `price_id` or `sku_id` can equal another product's `id` or `sku`: the earlier product now matches.
+
+#### `CartProvider` Renders on the Server; `loading` Removed
+
+`CartProvider` now renders its children during server rendering. The server and the first client render show the cart from your props (`cartDetails`, formatted with `language`, or `en-US` if you don't set it); the cart saved in storage and the browser's language apply right after hydration. Before, the server rendered the `loading` prop instead, which made hydration fail. Remove `loading` from `<CartProvider>`. `cart.getInitialState()` returns that server-side state, and `initialState.language` is now always `en-US` (it used to be the browser's language in the browser).
+
+#### `createNoopStorage` Removed
+
+Use `shouldPersist={false}` instead of `storage={createNoopStorage()}`; both store nothing.
+
+#### Item Metadata Moved Under `metadata`
+
+`product_metadata` and `price_metadata` from `addItem` are now stored as the entry's `product_data.metadata` and `price_data.metadata`, instead of being spread into `product_data` and `price_data`. This is what makes `validateCartItems` send `product_metadata` to Stripe Checkout; before, it was silently dropped. `price_metadata` stays in the cart, because Checkout's inline prices can't carry metadata.
+
+```js
+// Before
+entry.product_data.gift_wrap
+
+// After
+entry.product_data.metadata.gift_wrap
+```
+
+#### `redirectToCheckout` Is a Standalone Function
+
+Import it instead of reading it from the cart, and pass the Checkout Session URL. Session IDs, the `stripe` prop and `changeStripeKey` are gone: Stripe removed `redirectToCheckout({ sessionId })` from Stripe.js, and a session URL needs no publishable key.
+
+```jsx
+// Before
+const { redirectToCheckout } = useShoppingCart()
+await redirectToCheckout(sessionId)
+
+// After: return session.url from your server
+import { redirectToCheckout } from 'use-shopping-cart'
+redirectToCheckout(sessionUrl)
+```
+
+#### `useShoppingCart(selector)` Is Back
+
+As in v3, `useShoppingCart` takes an optional selector, and the component re-renders only when the selected value changes:
+
+```js
+const cartCount = useShoppingCart((cart) => cart.cartCount)
+```
+
 ### Improvements and Bug Fixes
 
 #### Fixed: CartProvider Store Recreation Bug

@@ -35,6 +35,7 @@ jobs:
       # Build, then run type tests against the published type definitions
       - run: pnpm --filter use-shopping-cart run build
       - run: pnpm --filter use-shopping-cart run test:types
+      - run: pnpm --filter use-shopping-cart run test:dist
 
   build-package:
     name: Build

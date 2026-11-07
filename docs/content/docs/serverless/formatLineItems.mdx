@@ -3,9 +3,22 @@ title: formatLineItems()
 id: format-line-items
 ---
 
-`formatLineItems(cartDetails)` Is a function that helps with creating Session IDs server side
-for products that have been created on the Stripe dashboard. It's preferred to use this with the
-Price API.
+`formatLineItems(cartDetails)` turns the cart into `line_items` for a Checkout Session when your
+products and prices live in Stripe (created in the dashboard or with the Prices API). Each line item
+is `{ price, quantity }`, where `price` is the cart entry's ID.
 
-It's important that your product data has a `price_id` key that provides the given Price ID you get
-from Stripe's dashboard.
+Use the Stripe Price ID as the product's `id`, or give the product a `price_id` and no `id`. The cart
+keys entries by the first of `id`, `price_id`, `sku_id` and `sku` it finds, so a product with both an
+`id` and a `price_id` is keyed by its `id`, which isn't a Price ID. Stripe charges the price stored in
+Stripe, so the browser can't change it.
+
+```js
+import { formatLineItems } from 'use-shopping-cart/utilities'
+
+const session = await stripe.checkout.sessions.create({
+  mode: 'payment',
+  line_items: formatLineItems(cartDetails),
+  success_url: `${origin}/success`,
+  cancel_url: origin
+})
+```

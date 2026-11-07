@@ -9,7 +9,6 @@ const wrapper = ({ children }) => (
   <CartProvider
     mode="payment"
     cartMode="client-only"
-    stripe="pk_test_123"
     currency="USD"
     language="en-US"
     shouldPersist={false}

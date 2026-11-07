@@ -102,6 +102,73 @@ describe('createCartPersister', () => {
     await vi.waitFor(() => expect(onLoad).toHaveBeenCalled())
   })
 
+  describe('when the cart changes before an async load finishes', () => {
+    function deferred() {
+      let finish!: () => void
+      const storage: StorageAdapter = {
+        getItem: () =>
+          new Promise<string>((resolve) => {
+            finish = () =>
+              resolve(
+                JSON.stringify({
+                  cartDetails: { a: entry },
+                  currency: 'EUR',
+                  language: 'de-DE'
+                })
+              )
+          }),
+        setItem: () => {},
+        removeItem: () => {}
+      }
+      return { storage, finish: () => finish() }
+    }
+
+    it('skips the stored cart after an item change', async () => {
+      const { storage, finish } = deferred()
+      const onLoad = vi.fn()
+      const persister = createCartPersister(storage, 'k', initialState)
+
+      persister.load(onLoad)
+      persister.save(state)
+      finish()
+      await new Promise((r) => setTimeout(r, 0))
+
+      expect(onLoad).not.toHaveBeenCalled()
+    })
+
+    it('restores only the items after a currency or language change', async () => {
+      const { storage, finish } = deferred()
+      const onLoad = vi.fn()
+      const persister = createCartPersister(storage, 'k', initialState)
+
+      persister.load(onLoad)
+      persister.save({ ...initialState, currency: 'GBP', cartDetails: {} })
+      finish()
+
+      await vi.waitFor(() =>
+        expect(onLoad).toHaveBeenCalledWith({ cartDetails: { a: entry } })
+      )
+    })
+
+    it('restores everything after a UI-only change', async () => {
+      const { storage, finish } = deferred()
+      const onLoad = vi.fn()
+      const persister = createCartPersister(storage, 'k', initialState)
+
+      persister.load(onLoad)
+      persister.save({ ...initialState, shouldDisplayCart: true })
+      finish()
+
+      await vi.waitFor(() =>
+        expect(onLoad).toHaveBeenCalledWith({
+          cartDetails: { a: entry },
+          currency: 'EUR',
+          language: 'de-DE'
+        })
+      )
+    })
+  })
+
   it('writes the same payload shape as earlier versions', () => {
     const storage = createMemoryStorage()
 

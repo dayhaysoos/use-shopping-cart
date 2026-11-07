@@ -3,33 +3,33 @@ import {
   validateCount,
   validateQuantity,
   validateItemExists,
-  validateProduct,
-  ValidationError
+  validateProduct
 } from './validation'
+import { CartError } from './errors'
 
 describe('validateCount', () => {
   it('throws on non-number', () => {
-    expect(() => validateCount('5', 'addItem')).toThrow(ValidationError)
+    expect(() => validateCount('5', 'addItem')).toThrow(CartError)
     expect(() => validateCount('5', 'addItem')).toThrow('finite number')
   })
 
   it('throws on non-integer', () => {
-    expect(() => validateCount(1.5, 'addItem')).toThrow(ValidationError)
+    expect(() => validateCount(1.5, 'addItem')).toThrow(CartError)
     expect(() => validateCount(1.5, 'addItem')).toThrow('integer')
   })
 
   it('throws on infinite', () => {
-    expect(() => validateCount(Infinity, 'addItem')).toThrow(ValidationError)
+    expect(() => validateCount(Infinity, 'addItem')).toThrow(CartError)
     expect(() => validateCount(Infinity, 'addItem')).toThrow('finite number')
   })
 
   it('throws on zero', () => {
-    expect(() => validateCount(0, 'addItem')).toThrow(ValidationError)
+    expect(() => validateCount(0, 'addItem')).toThrow(CartError)
     expect(() => validateCount(0, 'addItem')).toThrow('greater than 0')
   })
 
   it('throws on negative', () => {
-    expect(() => validateCount(-1, 'addItem')).toThrow(ValidationError)
+    expect(() => validateCount(-1, 'addItem')).toThrow(CartError)
     expect(() => validateCount(-1, 'addItem')).toThrow('greater than 0')
   })
 
@@ -46,34 +46,26 @@ describe('validateCount', () => {
 
 describe('validateQuantity', () => {
   it('throws on non-number', () => {
-    expect(() => validateQuantity('5', 'setItemQuantity')).toThrow(
-      ValidationError
-    )
+    expect(() => validateQuantity('5', 'setItemQuantity')).toThrow()
     expect(() => validateQuantity('5', 'setItemQuantity')).toThrow(
       'finite number'
     )
   })
 
   it('throws on non-integer', () => {
-    expect(() => validateQuantity(2.5, 'setItemQuantity')).toThrow(
-      ValidationError
-    )
+    expect(() => validateQuantity(2.5, 'setItemQuantity')).toThrow()
     expect(() => validateQuantity(2.5, 'setItemQuantity')).toThrow('integer')
   })
 
   it('throws on infinite', () => {
-    expect(() => validateQuantity(Infinity, 'setItemQuantity')).toThrow(
-      ValidationError
-    )
+    expect(() => validateQuantity(Infinity, 'setItemQuantity')).toThrow()
     expect(() => validateQuantity(Infinity, 'setItemQuantity')).toThrow(
       'finite number'
     )
   })
 
   it('throws on negative', () => {
-    expect(() => validateQuantity(-1, 'setItemQuantity')).toThrow(
-      ValidationError
-    )
+    expect(() => validateQuantity(-1, 'setItemQuantity')).toThrow()
     expect(() => validateQuantity(-1, 'setItemQuantity')).toThrow(
       'greater than or equal to 0'
     )
@@ -104,7 +96,7 @@ describe('validateItemExists', () => {
   it('throws when item does not exist', () => {
     expect(() =>
       validateItemExists('item3', cartDetails, 'removeItem')
-    ).toThrow(ValidationError)
+    ).toThrow(CartError)
     expect(() =>
       validateItemExists('item3', cartDetails, 'removeItem')
     ).toThrow('must already be in the cart')
@@ -131,7 +123,7 @@ describe('validateItemExists', () => {
 
 describe('validateProduct', () => {
   it('throws when product is not an object', () => {
-    expect(() => validateProduct(null)).toThrow(ValidationError)
+    expect(() => validateProduct(null)).toThrow(CartError)
     expect(() => validateProduct(undefined)).toThrow('must be an object')
     expect(() => validateProduct('string')).toThrow('must be an object')
     expect(() => validateProduct(123)).toThrow('must be an object')

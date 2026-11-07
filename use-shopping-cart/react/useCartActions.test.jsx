@@ -44,7 +44,6 @@ const wrapper = ({ children }) => (
   <CartProvider
     mode="payment"
     cartMode="client-only"
-    stripe="pk_test_123"
     successUrl="https://example.com/success"
     cancelUrl="https://example.com/cancel"
     currency="USD"
@@ -84,10 +83,13 @@ describe('useCartActions', () => {
 
       expect(result.current.addItemState.error).toBeNull()
       expect(result.current.addItemState.productId).toBe(mockProduct.id)
+      expect(result.current.addItemState.errorCode).toBeNull()
     })
 
     test('should handle missing product data', async () => {
       const { result } = renderHook(() => useCartActions(), { wrapper })
+
+      expect(result.current.addItemState.errorCode).toBeNull()
 
       const formData = new FormData()
       // No product data
@@ -101,6 +103,7 @@ describe('useCartActions', () => {
       })
 
       expect(result.current.addItemState.error).toBe('Product data is required')
+      expect(result.current.addItemState.errorCode).toBe('INVALID_FORM_DATA')
     })
 
     test('should reject invalid JSON product data', async () => {
@@ -156,8 +159,8 @@ describe('useCartActions', () => {
         expect(result.current.addItemState.status).toBe('error')
       })
 
-      expect(result.current.addItemState.error).toBe(
-        'count must be a positive integer'
+      expect(result.current.addItemState.error).toContain(
+        'count must be an integer'
       )
     })
 
@@ -176,8 +179,8 @@ describe('useCartActions', () => {
         expect(result.current.addItemState.status).toBe('error')
       })
 
-      expect(result.current.addItemState.error).toBe(
-        'count must be a positive integer'
+      expect(result.current.addItemState.error).toContain(
+        'count must be a finite number'
       )
     })
 
@@ -196,8 +199,8 @@ describe('useCartActions', () => {
         expect(result.current.addItemState.status).toBe('error')
       })
 
-      expect(result.current.addItemState.error).toBe(
-        'count must be a positive integer'
+      expect(result.current.addItemState.error).toContain(
+        'count must be greater than 0'
       )
     })
 
@@ -314,7 +317,7 @@ describe('useCartActions', () => {
       })
 
       expect(result.current.updateQuantityState.error).toBe(
-        'Item ID and quantity are required'
+        'Item ID is required'
       )
     })
 
@@ -333,8 +336,8 @@ describe('useCartActions', () => {
         expect(result.current.updateQuantityState.status).toBe('error')
       })
 
-      expect(result.current.updateQuantityState.error).toBe(
-        'quantity must be a non-negative integer'
+      expect(result.current.updateQuantityState.error).toContain(
+        'quantity must be a finite number'
       )
     })
 
@@ -353,8 +356,8 @@ describe('useCartActions', () => {
         expect(result.current.updateQuantityState.status).toBe('error')
       })
 
-      expect(result.current.updateQuantityState.error).toBe(
-        'quantity must be a non-negative integer'
+      expect(result.current.updateQuantityState.error).toContain(
+        'quantity must be greater than or equal to 0'
       )
     })
 
@@ -373,8 +376,8 @@ describe('useCartActions', () => {
         expect(result.current.updateQuantityState.status).toBe('error')
       })
 
-      expect(result.current.updateQuantityState.error).toBe(
-        'quantity must be a non-negative integer'
+      expect(result.current.updateQuantityState.error).toContain(
+        'quantity must be an integer'
       )
     })
 
@@ -393,8 +396,8 @@ describe('useCartActions', () => {
         expect(result.current.updateQuantityState.status).toBe('error')
       })
 
-      expect(result.current.updateQuantityState.error).toBe(
-        'quantity must be a non-negative integer'
+      expect(result.current.updateQuantityState.error).toContain(
+        'quantity must be a finite number'
       )
     })
   })
@@ -492,8 +495,8 @@ describe('useCartActions', () => {
         expect(result.current.incrementItemState.status).toBe('error')
       })
 
-      expect(result.current.incrementItemState.error).toBe(
-        'count must be a positive integer'
+      expect(result.current.incrementItemState.error).toContain(
+        'count must be greater than 0'
       )
     })
   })
@@ -563,8 +566,8 @@ describe('useCartActions', () => {
         expect(result.current.decrementItemState.status).toBe('error')
       })
 
-      expect(result.current.decrementItemState.error).toBe(
-        'count must be a positive integer'
+      expect(result.current.decrementItemState.error).toContain(
+        'count must be greater than 0'
       )
     })
   })
@@ -657,6 +660,27 @@ describe('useCartActions', () => {
       // Other action states should still be idle
       expect(result.current.removeItemState.status).toBe('idle')
       expect(result.current.clearCartState.status).toBe('idle')
+    })
+  })
+
+  describe('errorCode', () => {
+    test('carries the CartError code from the cart', async () => {
+      const { result } = renderHook(() => useCartActions(), { wrapper })
+
+      const formData = new FormData()
+      formData.append('itemId', 'missing')
+
+      await act(async () => {
+        await result.current.incrementItemAction(formData)
+      })
+
+      await waitFor(() => {
+        expect(result.current.incrementItemState.status).toBe('error')
+      })
+
+      expect(result.current.incrementItemState.errorCode).toBe(
+        'ITEM_NOT_IN_CART'
+      )
     })
   })
 })

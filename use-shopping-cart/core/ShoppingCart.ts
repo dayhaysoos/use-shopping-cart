@@ -7,8 +7,7 @@ import type {
   AddItemOptions,
   IncrementOptions,
   SubscribeCallback,
-  UnsubscribeFunction,
-  RedirectToCheckoutInput
+  UnsubscribeFunction
 } from './types'
 import { createLocalStorage } from './storage'
 import {
@@ -22,41 +21,46 @@ import {
   applyCartChange,
   type CartChange
 } from './cartState'
-import {
-  validateProduct,
-  validateCount,
-  validateItemExists,
-  validateQuantity
-} from './validation'
-import { redirectToCheckout as stripeRedirect } from './stripe'
+import { toCartChange, type CartCall } from './cartCall'
 
 const STORAGE_KEY_PREFIX = 'use-shopping-cart'
 
 export const initialState: CartState = {
   currency: 'USD',
-  language: isClient ? navigator.language : 'en-US',
+  language: 'en-US',
   lastClicked: '',
   shouldDisplayCart: false,
   cartCount: 0,
   totalPrice: 0,
   formattedTotalPrice: '$0.00',
-  cartDetails: {},
-  shouldPersist: true
+  cartDetails: {}
+}
+
+function createCartState({
+  cartDetails = {},
+  currency = initialState.currency,
+  language = initialState.language
+}: CartConfig): CartState {
+  return withCartDetails(
+    { ...initialState, currency, language },
+    normalizeCartDetails(cartDetails, currency, language)
+  )
 }
 
 export class ShoppingCart {
+  private readonly _initialState: CartState
   private _state: CartState
   private _subscribers: Set<SubscribeCallback>
   private _persister: CartPersister | null
-  private _hasBeenModified: boolean = false
-  private _settingsChanged: boolean = false
 
   constructor(config: CartConfig = {}) {
-    const state = { ...initialState, ...config }
-    this._state = withCartDetails(
-      state,
-      normalizeCartDetails(state.cartDetails, state.currency, state.language)
-    )
+    this._initialState = createCartState(config)
+    const language =
+      config.language ?? (isClient ? navigator.language : initialState.language)
+    this._state =
+      language === this._initialState.language
+        ? this._initialState
+        : createCartState({ ...config, language })
     this._subscribers = new Set()
 
     if (config.shouldPersist !== false && isClient) {
@@ -75,6 +79,10 @@ export class ShoppingCart {
     return this._state
   }
 
+  getInitialState(): Readonly<CartState> {
+    return this._initialState
+  }
+
   subscribe(callback: SubscribeCallback): UnsubscribeFunction {
     this._subscribers.add(callback)
     return () => {
@@ -83,14 +91,10 @@ export class ShoppingCart {
   }
 
   private _restore(stored: StoredCart): void {
-    if (this._hasBeenModified) return
-
-    if (!this._settingsChanged) {
-      this._state = {
-        ...this._state,
-        currency: stored.currency ?? this._state.currency,
-        language: stored.language ?? this._state.language
-      }
+    this._state = {
+      ...this._state,
+      currency: stored.currency ?? this._state.currency,
+      language: stored.language ?? this._state.language
     }
     this._setCartDetails(
       normalizeCartDetails(
@@ -117,56 +121,35 @@ export class ShoppingCart {
     this._persister?.save(this._state)
   }
 
+  private _run(call: CartCall): void {
+    this._apply(toCartChange(call, this._state.cartDetails))
+  }
+
   addItem(product: Product, options: AddItemOptions = {}): void {
-    this._hasBeenModified = true
-    validateProduct(product)
-
-    const count = options.count ?? 1
-    validateCount(count, 'addItem')
-
-    this._apply({ type: 'add', product, count, metadata: options })
+    this._run({ action: 'addItem', product, options })
   }
 
   incrementItem(id: string, options: IncrementOptions = {}): void {
-    this._hasBeenModified = true
-    const count = options.count ?? 1
-    validateCount(count, 'incrementItem')
-    validateItemExists(id, this._state.cartDetails, 'incrementItem')
-
-    this._apply({ type: 'adjust', id, by: count })
+    this._run({ action: 'incrementItem', id, options })
   }
 
   decrementItem(id: string, options: IncrementOptions = {}): void {
-    this._hasBeenModified = true
-    const count = options.count ?? 1
-    validateCount(count, 'decrementItem')
-    validateItemExists(id, this._state.cartDetails, 'decrementItem')
-
-    this._apply({ type: 'adjust', id, by: -count })
+    this._run({ action: 'decrementItem', id, options })
   }
 
   setItemQuantity(id: string, quantity: number): void {
-    this._hasBeenModified = true
-    validateQuantity(quantity, 'setItemQuantity')
-    validateItemExists(id, this._state.cartDetails, 'setItemQuantity')
-
-    this._apply({ type: 'set', id, quantity })
+    this._run({ action: 'setItemQuantity', id, quantity })
   }
 
   removeItem(id: string): void {
-    this._hasBeenModified = true
-    validateItemExists(id, this._state.cartDetails, 'removeItem')
-
-    this._apply({ type: 'remove', id })
+    this._run({ action: 'removeItem', id })
   }
 
   clearCart(): void {
-    this._hasBeenModified = true
-    this._apply({ type: 'clear' })
+    this._run({ action: 'clearCart' })
   }
 
   loadCart(cartDetails: CartDetails, shouldMerge = true): void {
-    this._hasBeenModified = true
     const newCartDetails = shouldMerge
       ? { ...this._state.cartDetails, ...cartDetails }
       : cartDetails
@@ -203,15 +186,9 @@ export class ShoppingCart {
     this._notifySubscribers()
   }
 
-  changeStripeKey(key: string): void {
-    this._state = { ...this._state, stripe: key }
-    this._notifySubscribers()
-  }
-
   changeLanguage(language: string): void {
     if (language === this._state.language) return
 
-    this._settingsChanged = true
     this._state = { ...this._state, language }
     this._setCartDetails(
       normalizeCartDetails(
@@ -225,7 +202,6 @@ export class ShoppingCart {
   changeCurrency(currency: string): void {
     if (currency === this._state.currency) return
 
-    this._settingsChanged = true
     this._state = { ...this._state, currency }
     this._setCartDetails(
       normalizeCartDetails(
@@ -234,11 +210,5 @@ export class ShoppingCart {
         this._state.language
       )
     )
-  }
-
-  async redirectToCheckout(
-    input: RedirectToCheckoutInput
-  ): Promise<{ error: any } | undefined> {
-    return stripeRedirect(this._state, input)
   }
 }

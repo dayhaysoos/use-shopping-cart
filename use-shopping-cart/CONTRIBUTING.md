@@ -43,8 +43,11 @@ Here are a couple commands to get you started in development (run them from the 
 # Builds use-shopping-cart in watch-mode and runs the documentation site locally
 pnpm dev
 
-# Builds the library, then runs the tests once
+# Builds the library, then runs the unit and dist smoke tests once
 pnpm test
+
+# Runs every CI step: lint, typecheck, build, tests, type tests and the package check
+pnpm check
 
 # Builds the library, then runs the tests in watch-mode
 pnpm test:watch
@@ -60,6 +63,7 @@ Local validation:
 pnpm --filter use-shopping-cart run test
 pnpm --filter use-shopping-cart run test:types
 pnpm --filter use-shopping-cart run build
+pnpm --filter use-shopping-cart run test:dist
 pnpm --filter use-shopping-cart publish --dry-run
 ```
 

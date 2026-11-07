@@ -7,9 +7,18 @@
 
 import { useOptimisticCart } from 'use-shopping-cart'
 
+async function syncCart(change) {
+  const res = await fetch('/api/cart', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(change)
+  })
+  if (!res.ok) throw new Error('Could not update cart')
+}
+
 // Example 1: Product Card with Add to Cart
 export function ProductCard({ product }) {
-  const { addItem, isOptimistic } = useOptimisticCart()
+  const { addItem, isOptimistic } = useOptimisticCart({ onChange: syncCart })
 
   const handleAddToCart = () => {
     addItem(product, { count: 1 })
@@ -31,7 +40,7 @@ export function ProductCard({ product }) {
 // Example 2: Cart Item with Quantity Controls
 export function CartItem({ item }) {
   const { incrementItem, decrementItem, removeItem, isOptimistic } =
-    useOptimisticCart()
+    useOptimisticCart({ onChange: syncCart })
 
   return (
     <div className="cart-item">
@@ -72,7 +81,7 @@ export function ShoppingCart() {
     formattedTotalPrice,
     clearCart,
     isOptimistic
-  } = useOptimisticCart()
+  } = useOptimisticCart({ onChange: syncCart })
 
   const items = Object.values(cartDetails)
 
@@ -120,7 +129,7 @@ export function ProductCardComparison({ product }) {
   // const { addItem } = useShoppingCart()
 
   // ✅ NEW WAY - With optimistic updates
-  const { addItem, isOptimistic } = useOptimisticCart()
+  const { addItem, isOptimistic } = useOptimisticCart({ onChange: syncCart })
 
   // Everything else stays the same!
   // Just replace useShoppingCart with useOptimisticCart
@@ -134,7 +143,9 @@ export function ProductCardComparison({ product }) {
 
 // Example 5: Advanced - Custom Loading UI
 export function ProductCardAdvanced({ product }) {
-  const { addItem, cartDetails, isOptimistic } = useOptimisticCart()
+  const { addItem, cartDetails, isOptimistic } = useOptimisticCart({
+    onChange: syncCart
+  })
 
   const itemInCart = cartDetails[product.id]
   const isThisItemOptimistic = itemInCart?._optimistic === true
@@ -176,7 +187,9 @@ export function ProductCardAdvanced({ product }) {
 
 // Example 6: Form-based quantity update
 export function QuantityForm({ itemId }) {
-  const { setItemQuantity, cartDetails, isOptimistic } = useOptimisticCart()
+  const { setItemQuantity, cartDetails, isOptimistic } = useOptimisticCart({
+    onChange: syncCart
+  })
   const item = cartDetails[itemId]
 
   const handleSubmit = (e) => {

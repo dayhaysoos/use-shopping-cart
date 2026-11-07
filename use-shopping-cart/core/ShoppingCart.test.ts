@@ -1,4 +1,4 @@
-import { describe, it, expect, vi } from 'vitest'
+import { describe, it, expect, vi, afterEach } from 'vitest'
 import { ShoppingCart, initialState } from './ShoppingCart'
 import { createMemoryStorage } from './storage'
 
@@ -19,21 +19,49 @@ describe('ShoppingCart', () => {
     it('merges config with initial state', () => {
       const cart = new ShoppingCart({
         currency: 'EUR',
-        language: 'de-DE',
-        stripe: 'pk_test_123'
+        language: 'de-DE'
       })
 
       const state = cart.getState()
       expect(state.currency).toBe('EUR')
       expect(state.language).toBe('de-DE')
-      expect(state.stripe).toBe('pk_test_123')
     })
 
-    it('respects shouldPersist false', () => {
-      const cart = new ShoppingCart({ shouldPersist: false })
-      const state = cart.getState()
+    it('keeps config options out of state', () => {
+      const cart = new ShoppingCart({
+        shouldPersist: false,
+        persistKey: 'k',
+        storage: createMemoryStorage(),
+        currency: 'EUR',
+        language: 'de-DE'
+      })
 
-      expect(state.shouldPersist).toBe(false)
+      expect(Object.keys(cart.getState()).sort()).toEqual(
+        [
+          'cartCount',
+          'cartDetails',
+          'currency',
+          'formattedTotalPrice',
+          'language',
+          'lastClicked',
+          'shouldDisplayCart',
+          'totalPrice'
+        ].sort()
+      )
+    })
+
+    it('ignores derived and unknown fields passed as config', () => {
+      const cart = new ShoppingCart({
+        shouldPersist: false,
+        cartCount: 99,
+        totalPrice: 5,
+        mode: 'payment'
+      } as never)
+      const state = cart.getState() as unknown as Record<string, unknown>
+
+      expect(state.cartCount).toBe(0)
+      expect(state.totalPrice).toBe(0)
+      expect(state).not.toHaveProperty('mode')
     })
 
     it('uses custom persistKey', () => {
@@ -71,6 +99,72 @@ describe('ShoppingCart', () => {
       const state = cart.getState()
 
       expect(typeof state).toBe('object')
+    })
+  })
+
+  describe('getInitialState', () => {
+    afterEach(() => {
+      vi.restoreAllMocks()
+    })
+
+    it('returns the cart from config, without the saved cart or browser language', () => {
+      vi.spyOn(navigator, 'language', 'get').mockReturnValue('de-DE')
+      const storage = createMemoryStorage()
+      storage.setItem(
+        'use-shopping-cart',
+        JSON.stringify({
+          cartDetails: {
+            saved: {
+              id: 'saved',
+              name: 'Saved',
+              price: 100,
+              currency: 'USD',
+              quantity: 2,
+              value: 200
+            }
+          }
+        })
+      )
+      const cart = new ShoppingCart({
+        storage,
+        cartDetails: {
+          given: {
+            id: 'given',
+            name: 'Given',
+            price: 300,
+            currency: 'USD',
+            quantity: 1,
+            value: 300,
+            formattedValue: '',
+            formattedPrice: '',
+            timestamp: ''
+          }
+        }
+      })
+
+      expect(Object.keys(cart.getInitialState().cartDetails)).toEqual(['given'])
+      expect(cart.getInitialState().language).toBe('en-US')
+      expect(cart.getInitialState().formattedTotalPrice).toBe('$3.00')
+      expect(Object.keys(cart.getState().cartDetails)).toEqual(['saved'])
+      expect(cart.getState().language).toBe('de-DE')
+    })
+
+    it('is the same object as getState until something changes it', () => {
+      const cart = new ShoppingCart({ language: 'en-US', shouldPersist: false })
+      const initial = cart.getInitialState()
+
+      expect(cart.getState()).toBe(initial)
+      cart.addItem({ id: 'a', name: 'A', price: 100, currency: 'USD' })
+      expect(cart.getState()).not.toBe(initial)
+      expect(cart.getInitialState()).toBe(initial)
+    })
+
+    it('keeps initialState the same in every environment', async () => {
+      vi.spyOn(navigator, 'language', 'get').mockReturnValue('de-DE')
+      vi.resetModules()
+      const fresh = await import('./ShoppingCart')
+
+      expect(fresh.initialState.language).toBe('en-US')
     })
   })
 
@@ -252,7 +346,7 @@ describe('ShoppingCart', () => {
 
       const state = cart.getState()
       expect(state.cartDetails['test-price-meta'].price_data).toEqual({
-        type: 'food'
+        metadata: { type: 'food' }
       })
     })
 
@@ -271,7 +365,7 @@ describe('ShoppingCart', () => {
 
       const state = cart.getState()
       expect(state.cartDetails['test-product-meta'].product_data).toEqual({
-        type: 'digital'
+        metadata: { type: 'digital' }
       })
     })
 
@@ -727,17 +821,6 @@ describe('ShoppingCart', () => {
     })
   })
 
-  describe('changeStripeKey', () => {
-    it('updates the stripe key', () => {
-      const cart = new ShoppingCart({ shouldPersist: false })
-
-      cart.changeStripeKey('pk_test_new_key')
-
-      const state = cart.getState()
-      expect(state.stripe).toBe('pk_test_new_key')
-    })
-  })
-
   describe('changeLanguage', () => {
     it('updates the language and recalculates formatted prices', () => {
       const cart = new ShoppingCart({ shouldPersist: false })
@@ -773,38 +856,6 @@ describe('ShoppingCart', () => {
       const state = cart.getState()
       expect(state.currency).toBe('EUR')
       expect(state.formattedTotalPrice).toContain('€')
-    })
-  })
-
-  describe('redirectToCheckout', () => {
-    it('throws when stripe key not configured', async () => {
-      const cart = new ShoppingCart({ shouldPersist: false })
-
-      await expect(cart.redirectToCheckout('sess_123')).rejects.toThrow(
-        'Stripe publishable key not configured'
-      )
-    })
-
-    it('throws when session input is missing', async () => {
-      const cart = new ShoppingCart({
-        shouldPersist: false,
-        stripe: 'pk_test_123'
-      })
-
-      await expect(cart.redirectToCheckout('' as any)).rejects.toThrow(
-        'sessionUrl or sessionId is required'
-      )
-    })
-
-    it('throws when stripe key has invalid format', async () => {
-      const cart = new ShoppingCart({
-        shouldPersist: false,
-        stripe: 'invalid_key_123'
-      })
-
-      await expect(cart.redirectToCheckout('sess_123')).rejects.toThrow(
-        'Invalid Stripe publishable key format'
-      )
     })
   })
 

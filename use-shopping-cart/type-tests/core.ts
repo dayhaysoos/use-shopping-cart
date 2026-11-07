@@ -2,13 +2,18 @@ import type { CartState, CartEntry, Product } from 'use-shopping-cart/core'
 import {
   ShoppingCart,
   formatCurrencyString,
-  filterCart
+  filterCart,
+  redirectToCheckout
 } from 'use-shopping-cart/core'
 
 const cart = new ShoppingCart({
-  stripe: '',
   currency: 'USD',
   shouldPersist: true
+})
+
+new ShoppingCart({
+  // @ts-expect-error totals are derived, not config
+  cartCount: 3
 })
 
 let state: CartState = cart.getState()
@@ -72,14 +77,15 @@ cart.loadCart(
   false
 )
 cart.storeLastClicked('id_watermelon')
-cart.changeStripeKey('blah')
 cart.changeLanguage('es-MX')
 cart.changeCurrency('MXN')
-try {
-  cart.redirectToCheckout('https://checkout.stripe.com/pay/cs_test_123')
-} catch {
-  // redirectToCheckout requires a browser
-}
+const redirected: void = redirectToCheckout(
+  'https://checkout.stripe.com/c/pay/cs_test_123'
+)
+// @ts-expect-error redirectToCheckout is no longer a cart method
+cart.redirectToCheckout
+// @ts-expect-error the Stripe key is no longer cart config
+new ShoppingCart({ stripe: 'pk_test_123' })
 
 cart.handleCartHover()
 cart.handleCartClick()

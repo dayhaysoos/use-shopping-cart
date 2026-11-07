@@ -36,23 +36,16 @@ describe('decodeAddItem', () => {
     [
       { product: JSON.stringify({ ...product, price: '1' }) },
       'Product.price must be a number'
-    ],
-    [
-      { product: JSON.stringify(product), count: '0' },
-      'count must be a positive integer'
-    ],
-    [
-      { product: JSON.stringify(product), count: '1.5' },
-      'count must be a positive integer'
     ]
   ])('rejects %j with "%s"', (fields, message) => {
     expect(() => decodeAddItem(form(fields))).toThrow(message)
   })
 
-  it('checks the product before the count', () => {
-    expect(() =>
-      decodeAddItem(form({ product: JSON.stringify({}), count: '-1' }))
-    ).toThrow('Product.price must be a number')
+  it('leaves range checks on the count to the cart', () => {
+    expect(
+      decodeAddItem(form({ product: JSON.stringify(product), count: '1.5' }))
+        .count
+    ).toBe(1.5)
   })
 })
 
@@ -81,9 +74,6 @@ describe('decodeCountChange', () => {
     expect(() => decodeCountChange(form({ count: 'x' }))).toThrow(
       'Item ID is required'
     )
-    expect(() => decodeCountChange(form({ itemId: 'a', count: '-2' }))).toThrow(
-      'count must be a positive integer'
-    )
   })
 })
 
@@ -97,18 +87,16 @@ describe('decodeQuantity', () => {
 
   it('requires both fields', () => {
     expect(() => decodeQuantity(form({ itemId: 'a' }))).toThrow(
-      'Item ID and quantity are required'
+      'Quantity is required'
     )
     expect(() => decodeQuantity(form({ quantity: '2' }))).toThrow(
-      'Item ID and quantity are required'
+      'Item ID is required'
     )
   })
 
-  it('rejects negative and fractional quantities', () => {
-    for (const quantity of ['-1', '2.5', 'abc', 'Infinity']) {
-      expect(() => decodeQuantity(form({ itemId: 'a', quantity }))).toThrow(
-        'quantity must be a non-negative integer'
-      )
-    }
+  it('leaves range checks on the quantity to the cart', () => {
+    expect(decodeQuantity(form({ itemId: 'a', quantity: '-1' })).quantity).toBe(
+      -1
+    )
   })
 })

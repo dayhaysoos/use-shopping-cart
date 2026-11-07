@@ -21,7 +21,7 @@ const SHOWCASE_ITEMS: ShowcaseItem[] = [
   cartCount,
   formattedTotalPrice
 } = useShoppingCart()`,
-    description: 'One hook exposes state + Stripe helpers.',
+    description: 'One hook exposes cart state and actions.',
     language: 'tsx'
   },
   {
