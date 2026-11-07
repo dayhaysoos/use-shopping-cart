@@ -63,20 +63,20 @@ export function validateItemExists(
 
 export function validateProduct(product: unknown): void {
   if (!product || typeof product !== 'object') {
-    throw new CartError('INVALID_PRODUCT', 'Product must be an object')
+    fail('INVALID_PRODUCT', 'Product must be an object')
   }
 
   const p = product as Record<string, unknown>
 
   if (typeof p.price !== 'number') {
-    throw new CartError('INVALID_PRODUCT', 'Product.price must be a number')
+    fail('INVALID_PRODUCT', 'Product.price must be a number')
   }
 
   if (!p.currency || typeof p.currency !== 'string') {
-    throw new CartError('INVALID_PRODUCT', 'Product.currency must be a string')
+    fail('INVALID_PRODUCT', 'Product.currency must be a string')
   }
 
   if (!p.name || typeof p.name !== 'string') {
-    throw new CartError('INVALID_PRODUCT', 'Product.name must be a string')
+    fail('INVALID_PRODUCT', 'Product.name must be a string')
   }
 }
