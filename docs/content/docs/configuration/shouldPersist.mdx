@@ -5,16 +5,14 @@ id: shouldPersist
 
 This prop is used to determine if the cart should be persisted to local storage. If you don't want to persist the cart to local storage, you can set this prop to `false`. The default value is `true`.
 
-```js
-import ReactDOM from 'react-dom'
-import { CartProvider } from 'use-shopping-cart/react'
-
+```jsx
+import { createRoot } from 'react-dom/client'
+import { CartProvider } from 'use-shopping-cart'
 import App from './App'
 
-ReactDOM.render(
+createRoot(document.getElementById('root')).render(
   <CartProvider currency="USD" shouldPersist={false}>
     <App />
-  </CartProvider>,
-  document.getElementById('root')
+  </CartProvider>
 )
 ```

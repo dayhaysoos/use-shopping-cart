@@ -28,14 +28,14 @@ function ProductCard({ product }: { product: Product }) {
 ```typescript
 import { useShoppingCart } from 'use-shopping-cart'
 
-function RecentlyViewed() {
-  const { lastClicked, cartDetails } = useShoppingCart()
+function RecentlyViewed({ products }: { products: Product[] }) {
+  const { lastClicked } = useShoppingCart()
 
   if (!lastClicked) {
     return <p>No recently viewed products</p>
   }
 
-  const product = cartDetails[lastClicked]
+  const product = products.find((p) => p.id === lastClicked)
 
   return (
     <div className="recently-viewed">
@@ -84,6 +84,6 @@ function ProductGrid({ products }: { products: Product[] }) {
 ## Notes
 
 - Stores a string value (typically a product ID)
-- Persists across page navigation
+- Kept in memory for the life of the cart; it isn't saved to storage, so it resets on reload
 - Access via the `lastClicked` property
 - Useful for analytics and "Recently Viewed" features

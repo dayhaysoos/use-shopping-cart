@@ -59,38 +59,14 @@ The core of v4.0 is the `ShoppingCart` class, which manages all cart state and o
 ### Basic Structure
 
 ```typescript
-class ShoppingCart {
-  private state: CartState
-  private listeners: Set<Listener>
+const cart = new ShoppingCart({ currency: 'USD' })
 
-  // Subscribe to changes
-  subscribe(listener: Listener): () => void {
-    this.listeners.add(listener)
-    return () => this.listeners.delete(listener)
-  }
-
-  // Get current state
-  getSnapshot(): CartState {
-    return this.state
-  }
-
-  // Update cart
-  addItem(product: Product): void {
-    this.state = {
-      ...this.state,
-      cartDetails: {
-        ...this.state.cartDetails,
-        [product.id]: createCartEntry(product)
-      }
-    }
-    this.notifyListeners()
-  }
-
-  private notifyListeners(): void {
-    this.listeners.forEach((listener) => listener())
-  }
-}
+cart.subscribe((state) => console.log(state.cartCount))
+cart.addItem(product)
+cart.getState().cartDetails
 ```
+
+See [ShoppingCart Class](/docs/concepts/shopping-cart-class) for the full API.
 
 ## React Integration
 
@@ -99,20 +75,18 @@ class ShoppingCart {
 React 19's `useSyncExternalStore` connects components to the ShoppingCart:
 
 ```typescript
-function useShoppingCart() {
+function useShoppingCart(selector) {
   const cart = useContext(CartContext) // ShoppingCart instance
 
-  // Subscribe to cart changes
-  const state = useSyncExternalStore(cart.subscribe, cart.getSnapshot)
-
-  return {
-    ...state,
-    addItem: cart.addItem,
-    removeItem: cart.removeItem
-    // ... other methods
-  }
+  return useSyncExternalStore(
+    cart.subscribe,
+    () => select(cart.getState(), selector),
+    () => select(serverState, selector) // used while hydrating
+  )
 }
 ```
+
+The real hook also binds the cart's methods once and caches each selection per state, so the snapshot only changes when the state does.
 
 ### Benefits
 
@@ -173,9 +147,12 @@ interface Storage {
 
 ### Built-in Adapters
 
-1. **LocalStorage**: Browser localStorage (default)
-2. **MemoryStorage**: In-memory (for SSR)
-3. **NoopStorage**: No persistence (testing)
+1. **`createLocalStorage()`**: browser localStorage (default)
+2. **`createSessionStorage()`**: browser sessionStorage, cleared when the tab closes
+3. **`createMemoryStorage()`**: in memory, for tests
+4. **`createNoopStorage()`**: stores nothing
+
+On the server, the cart doesn't touch storage at all.
 
 ### Custom Storage
 
@@ -217,26 +194,19 @@ const cartCount = useShoppingCart((cart) => cart.cartCount)
 const totalPrice = useShoppingCart((cart) => cart.totalPrice)
 ```
 
-### 3. Computed Values
+### 3. Precomputed Totals
 
-Values like `formattedTotalPrice` are computed on demand:
-
-```typescript
-get formattedTotalPrice(): string {
-  return formatCurrencyString({
-    value: this.totalPrice,
-    currency: this.currency
-  })
-}
-```
+`cartCount`, `totalPrice` and `formattedTotalPrice` are computed once per change and stored on the state, so reading them is free.
 
 ## Bundle Size Comparison
 
-| Version     | Size (minified + gzipped) | Dependencies            |
-| ----------- | ------------------------- | ----------------------- |
-| v3.x        | ~45 KB                    | Redux, React-Redux, RTK |
-| v4.0        | ~27 KB                    | None (just React 19)    |
-| **Savings** | **~40% smaller**          | **3 fewer packages**    |
+| Entry point                   | Size (minified + gzipped) |
+| ----------------------------- | ------------------------- |
+| `use-shopping-cart`           | ~8 KB                     |
+| `use-shopping-cart/core`      | ~5 KB                     |
+| `use-shopping-cart/utilities` | ~1.5 KB                   |
+
+v4 has no runtime dependencies besides React. v3 also shipped Redux, React-Redux and Redux Toolkit.
 
 ## Migration Impact
 
@@ -278,7 +248,7 @@ import type {
   CartEntry,
   CartDetails,
   UseShoppingCartReturn
-} from 'use-shopping-cart/core'
+} from 'use-shopping-cart'
 ```
 
 ## Debugging
@@ -286,7 +256,7 @@ import type {
 ### Dev Tools
 
 ```jsx
-import { DebugCart } from 'use-shopping-cart/react'
+import { CartProvider, DebugCart } from 'use-shopping-cart'
 
 function App() {
   return (
@@ -311,8 +281,8 @@ Enable logging in development:
 ```typescript
 const cart = new ShoppingCart(config)
 
-cart.subscribe(() => {
-  console.log('Cart updated:', cart.getSnapshot())
+cart.subscribe((state) => {
+  console.log('Cart updated:', state)
 })
 ```
 
@@ -339,7 +309,7 @@ Just: "Call a method, state updates, components re-render"
 
 - Uses React's built-in features
 - Works with concurrent rendering
-- Supports React Server Components
+- Server-renders and hydrates without mismatches
 - Future-proof
 
 ### 4. Easier Testing
@@ -349,10 +319,10 @@ Just: "Call a method, state updates, components re-render"
 const cart = new ShoppingCart(config)
 
 cart.addItem(product)
-expect(cart.getSnapshot().cartCount).toBe(1)
+expect(cart.getState().cartCount).toBe(1)
 
 cart.removeItem(product.id)
-expect(cart.getSnapshot().cartCount).toBe(0)
+expect(cart.getState().cartCount).toBe(0)
 ```
 
 ## See Also

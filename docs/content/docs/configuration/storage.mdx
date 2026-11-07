@@ -36,32 +36,41 @@ interface Storage {
 
 ```jsx
 import { createSessionStorage } from 'use-shopping-cart/core'
-;<CartProvider currency="USD" storage={createSessionStorage()}>
-  <App />
-</CartProvider>
+
+export const Root = () => (
+  <CartProvider currency="USD" storage={createSessionStorage()}>
+    <App />
+  </CartProvider>
+)
 ```
 
 ### Memory Storage
 
 ```jsx
 import { createMemoryStorage } from 'use-shopping-cart/core'
-;<CartProvider currency="USD" storage={createMemoryStorage()}>
-  <App />
-</CartProvider>
+
+export const Root = () => (
+  <CartProvider currency="USD" storage={createMemoryStorage()}>
+    <App />
+  </CartProvider>
+)
 ```
 
 ### No Storage
 
 ```jsx
 import { createNoopStorage } from 'use-shopping-cart/core'
-;<CartProvider
-  currency="USD"
-  storage={createNoopStorage()}
-  // Or simply:
-  // shouldPersist={false}
->
-  <App />
-</CartProvider>
+
+export const Root = () => (
+  <CartProvider
+    currency="USD"
+    storage={createNoopStorage()}
+    // Or simply:
+    // shouldPersist={false}
+  >
+    <App />
+  </CartProvider>
+)
 ```
 
 ## Built-in Adapters
@@ -70,7 +79,8 @@ import { createNoopStorage } from 'use-shopping-cart/core'
 
 ```typescript
 import { createLocalStorage } from 'use-shopping-cart/core'
-;<CartProvider storage={createLocalStorage()}>
+
+<CartProvider storage={createLocalStorage()}>
   <App />
 </CartProvider>
 ```
@@ -78,19 +88,19 @@ import { createLocalStorage } from 'use-shopping-cart/core'
 - Persists across browser sessions
 - ~5-10MB storage limit
 - Synchronous API
-- Not available in incognito mode
 - **Used by default** if no storage specified
 
 ### createSessionStorage()
 
 ```typescript
 import { createSessionStorage } from 'use-shopping-cart/core'
-;<CartProvider storage={createSessionStorage()}>
+
+<CartProvider storage={createSessionStorage()}>
   <App />
 </CartProvider>
 ```
 
-- Clears when browser closes
+- Clears when the tab closes
 - ~5-10MB storage limit
 - Synchronous API
 - Per-tab storage
@@ -212,7 +222,7 @@ const indexedDBStorage = {
 
 ## Notes
 
-- Storage adapter is called on every cart change
+- `setItem` is called when the items, currency or language change
 - Must implement all three methods: `getItem`, `setItem`, `removeItem`
 - Methods can be async (return Promises)
 - Values are always strings (serialized JSON)

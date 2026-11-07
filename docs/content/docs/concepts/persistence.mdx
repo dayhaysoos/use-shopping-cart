@@ -71,43 +71,48 @@ Saves to browser's localStorage:
 
 **Cons:**
 
-- Not available in incognito mode
+- Cleared when an incognito window closes
 - Synchronous (can block)
 - Not shared across tabs automatically
 
 ### SessionStorage
 
-Clears when browser closes:
+Clears when the tab closes:
 
 ```jsx
 import { createSessionStorage } from 'use-shopping-cart/core'
-;<CartProvider shouldPersist={true} storage={createSessionStorage()}>
-  <App />
-</CartProvider>
+
+export const Root = () => (
+  <CartProvider shouldPersist={true} storage={createSessionStorage()}>
+    <App />
+  </CartProvider>
+)
 ```
 
 **Use when:**
 
-- Cart should clear on browser close
+- Cart should clear when the tab closes
 - Temporary shopping sessions
 - Multi-tab isolation needed
 
 ### Memory Storage
 
-No persistence (testing/SSR):
+Keeps the cart in memory for the life of the page (useful in tests):
 
 ```jsx
 import { createMemoryStorage } from 'use-shopping-cart/core'
-;<CartProvider shouldPersist={true} storage={createMemoryStorage()}>
-  <App />
-</CartProvider>
+
+export const Root = () => (
+  <CartProvider shouldPersist={true} storage={createMemoryStorage()}>
+    <App />
+  </CartProvider>
+)
 ```
 
 **Use when:**
 
-- Server-side rendering
 - Testing
-- No persistence needed
+- You want a cart that survives client-side navigation but not a reload
 
 ### No Storage
 
@@ -267,19 +272,19 @@ function CrossTabSync() {
       // Check if it's our cart key
       if (e.key === 'use-shopping-cart' && e.newValue) {
         const cart = JSON.parse(e.newValue)
-        loadCart(cart.cartDetails)
+        loadCart(cart.cartDetails, false)
       }
     }
 
     window.addEventListener('storage', handleStorage)
     return () => window.removeEventListener('storage', handleStorage)
-  }, [])
+  }, [loadCart])
 
   return null
 }
 ```
 
-**Note**: The `storage` event only fires in OTHER tabs, not the current tab. If using a custom `persistKey`, make sure to check for that key instead of `'use-shopping-cart'`.
+**Note**: The `storage` event only fires in OTHER tabs, not the current tab. Pass `false` to `loadCart` so the other tab's cart replaces this one; merging would keep items the other tab removed. If using a custom `persistKey`, check for that key instead of `'use-shopping-cart'`.
 
 ## Manual Control
 
@@ -319,35 +324,29 @@ const handleClearEverything = () => {
 
 ## Best Practices
 
-### 1. Version Your Data
+### 1. Handle Corrupted Data
 
-```javascript
-const cart = {
-  version: 1,
-  data: cartDetails
-}
-
-localStorage.setItem(key, JSON.stringify(cart))
-```
-
-### 2. Handle Corrupted Data
+The cart already ignores stored data it can't parse. To also delete it, check it in your adapter's `getItem`, which must return the stored string (not parsed JSON):
 
 ```javascript
 const customStorage = {
   getItem(key) {
+    const value = localStorage.getItem(key)
     try {
-      const value = localStorage.getItem(key)
-      return value ? JSON.parse(value) : null
+      if (value) JSON.parse(value)
+      return value
     } catch (error) {
       console.error('Corrupted cart data, clearing:', error)
       localStorage.removeItem(key)
       return null
     }
-  }
+  },
+  setItem: (key, value) => localStorage.setItem(key, value),
+  removeItem: (key) => localStorage.removeItem(key)
 }
 ```
 
-### 3. Expire Old Carts
+### 2. Expire Old Carts
 
 ```javascript
 const EXPIRY_DAYS = 30
@@ -375,11 +374,13 @@ const timestampedStorage = {
     }
 
     return value
-  }
+  },
+
+  removeItem: (key) => localStorage.removeItem(key)
 }
 ```
 
-### 4. Compress Large Carts
+### 3. Compress Large Carts
 
 ```javascript
 import { compress, decompress } from 'lz-string'
@@ -393,7 +394,9 @@ const compressedStorage = {
   getItem(key) {
     const compressed = localStorage.getItem(key)
     return compressed ? decompress(compressed) : null
-  }
+  },
+
+  removeItem: (key) => localStorage.removeItem(key)
 }
 ```
 
@@ -403,8 +406,8 @@ const compressedStorage = {
 
 Check:
 
-1. `shouldPersist={true}` is set
-2. Storage is available (not incognito)
+1. `shouldPersist` isn't `false`
+2. Storage is available (some browsers block it, for example with all cookies disabled)
 3. Storage quota not exceeded
 4. No localStorage errors in console
 
@@ -423,21 +426,23 @@ Implement backup strategy:
 
 ```jsx
 function BackupCart() {
-  const { cartDetails } = useShoppingCart()
+  const cartDetails = useShoppingCart((cart) => cart.cartDetails)
 
   useEffect(() => {
-    // Backup to server every 30 seconds
-    const interval = setInterval(() => {
-      if (Object.keys(cartDetails).length > 0) {
-        fetch('/api/backup-cart', {
-          method: 'POST',
-          body: JSON.stringify({ cart: cartDetails })
-        })
-      }
-    }, 30000)
+    if (Object.keys(cartDetails).length === 0) return
 
-    return () => clearInterval(interval)
+    const timeout = setTimeout(() => {
+      fetch('/api/backup-cart', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ cart: cartDetails })
+      })
+    }, 2000)
+
+    return () => clearTimeout(timeout)
   }, [cartDetails])
+
+  return null
 }
 ```
 

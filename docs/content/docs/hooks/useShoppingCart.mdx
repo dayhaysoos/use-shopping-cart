@@ -80,18 +80,22 @@ The hook returns an object with all cart state and methods:
 | `cartDetails`         | `object`  | Object containing all cart items with details |
 | `shouldDisplayCart`   | `boolean` | UI helper for displaying cart                 |
 | `lastClicked`         | `string`  | ID of last clicked product                    |
+| `currency`            | `string`  | Currency used for formatting                  |
+| `language`            | `string`  | Locale used for formatting                    |
 
 ### Cart Manipulation Methods
 
 | Method                                                           | Description                    |
 | ---------------------------------------------------------------- | ------------------------------ |
 | [`addItem(product, options?)`](/docs/actions/addItem)            | Add product to cart            |
-| [`incrementItem(id, options?)`](/docs/actions/incrementItem)     | Increase quantity by 1         |
-| [`decrementItem(id, options?)`](/docs/actions/decrementItem)     | Decrease quantity by 1         |
+| [`incrementItem(id, options?)`](/docs/actions/incrementItem)     | Increase quantity (default 1)  |
+| [`decrementItem(id, options?)`](/docs/actions/decrementItem)     | Decrease quantity (default 1)  |
 | [`setItemQuantity(id, quantity)`](/docs/actions/setItemQuantity) | Set specific quantity          |
 | [`removeItem(id)`](/docs/actions/removeItem)                     | Remove item from cart          |
 | [`clearCart()`](/docs/actions/clearCart)                         | Remove all items               |
-| [`loadCart(cartDetails)`](/docs/actions/loadCart)                | Load cart from external source |
+| [`loadCart(cartDetails, shouldMerge?)`](/docs/actions/loadCart)  | Load cart from external source |
+| `changeCurrency(currency)`                                       | Reformat prices in a currency  |
+| `changeLanguage(language)`                                       | Reformat prices for a locale   |
 
 ### UI Helper Methods
 
@@ -107,23 +111,12 @@ The hook returns an object with all cart state and methods:
 ### Basic Cart Operations
 
 ```jsx
-import { redirectToCheckout, useShoppingCart } from 'use-shopping-cart'
+import { useShoppingCart } from 'use-shopping-cart'
 
 function ProductCard({ product }) {
   const { addItem, cartDetails } = useShoppingCart()
 
   const itemInCart = cartDetails[product.id]
-
-  const handleCheckout = async () => {
-    const response = await fetch('/api/checkout', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ cartDetails })
-    })
-
-    const { sessionUrl } = await response.json()
-    redirectToCheckout(sessionUrl)
-  }
 
   return (
     <div className="product">
@@ -199,33 +192,28 @@ function CartSummary() {
 
 ## TypeScript Support
 
-```typescript
-import { useShoppingCart } from 'use-shopping-cart'
-import type { Product } from 'use-shopping-cart/core'
+```tsx
+import { useShoppingCart, type Product } from 'use-shopping-cart'
 
-function TypeSafeComponent() {
-  const { addItem, cartDetails, incrementItem } = useShoppingCart()
+const banana: Product = {
+  id: 'banana_001',
+  name: 'Bananas',
+  price: 400,
+  currency: 'USD'
+}
 
-  // Fully typed product
-  const product: Product = {
-    id: 'banana_001',
-    name: 'Bananas',
-    price: 400,
-    currency: 'USD'
-  }
+function AddBanana() {
+  const addItem = useShoppingCart((cart) => cart.addItem)
 
-  addItem(product)
+  return <button onClick={() => addItem(banana)}>Add bananas</button>
 }
 ```
 
 ## Notes
 
 - Must be used within a `<CartProvider>` component
-- Returns stable references (safe to use in dependency arrays)
+- Methods keep the same identity for the life of the cart, so they're safe in dependency arrays
 - Without a selector, the component re-renders on every cart change, including `shouldDisplayCart` and `lastClicked`
-- All methods are memoized
-- State updates trigger re-renders
-- Works with React 19+ features
 
 ## See Also
 

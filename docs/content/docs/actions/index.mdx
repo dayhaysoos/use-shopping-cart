@@ -24,14 +24,17 @@ drill into the detailed reference pages that follow.
 
 ## Session + Checkout helpers
 
-- `loadCart(items)` — Hydrate carts from storage or server-rendered data.
+- `loadCart(cartDetails, shouldMerge?)` — Replace or merge the cart with items
+  from elsewhere, for example a logged-in user's saved cart.
 - `redirectToCheckout(sessionUrl)` — send the browser to the Stripe Checkout Session URL your server created (a standalone function, not a cart method).
 
 ## UI feedback helpers
 
-- `handleCartClick(event)` / `handleCartHover(event)` — Track the last cart
-  interaction so you can animate the UI contextually.
-- `handleCloseCart()` — Reset cart hover/focus metadata when a cart drawer is
-  closed.
-- `storeLastClicked()` — Imperatively mark a cart button as “recently used”
-  during advanced animations.
+- `handleCartClick()` — Toggle `shouldDisplayCart`, for a cart button that
+  opens and closes the cart.
+- `handleCartHover()` — Set `shouldDisplayCart` to `true`, for opening the cart
+  on hover.
+- `handleCloseCart()` — Set `shouldDisplayCart` to `false`, for close buttons
+  and backdrops.
+- `storeLastClicked(id)` — Save a product ID as `lastClicked`, for example to
+  highlight the product a customer last interacted with.

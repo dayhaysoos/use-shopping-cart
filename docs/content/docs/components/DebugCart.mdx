@@ -26,4 +26,4 @@ Without any style modifications, `<DebugCart />` will present more like it does 
 
 ## Debugging Tips
 
-If you don't want to drop this component into your code or you're just more fond of the React DevTools extension, as of version 2.5.0 use-shopping-cart now uses React's `useDebugValue` hook to allow you to easily inspect all of the values that `useShoppingCart()` returns. In order to find the debug value, open React DevTools and inspect a component that calls `useShoppingCart()`. Under "Hooks" you will see "ShoppingCart", if you look inside it you will find the "DebugValue".
+If you'd rather not render a component, inspect any component that calls `useShoppingCart()` in React DevTools: the cart state shows up under its "SyncExternalStore" hook. You can also log every change with `useShoppingCart` selectors or, outside React, with `cart.subscribe`.

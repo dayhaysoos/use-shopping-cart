@@ -3,20 +3,21 @@ title: useCartActions()
 sidebar_position: 3
 ---
 
-**New in v4.0.0** - Form-based cart actions using React 19's `useActionState` for progressive enhancement and better error handling.
+**New in v4.0.0** - Form-based cart actions built on React 19's `useActionState`, with pending and error state for each action.
 
 ## Overview
 
-`useCartActions()` provides form-friendly cart operations that work with HTML forms and support progressive enhancement. Unlike `useShoppingCart()` which uses imperative methods (onClick), this hook returns actions designed for the `action` attribute of forms.
+`useCartActions()` provides cart operations for the `action` attribute of forms. Unlike `useShoppingCart()`, whose methods you call from handlers like `onClick`, each action reads its input from the form's fields and tracks its own pending and error state.
+
+The actions run in the browser, because the cart lives there. A form only works once React has hydrated; without JavaScript, submitting it does nothing.
 
 ## When to Use
 
 **Use `useCartActions()` when:**
 
 - Building forms for cart operations
-- You want progressive enhancement (works without JS)
-- You need built-in loading states
-- Working with Next.js App Router server actions
+- You want built-in pending and error states
+- Your product data is already in the form (for example a hidden `product` field)
 
 **Use `useShoppingCart()` or `useOptimisticCart()` when:**
 
@@ -214,27 +215,6 @@ function CartItem({ item }) {
 }
 ```
 
-### Progressive Enhancement Example
-
-This form works even without JavaScript loaded!
-
-```jsx
-function ProductCard({ product }) {
-  const { addToCartAction, isAddingItem } = useCartActions()
-
-  return (
-    <form action={addToCartAction}>
-      <input type="hidden" name="product" value={JSON.stringify(product)} />
-
-      {/* Works without JS! */}
-      <button type="submit" disabled={isAddingItem}>
-        {isAddingItem ? 'Adding...' : 'Add to Cart'}
-      </button>
-    </form>
-  )
-}
-```
-
 ## Comparison: Actions vs Methods
 
 ### onClick Handler (use `useShoppingCart` or `useOptimisticCart`)
@@ -273,11 +253,8 @@ function ProductCard({ product }) {
 
 **Best for:**
 
-- Progressive enhancement
-- Next.js App Router
-- Accessibility
-- SEO-friendly interactions
-- Works without JavaScript
+- Forms whose fields carry the input (quantity inputs, hidden product data)
+- Built-in pending and error state per action
 
 ## Error Handling
 
@@ -336,12 +313,9 @@ function ProductCard({ product }: { product: Product }) {
 
 ## Benefits
 
-✅ **Progressive Enhancement** - Works without JavaScript  
-✅ **Built-in Loading States** - No manual state management  
-✅ **Error Handling** - Automatic error capture and display  
-✅ **Accessibility** - Better keyboard and screen reader support  
-✅ **SEO Friendly** - Forms work before JS loads  
-✅ **Next.js Ready** - Integrates with App Router patterns
+✅ **Built-in Pending States** - `isAddingItem`, `isPending` and the rest, no manual state  
+✅ **Error Handling** - Each action's state carries `error` and `errorCode`  
+✅ **Plain Forms** - Native `<form>` and `<button>` elements, so keyboard submit works as usual
 
 ## Interactive Demo
 
