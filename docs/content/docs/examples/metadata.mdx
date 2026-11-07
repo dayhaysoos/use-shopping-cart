@@ -188,37 +188,20 @@ function SubscriptionProduct({ product }) {
 
 ### In Checkout Session Creation
 
+`validateCartItems` takes prices, names and `price_data` from your inventory. From the cart it keeps only each item's quantity and `product_data.metadata`:
+
 ```js
 // pages/api/create-checkout-session.js
 import Stripe from 'stripe'
+import { validateCartItems } from 'use-shopping-cart/utilities'
+import { inventory } from '../../data/products'
+
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY)
 
 export default async function handler(req, res) {
   try {
     const { cartDetails } = req.body
-
-    const line_items = Object.values(cartDetails).map((item) => {
-      // Access metadata from cart item
-      const productMetadata = item.product_data?.metadata || {}
-      const priceMetadata = item.price_data?.metadata || {}
-
-      console.log('Product metadata:', productMetadata)
-      console.log('Price metadata:', priceMetadata)
-
-      return {
-        price_data: {
-          currency: 'usd',
-          product_data: {
-            name: item.name,
-            images: [item.image],
-            metadata: productMetadata // Include product metadata
-          },
-          unit_amount: item.price,
-          metadata: priceMetadata // Include price metadata
-        },
-        quantity: item.quantity
-      }
-    })
+    const line_items = validateCartItems(inventory, cartDetails)
 
     const session = await stripe.checkout.sessions.create({
       mode: 'payment',

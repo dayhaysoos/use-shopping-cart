@@ -95,34 +95,22 @@ function CheckoutButton() {
 
 ## Server Endpoint Example
 
-Your server endpoint should create the checkout session and return the `session.url`:
+Your server endpoint creates the checkout session and returns `session.url`. Build `line_items` with [`validateCartItems`](/docs/serverless/validateCartItems), which takes prices from your inventory instead of trusting the `cartDetails` the browser sent:
 
 ```typescript
 // app/api/checkout/route.ts (Next.js App Router)
 import { NextRequest, NextResponse } from 'next/server'
 import Stripe from 'stripe'
+import { validateCartItems } from 'use-shopping-cart/utilities'
+import { inventory } from '@/data/products'
 
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!)
 
 export async function POST(req: NextRequest) {
   try {
     const { cartDetails } = await req.json()
+    const line_items = validateCartItems(inventory, cartDetails)
 
-    // Convert cart to line items
-    const line_items = Object.values(cartDetails).map((item: any) => ({
-      price_data: {
-        currency: item.currency.toLowerCase(),
-        product_data: {
-          name: item.name,
-          description: item.description,
-          images: item.image ? [item.image] : []
-        },
-        unit_amount: item.price
-      },
-      quantity: item.quantity
-    }))
-
-    // Create checkout session
     const session = await stripe.checkout.sessions.create({
       mode: 'payment',
       line_items,
