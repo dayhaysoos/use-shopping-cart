@@ -160,7 +160,7 @@ If you're using TypeScript, you'll need to update your type imports:
 npm install --save-dev @types/react@^19.0.0 @types/react-dom@^19.0.0
 ```
 
-The `RemoveItemState` and `UpdateQuantityState` types are removed; they were aliases, so use `ItemState` and `QuantityState`.
+The `RemoveItemState` and `UpdateQuantityState` types are removed; they were aliases, so use `ItemState` and `QuantityState`. `ActionState` now holds only `status`, `error` and `errorCode`: read `productId`, `itemId` and `quantity` through `AddItemState`, `ItemState` and `QuantityState`.
 
 ### Migration Steps
 

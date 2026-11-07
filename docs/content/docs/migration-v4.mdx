@@ -403,6 +403,7 @@ npm install -D @types/react@19 @types/react-dom@19
 - `redirectToCheckout` as a cart method, session-ID redirects, and `RedirectToCheckoutInput` (import `redirectToCheckout` and pass `session.url`)
 - The `stripe` prop and `changeStripeKey`
 - The `RemoveItemState` and `UpdateQuantityState` types (aliases; use `ItemState` and `QuantityState`)
+- `productId`, `itemId` and `quantity` on `ActionState` (they're on `AddItemState`, `ItemState` and `QuantityState`)
 - `shouldPersist` and `stripe` in the cart state, and `CartState` fields as `CartProvider` props
 
 **Checkout-session apps mostly need to update how they redirect to checkout. Client-only apps need a server endpoint that creates checkout sessions. Both are covered under [Breaking Changes](#breaking-changes).**

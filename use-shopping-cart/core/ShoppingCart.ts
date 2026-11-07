@@ -69,7 +69,7 @@ export class ShoppingCart {
         config.persistKey ?? STORAGE_KEY_PREFIX,
         this._state
       )
-      this._persister.load((stored) => this._restore(stored))
+      this._persister.load((saved) => this._restore(saved))
     } else {
       this._persister = null
     }
@@ -90,15 +90,15 @@ export class ShoppingCart {
     }
   }
 
-  private _restore(stored: SavedCart): void {
+  private _restore(saved: SavedCart): void {
     this._state = {
       ...this._state,
-      currency: stored.currency ?? this._state.currency,
-      language: stored.language ?? this._state.language
+      currency: saved.currency ?? this._state.currency,
+      language: saved.language ?? this._state.language
     }
     this._setCartDetails(
       normalizeCartDetails(
-        stored.cartDetails,
+        saved.cartDetails,
         this._state.currency,
         this._state.language
       )

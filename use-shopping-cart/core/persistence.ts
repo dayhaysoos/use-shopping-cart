@@ -7,7 +7,7 @@ export interface SavedCart {
 }
 
 export interface CartPersister {
-  load(onLoad: (stored: SavedCart) => void): void
+  load(onLoad: (saved: SavedCart) => void): void
   save(state: Readonly<CartState>): void
 }
 
@@ -24,12 +24,12 @@ export function createCartPersister(
   let entriesChanged = false
   let settingsChanged = false
 
-  function finishLoad(raw: string | null, onLoad: (stored: SavedCart) => void) {
+  function finishLoad(raw: string | null, onLoad: (saved: SavedCart) => void) {
     loading = false
     if (entriesChanged) return
-    const stored = raw ? parseSavedCart(raw) : null
-    if (!stored) return
-    onLoad(settingsChanged ? { cartDetails: stored.cartDetails } : stored)
+    const saved = raw ? parseSavedCart(raw) : null
+    if (!saved) return
+    onLoad(settingsChanged ? { cartDetails: saved.cartDetails } : saved)
   }
 
   return {

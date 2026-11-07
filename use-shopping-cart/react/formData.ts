@@ -65,7 +65,7 @@ function decodeCount(formData: FormData): number {
   const count = formData.get('count')
   if (count === null) return 1
   if (typeof count !== 'string') {
-    throw new CartError('INVALID_COUNT', 'count must be a string')
+    throw new CartError('INVALID_FORM_DATA', 'count must be a string')
   }
   return Number(count)
 }

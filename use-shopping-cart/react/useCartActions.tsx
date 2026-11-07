@@ -14,7 +14,7 @@ import {
 export interface ActionState {
   status: 'idle' | 'success' | 'error'
   error: string | null
-  errorCode: CartErrorCode | null
+  errorCode: CartErrorCode | 'UNKNOWN' | null
 }
 
 export type AddItemState = ActionState & { productId: string | null }

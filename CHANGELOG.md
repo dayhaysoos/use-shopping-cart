@@ -22,6 +22,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **`CartProvider` renders its children on the server, and the `loading` prop is gone**: with `shouldPersist` on (the default), the server rendered `loading` (empty by default) while the browser rendered the children, so hydration failed and server-rendered pages shipped without the cart's subtree. Now the server and the first client render show the cart from props (`cartDetails`, formatted with `language` or `en-US`), and the saved cart and browser language apply right after hydration. Remove any `loading` prop. `initialState.language` is now always `en-US` instead of the browser's language
 - **`createNoopStorage` removed**: use `shouldPersist: false`, which also stores nothing
 - **`RemoveItemState` and `UpdateQuantityState` types removed**: they were aliases; use `ItemState` and `QuantityState`
+- **`ActionState` holds only `status`, `error` and `errorCode`**: the optional `productId`, `itemId` and `quantity` fields moved to `AddItemState`, `ItemState` and `QuantityState`; type each `useCartActions` state with its own type
 - **`useOptimisticCart` reports pending entries in `pendingIds`**: entries no longer carry `_optimistic: true`; use `pendingIds.has(item.id)`. `OptimisticCartEntry` and `OptimisticCartDetails` are removed; use `CartEntry` and `CartDetails` (#361)
 
 ### ✨ Features

@@ -47,6 +47,14 @@ describe('decodeAddItem', () => {
         .count
     ).toBe(1.5)
   })
+
+  it('rejects a count that is a file as form data, not as a count', () => {
+    const formData = form({ product: JSON.stringify(product) })
+    formData.set('count', new Blob(['3']))
+    expect(() => decodeAddItem(formData)).toThrow(
+      expect.objectContaining({ code: 'INVALID_FORM_DATA' })
+    )
+  })
 })
 
 describe('decodeItemId', () => {
