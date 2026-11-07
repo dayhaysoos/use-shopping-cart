@@ -75,8 +75,7 @@
     "lint:fix": "eslint . --fix"
   },
   "peerDependencies": {
-    "react": "^19.2.3",
-    "react-dom": "^19.2.3"
+    "react": "^19.2.3"
   },
   "devDependencies": {
     "@arethetypeswrong/cli": "^0.18.5",
