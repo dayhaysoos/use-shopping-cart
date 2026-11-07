@@ -47,12 +47,13 @@ function simulateServer(shouldFail: boolean) {
 }
 
 export function OptimisticCartDemo() {
-  const { addItem, cartDetails, isOptimistic, error } = useOptimisticCart({
-    onChange: (change) =>
-      simulateServer(
-        change.type === 'add' && failingProducts.has(change.product)
-      )
-  })
+  const { addItem, cartDetails, isOptimistic, pendingIds, error } =
+    useOptimisticCart({
+      onChange: (change) =>
+        simulateServer(
+          change.type === 'add' && failingProducts.has(change.product)
+        )
+    })
   const [selectedProduct, setSelectedProduct] = useState(sampleProducts[0])
 
   const price = formatCurrencyString({
@@ -64,7 +65,9 @@ export function OptimisticCartDemo() {
   const itemInCart = selectedProduct.id
     ? cartDetails[selectedProduct.id]
     : undefined
-  const isThisItemOptimistic = itemInCart?._optimistic === true
+  const isThisItemOptimistic = selectedProduct.id
+    ? pendingIds.has(selectedProduct.id)
+    : false
 
   return (
     <div className="not-prose my-8 border rounded-lg p-6 bg-fd-card">

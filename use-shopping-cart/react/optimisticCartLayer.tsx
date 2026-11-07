@@ -8,7 +8,7 @@ import {
   type ReactNode
 } from 'react'
 import { useShoppingCart } from './useShoppingCart'
-import type { CartEntry } from '../core/types'
+import type { CartDetails } from '../core/types'
 import {
   applyCartChange,
   changedEntryId,
@@ -16,13 +16,12 @@ import {
   type CartFormat
 } from '../core/cartState'
 
-export interface OptimisticCartEntry extends CartEntry {
-  _optimistic?: boolean
+interface PendingCart {
+  cartDetails: CartDetails
+  pendingIds: ReadonlySet<string>
 }
 
-export type OptimisticCartDetails = {
-  [id: string]: OptimisticCartEntry
-}
+const noPendingIds: ReadonlySet<string> = new Set()
 
 const committedChanges = new WeakSet<CartChange>()
 
@@ -31,20 +30,21 @@ export function markCommitted(change: CartChange): void {
 }
 
 function showPendingChange(
-  details: OptimisticCartDetails,
+  pending: PendingCart,
   change: CartChange,
   format: CartFormat
-): OptimisticCartDetails {
-  if (committedChanges.has(change)) return details
-  const next: OptimisticCartDetails = applyCartChange(details, change, format)
+): PendingCart {
+  if (committedChanges.has(change)) return pending
+  const cartDetails = applyCartChange(pending.cartDetails, change, format)
   const id = changedEntryId(change)
-  return id && next !== details && next[id]
-    ? { ...next, [id]: { ...next[id], _optimistic: true } }
-    : next
+  const pendingIds =
+    id && cartDetails !== pending.cartDetails && cartDetails[id]
+      ? new Set([...pending.pendingIds, id])
+      : pending.pendingIds
+  return { cartDetails, pendingIds }
 }
 
-interface OptimisticCart {
-  cartDetails: OptimisticCartDetails
+interface OptimisticCart extends PendingCart {
   showChange: (change: CartChange) => void
 }
 
@@ -55,16 +55,18 @@ export function OptimisticCartLayer({ children }: { children: ReactNode }) {
   const currency = useShoppingCart((cart) => cart.currency)
   const language = useShoppingCart((cart) => cart.language)
 
-  const [optimisticCartDetails, showChange] = useOptimistic<
-    OptimisticCartDetails,
-    CartChange
-  >(cartDetails, (state, change) =>
-    showPendingChange(state, change, { currency, language })
+  const committed = useMemo(
+    () => ({ cartDetails, pendingIds: noPendingIds }),
+    [cartDetails]
+  )
+  const [pending, showChange] = useOptimistic<PendingCart, CartChange>(
+    committed,
+    (state, change) => showPendingChange(state, change, { currency, language })
   )
 
   const value = useMemo(
-    () => ({ cartDetails: optimisticCartDetails, showChange }),
-    [optimisticCartDetails, showChange]
+    () => ({ ...pending, showChange }),
+    [pending, showChange]
   )
 
   return (

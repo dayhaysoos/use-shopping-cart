@@ -39,7 +39,7 @@ export function ProductCard({ product }) {
 
 // Example 2: Cart Item with Quantity Controls
 export function CartItem({ item }) {
-  const { incrementItem, decrementItem, removeItem, isOptimistic } =
+  const { incrementItem, decrementItem, removeItem, isOptimistic, pendingIds } =
     useOptimisticCart({ onChange: syncCart })
 
   return (
@@ -66,7 +66,7 @@ export function CartItem({ item }) {
         Remove
       </button>
 
-      {item._optimistic && (
+      {pendingIds.has(item.id) && (
         <small className="optimistic-badge">Updating...</small>
       )}
     </div>
@@ -143,12 +143,12 @@ export function ProductCardComparison({ product }) {
 
 // Example 5: Advanced - Custom Loading UI
 export function ProductCardAdvanced({ product }) {
-  const { addItem, cartDetails, isOptimistic } = useOptimisticCart({
+  const { addItem, cartDetails, isOptimistic, pendingIds } = useOptimisticCart({
     onChange: syncCart
   })
 
   const itemInCart = cartDetails[product.id]
-  const isThisItemOptimistic = itemInCart?._optimistic === true
+  const isThisItemOptimistic = pendingIds.has(product.id)
 
   const handleAddToCart = () => {
     addItem(product, { count: 1 })

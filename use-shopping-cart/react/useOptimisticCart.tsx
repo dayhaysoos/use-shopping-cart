@@ -11,16 +11,19 @@ import { useShoppingCart } from './useShoppingCart'
 import { useCartContext } from './cartContext'
 import { markCommitted, useOptimisticCartContext } from './optimisticCartLayer'
 import type { ShoppingCart } from '../core/ShoppingCart'
-import type { Product, AddItemOptions, IncrementOptions } from '../core/types'
 import { applyCartChange, cartTotals, type CartChange } from '../core/cartState'
-import { toCartChange, type CartCall } from '../core/cartCall'
-
-export type {
-  OptimisticCartEntry,
-  OptimisticCartDetails
-} from './optimisticCartLayer'
+import {
+  cartCalls,
+  toCartChange,
+  type CartCall,
+  type CartCallName
+} from '../core/cartCall'
 
 export type { CartChange }
+
+type OptimisticActions = {
+  [K in CartCallName]: (...args: Parameters<(typeof cartCalls)[K]>) => void
+}
 
 export interface UseOptimisticCartOptions {
   onChange?: (change: CartChange) => Promise<unknown> | unknown
@@ -79,7 +82,7 @@ export function useOptimisticCart({ onChange }: UseOptimisticCartOptions = {}) {
   const optimistic = useOptimisticCartContext()
   const [error, setError] = useState<unknown>(null)
 
-  const optimisticCartDetails = optimistic.cartDetails
+  const { cartDetails: optimisticCartDetails, pendingIds } = optimistic
   const isOptimistic = optimisticCartDetails !== cart.cartDetails
   const optimisticTotals = isOptimistic
     ? cartTotals(optimisticCartDetails, cart)
@@ -111,27 +114,16 @@ export function useOptimisticCart({ onChange }: UseOptimisticCartOptions = {}) {
       })
     }
 
-    return {
-      addItem: (product: Product, options: AddItemOptions = {}) =>
-        run({ action: 'addItem', product, options }, () =>
-          store.addItem(product, options)
-        ),
-      removeItem: (id: string) =>
-        run({ action: 'removeItem', id }, () => store.removeItem(id)),
-      incrementItem: (id: string, options: IncrementOptions = {}) =>
-        run({ action: 'incrementItem', id, options }, () =>
-          store.incrementItem(id, options)
-        ),
-      decrementItem: (id: string, options: IncrementOptions = {}) =>
-        run({ action: 'decrementItem', id, options }, () =>
-          store.decrementItem(id, options)
-        ),
-      setItemQuantity: (id: string, quantity: number) =>
-        run({ action: 'setItemQuantity', id, quantity }, () =>
-          store.setItemQuantity(id, quantity)
-        ),
-      clearCart: () => run({ action: 'clearCart' }, () => store.clearCart())
+    const bind = (name: CartCallName) => {
+      const toCall = cartCalls[name] as (...args: unknown[]) => CartCall
+      const method = store[name] as (...args: unknown[]) => void
+      return (...args: unknown[]) =>
+        run(toCall(...args), () => method.apply(store, args))
     }
+
+    return Object.fromEntries(
+      Object.keys(cartCalls).map((name) => [name, bind(name as CartCallName)])
+    ) as OptimisticActions
   }, [store, showChange])
 
   return {
@@ -141,6 +133,7 @@ export function useOptimisticCart({ onChange }: UseOptimisticCartOptions = {}) {
     totalPrice: optimisticTotals.totalPrice,
     formattedTotalPrice: optimisticTotals.formattedTotalPrice,
     isOptimistic,
+    pendingIds,
     error,
     ...actions
   }

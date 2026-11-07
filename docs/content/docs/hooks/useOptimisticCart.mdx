@@ -126,17 +126,18 @@ const { isOptimistic } = useOptimisticCart({ onChange: syncCart })
 - **Type:** `unknown`
 - **Description:** what `onChange` threw for the last change this component made; `null` after one succeeds
 
-### Item-Level Optimistic Indicator
+#### `pendingIds`
 
-Each cart item has an `_optimistic` property when it's being optimistically updated:
+- **Type:** `ReadonlySet<string>`
+- **Description:** ids of the cart entries an optimistic change added or changed that the backend hasn't confirmed yet; empty when nothing is in flight
 
 ```jsx
-const { cartDetails } = useOptimisticCart({ onChange: syncCart })
+const { cartDetails, pendingIds } = useOptimisticCart({ onChange: syncCart })
 
 Object.values(cartDetails).map((item) => (
   <div key={item.id}>
     {item.name} - Qty: {item.quantity}
-    {item._optimistic && <span> (updating...)</span>}
+    {pendingIds.has(item.id) && <span> (updating...)</span>}
   </div>
 ))
 ```
@@ -186,7 +187,7 @@ function ShoppingCart() {
 
 ```jsx
 function CartItem({ item }) {
-  const { incrementItem, decrementItem, removeItem, isOptimistic } =
+  const { incrementItem, decrementItem, removeItem, isOptimistic, pendingIds } =
     useOptimisticCart({ onChange: syncCart })
 
   return (
@@ -201,7 +202,7 @@ function CartItem({ item }) {
           -
         </button>
 
-        <span className={item._optimistic ? 'updating' : ''}>
+        <span className={pendingIds.has(item.id) ? 'updating' : ''}>
           {item.quantity}
         </span>
 
@@ -222,10 +223,12 @@ function CartItem({ item }) {
 
 ```jsx
 function ProductCard({ product }) {
-  const { addItem, cartDetails } = useOptimisticCart({ onChange: syncCart })
+  const { addItem, cartDetails, pendingIds } = useOptimisticCart({
+    onChange: syncCart
+  })
 
   const itemInCart = cartDetails[product.id]
-  const isThisItemOptimistic = itemInCart?._optimistic === true
+  const isThisItemOptimistic = pendingIds.has(product.id)
 
   return (
     <div className="product">

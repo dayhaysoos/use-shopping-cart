@@ -141,10 +141,10 @@ function TestUseOptimisticCart() {
 
   const error: unknown = cart.error
   const optimisticDetails: CartDetails = cart.cartDetails
-  const flag: boolean | undefined = cart.cartDetails['x']?._optimistic
+  const pending: ReadonlySet<string> = cart.pendingIds
   const asCart: UseShoppingCartReturn = cart
   void optimisticDetails
-  void flag
+  void pending
   void asCart
 
   const synced = useOptimisticCart({

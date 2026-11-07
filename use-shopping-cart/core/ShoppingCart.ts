@@ -21,7 +21,7 @@ import {
   applyCartChange,
   type CartChange
 } from './cartState'
-import { toCartChange, type CartCall } from './cartCall'
+import { cartCalls, toCartChange, type CartCall } from './cartCall'
 
 const STORAGE_KEY_PREFIX = 'use-shopping-cart'
 
@@ -125,28 +125,28 @@ export class ShoppingCart {
     this._apply(toCartChange(call, this._state.cartDetails))
   }
 
-  addItem(product: Product, options: AddItemOptions = {}): void {
-    this._run({ action: 'addItem', product, options })
+  addItem(product: Product, options?: AddItemOptions): void {
+    this._run(cartCalls.addItem(product, options))
   }
 
-  incrementItem(id: string, options: IncrementOptions = {}): void {
-    this._run({ action: 'incrementItem', id, options })
+  incrementItem(id: string, options?: IncrementOptions): void {
+    this._run(cartCalls.incrementItem(id, options))
   }
 
-  decrementItem(id: string, options: IncrementOptions = {}): void {
-    this._run({ action: 'decrementItem', id, options })
+  decrementItem(id: string, options?: IncrementOptions): void {
+    this._run(cartCalls.decrementItem(id, options))
   }
 
   setItemQuantity(id: string, quantity: number): void {
-    this._run({ action: 'setItemQuantity', id, quantity })
+    this._run(cartCalls.setItemQuantity(id, quantity))
   }
 
   removeItem(id: string): void {
-    this._run({ action: 'removeItem', id })
+    this._run(cartCalls.removeItem(id))
   }
 
   clearCart(): void {
-    this._run({ action: 'clearCart' })
+    this._run(cartCalls.clearCart())
   }
 
   loadCart(cartDetails: CartDetails, shouldMerge = true): void {

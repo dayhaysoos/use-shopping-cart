@@ -24,12 +24,7 @@ export type {
   ClearState
 } from './useCartActions'
 export type { DebugCartProps } from './DebugCart'
-export type {
-  OptimisticCartEntry,
-  OptimisticCartDetails,
-  UseOptimisticCartOptions,
-  CartChange
-} from './useOptimisticCart'
+export type { UseOptimisticCartOptions, CartChange } from './useOptimisticCart'
 export type {
   ProductAttributes,
   Product,

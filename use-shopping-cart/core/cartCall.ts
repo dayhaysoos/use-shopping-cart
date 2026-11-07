@@ -23,6 +23,33 @@ export type CartCall =
   | { action: 'removeItem'; id: string }
   | { action: 'clearCart' }
 
+export const cartCalls = {
+  addItem: (product: Product, options: AddItemOptions = {}): CartCall => ({
+    action: 'addItem',
+    product,
+    options
+  }),
+  incrementItem: (id: string, options: IncrementOptions = {}): CartCall => ({
+    action: 'incrementItem',
+    id,
+    options
+  }),
+  decrementItem: (id: string, options: IncrementOptions = {}): CartCall => ({
+    action: 'decrementItem',
+    id,
+    options
+  }),
+  setItemQuantity: (id: string, quantity: number): CartCall => ({
+    action: 'setItemQuantity',
+    id,
+    quantity
+  }),
+  removeItem: (id: string): CartCall => ({ action: 'removeItem', id }),
+  clearCart: (): CartCall => ({ action: 'clearCart' })
+} satisfies Record<CartCall['action'], (...args: never[]) => CartCall>
+
+export type CartCallName = keyof typeof cartCalls
+
 export function toCartChange(
   call: CartCall,
   cartDetails: CartDetails

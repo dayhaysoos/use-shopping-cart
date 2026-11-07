@@ -80,6 +80,10 @@ Inventory is now matched by `id`, `price_id`, `sku_id` and `sku` (first match in
 
 `CartProvider` now renders its children during server rendering. The server and the first client render show the cart from your props (`cartDetails`, formatted with `language`, or `en-US` if you don't set it); the cart saved in storage and the browser's language apply right after hydration. Before, the server rendered the `loading` prop instead, which made hydration fail. Remove `loading` from `<CartProvider>`. `cart.getInitialState()` returns that server-side state, and `initialState.language` is now always `en-US` (it used to be the browser's language in the browser).
 
+### `useOptimisticCart` Reports Pending Entries in `pendingIds`
+
+`useOptimisticCart()` no longer adds `_optimistic: true` to cart entries; its `cartDetails` hold plain `CartEntry`s. Read the new `pendingIds` set instead: `pendingIds.has(item.id)` replaces `item._optimistic`. The `OptimisticCartEntry` and `OptimisticCartDetails` types are removed; use `CartEntry` and `CartDetails`.
+
 ### `createNoopStorage` Removed
 
 Use `shouldPersist={false}` instead of `storage={createNoopStorage()}`; both store nothing.

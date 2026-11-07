@@ -275,13 +275,15 @@ describe('useOptimisticCart with onChange', () => {
 
     expect(views.summary.cartCount).toBe(2)
     expect(views.summary.isOptimistic).toBe(true)
-    expect(views.summary.cartDetails.a._optimistic).toBe(true)
+    expect(views.summary.pendingIds).toEqual(new Set(['a']))
+    expect(views.summary.cartDetails.a).not.toHaveProperty('_optimistic')
     expect(real).toBe(0)
 
     await act(async () => pending.resolve())
 
     expect(views.summary.cartCount).toBe(2)
     expect(views.summary.isOptimistic).toBe(false)
+    expect(views.summary.pendingIds.size).toBe(0)
     expect(views.item.isOptimistic).toBe(false)
     expect(real).toBe(2)
   })
