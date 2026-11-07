@@ -280,7 +280,7 @@ describe('ShoppingCart', () => {
 
       const state = cart.getState()
       expect(state.cartDetails['test-price-meta'].price_data).toEqual({
-        type: 'food'
+        metadata: { type: 'food' }
       })
     })
 
@@ -299,7 +299,7 @@ describe('ShoppingCart', () => {
 
       const state = cart.getState()
       expect(state.cartDetails['test-product-meta'].product_data).toEqual({
-        type: 'digital'
+        metadata: { type: 'digital' }
       })
     })
 

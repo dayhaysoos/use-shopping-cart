@@ -147,8 +147,8 @@ describe('applyCartChange', () => {
 
     expect(next.a.quantity).toBe(3)
     expect(next.a.value).toBe(450)
-    expect(next.a.price_data).toEqual({ tax: 'incl' })
-    expect(next.a.product_data).toEqual({ kind: 'x' })
+    expect(next.a.price_data).toEqual({ metadata: { tax: 'incl' } })
+    expect(next.a.product_data).toEqual({ metadata: { kind: 'x' } })
   })
 
   it('only takes price and product metadata from the add options', () => {

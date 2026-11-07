@@ -143,7 +143,7 @@ describe('createCartEntry', () => {
       price_metadata: { tax: 'included' }
     })
 
-    expect(entry.price_data).toEqual({ tax: 'included' })
+    expect(entry.price_data).toEqual({ metadata: { tax: 'included' } })
   })
 
   it('includes product_metadata', () => {
@@ -160,7 +160,7 @@ describe('createCartEntry', () => {
       product_metadata: { type: 'digital' }
     })
 
-    expect(entry.product_data).toEqual({ type: 'digital' })
+    expect(entry.product_data).toEqual({ metadata: { type: 'digital' } })
   })
 
   it('merges existing product metadata', () => {
@@ -169,7 +169,7 @@ describe('createCartEntry', () => {
       name: 'Test',
       price: 100,
       currency: 'USD',
-      product_data: { existing: 'data' }
+      product_data: { name: 'Shown', metadata: { existing: 'data' } }
     }
 
     const entry = createCartEntry('test', product, 1, {
@@ -178,6 +178,9 @@ describe('createCartEntry', () => {
       product_metadata: { new: 'data' }
     })
 
-    expect(entry.product_data).toEqual({ existing: 'data', new: 'data' })
+    expect(entry.product_data).toEqual({
+      name: 'Shown',
+      metadata: { existing: 'data', new: 'data' }
+    })
   })
 })

@@ -317,6 +317,20 @@ describe('validateCartItems with carts built by ShoppingCart', () => {
     expect(item.price_data.product_data.name).toBe('Both')
   })
 
+  it('sends product_metadata from addItem to Stripe', () => {
+    const product = { ...base, id: 'prod_meta', name: 'Meta' }
+    const cart = new ShoppingCart({ shouldPersist: false })
+    cart.addItem(product, {
+      product_metadata: { gift_wrap: 'yes' },
+      price_metadata: { billing_cycle: 'monthly' }
+    })
+
+    const [item] = validateCartItems([product], cart.getState().cartDetails)
+
+    expect(item.price_data.product_data.metadata).toEqual({ gift_wrap: 'yes' })
+    expect(item.price_data).not.toHaveProperty('metadata')
+  })
+
   it('still accepts carts keyed by a secondary ID field', () => {
     const product = { ...base, id: 'prod_1', sku: 'SKU-1', name: 'Secondary' }
     const cartDetails = {

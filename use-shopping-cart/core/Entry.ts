@@ -55,13 +55,15 @@ export function createCartEntry(
       language
     }),
     timestamp: new Date().toISOString(),
-    price_data: {
-      ...product.price_data,
-      ...price_metadata
-    },
-    product_data: {
-      ...product.product_data,
-      ...product_metadata
-    }
+    price_data: withMetadata(product.price_data, price_metadata),
+    product_data: withMetadata(product.product_data, product_metadata)
   }
+}
+
+function withMetadata(
+  data: Record<string, any> | undefined,
+  metadata: Record<string, unknown> | undefined
+): Record<string, any> {
+  if (!metadata) return { ...data }
+  return { ...data, metadata: { ...data?.metadata, ...metadata } }
 }
