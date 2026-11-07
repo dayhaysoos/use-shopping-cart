@@ -64,7 +64,12 @@ function enqueueChange(
       toCartChange(call, store.getState().cartDetails)
       await onChange(change)
       markCommitted(change)
-      commit()
+      try {
+        commit()
+      } catch {
+        // Backend already accepted the change via onChange, so commit failures
+        // should not propagate as errors (cart state will reconcile on next sync)
+      }
     } finally {
       queue.queued = queue.queued.filter((c) => c !== change)
     }
