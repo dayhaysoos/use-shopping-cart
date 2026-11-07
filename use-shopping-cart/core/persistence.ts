@@ -1,13 +1,13 @@
 import type { CartDetails, CartEntry, CartState, StorageAdapter } from './types'
 
-export interface StoredCart {
+export interface SavedCart {
   cartDetails: CartDetails
   currency?: string
   language?: string
 }
 
 export interface CartPersister {
-  load(onLoad: (stored: StoredCart) => void): void
+  load(onLoad: (stored: SavedCart) => void): void
   save(state: Readonly<CartState>): void
 }
 
@@ -24,13 +24,10 @@ export function createCartPersister(
   let entriesChanged = false
   let settingsChanged = false
 
-  function finishLoad(
-    raw: string | null,
-    onLoad: (stored: StoredCart) => void
-  ) {
+  function finishLoad(raw: string | null, onLoad: (stored: SavedCart) => void) {
     loading = false
     if (entriesChanged) return
-    const stored = raw ? parseStoredCart(raw) : null
+    const stored = raw ? parseSavedCart(raw) : null
     if (!stored) return
     onLoad(settingsChanged ? { cartDetails: stored.cartDetails } : stored)
   }
@@ -95,12 +92,12 @@ export function createCartPersister(
   }
 }
 
-export function parseStoredCart(raw: string): StoredCart | null {
+export function parseSavedCart(raw: string): SavedCart | null {
   let parsed: unknown
   try {
     parsed = JSON.parse(raw)
   } catch (error) {
-    console.warn('Failed to parse stored cart data:', error)
+    console.warn('Failed to parse saved cart data:', error)
     return null
   }
   if (!parsed || typeof parsed !== 'object') return null

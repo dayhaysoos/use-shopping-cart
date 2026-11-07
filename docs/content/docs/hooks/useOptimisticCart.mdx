@@ -100,9 +100,9 @@ What the server does with the change, and whether the cart is loaded from the se
 
 ### Options
 
-| Option     | Type                                       | Description                                       |
-| ---------- | ------------------------------------------ | ------------------------------------------------- |
-| `onChange` | `(change: CartChange) => Promise<unknown>` | Called for each change before it reaches the cart |
+| Option     | Type                                                  | Description                                       |
+| ---------- | ----------------------------------------------------- | ------------------------------------------------- |
+| `onChange` | `(change: CartChange) => Promise<unknown> \| unknown` | Called for each change before it reaches the cart |
 
 `useOptimisticCart()` returns the same properties and methods as `useShoppingCart()`, plus:
 
@@ -111,7 +111,7 @@ What the server does with the change, and whether the cart is loaded from the se
 #### `isOptimistic`
 
 - **Type:** `boolean`
-- **Description:** `true` when the cart is showing optimistic updates that haven't been confirmed yet
+- **Description:** `true` when the cart is showing optimistic changes that haven't been confirmed yet
 
 ```jsx
 const { isOptimistic } = useOptimisticCart({ onChange: syncCart })
@@ -183,7 +183,7 @@ function ShoppingCart() {
 }
 ```
 
-### Cart Item with Quantity Controls
+### Cart Entry with Quantity Controls
 
 ```jsx
 function CartItem({ item }) {
@@ -314,5 +314,5 @@ Try adding products and watch the instant UI feedback! The demo's `onChange` sim
 
 ## See Also
 
-- [useShoppingCart()](/docs/hooks/useShoppingCart) - Standard cart hook without optimistic updates
+- [useShoppingCart()](/docs/hooks/useShoppingCart) - Standard cart hook without optimistic changes
 - [React 19 useOptimistic](https://react.dev/reference/react/useOptimistic) - React's official documentation

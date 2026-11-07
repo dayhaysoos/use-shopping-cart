@@ -13,7 +13,7 @@ import { createLocalStorage } from './storage'
 import {
   createCartPersister,
   type CartPersister,
-  type StoredCart
+  type SavedCart
 } from './persistence'
 import {
   withCartDetails,
@@ -90,7 +90,7 @@ export class ShoppingCart {
     }
   }
 
-  private _restore(stored: StoredCart): void {
+  private _restore(stored: SavedCart): void {
     this._state = {
       ...this._state,
       currency: stored.currency ?? this._state.currency,
