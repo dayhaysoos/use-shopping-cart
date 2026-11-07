@@ -6,6 +6,7 @@ import noComments from './eslint-rules/no-comments.mjs'
 
 export default tseslint.config(
   { ignores: ['dist/', 'stats/', 'node_modules/'] },
+  { files: ['**/*.jsx'] },
   js.configs.recommended,
   tseslint.configs.recommended,
   reactHooks.configs.flat.recommended,

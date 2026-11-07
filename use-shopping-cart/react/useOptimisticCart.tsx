@@ -15,6 +15,7 @@ import { applyCartChange, cartTotals, type CartChange } from '../core/cartState'
 import {
   cartCalls,
   toCartChange,
+  validateCartCall,
   type CartCall,
   type CartCallName
 } from '../core/cartCall'
@@ -64,7 +65,7 @@ function enqueueChange(
 
   const task = queue.tail.then(async () => {
     try {
-      toCartChange(call, store.getState().cartDetails)
+      validateCartCall(call, store.getState().cartDetails)
       await onChange(change)
       markCommitted(change)
       commit()

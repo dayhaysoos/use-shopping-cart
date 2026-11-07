@@ -50,6 +50,13 @@ export const cartCalls = {
 
 export type CartCallName = keyof typeof cartCalls
 
+export function validateCartCall(
+  call: CartCall,
+  cartDetails: CartDetails
+): void {
+  toCartChange(call, cartDetails)
+}
+
 export function toCartChange(
   call: CartCall,
   cartDetails: CartDetails

@@ -4,14 +4,10 @@ import { useSyncExternalStore, useCallback, useRef } from 'react'
 import { useCartContext } from './cartContext'
 import type { ShoppingCart } from '../core/ShoppingCart'
 import type { CartState } from '../core/types'
+import { cartCalls, type CartCallName } from '../core/cartCall'
 
 const cartActionNames = [
-  'addItem',
-  'incrementItem',
-  'decrementItem',
-  'setItemQuantity',
-  'removeItem',
-  'clearCart',
+  ...(Object.keys(cartCalls) as CartCallName[]),
   'loadCart',
   'handleCartHover',
   'handleCartClick',

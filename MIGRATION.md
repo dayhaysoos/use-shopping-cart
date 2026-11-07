@@ -111,7 +111,7 @@ entry.product_data.metadata.gift_wrap
 
 #### `redirectToCheckout` Is a Standalone Function
 
-Import it instead of reading it from the cart, and pass the Checkout Session URL. Session IDs, the `stripe` prop and `changeStripeKey` are gone: Stripe removed `redirectToCheckout({ sessionId })` from Stripe.js, and a session URL needs no publishable key.
+Import it instead of reading it from the cart, and pass the Checkout Session URL. Session IDs, the `stripe` prop, `changeStripeKey` and the `RedirectToCheckoutInput` type are gone: Stripe removed `redirectToCheckout({ sessionId })` from Stripe.js, and a session URL needs no publishable key.
 
 ```jsx
 // Before
@@ -159,6 +159,8 @@ If you're using TypeScript, you'll need to update your type imports:
 ```bash
 npm install --save-dev @types/react@^19.0.0 @types/react-dom@^19.0.0
 ```
+
+The `RemoveItemState` and `UpdateQuantityState` types are removed; they were aliases, so use `ItemState` and `QuantityState`.
 
 ### Migration Steps
 

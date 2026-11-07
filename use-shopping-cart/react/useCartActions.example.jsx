@@ -1,13 +1,5 @@
-/**
- * Example usage of useCartActions
- *
- * This demonstrates form-based cart operations using React 19's useActionState
- * for progressive enhancement and better error handling.
- */
+import { useCartActions, useShoppingCart } from 'use-shopping-cart'
 
-import { useCartActions } from 'use-shopping-cart'
-
-// Example 1: Add to Cart Form
 export function ProductCard({ product }) {
   const { addToCartAction, addItemState, isAddingItem } = useCartActions()
 
@@ -37,7 +29,6 @@ export function ProductCard({ product }) {
   )
 }
 
-// Example 2: Quantity Update Form
 export function QuantityForm({ itemId, currentQuantity }) {
   const { updateQuantityAction, updateQuantityState, isUpdatingQuantity } =
     useCartActions()
@@ -65,15 +56,9 @@ export function QuantityForm({ itemId, currentQuantity }) {
   )
 }
 
-// Example 3: Increment/Decrement Buttons (Form-based)
 export function QuantityControls({ itemId }) {
-  const {
-    incrementItemAction,
-    decrementItemAction,
-    isIncrementingItem,
-    isDecrementingItem,
-    isPending
-  } = useCartActions()
+  const { incrementItemAction, decrementItemAction, isPending } =
+    useCartActions()
 
   return (
     <div className="quantity-controls">
@@ -92,7 +77,6 @@ export function QuantityControls({ itemId }) {
   )
 }
 
-// Example 4: Remove Item Form
 export function RemoveItemButton({ itemId }) {
   const { removeFromCartAction, isRemovingItem } = useCartActions()
 
@@ -106,7 +90,6 @@ export function RemoveItemButton({ itemId }) {
   )
 }
 
-// Example 5: Clear Cart Form
 export function ClearCartButton() {
   const { clearCartAction, isClearingCart } = useCartActions()
 
@@ -119,20 +102,15 @@ export function ClearCartButton() {
   )
 }
 
-// Example 6: Combined - Click vs Form
 export function ProductCardComparison({ product }) {
-  // For onClick - use useShoppingCart or useOptimisticCart
   const { addItem: addItemClick } = useShoppingCart()
 
-  // For forms - use useCartActions
   const { addToCartAction, isAddingItem } = useCartActions()
 
   return (
     <div>
-      {/* Method 1: onClick handler (traditional) */}
       <button onClick={() => addItemClick(product)}>Add to Cart (Click)</button>
 
-      {/* Method 2: Form action (progressive enhancement) */}
       <form action={addToCartAction}>
         <input type="hidden" name="product" value={JSON.stringify(product)} />
         <button disabled={isAddingItem}>
@@ -143,7 +121,6 @@ export function ProductCardComparison({ product }) {
   )
 }
 
-// Example 7: Form with Custom Quantity
 export function AddWithQuantityForm({ product }) {
   const { addToCartAction, addItemState, isAddingItem } = useCartActions()
 
@@ -171,7 +148,6 @@ export function AddWithQuantityForm({ product }) {
   )
 }
 
-// Example 8: Next.js App Router Integration
 export function ProductCardNextJS({ product }) {
   const { addToCartAction, addItemState, isAddingItem } = useCartActions()
 
@@ -179,7 +155,6 @@ export function ProductCardNextJS({ product }) {
     <form action={addToCartAction}>
       <input type="hidden" name="product" value={JSON.stringify(product)} />
 
-      {/* This works without JavaScript! */}
       <button type="submit" disabled={isAddingItem}>
         {isAddingItem ? 'Adding...' : 'Add to Cart'}
       </button>

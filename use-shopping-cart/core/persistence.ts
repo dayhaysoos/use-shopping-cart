@@ -21,7 +21,7 @@ export function createCartPersister(
   let lastSaved: Readonly<PersistedFields> | null = initial
   let lastSeen: Readonly<PersistedFields> = initial
   let loading = true
-  let itemsChanged = false
+  let entriesChanged = false
   let settingsChanged = false
 
   function finishLoad(
@@ -29,7 +29,7 @@ export function createCartPersister(
     onLoad: (stored: StoredCart) => void
   ) {
     loading = false
-    if (itemsChanged) return
+    if (entriesChanged) return
     const stored = raw ? parseStoredCart(raw) : null
     if (!stored) return
     onLoad(settingsChanged ? { cartDetails: stored.cartDetails } : stored)
@@ -64,7 +64,7 @@ export function createCartPersister(
         ) {
           settingsChanged = true
         } else if (state.cartDetails !== lastSeen.cartDetails) {
-          itemsChanged = true
+          entriesChanged = true
         }
       }
       lastSeen = state
