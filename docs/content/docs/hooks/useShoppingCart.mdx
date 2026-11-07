@@ -72,16 +72,16 @@ The hook returns an object with all cart state and methods:
 
 ### Cart State Properties
 
-| Property              | Type      | Description                                   |
-| --------------------- | --------- | --------------------------------------------- |
-| `cartCount`           | `number`  | Total number of items in cart                 |
-| `totalPrice`          | `number`  | Total price in smallest currency unit         |
-| `formattedTotalPrice` | `string`  | Formatted total price with currency symbol    |
-| `cartDetails`         | `object`  | Object containing all cart items with details |
-| `shouldDisplayCart`   | `boolean` | UI helper for displaying cart                 |
-| `lastClicked`         | `string`  | ID of last clicked product                    |
-| `currency`            | `string`  | Currency used for formatting                  |
-| `language`            | `string`  | Locale used for formatting                    |
+| Property              | Type      | Description                                     |
+| --------------------- | --------- | ----------------------------------------------- |
+| `cartCount`           | `number`  | Total number of items in cart                   |
+| `totalPrice`          | `number`  | Total price in smallest currency unit           |
+| `formattedTotalPrice` | `string`  | Formatted total price with currency symbol      |
+| `cartDetails`         | `object`  | Object containing all cart entries with details |
+| `shouldDisplayCart`   | `boolean` | UI helper for displaying cart                   |
+| `lastClicked`         | `string`  | ID of last clicked product                      |
+| `currency`            | `string`  | Currency used for formatting                    |
+| `language`            | `string`  | Language used for formatting                    |
 
 ### Cart Manipulation Methods
 
@@ -95,7 +95,7 @@ The hook returns an object with all cart state and methods:
 | [`clearCart()`](/docs/actions/clearCart)                         | Remove all items               |
 | [`loadCart(cartDetails, shouldMerge?)`](/docs/actions/loadCart)  | Load cart from external source |
 | `changeCurrency(currency)`                                       | Reformat prices in a currency  |
-| `changeLanguage(language)`                                       | Reformat prices for a locale   |
+| `changeLanguage(language)`                                       | Reformat prices for a language |
 
 ### UI Helper Methods
 

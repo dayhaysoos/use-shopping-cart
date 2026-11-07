@@ -219,10 +219,10 @@ describe('validateCartItems', () => {
     }).toThrow('Invalid Cart: cartDetails must be an object.')
   })
 
-  it('throws an error when cart items are not objects', () => {
+  it('throws an error when cart entries are not objects', () => {
     expect(() => {
       validateCartItems(inventory, { bad: 'item' })
-    }).toThrow('Invalid Cart: cart item "bad" must be an object.')
+    }).toThrow('Invalid Cart: cart entry "bad" must be an object.')
   })
 
   it('throws an error when a quantity is not a positive integer', () => {
@@ -233,7 +233,7 @@ describe('validateCartItems', () => {
         [id]: { ...cartDetails[id], quantity: 0 }
       })
     }).toThrow(
-      `Invalid quantity in cart item "${id}": quantity must be greater than 0. The current value is 0.`
+      `Invalid quantity in cart entry "${id}": quantity must be greater than 0. The current value is 0.`
     )
     vi.restoreAllMocks()
   })

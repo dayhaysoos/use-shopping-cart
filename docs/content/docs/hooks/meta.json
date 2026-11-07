@@ -2,4 +2,3 @@
   "title": "Hooks",
   "pages": ["useShoppingCart", "useOptimisticCart", "useCartActions"]
 }
-

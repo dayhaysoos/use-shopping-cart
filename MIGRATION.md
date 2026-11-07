@@ -65,7 +65,7 @@ These are unchanged. Importing `use-shopping-cart/dist/...` was already blocked 
 
 #### Errors Are `CartError`s
 
-Errors thrown by the cart, `useCartActions` forms, `validateCartItems` and `redirectToCheckout` are now `CartError`s with a `code`. Messages are unchanged, so code that only displays `error.message` keeps working. If you check `error.name === 'ValidationError'`, switch to the code:
+Errors thrown by the cart, `useCartActions` forms, `validateCartItems` and `redirectToCheckout` are now `CartError`s with a `code`. Some messages changed (for example invalid count and quantity errors), so match on `code` rather than `message`. If you check `error.name === 'ValidationError'`, switch to the code:
 
 ```js
 import { isCartError } from 'use-shopping-cart/core'

@@ -98,7 +98,7 @@ Use `isCartError(error)` rather than `instanceof CartError`: each entry point (`
 | `INVALID_FORM_DATA`    | `useCartActions` forms with missing or unreadable fields                                     |
 | `INVALID_INVENTORY`    | `validateCartItems` with an inventory that isn't a list of objects                           |
 | `INVALID_CART`         | `validateCartItems` with malformed `cartDetails`                                             |
-| `NOT_IN_INVENTORY`     | `validateCartItems` with a cart item that isn't in the inventory                             |
+| `NOT_IN_INVENTORY`     | `validateCartItems` with a cart entry that isn't in the inventory                            |
 | `INVALID_CHECKOUT_URL` | `redirectToCheckout` with anything other than an `http(s)` session URL                       |
 | `NO_CART_PROVIDER`     | `useShoppingCart` and the other hooks outside `<CartProvider>`                               |
 | `NOT_IN_BROWSER`       | `redirectToCheckout` called on the server                                                    |
@@ -149,7 +149,7 @@ The constructor takes a `CartConfig`:
 | --------------- | --------------------- | -------------------------------------------- |
 | `cartDetails`   | `{}`                  | Initial items; totals are computed from them |
 | `currency`      | `'USD'`               | ISO 4217 currency code                       |
-| `language`      | `navigator.language`  | Locale for formatting                        |
+| `language`      | `navigator.language`  | Language for formatting                      |
 | `shouldPersist` | `true`                | Save the cart to `storage`                   |
 | `persistKey`    | `'use-shopping-cart'` | Storage key                                  |
 | `storage`       | `localStorage`        | A `StorageAdapter`                           |

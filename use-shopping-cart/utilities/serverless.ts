@@ -61,7 +61,7 @@ export function validateCartItems(
     if (!cartItem || typeof cartItem !== 'object') {
       throw new CartError(
         'INVALID_CART',
-        `Invalid Cart: cart item "${id}" must be an object.`
+        `Invalid Cart: cart entry "${id}" must be an object.`
       )
     }
 
@@ -79,7 +79,7 @@ export function validateCartItems(
       'quantity',
       1,
       'INVALID_QUANTITY',
-      `cart item "${id}"`
+      `cart entry "${id}"`
     )
 
     const item: ValidatedItem = {

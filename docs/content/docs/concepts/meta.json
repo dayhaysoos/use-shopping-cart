@@ -1,10 +1,4 @@
 {
   "title": "Concepts",
-  "pages": [
-    "architecture",
-    "shopping-cart-class",
-    "persistence"
-  ]
+  "pages": ["architecture", "shopping-cart-class", "persistence"]
 }
-
-

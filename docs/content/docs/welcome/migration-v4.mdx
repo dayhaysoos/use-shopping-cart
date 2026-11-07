@@ -66,7 +66,7 @@ Imports through `use-shopping-cart`, `use-shopping-cart/core` and `use-shopping-
 
 ### Errors Are `CartError`s
 
-Errors thrown by the cart, `useCartActions` forms, `validateCartItems` and `redirectToCheckout` are now `CartError`s with a `code` (for example `ITEM_NOT_IN_CART`, `NOT_IN_INVENTORY`). Messages are unchanged. Validation errors previously had `name: 'ValidationError'`; they now have `name: 'CartError'`. `useCartActions` states have a new `errorCode` field. See [error codes](/docs/concepts/shopping-cart-class#error-handling).
+Errors thrown by the cart, `useCartActions` forms, `validateCartItems` and `redirectToCheckout` are now `CartError`s with a `code` (for example `ITEM_NOT_IN_CART`, `NOT_IN_INVENTORY`). Some messages changed (for example invalid count and quantity errors), so match on `code` rather than `message`. Validation errors previously had `name: 'ValidationError'`; they now have `name: 'CartError'`. `useCartActions` states have a new `errorCode` field. See [error codes](/docs/concepts/shopping-cart-class#error-handling).
 
 ### `CartConfig` Is Its Own Type
 
