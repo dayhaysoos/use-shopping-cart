@@ -12,10 +12,6 @@ import path from 'path'
 
 const pkg = JSON.parse(readFileSync('./package.json', 'utf8'))
 
-/**
- * Deletes the dist/ folder and then makes a new directory.
- * Equivalent to `rm -r dist && mkdir dist`
- */
 function clearDist() {
   let cleared = false
 
@@ -73,11 +69,6 @@ function plugins({ bundleJsxRuntime = false } = {}) {
   ]
 }
 
-/**
- * Each entry is built as ESM (.mjs), CommonJS (.cjs) and optionally UMD, plus a
- * single bundled declaration file emitted as .d.mts, .d.cts and .d.ts (the
- * latter for `moduleResolution: node` consumers that ignore `exports`).
- */
 const entries = [
   {
     name: 'react',

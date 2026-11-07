@@ -1,4 +1,3 @@
-// Core exports for use-shopping-cart
 import type { CartDetails, CartEntry } from './types'
 
 export { ShoppingCart, initialState } from './ShoppingCart'
@@ -28,7 +27,6 @@ export type {
   FormatCurrencyStringOptions
 } from './types'
 
-// Helper function for filtering cart
 export async function filterCart(
   cartDetails: CartDetails,
   filter: (entry: CartEntry) => Promise<boolean> | boolean

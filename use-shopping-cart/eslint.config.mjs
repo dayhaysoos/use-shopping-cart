@@ -2,6 +2,7 @@ import js from '@eslint/js'
 import globals from 'globals'
 import tseslint from 'typescript-eslint'
 import reactHooks from 'eslint-plugin-react-hooks'
+import noComments from './eslint-rules/no-comments.mjs'
 
 export default tseslint.config(
   { ignores: ['dist/', 'stats/', 'node_modules/'] },
@@ -12,8 +13,9 @@ export default tseslint.config(
     languageOptions: {
       globals: { ...globals.browser, ...globals.node }
     },
+    plugins: { local: { rules: { 'no-comments': noComments } } },
     rules: {
-      // Product/price metadata is intentionally open-ended (`Record<string, any>`).
+      'local/no-comments': 'error',
       '@typescript-eslint/no-explicit-any': 'off',
       '@typescript-eslint/no-unused-vars': [
         'error',
@@ -30,7 +32,6 @@ export default tseslint.config(
     }
   },
   {
-    // Type tests declare values only to assert their types.
     files: ['type-tests/**'],
     rules: {
       '@typescript-eslint/no-unused-vars': 'off',

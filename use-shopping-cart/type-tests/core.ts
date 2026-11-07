@@ -93,7 +93,6 @@ cart.handleCloseCart()
 
 console.log(cart.getState())
 filterCart(cart.getState().cartDetails, async (entry: CartEntry) => {
-  // sold out of watermelon
   if (entry.id === 'id_watermelon') return false
   return true
 })

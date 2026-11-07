@@ -21,12 +21,6 @@ export interface LineItem {
   quantity: number
 }
 
-/**
- * Server-side: rebuild Stripe `line_items` from your trusted inventory.
- * Never trust prices sent from the client: price, currency and name come from
- * `inventory`; only quantity and product metadata are taken from `cartDetails`.
- * Throws if an item is not in `inventory` or has an invalid quantity.
- */
 export function validateCartItems(
   inventorySrc: Iterable<Product>,
   cartDetails: CartDetails
@@ -129,10 +123,6 @@ export function validateCartItems(
   return validatedItems
 }
 
-/**
- * Server-side: map `cartDetails` to Stripe `line_items` when cart IDs are
- * Stripe Price IDs (prices are resolved by Stripe, not the client).
- */
 export function formatLineItems(cartDetails: CartDetails): LineItem[] {
   const lineItems: LineItem[] = []
   for (const id in cartDetails)

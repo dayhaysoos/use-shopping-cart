@@ -67,6 +67,7 @@
     "test:types": "tsc -p tsconfig.types.json",
     "test:dist": "vitest run --config vitest.dist.config.ts",
     "check:package": "publint --strict && attw --pack .",
+    "check:docs": "node scripts/check-docs.mjs",
     "build": "rollup -c",
     "build:watch": "rollup -c -w",
     "prepublishOnly": "pnpm build",

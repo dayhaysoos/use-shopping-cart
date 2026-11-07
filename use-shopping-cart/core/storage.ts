@@ -37,9 +37,6 @@ export function createSessionStorage(): StorageAdapter {
   return createWebStorage('sessionStorage')
 }
 
-/**
- * Creates an in-memory storage adapter (useful for testing)
- */
 export function createMemoryStorage(): StorageAdapter {
   const store = new Map<string, string>()
 

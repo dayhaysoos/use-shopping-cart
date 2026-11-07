@@ -245,8 +245,6 @@ describe('validateCartItems', () => {
   })
 
   it('returns first match when inventory has overlapping id and sku values across products', () => {
-    // ProductA has sku: 'ABC', ProductB has id: 'ABC'
-    // The first match (ProductA via sku) should win
     const inventoryWithOverlap = [
       {
         sku: 'ABC',
@@ -276,7 +274,6 @@ describe('validateCartItems', () => {
 
     const result = validateCartItems(inventoryWithOverlap, cartWithOverlap)
 
-    // Should use ProductA's data (first match), not ProductB
     expect(result[0].price_data.unit_amount).toBe(500)
     expect(result[0].price_data.product_data.name).toBe('ProductA (via SKU)')
   })

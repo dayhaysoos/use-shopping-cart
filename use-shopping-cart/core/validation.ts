@@ -1,9 +1,6 @@
 import type { CartDetails } from './types'
 import { CartError, type CartErrorCode } from './errors'
 
-/**
- * Returns the constructor name of any value.
- */
 function typeOf(value: unknown): string {
   if (value === undefined) return 'undefined'
   if (value === null) return 'null'

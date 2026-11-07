@@ -1,6 +1,5 @@
 'use client'
 
-// React exports for use-shopping-cart
 export { CartProvider } from './CartProvider'
 export { useShoppingCart } from './useShoppingCart'
 export { useOptimisticCart } from './useOptimisticCart'

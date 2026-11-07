@@ -11,13 +11,9 @@ import {
   type UseShoppingCartReturn
 } from 'use-shopping-cart'
 
-/**
- * Test that useShoppingCart returns expected state properties
- */
 function TestUseShoppingCartState() {
   const cart = useShoppingCart()
 
-  // State properties should exist and have correct types
   const count: number = cart.cartCount
   const total: number = cart.totalPrice
   const formatted: string = cart.formattedTotalPrice
@@ -28,7 +24,6 @@ function TestUseShoppingCartState() {
   // @ts-expect-error shouldPersist is config, not state
   cart.shouldPersist
 
-  // Cart details
   const details = cart.cartDetails
   if (details !== undefined) {
     const cartEntry = details['id_banana001']
@@ -42,7 +37,6 @@ function TestUseShoppingCartState() {
       const timestamp: string = cartEntry.timestamp
       const formattedPrice: string = cartEntry.formattedPrice
 
-      // Optional properties
       const description: string | undefined = cartEntry.description
       const image: string | undefined = cartEntry.image
     }
@@ -51,14 +45,10 @@ function TestUseShoppingCartState() {
   return null
 }
 
-/**
- * Test that useShoppingCart returns expected action methods
- */
 function TestUseShoppingCartActions() {
   const cart = useShoppingCart()
 
   React.useEffect(() => {
-    // Load cart
     cart.loadCart({
       some_product: {
         name: 'Some Product',
@@ -75,17 +65,14 @@ function TestUseShoppingCartActions() {
       }
     })
 
-    // Load cart with shouldMerge = false
     cart.loadCart({}, false)
 
-    // Add item with minimal product
     cart.addItem({
       name: 'Bananas',
       price: 400,
       currency: 'USD'
     })
 
-    // Add item with full product
     cart.addItem(
       {
         name: 'Bananas',
@@ -102,28 +89,22 @@ function TestUseShoppingCartActions() {
       }
     )
 
-    // Increment/decrement
     cart.incrementItem('id_banana001')
     cart.incrementItem('id_banana001', { count: 4 })
     cart.decrementItem('id_banana001')
     cart.decrementItem('id_banana001', { count: 2 })
 
-    // Set quantity
     cart.setItemQuantity('id_banana001', 10)
 
-    // Remove
     cart.removeItem('id_banana001')
 
-    // Clear
     cart.clearCart()
 
-    // UI helpers
     cart.storeLastClicked('id_banana001')
     cart.handleCartHover()
     cart.handleCloseCart()
     cart.handleCartClick()
 
-    // Config changes
     cart.changeLanguage('ja')
     cart.changeCurrency('JPY')
 
@@ -142,21 +123,15 @@ function TestUseShoppingCartSelector() {
   return <span>{count + wrong}</span>
 }
 
-/**
- * Test useOptimisticCart hook
- */
 function TestUseOptimisticCart() {
   const cart = useOptimisticCart()
 
-  // Should have all the same properties as useShoppingCart
   const count: number = cart.cartCount
   const total: number = cart.totalPrice
   const formatted: string = cart.formattedTotalPrice
 
-  // Plus the isOptimistic flag
   const isOptimistic: boolean = cart.isOptimistic
 
-  // Methods should exist
   cart.addItem({ name: 'Test', price: 100, currency: 'USD' })
   cart.removeItem('test')
   cart.incrementItem('test')
@@ -196,46 +171,35 @@ function TestUseOptimisticCart() {
   return null
 }
 
-/**
- * Test useCartActions hook
- */
 function TestUseCartActions() {
   const {
-    // Add item
     addToCartAction,
     addItemState,
     isAddingItem,
 
-    // Remove item
     removeFromCartAction,
     removeItemState,
     isRemovingItem,
 
-    // Update quantity
     updateQuantityAction,
     updateQuantityState,
     isUpdatingQuantity,
 
-    // Increment
     incrementItemAction,
     incrementItemState,
     isIncrementingItem,
 
-    // Decrement
     decrementItemAction,
     decrementItemState,
     isDecrementingItem,
 
-    // Clear cart
     clearCartAction,
     clearCartState,
     isClearingCart,
 
-    // Global pending
     isPending
   } = useCartActions()
 
-  // Type checks for state objects
   const addStatus: 'idle' | 'success' | 'error' = addItemState.status
   const addError: string | null = addItemState.error
   const productId: string | null = addItemState.productId
@@ -246,7 +210,6 @@ function TestUseCartActions() {
   const updateStatus: 'idle' | 'success' | 'error' = updateQuantityState.status
   const quantity: number | null = updateQuantityState.quantity
 
-  // Type checks for pending states
   const pending1: boolean = isAddingItem
   const pending2: boolean = isRemovingItem
   const pending3: boolean = isUpdatingQuantity
@@ -267,23 +230,17 @@ function TestUseCartActions() {
   )
 }
 
-/**
- * Test CartProvider props
- */
 function TestCartProviderProps() {
   return (
     <>
-      {/* Minimal props */}
       <CartProvider>
         <div>Children</div>
       </CartProvider>
 
-      {/* With shouldPersist */}
       <CartProvider shouldPersist={false}>
         <div>Children</div>
       </CartProvider>
 
-      {/* With all props */}
       <CartProvider
         currency="USD"
         language="en-US"

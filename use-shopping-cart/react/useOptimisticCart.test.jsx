@@ -31,17 +31,14 @@ describe('useOptimisticCart', () => {
 
     expect(result.current.cartCount).toBe(0)
 
-    // Add item (wrapped in act)
     await act(async () => {
       result.current.addItem(mockProduct)
     })
 
-    // Wait for update to complete
     await waitFor(() => {
       expect(result.current.cartCount).toBe(1)
     })
 
-    // Real state should be present
     expect(result.current.cartDetails[mockProduct.id]).toBeDefined()
     expect(result.current.cartDetails[mockProduct.id].quantity).toBe(1)
   })
@@ -49,7 +46,6 @@ describe('useOptimisticCart', () => {
   test('should remove item optimistically', async () => {
     const { result } = renderHook(() => useOptimisticCart(), { wrapper })
 
-    // Add item first
     await act(async () => {
       result.current.addItem(mockProduct)
     })
@@ -58,12 +54,10 @@ describe('useOptimisticCart', () => {
       expect(result.current.cartCount).toBe(1)
     })
 
-    // Remove item
     await act(async () => {
       result.current.removeItem(mockProduct.id)
     })
 
-    // Wait for removal to complete
     await waitFor(() => {
       expect(result.current.cartCount).toBe(0)
     })
@@ -74,7 +68,6 @@ describe('useOptimisticCart', () => {
   test('should increment item optimistically', async () => {
     const { result } = renderHook(() => useOptimisticCart(), { wrapper })
 
-    // Add item first
     await act(async () => {
       result.current.addItem(mockProduct)
     })
@@ -83,12 +76,10 @@ describe('useOptimisticCart', () => {
       expect(result.current.cartDetails[mockProduct.id].quantity).toBe(1)
     })
 
-    // Increment
     await act(async () => {
       result.current.incrementItem(mockProduct.id)
     })
 
-    // Wait for increment to complete
     await waitFor(() => {
       expect(result.current.cartDetails[mockProduct.id].quantity).toBe(2)
       expect(result.current.cartDetails[mockProduct.id].formattedValue).toBe(
@@ -103,7 +94,6 @@ describe('useOptimisticCart', () => {
   test('should decrement item optimistically', async () => {
     const { result } = renderHook(() => useOptimisticCart(), { wrapper })
 
-    // Add item with quantity 2
     await act(async () => {
       result.current.addItem(mockProduct, { count: 2 })
     })
@@ -112,12 +102,10 @@ describe('useOptimisticCart', () => {
       expect(result.current.cartDetails[mockProduct.id].quantity).toBe(2)
     })
 
-    // Decrement
     await act(async () => {
       result.current.decrementItem(mockProduct.id)
     })
 
-    // Wait for decrement to complete
     await waitFor(() => {
       expect(result.current.cartDetails[mockProduct.id].quantity).toBe(1)
     })
@@ -126,7 +114,6 @@ describe('useOptimisticCart', () => {
   test('should remove item when decrementing to 0', async () => {
     const { result } = renderHook(() => useOptimisticCart(), { wrapper })
 
-    // Add item with quantity 1
     await act(async () => {
       result.current.addItem(mockProduct)
     })
@@ -135,12 +122,10 @@ describe('useOptimisticCart', () => {
       expect(result.current.cartCount).toBe(1)
     })
 
-    // Decrement to 0
     await act(async () => {
       result.current.decrementItem(mockProduct.id)
     })
 
-    // Wait for removal
     await waitFor(() => {
       expect(result.current.cartCount).toBe(0)
     })
@@ -151,7 +136,6 @@ describe('useOptimisticCart', () => {
   test('should set quantity optimistically', async () => {
     const { result } = renderHook(() => useOptimisticCart(), { wrapper })
 
-    // Add item
     await act(async () => {
       result.current.addItem(mockProduct)
     })
@@ -160,12 +144,10 @@ describe('useOptimisticCart', () => {
       expect(result.current.cartCount).toBe(1)
     })
 
-    // Set quantity to 5
     await act(async () => {
       result.current.setItemQuantity(mockProduct.id, 5)
     })
 
-    // Wait for update
     await waitFor(() => {
       expect(result.current.cartDetails[mockProduct.id].quantity).toBe(5)
     })
@@ -174,7 +156,6 @@ describe('useOptimisticCart', () => {
   test('should clear cart optimistically', async () => {
     const { result } = renderHook(() => useOptimisticCart(), { wrapper })
 
-    // Add multiple items
     await act(async () => {
       result.current.addItem(mockProduct)
       result.current.addItem({ ...mockProduct, id: 'prod_456' })
@@ -184,12 +165,10 @@ describe('useOptimisticCart', () => {
       expect(result.current.cartCount).toBe(2)
     })
 
-    // Clear cart
     await act(async () => {
       result.current.clearCart()
     })
 
-    // Wait for clear
     await waitFor(() => {
       expect(result.current.cartCount).toBe(0)
     })
@@ -200,43 +179,36 @@ describe('useOptimisticCart', () => {
   test('should calculate optimistic totals correctly', async () => {
     const { result } = renderHook(() => useOptimisticCart(), { wrapper })
 
-    // Add item with price 1000 (= $10.00)
     await act(async () => {
       result.current.addItem(mockProduct, { count: 2 })
     })
 
-    // Wait for update
     await waitFor(() => {
       expect(result.current.cartCount).toBe(2)
     })
 
-    // Total should be 2000 (2 * 1000)
     expect(result.current.totalPrice).toBe(2000)
   })
 
   test('should handle multiple optimistic updates', async () => {
     const { result } = renderHook(() => useOptimisticCart(), { wrapper })
 
-    // Multiple rapid updates
     await act(async () => {
       result.current.addItem(mockProduct)
       result.current.incrementItem(mockProduct.id)
       result.current.incrementItem(mockProduct.id)
     })
 
-    // Wait for all updates to complete
     await waitFor(() => {
       expect(result.current.cartDetails[mockProduct.id]?.quantity).toBe(3)
     })
 
-    // Final state should be correct
     expect(result.current.cartCount).toBe(3)
   })
 
   test('should generate unique IDs for products without IDs', async () => {
     const { result } = renderHook(() => useOptimisticCart(), { wrapper })
 
-    // Products without any ID field - they should each get a unique generated UUID
     const productWithoutId1 = {
       name: 'Product Without ID 1',
       price: 500,
@@ -248,7 +220,6 @@ describe('useOptimisticCart', () => {
       currency: 'USD'
     }
 
-    // Add both products
     await act(async () => {
       result.current.addItem(productWithoutId1)
     })
@@ -261,12 +232,10 @@ describe('useOptimisticCart', () => {
       result.current.addItem(productWithoutId2)
     })
 
-    // Both products should be in cart with unique IDs
     await waitFor(() => {
       expect(result.current.cartCount).toBe(2)
     })
 
-    // Check that both products have unique generated IDs
     const cartEntries = Object.values(result.current.cartDetails)
     expect(cartEntries.length).toBe(2)
 
@@ -275,7 +244,6 @@ describe('useOptimisticCart', () => {
     expect(ids[1]).not.toBe('')
     expect(ids[0]).not.toBe(ids[1])
 
-    // The product objects should remain unmutated
     expect(productWithoutId1.id).toBeUndefined()
     expect(productWithoutId2.id).toBeUndefined()
   })
@@ -289,7 +257,6 @@ describe('useOptimisticCart', () => {
       currency: 'USD'
     }
 
-    // Add item - optimistic update should use getProductId which generates a UUID
     await act(async () => {
       result.current.addItem(productWithoutId)
     })
@@ -306,11 +273,9 @@ describe('useOptimisticCart', () => {
     expect(typeof cartEntry.id).toBe('string')
     expect(cartEntry.id.length).toBeGreaterThan(0)
 
-    // The cart should use this generated ID
     expect(result.current.cartDetails[cartEntry.id]).toBeDefined()
     expect(result.current.cartDetails[cartEntry.id].quantity).toBe(1)
 
-    // isOptimistic should be false after the real state is reconciled
     await waitFor(() => {
       expect(result.current.isOptimistic).toBe(false)
     })

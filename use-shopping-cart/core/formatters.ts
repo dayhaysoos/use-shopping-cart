@@ -1,10 +1,8 @@
 import { isClient } from '../utilities/SSR'
 import type { FormatCurrencyStringOptions } from './types'
 
-// Cache for Intl.NumberFormat instances to avoid expensive recreation
 const formatterCache = new Map<string, Intl.NumberFormat>()
 
-// Cache for zero-decimal currency detection
 const zeroDecimalCache = new Map<string, boolean>()
 
 function getFormatter(currency: string, language: string): Intl.NumberFormat {

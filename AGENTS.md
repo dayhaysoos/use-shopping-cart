@@ -4,7 +4,7 @@ A pnpm monorepo: the library in `use-shopping-cart/` (entry points `core`, `reac
 
 ## Before you report work as done
 
-- Run `pnpm check` from the repo root. It runs every CI step: lint, typecheck, build, unit tests, type tests, built-package tests and the package check. The pre-commit hook runs it too.
+- Run `pnpm check` from the repo root. It runs every CI step: lint, typecheck, build, unit tests, type tests, built-package tests, the package check and the docs import check. The pre-commit hook runs it too.
 - Docs changes: also run `pnpm --filter docs build`.
 
 ## Where things are decided
@@ -17,7 +17,6 @@ A pnpm monorepo: the library in `use-shopping-cart/` (entry points `core`, `reac
 
 - v4 is unreleased: make breaking changes in v4 directly. (Remove this line once 4.0.0 ships.)
 - Ask the user before removing a feature or public export, even one that looks unused.
-- Code has no comments, including JSDoc. The one exception is the description ESLint requires on `@ts-expect-error`.
 
 ## Changing the public API
 
@@ -31,5 +30,4 @@ Then update every docs page that shows the changed API.
 
 ## Docs gotchas
 
-- Prettier puts `;` in front of a JSX line that follows an import in an MDX code block. Wrap that JSX in `export const Root = () => (...)`.
 - The docs site runs its cart with `shouldPersist={false}`, so it never exercises saved carts or server rendering with one. Test those in the library's tests.

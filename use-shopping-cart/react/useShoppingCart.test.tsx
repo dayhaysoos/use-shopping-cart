@@ -40,7 +40,6 @@ describe('useShoppingCart', () => {
   it('all cart methods work correctly', () => {
     const { result } = renderHook(() => useShoppingCart(), { wrapper })
 
-    // addItem
     act(() => {
       result.current.addItem({
         id: 'test',
@@ -51,25 +50,21 @@ describe('useShoppingCart', () => {
     })
     expect(result.current.cartCount).toBe(1)
 
-    // incrementItem
     act(() => {
       result.current.incrementItem('test')
     })
     expect(result.current.cartCount).toBe(2)
 
-    // decrementItem
     act(() => {
       result.current.decrementItem('test')
     })
     expect(result.current.cartCount).toBe(1)
 
-    // setItemQuantity
     act(() => {
       result.current.setItemQuantity('test', 5)
     })
     expect(result.current.cartCount).toBe(5)
 
-    // removeItem
     act(() => {
       result.current.removeItem('test')
     })

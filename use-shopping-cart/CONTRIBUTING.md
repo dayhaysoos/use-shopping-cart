@@ -46,7 +46,7 @@ pnpm dev
 # Builds the library, then runs the unit and dist smoke tests once
 pnpm test
 
-# Runs every CI step: lint, typecheck, build, tests, type tests and the package check
+# Runs every CI step: lint, typecheck, build, tests, type tests, the package check and the docs import check
 pnpm check
 
 # Builds the library, then runs the tests in watch-mode

@@ -1,4 +1,3 @@
-/// <reference types="@testing-library/jest-dom" />
 import { describe, it, expect, vi } from 'vitest'
 import React from 'react'
 import { render, screen } from '@testing-library/react'
@@ -59,7 +58,7 @@ describe('CartProvider', () => {
     )
 
     expect(instances.length).toBe(2)
-    expect(instances[0]).toBe(instances[1]) // Same instance
+    expect(instances[0]).toBe(instances[1])
   })
 
   it('shows content immediately when persistence is enabled', () => {
@@ -90,7 +89,6 @@ describe('useCartContext', () => {
       return null
     }
 
-    // Suppress console.error for this test
     const spy = vi.spyOn(console, 'error').mockImplementation(() => {})
 
     expect(() => render(<TestComponent />)).toThrow(
@@ -101,7 +99,6 @@ describe('useCartContext', () => {
   })
 })
 
-// Integration tests with useShoppingCart
 import { useShoppingCart } from './useShoppingCart'
 import { act } from '@testing-library/react'
 
@@ -162,7 +159,6 @@ describe('CartProvider integration with useShoppingCart', () => {
       screen.getByText('Add').click()
     })
 
-    // Both consumers should see the same count
     expect(screen.getByTestId('count')).toHaveTextContent('1')
     expect(screen.getByTestId('second-count')).toHaveTextContent('1')
   })
