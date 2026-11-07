@@ -212,7 +212,7 @@ Only cart-specific data is persisted to localStorage:
 
 ```typescript
 {
-  cartDetails: { /* all cart items */ },
+  cartDetails: { /* all cart entries */ },
   cartCount: number,
   totalPrice: number,
   formattedTotalPrice: string,
@@ -284,7 +284,7 @@ function CrossTabSync() {
 }
 ```
 
-**Note**: The `storage` event only fires in OTHER tabs, not the current tab. Pass `false` to `loadCart` so the other tab's cart replaces this one; merging would keep items the other tab removed. If using a custom `persistKey`, check for that key instead of `'use-shopping-cart'`.
+**Note**: The `storage` event only fires in OTHER tabs, not the current tab. Pass `false` to `loadCart` so the other tab's cart replaces this one; merging would keep cart entries the other tab removed. If using a custom `persistKey`, check for that key instead of `'use-shopping-cart'`.
 
 ## Manual Control
 

@@ -241,7 +241,7 @@ describe('validateCartItems', () => {
   it('throws an error when inventory items are not objects', () => {
     expect(() => {
       validateCartItems([null], cartDetails)
-    }).toThrow('Invalid Cart: inventory items must be objects.')
+    }).toThrow('Invalid Cart: inventory products must be objects.')
   })
 
   it('returns first match when inventory has overlapping id and sku values across products', () => {

@@ -9,7 +9,7 @@ validateCartItems checks the items in the current cart and compares them with a 
 make sure that the prices and quantities are correct. This is necessary because it's possible that
 malicious users could change the prices in `cartDetails` before sending the cart to your checkout endpoint.
 
-It also validates input shapes and throws if inventory items or cart entries are not objects or if the inventory
+It also validates input shapes and throws if inventory products or cart entries are not objects or if the inventory
 source is not iterable.
 
 inventory: Source of truth. This should be the object of products you sell. It can come from anywhere that
@@ -84,7 +84,7 @@ try {
 | Code                | Cause                                                                             |
 | ------------------- | --------------------------------------------------------------------------------- |
 | `INVALID_INVENTORY` | `inventory` isn't an iterable of objects                                          |
-| `INVALID_CART`      | `cartDetails` or one of its items isn't an object                                 |
+| `INVALID_CART`      | `cartDetails` or one of its cart entries isn't an object                          |
 | `NOT_IN_INVENTORY`  | a cart entry's ID doesn't match any product's `id`, `price_id`, `sku_id` or `sku` |
 | `INVALID_QUANTITY`  | a cart entry's quantity isn't a positive integer                                  |
 

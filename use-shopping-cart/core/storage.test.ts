@@ -146,7 +146,7 @@ describe('async storage', () => {
 })
 
 describe('ShoppingCart with async storage', () => {
-  it('does not overwrite cart items added before async storage loads', async () => {
+  it('does not overwrite cart entries added before async storage loads', async () => {
     const storage = createAsyncStorage(100)
 
     await storage.setItem(

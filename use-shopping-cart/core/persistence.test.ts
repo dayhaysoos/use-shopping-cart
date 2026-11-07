@@ -123,7 +123,7 @@ describe('createCartPersister', () => {
       return { storage, finish: () => finish() }
     }
 
-    it('skips the stored cart after an item change', async () => {
+    it('skips the saved cart after an item change', async () => {
       const { storage, finish } = deferred()
       const onLoad = vi.fn()
       const persister = createCartPersister(storage, 'k', initialState)

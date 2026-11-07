@@ -87,10 +87,10 @@ function Cart() {
 
 How it behaves:
 
-- **Every component:** `<CartProvider>` holds one `useOptimistic` state per cart, so a pending change shows in every component that calls `useOptimisticCart`. A total in one component updates when an item in another changes. `useShoppingCart` shows only confirmed changes.
+- **Every component:** `<CartProvider>` holds one `useOptimistic` state per cart, so a pending change shows in every component that calls `useOptimisticCart`. A total in one component updates when a cart entry in another changes. `useShoppingCart` shows only confirmed changes.
 - **Order:** changes wait for the previous `onChange` to settle, so three quick clicks send three requests, one after another. Changes made without `onChange` don't wait: they apply to the cart straight away.
 - **Success:** the change is applied to the real cart (and saved to `storage`).
-- **Failure:** the change is dropped and `error` holds what `onChange` threw, in the component that made the change. Later queued changes still run, but each is checked against the real cart first: one that depended on the failed change (incrementing an item whose add failed) is dropped with an `ITEM_NOT_IN_CART` error and never reaches `onChange`.
+- **Failure:** the change is dropped and `error` holds what `onChange` threw, in the component that made the change. Later queued changes still run, but each is checked against the real cart first: one that depended on the failed change (incrementing a cart entry whose add failed) is dropped with an `ITEM_NOT_IN_CART` error and never reaches `onChange`.
 - **Rollback timing:** React batches pending transitions together, so if one change fails while others are still pending, its rollback shows once they settle.
 - **Invalid input** (bad count, product without a price) throws immediately and never reaches `onChange`.
 
@@ -310,7 +310,7 @@ import { OptimisticCartDemo } from '../../../src/components/OptimisticCartDemo'
 
 <OptimisticCartDemo />
 
-Try adding items and watch the instant UI feedback! The demo's `onChange` simulates a server that takes a couple of seconds. The item shows immediately with a "confirming" state, and the cart on the left updates once the simulated server confirms. "Add with Error" shows the rollback.
+Try adding products and watch the instant UI feedback! The demo's `onChange` simulates a server that takes a couple of seconds. The cart entry shows immediately with a "confirming" state, and the cart on the left updates once the simulated server confirms. "Add with Error" shows the rollback.
 
 ## See Also
 

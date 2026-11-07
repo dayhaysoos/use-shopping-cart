@@ -46,7 +46,7 @@ export function validateCartItems(
     if (!product || typeof product !== 'object') {
       throw new CartError(
         'INVALID_INVENTORY',
-        'Invalid Cart: inventory items must be objects.'
+        'Invalid Cart: inventory products must be objects.'
       )
     }
 

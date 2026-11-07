@@ -91,7 +91,7 @@ export function Root() {
   {
     title: 'Build the frontend',
     description:
-      'Use the hook to add items and read totals, and formatCurrencyString to format prices.',
+      'Use the hook to add products and read totals, and formatCurrencyString to format prices.',
     language: 'tsx',
     code: `import { useShoppingCart, formatCurrencyString } from 'use-shopping-cart'
 

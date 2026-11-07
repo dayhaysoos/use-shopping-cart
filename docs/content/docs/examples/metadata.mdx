@@ -89,13 +89,13 @@ function PersonalizedProduct({ product }) {
 }
 ```
 
-If engraving costs extra, sell it as its own inventory item (for example `engraving_fee`) and add it to the cart. Don't change `price` in the browser: `validateCartItems` charges the price from your inventory.
+If engraving costs extra, sell it as its own product in the inventory (for example `engraving_fee`) and add it to the cart. Don't change `price` in the browser: `validateCartItems` charges the price from your inventory.
 
 ## Server-Side Access
 
 ### In Checkout Session Creation
 
-`validateCartItems` takes prices, names and `price_data` from your inventory. From the cart it keeps only each item's quantity and `product_data.metadata`:
+`validateCartItems` takes prices, names and `price_data` from your inventory. From the cart it keeps only each cart entry's quantity and `product_data.metadata`:
 
 ```js
 // pages/api/create-checkout-session.js

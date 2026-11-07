@@ -97,7 +97,7 @@ Inventory is now matched by `id`, `price_id`, `sku_id` and `sku` (first match in
 
 Use `shouldPersist={false}` instead of `storage={createNoopStorage()}`; both store nothing.
 
-#### Item Metadata Moved Under `metadata`
+#### Cart Entry Metadata Moved Under `metadata`
 
 `product_metadata` and `price_metadata` from `addItem` are now stored as the entry's `product_data.metadata` and `price_data.metadata`, instead of being spread into `product_data` and `price_data`. This is what makes `validateCartItems` send `product_metadata` to Stripe Checkout; before, it was silently dropped. `price_metadata` stays in the cart, because Checkout's inline prices can't carry metadata.
 

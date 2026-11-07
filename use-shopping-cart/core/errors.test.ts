@@ -178,7 +178,7 @@ describe('validateCartItems error codes', () => {
       'INVALID_CART'
     ],
     [
-      'non-object cart item',
+      'non-object cart entry',
       () => validateCartItems([product], { a: null as any }),
       'INVALID_CART'
     ],

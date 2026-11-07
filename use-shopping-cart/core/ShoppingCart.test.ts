@@ -429,7 +429,7 @@ describe('ShoppingCart', () => {
   })
 
   describe('incrementItem', () => {
-    it('increments a cart item by 1', () => {
+    it('increments a cart entry by 1', () => {
       const cart = new ShoppingCart({ shouldPersist: false })
       const product = {
         id: 'item-1',
@@ -447,7 +447,7 @@ describe('ShoppingCart', () => {
       expect(state.totalPrice).toBe(1200)
     })
 
-    it('increments a cart item by custom count', () => {
+    it('increments a cart entry by custom count', () => {
       const cart = new ShoppingCart({ shouldPersist: false })
       const product = {
         id: 'item-1',
@@ -576,7 +576,7 @@ describe('ShoppingCart', () => {
   })
 
   describe('setItemQuantity', () => {
-    it('sets the quantity for a cart item', () => {
+    it('sets the quantity for a cart entry', () => {
       const cart = new ShoppingCart({ shouldPersist: false })
       const product = {
         id: 'item-1',
