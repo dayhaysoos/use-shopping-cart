@@ -74,7 +74,7 @@ Errors thrown by the cart, `useCartActions` forms, `validateCartItems` and `redi
 
 ### `validateCartItems` Matches More ID Fields
 
-Inventory is now matched by `id`, `price_id`, `sku_id` and `sku` (first match in `inventory` wins), the same fields the cart uses for item IDs. Carts with items added by `price_id` or `sku_id` alone now validate instead of failing with "not in your inventory". Check your inventory if one product's `price_id` or `sku_id` can equal another product's `id` or `sku`: the earlier product now matches.
+Inventory is now matched by `id`, `price_id`, `sku_id` and `sku` (first match in `inventory` wins), the same fields the cart uses for product ids. Carts with entries added by `price_id` or `sku_id` alone now validate instead of failing with "not in your inventory". Check your inventory if one product's `price_id` or `sku_id` can equal another product's `id` or `sku`: the earlier product now matches.
 
 ### `CartProvider` Renders on the Server; `loading` Removed
 
@@ -122,7 +122,7 @@ As in v3, `useShoppingCart` takes an optional selector, and the component re-ren
 const cartCount = useShoppingCart((cart) => cart.cartCount)
 ```
 
-Cart methods (`addItem`, `incrementItem`, `removeItem`, ...) are unchanged, and so is cart state (`cartCount`, `cartDetails`, ...) apart from `shouldPersist` (now config only) and `stripe` (removed).
+Apart from the breaking changes above, cart methods (`addItem`, `incrementItem`, `removeItem`, ...) work as before, and so does cart state (`cartCount`, `cartDetails`, ...).
 
 ## What's New in v4.0
 
@@ -382,7 +382,7 @@ npm install -D @types/react@19 @types/react-dom@19
 
 ### Mostly Compatible ✅
 
-- Cart methods and cart state work as before (except `shouldPersist`, now config only, and `stripe`, removed)
+- Cart methods and cart state work as before, apart from the breaking changes above
 - Check the [breaking changes](#breaking-changes): `redirectToCheckout` is now an import that takes `session.url`, `CartConfig` is narrower, and errors are `CartError`s
 - Opt in to new features when ready
 

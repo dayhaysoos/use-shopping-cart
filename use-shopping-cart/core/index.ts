@@ -33,9 +33,9 @@ export async function filterCart(
 ): Promise<CartDetails> {
   const filteredCart: CartDetails = {}
 
-  for (const sku in cartDetails) {
-    const entry = cartDetails[sku]
-    if (await filter(entry)) filteredCart[sku] = entry
+  for (const id in cartDetails) {
+    const entry = cartDetails[id]
+    if (await filter(entry)) filteredCart[id] = entry
   }
 
   return filteredCart

@@ -83,7 +83,7 @@ if (isCartError(error) && error.code === 'ITEM_NOT_IN_CART') {
 
 #### `validateCartItems` Matches More ID Fields
 
-Inventory is now matched by `id`, `price_id`, `sku_id` and `sku` (first match in `inventory` wins), the same fields the cart uses for item IDs. Carts with items added by `price_id` or `sku_id` alone now validate instead of failing with "not in your inventory". Check your inventory if one product's `price_id` or `sku_id` can equal another product's `id` or `sku`: the earlier product now matches.
+Inventory is now matched by `id`, `price_id`, `sku_id` and `sku` (first match in `inventory` wins), the same fields the cart uses for product ids. Carts with entries added by `price_id` or `sku_id` alone now validate instead of failing with "not in your inventory". Check your inventory if one product's `price_id` or `sku_id` can equal another product's `id` or `sku`: the earlier product now matches.
 
 #### `CartProvider` Renders on the Server; `loading` Removed
 
