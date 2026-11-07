@@ -92,7 +92,7 @@ describe('useCartContext', () => {
     const spy = vi.spyOn(console, 'error').mockImplementation(() => {})
 
     expect(() => render(<TestComponent />)).toThrow(
-      'useCartContext must be used within CartProvider'
+      'use-shopping-cart hooks must be used within CartProvider'
     )
 
     spy.mockRestore()

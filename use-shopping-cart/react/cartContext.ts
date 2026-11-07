@@ -10,7 +10,7 @@ export function useCartContext(): ShoppingCart {
   if (!cart) {
     throw new CartError(
       'NO_CART_PROVIDER',
-      'useCartContext must be used within CartProvider'
+      'use-shopping-cart hooks must be used within CartProvider'
     )
   }
 
