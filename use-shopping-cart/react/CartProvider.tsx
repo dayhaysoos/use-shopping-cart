@@ -1,9 +1,9 @@
 'use client'
 
 import * as React from 'react'
-import { ShoppingCart, createCartState } from '../core/ShoppingCart'
+import { ShoppingCart } from '../core/ShoppingCart'
 import type { CartConfig } from '../core/types'
-import { CartContext, setServerState } from './cartContext'
+import { CartContext } from './cartContext'
 import { OptimisticCartLayer } from './optimisticCartLayer'
 
 export interface CartProviderProps extends CartConfig {
@@ -11,14 +11,7 @@ export interface CartProviderProps extends CartConfig {
 }
 
 export function CartProvider({ children, ...config }: CartProviderProps) {
-  const [cart] = React.useState(() => {
-    const created = new ShoppingCart(config)
-    setServerState(
-      created,
-      createCartState({ ...config, language: config.language ?? 'en-US' })
-    )
-    return created
-  })
+  const [cart] = React.useState(() => new ShoppingCart(config))
 
   return (
     <CartContext.Provider value={cart}>

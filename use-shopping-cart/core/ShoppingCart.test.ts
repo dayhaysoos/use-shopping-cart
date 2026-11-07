@@ -1,4 +1,4 @@
-import { describe, it, expect, vi } from 'vitest'
+import { describe, it, expect, vi, afterEach } from 'vitest'
 import { ShoppingCart, initialState } from './ShoppingCart'
 import { createMemoryStorage } from './storage'
 
@@ -99,6 +99,72 @@ describe('ShoppingCart', () => {
       const state = cart.getState()
 
       expect(typeof state).toBe('object')
+    })
+  })
+
+  describe('getInitialState', () => {
+    afterEach(() => {
+      vi.restoreAllMocks()
+    })
+
+    it('returns the cart from config, without the saved cart or browser language', () => {
+      vi.spyOn(navigator, 'language', 'get').mockReturnValue('de-DE')
+      const storage = createMemoryStorage()
+      storage.setItem(
+        'use-shopping-cart',
+        JSON.stringify({
+          cartDetails: {
+            saved: {
+              id: 'saved',
+              name: 'Saved',
+              price: 100,
+              currency: 'USD',
+              quantity: 2,
+              value: 200
+            }
+          }
+        })
+      )
+      const cart = new ShoppingCart({
+        storage,
+        cartDetails: {
+          given: {
+            id: 'given',
+            name: 'Given',
+            price: 300,
+            currency: 'USD',
+            quantity: 1,
+            value: 300,
+            formattedValue: '',
+            formattedPrice: '',
+            timestamp: ''
+          }
+        }
+      })
+
+      expect(Object.keys(cart.getInitialState().cartDetails)).toEqual(['given'])
+      expect(cart.getInitialState().language).toBe('en-US')
+      expect(cart.getInitialState().formattedTotalPrice).toBe('$3.00')
+      expect(Object.keys(cart.getState().cartDetails)).toEqual(['saved'])
+      expect(cart.getState().language).toBe('de-DE')
+    })
+
+    it('is the same object as getState until something changes it', () => {
+      const cart = new ShoppingCart({ language: 'en-US', shouldPersist: false })
+      const initial = cart.getInitialState()
+
+      expect(cart.getState()).toBe(initial)
+      cart.addItem({ id: 'a', name: 'A', price: 100, currency: 'USD' })
+      expect(cart.getState()).not.toBe(initial)
+      expect(cart.getInitialState()).toBe(initial)
+    })
+
+    it('keeps initialState the same in every environment', async () => {
+      vi.spyOn(navigator, 'language', 'get').mockReturnValue('de-DE')
+      vi.resetModules()
+      const fresh = await import('./ShoppingCart')
+
+      expect(fresh.initialState.language).toBe('en-US')
     })
   })
 

@@ -16,6 +16,7 @@ class ShoppingCart {
   constructor(config?: CartConfig)
 
   getState(): Readonly<CartState>
+  getInitialState(): Readonly<CartState>
   subscribe(callback: (state: CartState) => void): () => void
 
   addItem(product: Product, options?: AddItemOptions): void
@@ -38,6 +39,8 @@ class ShoppingCart {
 ## State
 
 Every change replaces the state object instead of mutating it, so `getState()` returns a new object after each change and the same object otherwise. That's what lets `useShoppingCart` (built on `useSyncExternalStore`) skip re-renders when nothing changed.
+
+`getInitialState()` returns the state built from config alone: your `cartDetails`, `currency`, and `language` (`en-US` if you don't set one), without the saved cart or the browser's language. It's the same on the server and in the browser, so `useShoppingCart` renders it on the server and while hydrating, then switches to `getState()`. Until something changes the cart, both return the same object.
 
 `cartCount`, `totalPrice`, `formattedTotalPrice` and each entry's `value`, `formattedValue` and `formattedPrice` are recomputed whenever the items, currency or language change. They're plain fields on the state, not getters.
 

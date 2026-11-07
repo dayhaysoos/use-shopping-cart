@@ -2,7 +2,7 @@
 
 import { useActionState } from 'react'
 import { useCartContext } from './cartContext'
-import { getProductId } from '../core/Entry'
+import { getProductId } from '../core/productId'
 import { isCartError, type CartErrorCode } from '../core/errors'
 import {
   decodeAddItem,

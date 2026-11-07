@@ -38,17 +38,6 @@ export function createSessionStorage(): StorageAdapter {
 }
 
 /**
- * Creates a no-op storage adapter (for server-side rendering)
- */
-export function createNoopStorage(): StorageAdapter {
-  return {
-    getItem: () => null,
-    setItem: () => {},
-    removeItem: () => {}
-  }
-}
-
-/**
  * Creates an in-memory storage adapter (useful for testing)
  */
 export function createMemoryStorage(): StorageAdapter {

@@ -59,15 +59,8 @@ export const Root = () => (
 ### No Storage
 
 ```jsx
-import { createNoopStorage } from 'use-shopping-cart/core'
-
 export const Root = () => (
-  <CartProvider
-    currency="USD"
-    storage={createNoopStorage()}
-    // Or simply:
-    // shouldPersist={false}
-  >
+  <CartProvider currency="USD" shouldPersist={false}>
     <App />
   </CartProvider>
 )

@@ -2,7 +2,6 @@ import { describe, it, expect, beforeEach } from 'vitest'
 import {
   createLocalStorage,
   createSessionStorage,
-  createNoopStorage,
   createMemoryStorage
 } from './storage'
 import { ShoppingCart } from './ShoppingCart'
@@ -76,27 +75,6 @@ describe('createSessionStorage', () => {
     expect(sessionStorage.getItem('test-key')).toBe('test-value')
     expect(localStorage.getItem('test-key')).toBeNull()
     expect(createSessionStorage().getItem('test-key')).toBe('test-value')
-  })
-})
-
-describe('createNoopStorage', () => {
-  let storage: ReturnType<typeof createNoopStorage>
-
-  beforeEach(() => {
-    storage = createNoopStorage()
-  })
-
-  it('always returns null for getItem', () => {
-    expect(storage.getItem('any-key')).toBeNull()
-  })
-
-  it('setItem does nothing', () => {
-    expect(() => storage.setItem('test-key', 'test-value')).not.toThrow()
-    expect(storage.getItem('test-key')).toBeNull()
-  })
-
-  it('removeItem does nothing', () => {
-    expect(() => storage.removeItem('test-key')).not.toThrow()
   })
 })
 

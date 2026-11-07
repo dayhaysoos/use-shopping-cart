@@ -78,7 +78,11 @@ Inventory is now matched by `id`, `price_id`, `sku_id` and `sku` (first match in
 
 ### `CartProvider` Renders on the Server; `loading` Removed
 
-`CartProvider` now renders its children during server rendering. The server and the first client render show the cart from your props (`cartDetails`, formatted with `language`, or `en-US` if you don't set it); the cart saved in storage and the browser's language apply right after hydration. Before, the server rendered the `loading` prop instead, which made hydration fail. Remove `loading` from `<CartProvider>`.
+`CartProvider` now renders its children during server rendering. The server and the first client render show the cart from your props (`cartDetails`, formatted with `language`, or `en-US` if you don't set it); the cart saved in storage and the browser's language apply right after hydration. Before, the server rendered the `loading` prop instead, which made hydration fail. Remove `loading` from `<CartProvider>`. `cart.getInitialState()` returns that server-side state, and `initialState.language` is now always `en-US` (it used to be the browser's language in the browser).
+
+### `createNoopStorage` Removed
+
+Use `shouldPersist={false}` instead of `storage={createNoopStorage()}`; both store nothing.
 
 ### Item Metadata Moved Under `metadata`
 

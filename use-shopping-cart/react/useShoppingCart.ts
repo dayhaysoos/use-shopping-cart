@@ -1,7 +1,7 @@
 'use client'
 
 import { useSyncExternalStore, useCallback, useRef } from 'react'
-import { getServerState, useCartContext } from './cartContext'
+import { useCartContext } from './cartContext'
 import type { ShoppingCart } from '../core/ShoppingCart'
 import type { CartState } from '../core/types'
 
@@ -106,6 +106,6 @@ export function useShoppingCart<T>(
   return useSyncExternalStore(
     subscribe,
     () => snapshotOf(cart.getState()),
-    () => snapshotOf(getServerState(cart))
+    () => snapshotOf(cart.getInitialState())
   )
 }

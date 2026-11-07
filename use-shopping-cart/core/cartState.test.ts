@@ -2,7 +2,8 @@ import { describe, it, expect } from 'vitest'
 import {
   withCartDetails,
   normalizeCartDetails,
-  applyCartChange
+  applyCartChange,
+  type CartChange
 } from './cartState'
 import { initialState } from './ShoppingCart'
 import type { CartDetails, CartState } from './types'
@@ -118,6 +119,25 @@ describe('normalizeCartDetails', () => {
 describe('applyCartChange', () => {
   const format = { currency: 'USD', language: 'en-US' }
   const product = { id: 'a', name: 'A', price: 150, currency: 'USD' }
+
+  it.each<[string, CartChange]>([
+    ['adding it again', { type: 'add', product, count: 1 }],
+    ['adjusting its quantity', { type: 'adjust', id: 'a', by: 2 }],
+    ['setting its quantity', { type: 'set', id: 'a', quantity: 5 }]
+  ])('keeps when an item was added after %s', (_name, change) => {
+    const added = applyCartChange(
+      {},
+      { type: 'add', product, count: 1 },
+      format
+    )
+    const stamped = {
+      a: { ...added.a, timestamp: '2020-01-01T00:00:00.000Z' }
+    }
+
+    const result = applyCartChange(stamped, change, format)
+
+    expect(result.a.timestamp).toBe('2020-01-01T00:00:00.000Z')
+  })
   const withA = applyCartChange({}, { type: 'add', product, count: 2 }, format)
 
   it('adds a new entry with derived value and formatting', () => {

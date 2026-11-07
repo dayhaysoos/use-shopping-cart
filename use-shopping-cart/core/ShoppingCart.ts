@@ -27,7 +27,7 @@ const STORAGE_KEY_PREFIX = 'use-shopping-cart'
 
 export const initialState: CartState = {
   currency: 'USD',
-  language: isClient ? navigator.language : 'en-US',
+  language: 'en-US',
   lastClicked: '',
   shouldDisplayCart: false,
   cartCount: 0,
@@ -36,7 +36,7 @@ export const initialState: CartState = {
   cartDetails: {}
 }
 
-export function createCartState({
+function createCartState({
   cartDetails = {},
   currency = initialState.currency,
   language = initialState.language
@@ -48,14 +48,19 @@ export function createCartState({
 }
 
 export class ShoppingCart {
+  private readonly _initialState: CartState
   private _state: CartState
   private _subscribers: Set<SubscribeCallback>
   private _persister: CartPersister | null
-  private _hasBeenModified: boolean = false
-  private _settingsChanged: boolean = false
 
   constructor(config: CartConfig = {}) {
-    this._state = createCartState(config)
+    this._initialState = createCartState(config)
+    const language =
+      config.language ?? (isClient ? navigator.language : initialState.language)
+    this._state =
+      language === this._initialState.language
+        ? this._initialState
+        : createCartState({ ...config, language })
     this._subscribers = new Set()
 
     if (config.shouldPersist !== false && isClient) {
@@ -74,6 +79,10 @@ export class ShoppingCart {
     return this._state
   }
 
+  getInitialState(): Readonly<CartState> {
+    return this._initialState
+  }
+
   subscribe(callback: SubscribeCallback): UnsubscribeFunction {
     this._subscribers.add(callback)
     return () => {
@@ -82,14 +91,10 @@ export class ShoppingCart {
   }
 
   private _restore(stored: StoredCart): void {
-    if (this._hasBeenModified) return
-
-    if (!this._settingsChanged) {
-      this._state = {
-        ...this._state,
-        currency: stored.currency ?? this._state.currency,
-        language: stored.language ?? this._state.language
-      }
+    this._state = {
+      ...this._state,
+      currency: stored.currency ?? this._state.currency,
+      language: stored.language ?? this._state.language
     }
     this._setCartDetails(
       normalizeCartDetails(
@@ -117,7 +122,6 @@ export class ShoppingCart {
   }
 
   private _run(call: CartCall): void {
-    this._hasBeenModified = true
     this._apply(toCartChange(call, this._state.cartDetails))
   }
 
@@ -146,7 +150,6 @@ export class ShoppingCart {
   }
 
   loadCart(cartDetails: CartDetails, shouldMerge = true): void {
-    this._hasBeenModified = true
     const newCartDetails = shouldMerge
       ? { ...this._state.cartDetails, ...cartDetails }
       : cartDetails
@@ -186,7 +189,6 @@ export class ShoppingCart {
   changeLanguage(language: string): void {
     if (language === this._state.language) return
 
-    this._settingsChanged = true
     this._state = { ...this._state, language }
     this._setCartDetails(
       normalizeCartDetails(
@@ -200,7 +202,6 @@ export class ShoppingCart {
   changeCurrency(currency: string): void {
     if (currency === this._state.currency) return
 
-    this._settingsChanged = true
     this._state = { ...this._state, currency }
     this._setCartDetails(
       normalizeCartDetails(

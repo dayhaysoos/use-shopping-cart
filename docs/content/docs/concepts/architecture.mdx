@@ -150,7 +150,8 @@ interface Storage {
 1. **`createLocalStorage()`**: browser localStorage (default)
 2. **`createSessionStorage()`**: browser sessionStorage, cleared when the tab closes
 3. **`createMemoryStorage()`**: in memory, for tests
-4. **`createNoopStorage()`**: stores nothing
+
+To store nothing, pass `shouldPersist={false}`.
 
 On the server, the cart doesn't touch storage at all.
 
