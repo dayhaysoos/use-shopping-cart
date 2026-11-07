@@ -289,8 +289,12 @@ function TestCartProviderProps() {
         language="en-US"
         shouldPersist={true}
         persistKey="my-cart"
-        loading={<p>Loading...</p>}
       >
+        <div>Children</div>
+      </CartProvider>
+
+      {/* @ts-expect-error loading was removed; CartProvider renders its children on the server */}
+      <CartProvider loading={<p>Loading...</p>}>
         <div>Children</div>
       </CartProvider>
     </>
