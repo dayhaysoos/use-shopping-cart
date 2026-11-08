@@ -94,6 +94,22 @@ describe('createCartPersister', () => {
     expect(setItem).not.toHaveBeenCalled()
   })
 
+  it('does not write when storage already holds the same saved cart', async () => {
+    const storage = createMemoryStorage()
+    const persister = createCartPersister(storage, 'k', initialState)
+    persister.load(() => {})
+    persister.save(state)
+    await flush()
+    const written = storage.getItem('k') as string
+    const setItem = vi.spyOn(storage, 'setItem')
+
+    persister.save({ ...state, cartDetails: { ...state.cartDetails } })
+    await flush()
+
+    expect(storage.getItem('k')).toBe(written)
+    expect(setItem).not.toHaveBeenCalled()
+  })
+
   it('does not call onLoad when nothing is stored', () => {
     const onLoad = vi.fn()
 

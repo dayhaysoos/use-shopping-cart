@@ -1102,7 +1102,7 @@ describe('ShoppingCart', () => {
       language: 'en-US'
     }
 
-    it('does not save back a stored cart it restored unchanged, so a discarded second cart cannot overwrite a change', async () => {
+    it('does not save back a saved cart it restored unchanged, so a discarded second cart cannot overwrite a change', async () => {
       const saved = new Map([['use-shopping-cart', JSON.stringify(storedCart)]])
       const pendingLoads: Array<() => void> = []
       const storage = {
@@ -1196,58 +1196,84 @@ describe('ShoppingCart', () => {
       expect(setItem).toHaveBeenCalledTimes(1)
     })
 
-    it('two tabs syncing through storage events settle on the final cart when one tab reprices', async () => {
-      const saved = new Map<string, string>()
+    function syncedTabs() {
+      const key = 'use-shopping-cart'
+      const browserCopy = new Map<string, string>()
+      const tabCopies = [new Map<string, string>(), new Map<string, string>()]
+      const handlers: Array<() => void> = []
       let writes = 0
-      const tabs: Array<{
-        cart: ShoppingCart
-        onStorage: (value: string) => void
-      }> = []
-      const tabStorage = (self: number) => ({
-        getItem: (key: string) => saved.get(key) ?? null,
-        setItem: (key: string, value: string) => {
-          if (saved.get(key) === value) return
-          saved.set(key, value)
-          writes++
-          tabs.forEach((tab, index) => {
-            if (index !== self) setTimeout(() => tab.onStorage(value), 0)
-          })
-        },
-        removeItem: () => {}
-      })
-      for (const index of [0, 1]) {
+      const carts = [0, 1].map((self) => {
         const cart = new ShoppingCart({
-          storage: tabStorage(index),
           currency: 'EUR',
-          language: 'en-US'
-        })
-        tabs.push({
-          cart,
-          onStorage: (value) => {
-            const next = JSON.parse(value)
-            cart.changeCurrency(next.currency)
-            cart.changeLanguage(next.language)
-            cart.loadCart(next.cartDetails, false)
+          language: 'en-US',
+          storage: {
+            getItem: (k: string) => tabCopies[self].get(k) ?? null,
+            setItem: (k: string, value: string) => {
+              tabCopies[self].set(k, value)
+              if (browserCopy.get(k) === value) return
+              browserCopy.set(k, value)
+              writes++
+              const other = 1 - self
+              setTimeout(() => {
+                tabCopies[other].set(k, value)
+                handlers[other]()
+              }, 0)
+            },
+            removeItem: () => {}
           }
         })
+        handlers[self] = () => {
+          const latest = tabCopies[self].get(key)
+          if (!latest) return
+          const saved = JSON.parse(latest)
+          cart.changeCurrency(saved.currency)
+          cart.changeLanguage(saved.language)
+          cart.loadCart(saved.cartDetails, false)
+        }
+        return cart
+      })
+      const settle = async () => {
+        let before
+        do {
+          before = writes
+          await new Promise((r) => setTimeout(r, 30))
+        } while (writes !== before && writes < 200)
+        return writes
       }
-      const [a, b] = tabs.map((tab) => tab.cart)
+      return { a: carts[0], b: carts[1], settle }
+    }
+
+    it('two tabs syncing through storage events settle on the final cart when one tab reprices', async () => {
+      const { a, b, settle } = syncedTabs()
       a.addItem({ id: 'banana', name: 'Banana', price: 380, currency: 'EUR' })
-      await new Promise((r) => setTimeout(r, 20))
+      await settle()
 
       b.changeCurrency('USD')
       b.loadCart(
         { banana: { ...b.getState().cartDetails.banana, price: 400 } },
         false
       )
-      await new Promise((r) => setTimeout(r, 50))
-      const writesWhenSettled = writes
-      await new Promise((r) => setTimeout(r, 50))
+      expect(await settle()).toBeLessThan(200)
 
-      expect(writes).toBe(writesWhenSettled)
       for (const cart of [a, b]) {
         expect(cart.getState().currency).toBe('USD')
         expect(cart.getState().cartDetails.banana.price).toBe(400)
+      }
+    })
+
+    it('two tabs syncing through storage events settle on the final cart after quick changes one after another', async () => {
+      const { a, b, settle } = syncedTabs()
+      a.addItem({ id: 'banana', name: 'Banana', price: 380, currency: 'EUR' })
+      await settle()
+
+      for (let i = 0; i < 5; i++) {
+        b.incrementItem('banana')
+        await new Promise((r) => setTimeout(r, 0))
+      }
+      expect(await settle()).toBeLessThan(200)
+
+      for (const cart of [a, b]) {
+        expect(cart.getState().cartDetails.banana.quantity).toBe(6)
       }
     })
 

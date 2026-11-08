@@ -22,6 +22,7 @@ export function createCartPersister(
   let lastSaved: Readonly<PersistedFields> | null = initial
   let lastSeen: Readonly<PersistedFields> = initial
   let queuedState: Readonly<CartState> | null = null
+  let readsSynchronously = false
   let loading = true
   let entriesChanged = false
   let currencyChanged = false
@@ -36,13 +37,15 @@ export function createCartPersister(
     if (!currencyChanged && saved.currency) restored.currency = saved.currency
     if (!languageChanged && saved.language) restored.language = saved.language
     onLoad(restored)
-    if (!currencyChanged && !languageChanged) lastSaved = lastSeen
+    const restoredAsSaved = !currencyChanged && !languageChanged
+    if (restoredAsSaved) lastSaved = lastSeen
   }
 
   return {
     load(onLoad) {
       try {
         const raw = storage.getItem(key)
+        readsSynchronously = !(raw instanceof Promise)
         if (raw instanceof Promise) {
           raw
             .then((data) => finishLoad(data, onLoad))
@@ -95,7 +98,9 @@ export function createCartPersister(
     lastSaved = state
 
     try {
-      const result = storage.setItem(key, serializeCart(state))
+      const serialized = serializeCart(state)
+      if (readsSynchronously && storage.getItem(key) === serialized) return
+      const result = storage.setItem(key, serialized)
       if (result instanceof Promise) {
         result.catch((error) => {
           if (lastSaved === state) lastSaved = null
