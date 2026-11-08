@@ -22,6 +22,7 @@ import {
   type CartChange
 } from './cartState'
 import { cartCalls, toCartChange, type CartCall } from './cartCall'
+import { validateCartDetails } from './validation'
 
 const STORAGE_KEY_PREFIX = 'use-shopping-cart'
 
@@ -150,6 +151,7 @@ export class ShoppingCart {
   }
 
   loadCart(cartDetails: CartDetails, shouldMerge = true): void {
+    validateCartDetails(cartDetails, 'loadCart')
     const newCartDetails = shouldMerge
       ? { ...this._state.cartDetails, ...cartDetails }
       : cartDetails

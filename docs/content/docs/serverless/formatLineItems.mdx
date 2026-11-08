@@ -9,15 +9,26 @@ is `{ price, quantity }`, where `price` is the cart entry's ID.
 
 Use the Stripe Price ID as the product's `id`, or give the product a `price_id` and no `id`. The cart
 keys entries by the first of `id`, `price_id`, `sku_id` and `sku` it finds, so a product with both an
-`id` and a `price_id` is keyed by its `id`, which isn't a Price ID. Stripe charges the price stored in
-Stripe, so the browser can't change it.
+`id` and a `price_id` is keyed by its `id`, which isn't a Price ID.
+
+Stripe charges the amount stored on each Price, but the browser chooses which Price IDs to send: anyone
+can swap in another active Price from your account, such as a wholesale price or an old one. Check each
+ID against the prices you sell before creating the session, or use
+[`validateCartItems`](/docs/serverless/validateCartItems) with an inventory of your products.
 
 ```js
 import { formatLineItems } from 'use-shopping-cart/utilities'
 
+const pricesForSale = new Set(['price_tshirt', 'price_mug'])
+
+const line_items = formatLineItems(cartDetails)
+if (line_items.some((item) => !pricesForSale.has(item.price))) {
+  throw new Error('The cart has a price that is not for sale')
+}
+
 const session = await stripe.checkout.sessions.create({
   mode: 'payment',
-  line_items: formatLineItems(cartDetails),
+  line_items,
   success_url: `${origin}/success`,
   cancel_url: origin
 })

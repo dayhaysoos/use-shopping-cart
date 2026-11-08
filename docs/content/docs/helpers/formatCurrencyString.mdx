@@ -32,12 +32,30 @@ formatCurrencyString formats the prices of the products. It takes an object shap
 }
 ```
 
-If you don't pass a value to language, it will choose language based on the browsers settings
-
 ```jsx
 import { formatCurrencyString } from 'use-shopping-cart' // or
 import { formatCurrencyString } from 'use-shopping-cart/core'
 
-formatCurrencyString({ value: 400, currency: 'USD' })
+formatCurrencyString({ value: 400, currency: 'USD', language: 'en-US' })
 // returns '$4.00'
+```
+
+Without `language`, it formats with the browser's language in the browser and `en-US` on the server. A price rendered on the server would then change during hydration, and React reports a hydration error. In components that render on the server, pass the cart's language: it's `en-US` (or the `language` you gave `CartProvider`) while hydrating, and the browser's language afterwards.
+
+```jsx
+import { formatCurrencyString, useShoppingCart } from 'use-shopping-cart'
+
+function Price({ product }) {
+  const language = useShoppingCart((cart) => cart.language)
+
+  return (
+    <span>
+      {formatCurrencyString({
+        value: product.price,
+        currency: product.currency,
+        language
+      })}
+    </span>
+  )
+}
 ```

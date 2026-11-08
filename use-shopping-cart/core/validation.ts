@@ -1,4 +1,4 @@
-import type { CartDetails } from './types'
+import type { CartDetails, CartEntry } from './types'
 import { CartError, type CartErrorCode } from './errors'
 
 function typeOf(value: unknown): string {
@@ -78,5 +78,42 @@ export function validateProduct(product: unknown): void {
 
   if (!p.name || typeof p.name !== 'string') {
     fail('INVALID_PRODUCT', 'Product.name must be a string')
+  }
+}
+
+export function isValidCartEntry(entry: unknown): entry is CartEntry {
+  if (!entry || typeof entry !== 'object') return false
+
+  const e = entry as Record<string, unknown>
+  return (
+    typeof e.id === 'string' &&
+    typeof e.price === 'number' &&
+    Number.isFinite(e.price) &&
+    typeof e.quantity === 'number' &&
+    Number.isInteger(e.quantity) &&
+    e.quantity > 0 &&
+    typeof e.name === 'string' &&
+    typeof e.currency === 'string'
+  )
+}
+
+export function validateCartDetails(
+  cartDetails: unknown,
+  actionName: string
+): void {
+  if (!cartDetails || typeof cartDetails !== 'object') {
+    fail(
+      'INVALID_CART',
+      `Invalid cartDetails in ${actionName}: cartDetails must be an object of cart entries.`
+    )
+  }
+
+  for (const id in cartDetails) {
+    if (!isValidCartEntry((cartDetails as Record<string, unknown>)[id])) {
+      fail(
+        'INVALID_CART',
+        `Invalid cart entry "${id}" in ${actionName}: a cart entry needs a string id, name and currency, a finite price, and a quantity that is an integer greater than 0.`
+      )
+    }
   }
 }

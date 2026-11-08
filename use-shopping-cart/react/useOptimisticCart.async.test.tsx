@@ -117,6 +117,34 @@ describe('useOptimisticCart with onChange', () => {
     expect(last()).toEqual({ shown: 0, real: 0, optimistic: false })
   })
 
+  it("sends each change with its cart entry's id, and only metadata as metadata", async () => {
+    const { calls, onChange } = queuedOnChange()
+    const { api } = setup(onChange)
+    const unnamed = { name: 'No id', price: 100, currency: 'USD' }
+
+    await act(async () =>
+      api.current.addItem(unnamed, {
+        count: 2,
+        product_metadata: { size: 'M' }
+      })
+    )
+    await act(async () => calls[0].resolve())
+    const [id] = Object.keys(api.current.cartDetails)
+    await act(async () => api.current.incrementItem(id))
+    await act(async () => calls[1].resolve())
+
+    expect(onChange.mock.calls.map(([change]) => change)).toEqual([
+      {
+        type: 'add',
+        id,
+        product: unnamed,
+        count: 2,
+        metadata: { product_metadata: { size: 'M' } }
+      },
+      { type: 'adjust', id, by: 1 }
+    ])
+  })
+
   it('rolls back and reports the error when onChange rejects', async () => {
     const pending = deferred()
     const { api, last } = setup(() => pending.promise)

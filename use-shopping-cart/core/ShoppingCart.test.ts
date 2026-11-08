@@ -671,6 +671,42 @@ describe('ShoppingCart', () => {
   })
 
   describe('loadCart', () => {
+    afterEach(() => {
+      vi.restoreAllMocks()
+    })
+
+    it('rejects cart entries it cannot rebuild and leaves the cart unchanged', () => {
+      vi.spyOn(console, 'warn').mockImplementation(() => {})
+      const cart = new ShoppingCart({ shouldPersist: false })
+      cart.addItem({
+        id: 'item-1',
+        name: 'Bananas',
+        price: 400,
+        currency: 'USD'
+      })
+      const before = cart.getState()
+      const carrots = {
+        id: 'item-2',
+        name: 'Carrots',
+        price: 250,
+        currency: 'USD',
+        quantity: 4,
+        value: 1000
+      }
+
+      for (const input of [
+        { cartDetails: { 'item-2': carrots } },
+        { 'item-2': { ...carrots, quantity: 0 } },
+        { 'item-2': { ...carrots, price: '2.50' } },
+        null
+      ]) {
+        expect(() => cart.loadCart(input as any, false)).toThrow(
+          expect.objectContaining({ code: 'INVALID_CART' })
+        )
+      }
+      expect(cart.getState()).toBe(before)
+    })
+
     it('merges new cartDetails into current cartDetails', () => {
       const cart = new ShoppingCart({ shouldPersist: false })
 
@@ -978,6 +1014,28 @@ describe('ShoppingCart', () => {
       expect(state.cartDetails['invalid-item']).toBeUndefined()
       expect(state.cartCount).toBe(2)
       expect(state.totalPrice).toBe(200)
+    })
+
+    it('restores a saved entry without a value, rebuilding it from price and quantity', () => {
+      const storage = createMemoryStorage()
+      storage.setItem(
+        'cart',
+        JSON.stringify({
+          cartDetails: {
+            a: { id: 'a', name: 'A', price: 100, currency: 'USD', quantity: 3 }
+          }
+        })
+      )
+
+      const cart = new ShoppingCart({
+        storage,
+        persistKey: 'cart',
+        currency: 'USD',
+        language: 'en-US'
+      })
+
+      expect(cart.getState().cartDetails.a?.value).toBe(300)
+      expect(cart.getState().totalPrice).toBe(300)
     })
 
     it('rebuilds stored values from price and quantity so totals stay consistent', () => {

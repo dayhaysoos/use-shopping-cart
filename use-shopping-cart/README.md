@@ -27,7 +27,7 @@ You need to polyfill `formatToParts` if you want to support older browsers. You 
 
 ### Why am I getting an SSR error about text content not matching?
 
-It is likely that you are using a value like `cartCount` that is loaded from LocalStorage which doesn't exist on the server. More info in [issue #122](https://github.com/dayhaysoos/use-shopping-cart/issues/122)
+`CartProvider` renders the cart from its props on the server and while hydrating, and applies the saved cart and the browser's language right after, so cart state like `cartCount` doesn't cause mismatches. The usual cause is `formatCurrencyString` without a `language`: it formats with `en-US` on the server and the browser's language in the browser. Read the cart's language with `useShoppingCart((cart) => cart.language)` and pass it as `language`.
 
 ## Contributing to use-shopping-cart
 

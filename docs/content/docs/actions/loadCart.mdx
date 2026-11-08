@@ -13,7 +13,7 @@ loadCart(cartDetails: CartDetails, shouldMerge?: boolean): void
 
 ## Parameters
 
-- `cartDetails` - The cart data to load (CartDetails object)
+- `cartDetails` - The cart entries to load, keyed by product id (a `CartDetails` object). Each entry needs a string `id`, `name` and `currency`, a finite `price`, and a `quantity` that's an integer greater than 0; `value` and the formatted fields are recomputed
 - `shouldMerge` - Whether to merge with current cart (default: `true`)
   - `true` - Combines loaded cart with current cart
   - `false` - Replaces current cart entirely (recommended)
@@ -83,6 +83,8 @@ function CartSync() {
 
 ## Save Cart on Changes
 
+Post `cartDetails` itself, so your endpoint can return it as-is to the examples above:
+
 ```typescript
 import { useEffect } from 'react'
 import { useShoppingCart } from 'use-shopping-cart'
@@ -99,7 +101,7 @@ function CartPersistence() {
       fetch(`/api/users/${user.id}/cart`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ cartDetails })
+        body: JSON.stringify(cartDetails)
       })
     }, 500)
 
@@ -114,7 +116,8 @@ function CartPersistence() {
 
 - **Recommended:** Set `shouldMerge` to `false` to avoid accidental duplicate merging
 - Typically used with user authentication systems
-- Cart structure must match the CartDetails type
+- Throws a `CartError` with code `INVALID_CART`, and leaves the cart unchanged, if `cartDetails` isn't an object or an entry is missing one of the fields above
+- Don't call it inside `useOptimisticCart`'s `onChange` with a cart that already includes the change: the change is applied after `onChange` resolves, so it would count twice (see [useOptimisticCart](/docs/hooks/useOptimisticCart#syncing-with-your-backend))
 - Works alongside localStorage persistence (for logged-out users)
 
 ## See Also

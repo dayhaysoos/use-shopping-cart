@@ -9,6 +9,9 @@ validateCartItems checks the items in the current cart and compares them with a 
 make sure that the prices and quantities are correct. This is necessary because it's possible that
 malicious users could change the prices in `cartDetails` before sending the cart to your checkout endpoint.
 
+From each cart entry it keeps only the quantity and `product_data.metadata`. Keys set in your inventory's
+`product_data.metadata` win over the cart's, so the browser can add metadata but can't change yours.
+
 It also validates input shapes and throws if inventory products or cart entries are not objects or if the inventory
 source is not iterable.
 

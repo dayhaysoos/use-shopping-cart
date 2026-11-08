@@ -80,10 +80,12 @@ For multi-tenant applications:
 ```jsx
 const persistKey = `cart-${userId}`
 
-<CartProvider persistKey={persistKey}>
+<CartProvider key={userId} persistKey={persistKey}>
   <App />
 </CartProvider>
 ```
+
+`CartProvider` reads `persistKey` when it mounts. The `key` makes it start a new cart under the new `persistKey` when `userId` changes, for example after the shopper signs in; without it, the cart keeps using the first key.
 
 ### Avoid Conflicts
 
@@ -114,6 +116,7 @@ localStorage.removeItem('my-custom-cart')
 ## Notes
 
 - Only relevant when `shouldPersist={true}` (default)
+- Read once, when `CartProvider` mounts; change the provider's `key` to switch keys
 - The key is used as-is, no prefixes or transformations
 - Choose unique keys to avoid conflicts
 - Keep keys consistent to maintain cart across sessions

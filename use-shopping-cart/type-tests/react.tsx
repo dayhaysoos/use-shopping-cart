@@ -150,8 +150,12 @@ function TestUseOptimisticCart() {
   const synced = useOptimisticCart({
     onChange: async (change: CartChange) => {
       if (change.type === 'add') {
-        const id: string | undefined = change.product.id
+        const id: string = change.id
         const count: number = change.count
+        const productMetadata: Record<string, any> | undefined =
+          change.metadata.product_metadata
+        // @ts-expect-error count is on the change, not in its metadata
+        change.metadata.count
         await fetch('/api/cart', {
           method: 'POST',
           body: JSON.stringify({ id, count })

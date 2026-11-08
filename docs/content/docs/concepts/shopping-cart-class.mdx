@@ -97,7 +97,7 @@ Use `isCartError(error)` rather than `instanceof CartError`: each entry point (`
 | `ITEM_NOT_IN_CART`     | `incrementItem`, `decrementItem`, `setItemQuantity`, `removeItem` with an ID not in the cart |
 | `INVALID_FORM_DATA`    | `useCartActions` forms with missing or unreadable fields                                     |
 | `INVALID_INVENTORY`    | `validateCartItems` with an inventory that isn't a list of objects                           |
-| `INVALID_CART`         | `validateCartItems` with malformed `cartDetails`                                             |
+| `INVALID_CART`         | `loadCart` and `validateCartItems` with malformed `cartDetails`                              |
 | `NOT_IN_INVENTORY`     | `validateCartItems` with a cart entry that isn't in the inventory                            |
 | `INVALID_CHECKOUT_URL` | `redirectToCheckout` with anything other than an `http(s)` session URL                       |
 | `NO_CART_PROVIDER`     | `useShoppingCart` and the other hooks outside `<CartProvider>`                               |

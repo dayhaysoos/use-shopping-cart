@@ -77,13 +77,15 @@ function Cart() {
 
 `change` describes what happened:
 
-| `type`     | Fields                               | From                             |
-| ---------- | ------------------------------------ | -------------------------------- |
-| `'add'`    | `product`, `count`, `metadata`       | `addItem`                        |
-| `'adjust'` | `id`, `by` (negative for decrements) | `incrementItem`, `decrementItem` |
-| `'set'`    | `id`, `quantity`                     | `setItemQuantity`                |
-| `'remove'` | `id`                                 | `removeItem`                     |
-| `'clear'`  |                                      | `clearCart`                      |
+| `type`     | Fields                                                                      | From                             |
+| ---------- | --------------------------------------------------------------------------- | -------------------------------- |
+| `'add'`    | `id`, `product`, `count`, `metadata` (`price_metadata`, `product_metadata`) | `addItem`                        |
+| `'adjust'` | `id`, `by` (negative for decrements)                                        | `incrementItem`, `decrementItem` |
+| `'set'`    | `id`, `quantity`                                                            | `setItemQuantity`                |
+| `'remove'` | `id`                                                                        | `removeItem`                     |
+| `'clear'`  |                                                                             | `clearCart`                      |
+
+`id` is the cart entry's key in `cartDetails`. The changes that follow use the same `id`, so your backend can match them to the `add`, even when the cart generated the id for a product without one.
 
 How it behaves:
 
@@ -94,7 +96,7 @@ How it behaves:
 - **Rollback timing:** React batches pending transitions together, so if one change fails while others are still pending, its rollback shows once they settle.
 - **Invalid input** (bad count, product without a price) throws immediately and never reaches `onChange`.
 
-What the server does with the change, and whether the cart is loaded from the server (for example with [`loadCart`](/docs/actions/loadCart)), is up to you.
+What the server does with the change is up to you. Don't call [`loadCart`](/docs/actions/loadCart) with the server's cart inside `onChange`: the change is applied to the cart after `onChange` resolves, so a server cart that already includes it gets the change twice. Load the server's cart outside `onChange`, for example when the page loads.
 
 ## API
 

@@ -24,6 +24,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **`RemoveItemState` and `UpdateQuantityState` types removed**: they were aliases; use `ItemState` and `QuantityState`
 - **`ActionState` holds only `status`, `error` and `errorCode`**: the optional `productId`, `itemId` and `quantity` fields moved to `AddItemState`, `ItemState` and `QuantityState`; type each `useCartActions` state with its own type
 - **`useOptimisticCart` reports pending entries in `pendingIds`**: entries no longer carry `_optimistic: true`; use `pendingIds.has(item.id)`. `OptimisticCartEntry` and `OptimisticCartDetails` are removed; use `CartEntry` and `CartDetails` (#361)
+- **`loadCart` checks its cart entries**: it throws a `CartError` with code `INVALID_CART`, and leaves the cart unchanged, when `cartDetails` isn't an object or an entry lacks a string `id`, `name` or `currency`, a finite `price`, or a `quantity` that's an integer greater than 0. That's the check a saved cart goes through, which no longer requires `value`, since it's recomputed. Before, such entries loaded with `NaN` totals, and `loadCart(null, false)` emptied the cart
 
 ### ✨ Features
 
@@ -32,7 +33,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - `CartError`, `isCartError` and the `CartErrorCode` type are exported from `use-shopping-cart`, `/core` and `/utilities`. Use `isCartError` rather than `instanceof`, since each entry point bundles its own copy
 - `useShoppingCart(selector)`: re-render only when the selected value changes (#357)
 - `useShoppingCart(selector, isEqual)`: keep the previous selection when `isEqual(previous, next)` is true, so a selector that builds an object doesn't re-render on every change
-- `useOptimisticCart({ onChange })`: pass an async function to sync each cart change with your backend. Changes show immediately in every `useOptimisticCart` on the cart, run through `onChange` one at a time, are applied to the cart when it resolves and rolled back (with `error` set) when it rejects. `CartChange` and `UseOptimisticCartOptions` types are exported (#361)
+- `useOptimisticCart({ onChange })`: pass an async function to sync each cart change with your backend. Changes show immediately in every `useOptimisticCart` on the cart, run through `onChange` one at a time, are applied to the cart when it resolves and rolled back (with `error` set) when it rejects. Each change names its cart entry's `id` (an `add` change too, next to `product`, `count` and `metadata`), so your backend can match later changes to it. `CartChange` and `UseOptimisticCartOptions` types are exported (#361)
 - `useCartActions` states have an `errorCode` field (`UNKNOWN` for errors that aren't `CartError`s) (#359)
 
 ### 🐛 Bug Fixes
@@ -47,6 +48,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Storage is written only when the cart, currency or language changes, not on UI changes like `handleCartHover`; failed async writes now log a warning instead of an unhandled rejection
 - Changing currency or language keeps each cart entry's `timestamp`, and so do adding a product again and changing its quantity: `timestamp` is when the entry was first added
 - `useOptimisticCart` no longer shows each change twice for one render (adding a product briefly showed two cart entries) (#361)
+- `validateCartItems` keeps the keys set in your inventory's `product_data.metadata`: a cart entry's metadata can add keys but no longer overwrite them, so a shopper can't change inventory metadata (such as a fulfillment SKU) that reaches Stripe
+- `validateCartItems` matches inventory products whose ID fields are numbers, such as database ids in plain JavaScript; they used to fail with `NOT_IN_INVENTORY` once the cart was sent as JSON
 
 ## [4.0.0-alpha.2] - 2025-12-26
 

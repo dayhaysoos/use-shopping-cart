@@ -183,6 +183,39 @@ describe('validateCartItems', () => {
     })
   })
 
+  it("keeps the inventory's metadata when a cart entry sends the same key", () => {
+    const [item] = validateCartItems(
+      [
+        {
+          id: 'tshirt',
+          name: 'T-Shirt',
+          price: 1000,
+          currency: 'USD',
+          product_data: { metadata: { warehouse_sku: 'TS-S' } }
+        }
+      ],
+      {
+        tshirt: {
+          id: 'tshirt',
+          name: 'T-Shirt',
+          price: 1,
+          currency: 'USD',
+          quantity: 1,
+          value: 1,
+          product_data: {
+            metadata: { warehouse_sku: 'LAPTOP-PRO', engraving: 'Hi' }
+          }
+        }
+      }
+    )
+
+    expect(item.price_data.unit_amount).toBe(1000)
+    expect(item.price_data.product_data.metadata).toEqual({
+      warehouse_sku: 'TS-S',
+      engraving: 'Hi'
+    })
+  })
+
   it('throws an error if product does not exist in inventory', () => {
     expect(() => {
       validateCartItems(inventory, {
@@ -326,6 +359,18 @@ describe('validateCartItems with carts built by ShoppingCart', () => {
 
     expect(item.price_data.product_data.metadata).toEqual({ gift_wrap: 'yes' })
     expect(item.price_data).not.toHaveProperty('metadata')
+  })
+
+  it('matches a product whose id is a number after the cart is sent as JSON', () => {
+    const product = { ...base, id: 7, name: 'Seven' }
+    const cart = new ShoppingCart({ shouldPersist: false })
+    cart.addItem(product, { count: 2 })
+    const posted = JSON.parse(JSON.stringify(cart.getState().cartDetails))
+
+    const [item] = validateCartItems([product], posted)
+
+    expect(item.quantity).toBe(2)
+    expect(item.price_data.product_data.name).toBe('Seven')
   })
 
   it('still accepts carts keyed by a secondary ID field', () => {

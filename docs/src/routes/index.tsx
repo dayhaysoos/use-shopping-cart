@@ -96,14 +96,19 @@ export function Root() {
     code: `import { useShoppingCart, formatCurrencyString } from 'use-shopping-cart'
 
 function Product({ product }) {
-  const { addItem } = useShoppingCart()
+  const { addItem, language } = useShoppingCart()
 
   return (
     <button
       onClick={() => addItem(product)}
       className="rounded-full bg-white/10 px-4 py-2"
     >
-      Add {formatCurrencyString({ value: product.price, currency: 'USD' })}
+      Add{' '}
+      {formatCurrencyString({
+        value: product.price,
+        currency: 'USD',
+        language
+      })}
     </button>
   )
 }`

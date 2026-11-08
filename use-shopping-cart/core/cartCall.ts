@@ -5,6 +5,7 @@ import type {
   Product
 } from './types'
 import type { CartChange } from './cartState'
+import { getProductId } from './productId'
 import {
   validateCount,
   validateItemExists,
@@ -66,11 +67,13 @@ export function toCartChange(
       validateProduct(call.product)
       const count = call.options.count ?? 1
       validateCount(count, call.action)
+      const { price_metadata, product_metadata } = call.options
       return {
         type: 'add',
+        id: getProductId(call.product),
         product: call.product,
         count,
-        metadata: call.options
+        metadata: { price_metadata, product_metadata }
       }
     }
     case 'incrementItem':

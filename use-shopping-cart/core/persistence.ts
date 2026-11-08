@@ -1,4 +1,5 @@
-import type { CartDetails, CartEntry, CartState, StorageAdapter } from './types'
+import type { CartDetails, CartState, StorageAdapter } from './types'
+import { isValidCartEntry } from './validation'
 
 export interface SavedCart {
   cartDetails: CartDetails
@@ -131,24 +132,6 @@ function serializeCart(state: Readonly<CartState>): string {
     currency: state.currency,
     language: state.language
   })
-}
-
-function isValidCartEntry(entry: unknown): entry is CartEntry {
-  if (!entry || typeof entry !== 'object') return false
-
-  const e = entry as Record<string, unknown>
-  return (
-    typeof e.id === 'string' &&
-    typeof e.price === 'number' &&
-    Number.isFinite(e.price) &&
-    typeof e.quantity === 'number' &&
-    Number.isInteger(e.quantity) &&
-    e.quantity > 0 &&
-    typeof e.value === 'number' &&
-    Number.isFinite(e.value) &&
-    typeof e.name === 'string' &&
-    typeof e.currency === 'string'
-  )
 }
 
 function nonEmptyString(value: unknown): string | undefined {

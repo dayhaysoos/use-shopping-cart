@@ -131,6 +131,18 @@ As in v3, `useShoppingCart` takes an optional selector, and the component re-ren
 const cartCount = useShoppingCart((cart) => cart.cartCount)
 ```
 
+#### `loadCart` Checks Its Cart Entries
+
+`loadCart` now throws a `CartError` with code `INVALID_CART`, and leaves the cart unchanged, if `cartDetails` isn't an object or an entry is missing a string `id`, `name` or `currency`, a finite `price`, or a `quantity` that's an integer greater than 0. Before, such entries loaded with `NaN` totals, and `loadCart(null, false)` emptied the cart. `value` and the formatted fields are recomputed, so you can leave them out. If you load carts from your server, pass the cart entries themselves, not an object that wraps them:
+
+```js
+// Before: loaded a broken entry named "cartDetails"
+loadCart(savedCart, false) // savedCart is { cartDetails: { ... } }
+
+// After
+loadCart(savedCart.cartDetails, false)
+```
+
 ### Improvements and Bug Fixes
 
 #### Fixed: CartProvider Store Recreation Bug

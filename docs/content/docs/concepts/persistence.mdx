@@ -264,7 +264,7 @@ import { useEffect } from 'react'
 import { useShoppingCart } from 'use-shopping-cart'
 
 function CrossTabSync() {
-  const { loadCart } = useShoppingCart()
+  const { loadCart, changeCurrency, changeLanguage } = useShoppingCart()
 
   useEffect(() => {
     // Listen for storage changes from other tabs
@@ -272,19 +272,21 @@ function CrossTabSync() {
       // Check if it's our cart key
       if (e.key === 'use-shopping-cart' && e.newValue) {
         const cart = JSON.parse(e.newValue)
+        changeCurrency(cart.currency)
+        changeLanguage(cart.language)
         loadCart(cart.cartDetails, false)
       }
     }
 
     window.addEventListener('storage', handleStorage)
     return () => window.removeEventListener('storage', handleStorage)
-  }, [loadCart])
+  }, [loadCart, changeCurrency, changeLanguage])
 
   return null
 }
 ```
 
-**Note**: The `storage` event only fires in OTHER tabs, not the current tab. Pass `false` to `loadCart` so the other tab's cart replaces this one; merging would keep cart entries the other tab removed. If using a custom `persistKey`, check for that key instead of `'use-shopping-cart'`.
+**Note**: The `storage` event only fires in OTHER tabs, not the current tab. Pass `false` to `loadCart` so the other tab's cart replaces this one; merging would keep cart entries the other tab removed. Take the other tab's currency and language too: if the tabs format prices differently, each saves its own version back and they update each other forever. If using a custom `persistKey`, check for that key instead of `'use-shopping-cart'`.
 
 ## Manual Control
 

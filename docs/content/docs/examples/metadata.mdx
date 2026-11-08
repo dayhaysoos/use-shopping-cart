@@ -95,7 +95,7 @@ If engraving costs extra, sell it as its own product in the inventory (for examp
 
 ### In Checkout Session Creation
 
-`validateCartItems` takes prices, names and `price_data` from your inventory. From the cart it keeps only each cart entry's quantity and `product_data.metadata`:
+`validateCartItems` takes prices, names and `price_data` from your inventory. From the cart it keeps only each cart entry's quantity and `product_data.metadata`, and the cart's metadata can't overwrite keys set in your inventory's `product_data.metadata`:
 
 ```js
 // pages/api/create-checkout-session.js
@@ -128,7 +128,7 @@ export default async function handler(req, res) {
 }
 ```
 
-Metadata comes from the browser, so treat it as customer input: fine for an engraving message or a size, not for anything that decides what you charge or ship without checking it.
+Metadata comes from the browser, so treat it as customer input: fine for an engraving message or a size, not for anything that decides what you charge or ship without checking it. Put data you rely on, such as a fulfillment SKU, in your inventory's `product_data.metadata`: its keys win over the cart's.
 
 ### In Webhooks
 

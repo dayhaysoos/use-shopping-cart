@@ -74,6 +74,16 @@ Additionally, you must verify the cartItems on the server-side before creating t
 | `storage`       | `StorageAdapter` | No       | `localStorage`        | Custom storage adapter for persistence                    |
 | `cartDetails`   | `CartDetails`    | No       | `{}`                  | Initial cart entries; totals are computed from them       |
 
+### Props Are Read Once
+
+`CartProvider` creates its cart when it mounts and ignores later changes to these props. Change the currency or language with [`changeCurrency` and `changeLanguage`](/docs/hooks/useShoppingCart#cart-manipulation-methods). To start a different cart, for example when a shopper signs in, give `CartProvider` a new `key`; this remounts everything inside it:
+
+```jsx
+<CartProvider key={userId} persistKey={`cart-${userId}`}>
+  <App />
+</CartProvider>
+```
+
 ### Server Rendering
 
 `CartProvider` renders its children on the server (Next.js, Remix, TanStack Start). The server and the first client render show the cart from your props: `cartDetails` (empty by default), formatted with `language` (`en-US` if you don't set one). Right after hydration, the cart saved in `storage` and the browser's language take over, so there's no hydration mismatch. Set `language` if you want server-rendered prices formatted for a specific language.

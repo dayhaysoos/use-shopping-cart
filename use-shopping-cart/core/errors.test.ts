@@ -123,6 +123,11 @@ describe('ShoppingCart error codes', () => {
       'removeItem on a missing item',
       (c) => c.removeItem('missing'),
       'ITEM_NOT_IN_CART'
+    ],
+    [
+      'loadCart with an entry it cannot rebuild',
+      (c) => c.loadCart({ b: { id: 'b' } } as any),
+      'INVALID_CART'
     ]
   ])('%s → %s', (_name, act, code) => {
     expect(codeOf(() => act(cart()))).toBe(code)

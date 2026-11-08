@@ -121,13 +121,16 @@ describe('applyCartChange', () => {
   const product = { id: 'a', name: 'A', price: 150, currency: 'USD' }
 
   it.each<[string, CartChange]>([
-    ['adding it again', { type: 'add', product, count: 1 }],
+    [
+      'adding it again',
+      { type: 'add', id: 'a', product, count: 1, metadata: {} }
+    ],
     ['adjusting its quantity', { type: 'adjust', id: 'a', by: 2 }],
     ['setting its quantity', { type: 'set', id: 'a', quantity: 5 }]
   ])('keeps when an item was added after %s', (_name, change) => {
     const added = applyCartChange(
       {},
-      { type: 'add', product, count: 1 },
+      { type: 'add', id: 'a', product, count: 1, metadata: {} },
       format
     )
     const stamped = {
@@ -138,7 +141,11 @@ describe('applyCartChange', () => {
 
     expect(result.a.timestamp).toBe('2020-01-01T00:00:00.000Z')
   })
-  const withA = applyCartChange({}, { type: 'add', product, count: 2 }, format)
+  const withA = applyCartChange(
+    {},
+    { type: 'add', id: 'a', product, count: 2, metadata: {} },
+    format
+  )
 
   it('adds a new entry with derived value and formatting', () => {
     expect(withA.a).toMatchObject({
@@ -155,6 +162,7 @@ describe('applyCartChange', () => {
       withA,
       {
         type: 'add',
+        id: 'a',
         product,
         count: 1,
         metadata: {
@@ -176,6 +184,7 @@ describe('applyCartChange', () => {
       {},
       {
         type: 'add',
+        id: 'a',
         product,
         count: 1,
         metadata: { currency: 'EUR', language: 'de-DE' } as any

@@ -52,7 +52,8 @@ export function validateCartItems(
 
     for (const field of productIdFields) {
       const id = product[field]
-      if (id && !inventoryMap.has(id)) inventoryMap.set(id, product)
+      if (!id) continue
+      if (!inventoryMap.has(String(id))) inventoryMap.set(String(id), product)
     }
   }
 
@@ -100,8 +101,8 @@ export function validateCartItems(
       typeof cartItem.product_data.metadata === 'object'
     ) {
       item.price_data.product_data.metadata = {
-        ...item.price_data.product_data.metadata,
-        ...cartItem.product_data.metadata
+        ...cartItem.product_data.metadata,
+        ...item.price_data.product_data.metadata
       }
     }
 
