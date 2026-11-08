@@ -25,7 +25,7 @@ class ShoppingCart {
   setItemQuantity(id: string, quantity: number): void
   removeItem(id: string): void
   clearCart(): void
-  loadCart(cartDetails: CartDetails, shouldMerge?: boolean): void
+  loadCart(cartDetails: CartDetailsInput, shouldMerge?: boolean): void
 
   handleCartClick(): void
   handleCartHover(): void

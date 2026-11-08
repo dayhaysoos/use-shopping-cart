@@ -30,6 +30,19 @@ export type CartDetails = {
   [id: string]: CartEntry
 }
 
+export type CartEntryInput = ProductAttributes & {
+  id: string
+  quantity: number
+  value?: number
+  formattedValue?: string
+  formattedPrice?: string
+  timestamp?: string
+}
+
+export type CartDetailsInput = {
+  [id: string]: CartEntryInput
+}
+
 export interface CartState {
   totalPrice: number
   formattedTotalPrice: string
@@ -42,7 +55,7 @@ export interface CartState {
 }
 
 export interface CartConfig {
-  cartDetails?: CartDetails
+  cartDetails?: CartDetailsInput
   currency?: string
   language?: string
   shouldPersist?: boolean

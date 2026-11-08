@@ -1,5 +1,5 @@
 import { formatCurrencyString } from './formatters'
-import type { Product, CartEntry } from './types'
+import type { Product, CartEntry, CartEntryInput } from './types'
 
 export interface CartEntryOptions {
   currency: string
@@ -23,7 +23,7 @@ export function createCartEntry(
 
 export function updateCartEntry(
   id: string,
-  entry: CartEntry,
+  entry: CartEntryInput,
   { quantity = entry.quantity, ...options }: CartEntryUpdate
 ): CartEntry {
   return buildEntry(

@@ -1,8 +1,8 @@
-import type { CartDetails, CartState, StorageAdapter } from './types'
+import type { CartDetailsInput, CartState, StorageAdapter } from './types'
 import { isValidCartEntry } from './validation'
 
 export interface SavedCart {
-  cartDetails: CartDetails
+  cartDetails: CartDetailsInput
   currency?: string
   language?: string
 }
@@ -36,6 +36,7 @@ export function createCartPersister(
     if (!currencyChanged && saved.currency) restored.currency = saved.currency
     if (!languageChanged && saved.language) restored.language = saved.language
     onLoad(restored)
+    if (!currencyChanged && !languageChanged) lastSaved = lastSeen
   }
 
   return {
@@ -121,7 +122,7 @@ export function parseSavedCart(raw: string): SavedCart | null {
   const { cartDetails, currency, language } = parsed as Record<string, unknown>
   if (!cartDetails || typeof cartDetails !== 'object') return null
 
-  const validCartDetails: CartDetails = {}
+  const validCartDetails: CartDetailsInput = {}
   for (const id in cartDetails) {
     const entry = (cartDetails as Record<string, unknown>)[id]
     if (isValidCartEntry(entry)) {

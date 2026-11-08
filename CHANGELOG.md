@@ -35,6 +35,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - `useShoppingCart(selector, isEqual)`: keep the previous selection when `isEqual(previous, next)` is true, so a selector that builds an object doesn't re-render on every change
 - `useOptimisticCart({ onChange })`: pass an async function to sync each cart change with your backend. Changes show immediately in every `useOptimisticCart` on the cart, run through `onChange` one at a time, are applied to the cart when it resolves and rolled back (with `error` set) when it rejects. Each change names its cart entry's `id` (an `add` change too, next to `product`, `count` and `metadata`), so your backend can match later changes to it. `CartChange` and `UseOptimisticCartOptions` types are exported (#361)
 - `useCartActions` states have an `errorCode` field (`UNKNOWN` for errors that aren't `CartError`s) (#359)
+- `CartEntryInput` and `CartDetailsInput` types: what `loadCart` and the `cartDetails` config accept. `value`, `formattedValue`, `formattedPrice` and `timestamp` are optional, since the cart recomputes them; before, the types required them even though the cart never read them
 
 ### 🐛 Bug Fixes
 
@@ -46,6 +47,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - `useOptimisticCart` shows the same entries the cart will: it used its own price formatting and dropped `price_metadata`/`product_metadata` on added items
 - A currency or language set while an async storage adapter is still loading is no longer overwritten by the saved cart's; the saved cart's entries are still restored
 - Storage is written only when the cart, currency or language changes, not on UI changes like `handleCartHover`; failed async writes now log a warning instead of an unhandled rejection
+- A saved cart restored unchanged is no longer saved back. Under React Strict Mode with an async storage adapter, the discarded second cart could overwrite a change made while the saved cart was loading
 - Changes made together (for example `changeCurrency` followed by `loadCart` with new prices) are saved once, right after the current task, instead of once per change. Other tabs syncing through the `storage` event no longer see, and save back, the in-between cart
 - Changing currency or language keeps each cart entry's `timestamp`, and so do adding a product again and changing its quantity: `timestamp` is when the entry was first added
 - `useOptimisticCart` no longer shows each change twice for one render (adding a product briefly showed two cart entries) (#361)

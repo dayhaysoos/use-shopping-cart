@@ -1,4 +1,4 @@
-import type { CartDetails, CartEntry } from './types'
+import type { CartDetails, CartEntryInput } from './types'
 import { CartError, type CartErrorCode } from './errors'
 
 function typeOf(value: unknown): string {
@@ -81,7 +81,7 @@ export function validateProduct(product: unknown): void {
   }
 }
 
-export function isValidCartEntry(entry: unknown): entry is CartEntry {
+export function isValidCartEntry(entry: unknown): entry is CartEntryInput {
   if (!entry || typeof entry !== 'object') return false
 
   const e = entry as Record<string, unknown>

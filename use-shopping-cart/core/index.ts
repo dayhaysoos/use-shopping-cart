@@ -17,6 +17,8 @@ export type {
   CartEntry,
   CartEntryAttributes,
   CartDetails,
+  CartEntryInput,
+  CartDetailsInput,
   CartState,
   CartConfig,
   AddItemOptions,

@@ -1102,6 +1102,34 @@ describe('ShoppingCart', () => {
       language: 'en-US'
     }
 
+    it('does not save back a stored cart it restored unchanged, so a discarded second cart cannot overwrite a change', async () => {
+      const saved = new Map([['use-shopping-cart', JSON.stringify(storedCart)]])
+      const pendingLoads: Array<() => void> = []
+      const storage = {
+        getItem: (key: string) => {
+          const value = saved.get(key) ?? null
+          return new Promise<string | null>((r) =>
+            pendingLoads.push(() => r(value))
+          )
+        },
+        setItem: (key: string, value: string) => {
+          saved.set(key, value)
+        },
+        removeItem: () => {}
+      }
+      const cart = new ShoppingCart({ storage })
+      new ShoppingCart({ storage })
+
+      cart.changeLanguage('ja-JP')
+      await Promise.resolve()
+      pendingLoads.forEach((finish) => finish())
+      await new Promise((r) => setTimeout(r, 0))
+
+      const stored = JSON.parse(saved.get('use-shopping-cart') as string)
+      expect(stored.language).toBe('ja-JP')
+      expect(stored.cartDetails.a.quantity).toBe(2)
+    })
+
     it('restores the stored cart when the load finishes', async () => {
       const { storage, finishLoad } = deferredStorage(storedCart)
       const cart = new ShoppingCart({ storage, currency: 'EUR' })

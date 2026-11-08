@@ -8,12 +8,12 @@ Loads a previously saved cart, enabling cart persistence across devices or sessi
 ## Signature
 
 ```typescript
-loadCart(cartDetails: CartDetails, shouldMerge?: boolean): void
+loadCart(cartDetails: CartDetailsInput, shouldMerge?: boolean): void
 ```
 
 ## Parameters
 
-- `cartDetails` - The cart entries to load, keyed by product id (a `CartDetails` object). Each entry needs a string `id`, `name` and `currency`, a finite `price`, and a `quantity` that's an integer greater than 0; `value` and the formatted fields are recomputed
+- `cartDetails` - The cart entries to load, keyed by product id. Each entry needs a string `id`, `name` and `currency`, a finite `price`, and a `quantity` that's an integer greater than 0. `value`, `formattedValue`, `formattedPrice` and `timestamp` are optional: `value` and the formatted fields are recomputed, and a missing `timestamp` is set to now. The `CartDetailsInput` and `CartEntryInput` types describe this shape; a `CartDetails` object from the cart fits it too
 - `shouldMerge` - Whether to merge with current cart (default: `true`)
   - `true` - Combines loaded cart with current cart
   - `false` - Replaces current cart entirely (recommended)

@@ -82,6 +82,18 @@ describe('createCartPersister', () => {
     )
   })
 
+  it('does not write back a saved cart it restored unchanged', async () => {
+    const storage = createMemoryStorage()
+    storage.setItem('k', JSON.stringify({ cartDetails: { a: entry } }))
+    const setItem = vi.spyOn(storage, 'setItem')
+    const persister = createCartPersister(storage, 'k', initialState)
+
+    persister.load(() => persister.save(state))
+    await flush()
+
+    expect(setItem).not.toHaveBeenCalled()
+  })
+
   it('does not call onLoad when nothing is stored', () => {
     const onLoad = vi.fn()
 

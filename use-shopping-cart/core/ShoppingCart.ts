@@ -3,6 +3,7 @@ import type {
   CartState,
   CartConfig,
   CartDetails,
+  CartDetailsInput,
   Product,
   AddItemOptions,
   IncrementOptions,
@@ -150,7 +151,7 @@ export class ShoppingCart {
     this._run(cartCalls.clearCart())
   }
 
-  loadCart(cartDetails: CartDetails, shouldMerge = true): void {
+  loadCart(cartDetails: CartDetailsInput, shouldMerge = true): void {
     validateCartDetails(cartDetails, 'loadCart')
     const newCartDetails = shouldMerge
       ? { ...this._state.cartDetails, ...cartDetails }
