@@ -8,12 +8,14 @@ Configure custom storage adapters for cart persistence.
 ## Type
 
 ```typescript
-interface Storage {
-  getItem(key: string): string | null
-  setItem(key: string, value: string): void
-  removeItem(key: string): void
+interface StorageAdapter {
+  getItem(key: string): Promise<string | null> | string | null
+  setItem(key: string, value: string): Promise<void> | void
+  removeItem(key: string): Promise<void> | void
 }
 ```
+
+`StorageAdapter` is exported from `use-shopping-cart` and `use-shopping-cart/core`. Each method can return its result directly or as a Promise.
 
 ## Default
 

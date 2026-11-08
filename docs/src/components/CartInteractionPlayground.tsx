@@ -53,7 +53,8 @@ function PlaygroundContent() {
     cartDetails = {},
     cartCount,
     formattedTotalPrice,
-    totalPrice
+    totalPrice,
+    language
   } = useShoppingCart()
 
   const incrementCounter = useMutation(api.counter.increment)
@@ -88,22 +89,26 @@ function PlaygroundContent() {
 
   const formattedSubtotal = formatCurrencyString({
     value: subtotal,
-    currency: BANANA_PRODUCT.currency
+    currency: BANANA_PRODUCT.currency,
+    language
   })
   const formattedDiscount = formatCurrencyString({
     value: discount,
-    currency: BANANA_PRODUCT.currency
+    currency: BANANA_PRODUCT.currency,
+    language
   })
   const formattedShipping =
     shippingAmount === 0
       ? 'Free'
       : formatCurrencyString({
           value: shippingAmount,
-          currency: BANANA_PRODUCT.currency
+          currency: BANANA_PRODUCT.currency,
+          language
         })
   const formattedComputedTotal = formatCurrencyString({
     value: computedTotal,
-    currency: BANANA_PRODUCT.currency
+    currency: BANANA_PRODUCT.currency,
+    language
   })
 
   const handleAddBananas = () => {

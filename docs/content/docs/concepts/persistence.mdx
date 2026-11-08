@@ -129,12 +129,14 @@ Disable persistence completely:
 ### Interface
 
 ```typescript
-interface Storage {
-  getItem(key: string): string | null
-  setItem(key: string, value: string): void
-  removeItem(key: string): void
+interface StorageAdapter {
+  getItem(key: string): Promise<string | null> | string | null
+  setItem(key: string, value: string): Promise<void> | void
+  removeItem(key: string): Promise<void> | void
 }
 ```
+
+`StorageAdapter` is exported from `use-shopping-cart` and `use-shopping-cart/core`. Each method can return its result directly or as a Promise.
 
 ### Example: IndexedDB
 
@@ -231,7 +233,7 @@ The cart data is stored as JSON in localStorage:
 
 ```json
 {
-  "cartCount": 2,
+  "cartCount": 3,
   "totalPrice": 1200,
   "formattedTotalPrice": "$12.00",
   "currency": "USD",
@@ -241,6 +243,7 @@ The cart data is stored as JSON in localStorage:
       "id": "banana_001",
       "name": "Bananas",
       "price": 400,
+      "currency": "USD",
       "quantity": 2,
       "value": 800
     },
@@ -248,6 +251,7 @@ The cart data is stored as JSON in localStorage:
       "id": "apple_001",
       "name": "Apples",
       "price": 400,
+      "currency": "USD",
       "quantity": 1,
       "value": 400
     }
