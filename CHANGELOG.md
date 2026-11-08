@@ -46,6 +46,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - `useOptimisticCart` shows the same entries the cart will: it used its own price formatting and dropped `price_metadata`/`product_metadata` on added items
 - A currency or language set while an async storage adapter is still loading is no longer overwritten by the saved cart's; the saved cart's entries are still restored
 - Storage is written only when the cart, currency or language changes, not on UI changes like `handleCartHover`; failed async writes now log a warning instead of an unhandled rejection
+- Changes made together (for example `changeCurrency` followed by `loadCart` with new prices) are saved once, right after the current task, instead of once per change. Other tabs syncing through the `storage` event no longer see, and save back, the in-between cart
 - Changing currency or language keeps each cart entry's `timestamp`, and so do adding a product again and changing its quantity: `timestamp` is when the entry was first added
 - `useOptimisticCart` no longer shows each change twice for one render (adding a product briefly showed two cart entries) (#361)
 - `validateCartItems` keeps the keys set in your inventory's `product_data.metadata`: a cart entry's metadata can add keys but no longer overwrite them, so a shopper can't change inventory metadata (such as a fulfillment SKU) that reaches Stripe

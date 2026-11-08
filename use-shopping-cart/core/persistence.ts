@@ -21,6 +21,7 @@ export function createCartPersister(
 ): CartPersister {
   let lastSaved: Readonly<PersistedFields> | null = initial
   let lastSeen: Readonly<PersistedFields> = initial
+  let pending: Readonly<CartState> | null = null
   let loading = true
   let entriesChanged = false
   let currencyChanged = false
@@ -74,28 +75,35 @@ export function createCartPersister(
       }
       lastSeen = state
 
-      if (
-        lastSaved &&
-        lastSaved.cartDetails === state.cartDetails &&
-        lastSaved.currency === state.currency &&
-        lastSaved.language === state.language
-      ) {
-        return
-      }
-      lastSaved = state
+      if (!pending) queueMicrotask(write)
+      pending = state
+    }
+  }
 
-      try {
-        const result = storage.setItem(key, serializeCart(state))
-        if (result instanceof Promise) {
-          result.catch((error) => {
-            if (lastSaved === state) lastSaved = null
-            console.warn('Failed to persist cart to storage:', error)
-          })
-        }
-      } catch (error) {
-        lastSaved = null
-        console.warn('Failed to persist cart to storage:', error)
+  function write() {
+    const state = pending!
+    pending = null
+    if (
+      lastSaved &&
+      lastSaved.cartDetails === state.cartDetails &&
+      lastSaved.currency === state.currency &&
+      lastSaved.language === state.language
+    ) {
+      return
+    }
+    lastSaved = state
+
+    try {
+      const result = storage.setItem(key, serializeCart(state))
+      if (result instanceof Promise) {
+        result.catch((error) => {
+          if (lastSaved === state) lastSaved = null
+          console.warn('Failed to persist cart to storage:', error)
+        })
       }
+    } catch (error) {
+      lastSaved = null
+      console.warn('Failed to persist cart to storage:', error)
     }
   }
 }
