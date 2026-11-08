@@ -23,14 +23,18 @@ export function createCartPersister(
   let lastSeen: Readonly<PersistedFields> = initial
   let loading = true
   let entriesChanged = false
-  let settingsChanged = false
+  let currencyChanged = false
+  let languageChanged = false
 
   function finishLoad(raw: string | null, onLoad: (saved: SavedCart) => void) {
     loading = false
     if (entriesChanged) return
     const saved = raw ? parseSavedCart(raw) : null
     if (!saved) return
-    onLoad(settingsChanged ? { cartDetails: saved.cartDetails } : saved)
+    const restored: SavedCart = { cartDetails: saved.cartDetails }
+    if (!currencyChanged && saved.currency) restored.currency = saved.currency
+    if (!languageChanged && saved.language) restored.language = saved.language
+    onLoad(restored)
   }
 
   return {
@@ -56,12 +60,15 @@ export function createCartPersister(
 
     save(state) {
       if (loading) {
+        const currencyChange = state.currency !== lastSeen.currency
+        const languageChange = state.language !== lastSeen.language
+        if (currencyChange) currencyChanged = true
+        if (languageChange) languageChanged = true
         if (
-          state.currency !== lastSeen.currency ||
-          state.language !== lastSeen.language
+          !currencyChange &&
+          !languageChange &&
+          state.cartDetails !== lastSeen.cartDetails
         ) {
-          settingsChanged = true
-        } else if (state.cartDetails !== lastSeen.cartDetails) {
           entriesChanged = true
         }
       }

@@ -274,12 +274,14 @@ function CrossTabSync() {
     // Listen for storage changes from other tabs
     const handleStorage = (e) => {
       // Check if it's our cart key
-      if (e.key === 'use-shopping-cart' && e.newValue) {
-        const cart = JSON.parse(e.newValue)
-        changeCurrency(cart.currency)
-        changeLanguage(cart.language)
-        loadCart(cart.cartDetails, false)
-      }
+      if (e.key !== 'use-shopping-cart') return
+      // Read the latest saved cart, not e.newValue
+      const latest = localStorage.getItem('use-shopping-cart')
+      if (!latest) return
+      const cart = JSON.parse(latest)
+      changeCurrency(cart.currency)
+      changeLanguage(cart.language)
+      loadCart(cart.cartDetails, false)
     }
 
     window.addEventListener('storage', handleStorage)
@@ -290,7 +292,7 @@ function CrossTabSync() {
 }
 ```
 
-**Note**: The `storage` event only fires in OTHER tabs, not the current tab. Pass `false` to `loadCart` so the other tab's cart replaces this one; merging would keep cart entries the other tab removed. Take the other tab's currency and language too: if the tabs format prices differently, each saves its own version back and they update each other forever. If using a custom `persistKey`, check for that key instead of `'use-shopping-cart'`.
+**Note**: The `storage` event only fires in OTHER tabs, not the current tab. Pass `false` to `loadCart` so the other tab's cart replaces this one; merging would keep cart entries the other tab removed. Take the other tab's currency and language too: if the tabs format prices differently, each saves its own version back and they update each other forever. Read the latest saved cart instead of `e.newValue`: one action can save twice (for example `changeCurrency` followed by `loadCart` with new prices), and applying the older event would save that in-between cart back over the newer one. If using a custom `persistKey`, check for that key instead of `'use-shopping-cart'`.
 
 ## Manual Control
 

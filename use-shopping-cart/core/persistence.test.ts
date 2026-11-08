@@ -136,13 +136,48 @@ describe('createCartPersister', () => {
       expect(onLoad).not.toHaveBeenCalled()
     })
 
-    it('restores only the items after a currency or language change', async () => {
+    it('keeps a currency set during the load and restores the saved language', async () => {
       const { storage, finish } = deferred()
       const onLoad = vi.fn()
       const persister = createCartPersister(storage, 'k', initialState)
 
       persister.load(onLoad)
       persister.save({ ...initialState, currency: 'GBP', cartDetails: {} })
+      finish()
+
+      await vi.waitFor(() =>
+        expect(onLoad).toHaveBeenCalledWith({
+          cartDetails: { a: entry },
+          language: 'de-DE'
+        })
+      )
+    })
+
+    it('keeps a language set during the load and restores the saved currency', async () => {
+      const { storage, finish } = deferred()
+      const onLoad = vi.fn()
+      const persister = createCartPersister(storage, 'k', initialState)
+
+      persister.load(onLoad)
+      persister.save({ ...initialState, language: 'ja-JP' })
+      finish()
+
+      await vi.waitFor(() =>
+        expect(onLoad).toHaveBeenCalledWith({
+          cartDetails: { a: entry },
+          currency: 'EUR'
+        })
+      )
+    })
+
+    it('keeps both when both are set during the load', async () => {
+      const { storage, finish } = deferred()
+      const onLoad = vi.fn()
+      const persister = createCartPersister(storage, 'k', initialState)
+
+      persister.load(onLoad)
+      persister.save({ ...initialState, currency: 'GBP' })
+      persister.save({ ...initialState, currency: 'GBP', language: 'ja-JP' })
       finish()
 
       await vi.waitFor(() =>
