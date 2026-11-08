@@ -1,36 +1,6 @@
 import { formatCurrencyString } from './formatters'
 import type { Product, CartEntry } from './types'
 
-function generateUUID(): string {
-  if (typeof crypto !== 'undefined' && crypto.randomUUID) {
-    return crypto.randomUUID()
-  }
-  return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, (c) => {
-    const r = (Math.random() * 16) | 0
-    const v = c === 'x' ? r : (r & 0x3) | 0x8
-    return v.toString(16)
-  })
-}
-
-const generatedIdCache = new WeakMap<object, string>()
-
-export function getProductId(product: Product): string {
-  const existingId =
-    ('id' in product && product.id) ||
-    ('price_id' in product && product.price_id) ||
-    ('sku_id' in product && product.sku_id) ||
-    ('sku' in product && product.sku)
-
-  if (existingId) return existingId
-
-  const cachedId = generatedIdCache.get(product as object)
-  if (cachedId) return cachedId
-
-  const generatedId = generateUUID()
-  generatedIdCache.set(product as object, generatedId)
-  return generatedId
-}
-
 export interface CartEntryOptions {
   currency: string
   language: string
@@ -38,11 +8,39 @@ export interface CartEntryOptions {
   product_metadata?: Record<string, unknown>
 }
 
+export interface CartEntryUpdate extends CartEntryOptions {
+  quantity?: number
+}
+
 export function createCartEntry(
   id: string,
   product: Product,
   quantity: number,
-  { currency, language, price_metadata, product_metadata }: CartEntryOptions
+  options: CartEntryOptions
+): CartEntry {
+  return buildEntry(id, product, quantity, options, new Date().toISOString())
+}
+
+export function updateCartEntry(
+  id: string,
+  entry: CartEntry,
+  { quantity = entry.quantity, ...options }: CartEntryUpdate
+): CartEntry {
+  return buildEntry(
+    id,
+    entry,
+    quantity,
+    options,
+    entry.timestamp || new Date().toISOString()
+  )
+}
+
+function buildEntry(
+  id: string,
+  product: Product,
+  quantity: number,
+  { currency, language, price_metadata, product_metadata }: CartEntryOptions,
+  timestamp: string
 ): CartEntry {
   const value = product.price * quantity
 
@@ -57,14 +55,16 @@ export function createCartEntry(
       currency,
       language
     }),
-    timestamp: new Date().toISOString(),
-    price_data: {
-      ...product.price_data,
-      ...price_metadata
-    },
-    product_data: {
-      ...product.product_data,
-      ...product_metadata
-    }
+    timestamp,
+    price_data: withMetadata(product.price_data, price_metadata),
+    product_data: withMetadata(product.product_data, product_metadata)
   }
+}
+
+function withMetadata(
+  data: Record<string, any> | undefined,
+  metadata: Record<string, unknown> | undefined
+): Record<string, any> {
+  if (!metadata) return { ...data }
+  return { ...data, metadata: { ...data?.metadata, ...metadata } }
 }

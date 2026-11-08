@@ -6,7 +6,7 @@
     "*.ts",
     "*.tsx"
   ],
-  "exclude": ["node_modules", "dist", "../old-docs/**"],
+  "exclude": ["node_modules", "dist"],
   "compilerOptions": {
     "strict": true,
     "esModuleInterop": true,

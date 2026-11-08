@@ -43,8 +43,11 @@ Here are a couple commands to get you started in development (run them from the 
 # Builds use-shopping-cart in watch-mode and runs the documentation site locally
 pnpm dev
 
-# Builds the library, then runs the tests once
+# Builds the library, then runs the unit and dist smoke tests once
 pnpm test
+
+# Runs every CI step: lint, typecheck, build, tests, type tests, the package check and the docs import check
+pnpm check
 
 # Builds the library, then runs the tests in watch-mode
 pnpm test:watch
@@ -60,6 +63,7 @@ Local validation:
 pnpm --filter use-shopping-cart run test
 pnpm --filter use-shopping-cart run test:types
 pnpm --filter use-shopping-cart run build
+pnpm --filter use-shopping-cart run test:dist
 pnpm --filter use-shopping-cart publish --dry-run
 ```
 
@@ -77,6 +81,3 @@ Publish (automatic on tags):
 
 Please make all README edits to `/README.md` and when you're done copy them to `/use-shopping-cart/README.md`. This is done so that once the README updates are merged and published to NPM, you can see the README appear on both GitHub and NPM.
 
-### Looking to add a payment service to use-shopping-cart
-
-If you're looking to add a new payment service like Square, Amazon Pay, PayPal, or even Shopify's Billing API, please [view this guide](https://github.com/dayhaysoos/use-shopping-cart/blob/master/use-shopping-cart/CONTRIBUTING-SERVICES.md) on how to do so.

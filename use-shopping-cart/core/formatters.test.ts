@@ -20,7 +20,6 @@ describe('formatCurrencyString', () => {
       currency: 'JPY',
       language: 'ja-JP'
     })
-    // Currency symbol may vary by system (¥ or ￥)
     expect(result).toMatch(/[¥￥]1,000/)
   })
 
@@ -30,7 +29,6 @@ describe('formatCurrencyString', () => {
       currency: 'EUR',
       language: 'de-DE'
     })
-    // Format may vary by system, but should contain the amount
     expect(result).toContain('25,99')
     expect(result).toContain('€')
   })

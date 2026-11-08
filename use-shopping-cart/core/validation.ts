@@ -1,63 +1,53 @@
-import type { CartDetails } from './types'
+import type { CartDetails, CartEntry } from './types'
+import { CartError, type CartErrorCode } from './errors'
 
-/**
- * Returns the constructor name of any value.
- */
 function typeOf(value: unknown): string {
   if (value === undefined) return 'undefined'
   if (value === null) return 'null'
   return (value as any).constructor.name
 }
 
-export class ValidationError extends Error {
-  constructor(message: string) {
-    super(message)
-    this.name = 'ValidationError'
+function fail(code: CartErrorCode, message: string): never {
+  console.warn(message)
+  throw new CartError(code, message)
+}
+
+export function validateInteger(
+  value: unknown,
+  name: string,
+  min: 0 | 1,
+  code: CartErrorCode,
+  where: string
+): asserts value is number {
+  if (typeof value !== 'number' || !Number.isFinite(value)) {
+    fail(
+      code,
+      `Invalid ${name} in ${where}: ${name} must be a finite number. The current type is ${typeOf(value)}.`
+    )
+  }
+
+  if (!Number.isInteger(value)) {
+    fail(
+      code,
+      `Invalid ${name} in ${where}: ${name} must be an integer. The current value is ${value}.`
+    )
+  }
+
+  if (value < min) {
+    const bound = min === 1 ? 'greater than 0' : 'greater than or equal to 0'
+    fail(
+      code,
+      `Invalid ${name} in ${where}: ${name} must be ${bound}. The current value is ${value}.`
+    )
   }
 }
 
 export function validateCount(count: unknown, actionName: string): void {
-  if (typeof count !== 'number' || !Number.isFinite(count)) {
-    const error = `Invalid count in ${actionName}: count must be a finite number. The current type is ${typeOf(
-      count
-    )}.`
-    console.warn(error)
-    throw new ValidationError(error)
-  }
-
-  if (!Number.isInteger(count)) {
-    const error = `Invalid count in ${actionName}: count must be an integer. The current value is ${count}.`
-    console.warn(error)
-    throw new ValidationError(error)
-  }
-
-  if (count <= 0) {
-    const error = `Invalid count in ${actionName}: count must be greater than 0. The current value is ${count}.`
-    console.warn(error)
-    throw new ValidationError(error)
-  }
+  validateInteger(count, 'count', 1, 'INVALID_COUNT', actionName)
 }
 
 export function validateQuantity(quantity: unknown, actionName: string): void {
-  if (typeof quantity !== 'number' || !Number.isFinite(quantity)) {
-    const error = `Invalid quantity in ${actionName}: quantity must be a finite number. The current type is ${typeOf(
-      quantity
-    )}.`
-    console.warn(error)
-    throw new ValidationError(error)
-  }
-
-  if (!Number.isInteger(quantity)) {
-    const error = `Invalid quantity in ${actionName}: quantity must be an integer. The current value is ${quantity}.`
-    console.warn(error)
-    throw new ValidationError(error)
-  }
-
-  if (quantity < 0) {
-    const error = `Invalid quantity in ${actionName}: quantity must be greater than or equal to 0. The current value is ${quantity}.`
-    console.warn(error)
-    throw new ValidationError(error)
-  }
+  validateInteger(quantity, 'quantity', 0, 'INVALID_QUANTITY', actionName)
 }
 
 export function validateItemExists(
@@ -67,27 +57,63 @@ export function validateItemExists(
 ): void {
   if (!(id in cartDetails)) {
     const error = `Invalid product ID in ${actionName}: the ID "${id}" must already be in the cart.`
-    console.warn(error)
-    throw new ValidationError(error)
+    fail('ITEM_NOT_IN_CART', error)
   }
 }
 
 export function validateProduct(product: unknown): void {
   if (!product || typeof product !== 'object') {
-    throw new ValidationError('Product must be an object')
+    fail('INVALID_PRODUCT', 'Product must be an object')
   }
 
   const p = product as Record<string, unknown>
 
   if (typeof p.price !== 'number') {
-    throw new ValidationError('Product.price must be a number')
+    fail('INVALID_PRODUCT', 'Product.price must be a number')
   }
 
   if (!p.currency || typeof p.currency !== 'string') {
-    throw new ValidationError('Product.currency must be a string')
+    fail('INVALID_PRODUCT', 'Product.currency must be a string')
   }
 
   if (!p.name || typeof p.name !== 'string') {
-    throw new ValidationError('Product.name must be a string')
+    fail('INVALID_PRODUCT', 'Product.name must be a string')
+  }
+}
+
+export function isValidCartEntry(entry: unknown): entry is CartEntry {
+  if (!entry || typeof entry !== 'object') return false
+
+  const e = entry as Record<string, unknown>
+  return (
+    typeof e.id === 'string' &&
+    typeof e.price === 'number' &&
+    Number.isFinite(e.price) &&
+    typeof e.quantity === 'number' &&
+    Number.isInteger(e.quantity) &&
+    e.quantity > 0 &&
+    typeof e.name === 'string' &&
+    typeof e.currency === 'string'
+  )
+}
+
+export function validateCartDetails(
+  cartDetails: unknown,
+  actionName: string
+): void {
+  if (!cartDetails || typeof cartDetails !== 'object') {
+    fail(
+      'INVALID_CART',
+      `Invalid cartDetails in ${actionName}: cartDetails must be an object of cart entries.`
+    )
+  }
+
+  for (const id in cartDetails) {
+    if (!isValidCartEntry((cartDetails as Record<string, unknown>)[id])) {
+      fail(
+        'INVALID_CART',
+        `Invalid cart entry "${id}" in ${actionName}: a cart entry needs a string id, name and currency, a finite price, and a quantity that is an integer greater than 0.`
+      )
+    }
   }
 }

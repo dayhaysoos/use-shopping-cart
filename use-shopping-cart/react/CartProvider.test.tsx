@@ -1,8 +1,8 @@
-/// <reference types="@testing-library/jest-dom" />
 import { describe, it, expect, vi } from 'vitest'
 import React from 'react'
-import { render, screen, waitFor } from '@testing-library/react'
-import { CartProvider, useCartContext } from './CartProvider'
+import { render, screen } from '@testing-library/react'
+import { CartProvider } from './CartProvider'
+import { useCartContext } from './cartContext'
 
 describe('CartProvider', () => {
   it('provides ShoppingCart instance to children', () => {
@@ -58,22 +58,17 @@ describe('CartProvider', () => {
     )
 
     expect(instances.length).toBe(2)
-    expect(instances[0]).toBe(instances[1]) // Same instance
+    expect(instances[0]).toBe(instances[1])
   })
 
-  it('shows loading initially when persistence enabled', async () => {
+  it('shows content immediately when persistence is enabled', () => {
     render(
-      <CartProvider shouldPersist={true} loading={<div>Loading...</div>}>
+      <CartProvider shouldPersist={true}>
         <div>Content</div>
       </CartProvider>
     )
 
-    // In jsdom, useEffect runs, so we need to wait
-    // Initially might show loading, then shows content after effect
-    await waitFor(() => {
-      const content = screen.queryByText('Content')
-      expect(content).toBeInTheDocument()
-    })
+    expect(screen.getByText('Content')).toBeInTheDocument()
   })
 
   it('shows content immediately when persistence disabled', () => {
@@ -94,18 +89,16 @@ describe('useCartContext', () => {
       return null
     }
 
-    // Suppress console.error for this test
     const spy = vi.spyOn(console, 'error').mockImplementation(() => {})
 
     expect(() => render(<TestComponent />)).toThrow(
-      'useCartContext must be used within CartProvider'
+      'use-shopping-cart hooks must be used within CartProvider'
     )
 
     spy.mockRestore()
   })
 })
 
-// Integration tests with useShoppingCart
 import { useShoppingCart } from './useShoppingCart'
 import { act } from '@testing-library/react'
 
@@ -166,7 +159,6 @@ describe('CartProvider integration with useShoppingCart', () => {
       screen.getByText('Add').click()
     })
 
-    // Both consumers should see the same count
     expect(screen.getByTestId('count')).toHaveTextContent('1')
     expect(screen.getByTestId('second-count')).toHaveTextContent('1')
   })

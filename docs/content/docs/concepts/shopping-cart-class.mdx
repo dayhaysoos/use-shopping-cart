@@ -9,202 +9,100 @@ Understanding the core ShoppingCart class that powers use-shopping-cart v4.0.
 
 The `ShoppingCart` class is the heart of use-shopping-cart v4.0. It manages all cart state and provides methods for cart operations using a pub/sub pattern.
 
-## Basic Structure
+## Public API
 
 ```typescript
 class ShoppingCart {
-  private state: CartState
-  private listeners: Set<Listener>
-  private storage: Storage
+  constructor(config?: CartConfig)
 
-  constructor(config: CartConfig) {
-    this.state = this.loadInitialState()
-    this.listeners = new Set()
-    this.storage = config.storage || createLocalStorage()
-  }
+  getState(): Readonly<CartState>
+  getInitialState(): Readonly<CartState>
+  subscribe(callback: (state: CartState) => void): () => void
 
-  // Subscribe to state changes
-  subscribe(listener: Listener): Unsubscribe {
-    this.listeners.add(listener)
-    return () => this.listeners.delete(listener)
-  }
+  addItem(product: Product, options?: AddItemOptions): void
+  incrementItem(id: string, options?: IncrementOptions): void
+  decrementItem(id: string, options?: IncrementOptions): void
+  setItemQuantity(id: string, quantity: number): void
+  removeItem(id: string): void
+  clearCart(): void
+  loadCart(cartDetails: CartDetails, shouldMerge?: boolean): void
 
-  // Get current state
-  getSnapshot(): CartState {
-    return this.state
-  }
-
-  // Notify all listeners of changes
-  private notifyListeners(): void {
-    this.listeners.forEach((listener) => listener())
-  }
+  handleCartClick(): void
+  handleCartHover(): void
+  handleCloseCart(): void
+  storeLastClicked(id: string): void
+  changeCurrency(currency: string): void
+  changeLanguage(language: string): void
 }
 ```
 
-## State Management
+## State
 
-### Immutable Updates
+Every change replaces the state object instead of mutating it, so `getState()` returns a new object after each change and the same object otherwise. That's what lets `useShoppingCart` (built on `useSyncExternalStore`) skip re-renders when nothing changed.
 
-All state modifications create new state objects:
+`getInitialState()` returns the state built from config alone: your `cartDetails`, `currency`, and `language` (`en-US` if you don't set one), without the saved cart or the browser's language. It's the same on the server and in the browser, so `useShoppingCart` renders it on the server and while hydrating, then switches to `getState()`. Until something changes the cart, both return the same object.
 
-```typescript
-// Adding an item
-addItem(product: Product): void {
-  const entry = this.createCartEntry(product)
+`cartCount`, `totalPrice`, `formattedTotalPrice` and each entry's `value`, `formattedValue` and `formattedPrice` are recomputed whenever the cart entries, currency or language change. They're plain fields on the state, not getters.
 
-  this.state = {
-    ...this.state,
-    cartDetails: {
-      ...this.state.cartDetails,
-      [product.id]: entry
-    },
-    cartCount: this.state.cartCount + 1,
-    totalPrice: this.state.totalPrice + product.price
-  }
-
-  this.persistState()
-  this.notifyListeners()
-}
-```
-
-### Why Immutability?
-
-1. **Predictable**: Easy to reason about state changes
-2. **Time-travel**: Can track state history
-3. **Debugging**: Clear before/after snapshots
-4. **React-friendly**: Works perfectly with React's rendering
-
-## Pub/Sub Pattern
-
-### How It Works
-
-```
-Component subscribes
-        ↓
-   Listener registered
-        ↓
-   State changes
-        ↓
-   All listeners notified
-        ↓
-   Components re-render
-```
-
-### Example
+## Subscribing
 
 ```typescript
-// Component subscribes
-const unsubscribe = cart.subscribe(() => {
-  console.log('Cart changed!', cart.getState())
+const unsubscribe = cart.subscribe((state) => {
+  console.log('Cart changed!', state.cartCount)
 })
 
-// Make changes
-cart.addItem(product) // Logs: "Cart changed! { ... }"
-cart.removeItem(id) // Logs: "Cart changed! { ... }"
+cart.addItem(product)
+cart.removeItem(product.id)
 
-// Cleanup
 unsubscribe()
 ```
 
-## Methods vs Properties
-
-### When to Use Methods
-
-Methods modify the cart state:
-
-```typescript
-cart.addItem(product) // Adds item
-cart.incrementItem(id) // Increases quantity
-cart.removeItem(id) // Removes item
-cart.clearCart() // Clears everything
-```
-
-### When to Use Properties
-
-Properties read the cart state:
-
-```typescript
-const count = cart.getState().cartCount
-const total = cart.getState().totalPrice
-const items = cart.getState().cartDetails
-```
-
-## Computed Values
-
-Some values are computed on-demand:
-
-```typescript
-class ShoppingCart {
-  // Computed when accessed
-  get formattedTotalPrice(): string {
-    return formatCurrencyString({
-      value: this.state.totalPrice,
-      currency: this.state.currency,
-      language: this.state.language
-    })
-  }
-
-  // Not stored, calculated fresh each time
-  get isEmpty(): boolean {
-    return this.state.cartCount === 0
-  }
-}
-```
+Subscribers are called synchronously after every change, with the new state.
 
 ## Persistence
 
-### Auto-Save
+With `shouldPersist` on (the default) and in a browser, the cart:
 
-The cart automatically persists to storage on every change:
+- **Loads** the saved cart from `storage` under `persistKey` when it's created. With an async adapter, the saved cart is applied when the Promise resolves. If cart entries changed in the meantime, the saved cart is skipped; a currency or language set in the meantime is kept, and the saved entries are still restored.
+- **Saves** `cartDetails`, `currency` and `language` (plus the totals) whenever the cart entries, currency or language change. Opening the cart or `storeLastClicked` doesn't write to storage.
+- **Ignores** saved data it can't parse, and drops entries that aren't valid cart entries.
 
-```typescript
-private persistState(): void {
-  if (this.config.shouldPersist) {
-    const serialized = JSON.stringify(this.state)
-    this.storage.setItem(this.config.persistKey, serialized)
-  }
-}
-```
-
-### Auto-Load
-
-On initialization, the cart loads from storage:
-
-```typescript
-private loadInitialState(): CartState {
-  if (!this.config.shouldPersist) {
-    return this.createEmptyState()
-  }
-
-  const saved = this.storage.getItem(this.config.persistKey)
-  return saved ? JSON.parse(saved) : this.createEmptyState()
-}
-```
+See [Persistence](/docs/concepts/persistence) for adapters and examples.
 
 ## Error Handling
 
-The class includes built-in error handling:
+Invalid input throws a `CartError` and leaves the cart unchanged. Branch on `error.code` rather than the message:
 
 ```typescript
-addItem(product: Product): void {
-  try {
-    this.validateProduct(product)
-    // ... add item logic
-  } catch (error) {
-    console.error('Failed to add item:', error)
-    // State remains unchanged
-  }
-}
+import { ShoppingCart, isCartError } from 'use-shopping-cart/core'
 
-private validateProduct(product: Product): void {
-  if (!product.id) {
-    throw new Error('Product must have an id')
-  }
-  if (!product.price || product.price < 0) {
-    throw new Error('Product must have a valid price')
+try {
+  cart.incrementItem(id)
+} catch (error) {
+  if (isCartError(error) && error.code === 'ITEM_NOT_IN_CART') {
+    cart.addItem(product)
+  } else {
+    throw error
   }
 }
 ```
+
+Use `isCartError(error)` rather than `instanceof CartError`: each entry point (`use-shopping-cart`, `/core`, `/utilities`) bundles its own copy of the class, so `instanceof` fails across them.
+
+| Code                   | Thrown by                                                                                    |
+| ---------------------- | -------------------------------------------------------------------------------------------- |
+| `INVALID_PRODUCT`      | `addItem` and `addToCartAction` with a product missing `name`, `price` or `currency`         |
+| `INVALID_COUNT`        | a `count` that isn't a positive integer                                                      |
+| `INVALID_QUANTITY`     | a `quantity` that isn't a non-negative integer (or positive, in `validateCartItems`)         |
+| `ITEM_NOT_IN_CART`     | `incrementItem`, `decrementItem`, `setItemQuantity`, `removeItem` with an ID not in the cart |
+| `INVALID_FORM_DATA`    | `useCartActions` forms with missing or unreadable fields                                     |
+| `INVALID_INVENTORY`    | `validateCartItems` with an inventory that isn't a list of objects                           |
+| `INVALID_CART`         | `loadCart` and `validateCartItems` with malformed `cartDetails`                              |
+| `NOT_IN_INVENTORY`     | `validateCartItems` with a cart entry that isn't in the inventory                            |
+| `INVALID_CHECKOUT_URL` | `redirectToCheckout` with anything other than an `http(s)` session URL                       |
+| `NO_CART_PROVIDER`     | `useShoppingCart` and the other hooks outside `<CartProvider>`                               |
+| `NOT_IN_BROWSER`       | `redirectToCheckout` called on the server                                                    |
+| `UNKNOWN`              | only in `useCartActions` state, for errors that aren't `CartError`s                          |
 
 ## Testing
 
@@ -216,7 +114,7 @@ import { ShoppingCart } from 'use-shopping-cart/core'
 test('adds item to cart', () => {
   const cart = new ShoppingCart({
     currency: 'USD',
-    stripe: 'pk_test_...'
+    shouldPersist: false
   })
 
   const product = {
@@ -241,13 +139,27 @@ While most users use `useShoppingCart()`, you can use the class directly:
 import { ShoppingCart } from 'use-shopping-cart/core'
 
 const cart = new ShoppingCart({
-  currency: 'USD',
-  stripe: 'pk_test_...'
+  currency: 'USD'
 })
+```
 
+The constructor takes a `CartConfig`:
+
+| Option          | Default               | Description                                         |
+| --------------- | --------------------- | --------------------------------------------------- |
+| `cartDetails`   | `{}`                  | Initial cart entries; totals are computed from them |
+| `currency`      | `'USD'`               | ISO 4217 currency code                              |
+| `language`      | `navigator.language`  | Language for formatting                             |
+| `shouldPersist` | `true`                | Save the cart to `storage`                          |
+| `persistKey`    | `'use-shopping-cart'` | Storage key                                         |
+| `storage`       | `localStorage`        | A `StorageAdapter`                                  |
+
+Config options aren't part of `getState()`. `getState()` returns `cartDetails`, `cartCount`, `totalPrice`, `formattedTotalPrice`, `currency`, `language`, `shouldDisplayCart` and `lastClicked`.
+
+```typescript
 // Subscribe to changes
-cart.subscribe(() => {
-  updateUI(cart.getState())
+cart.subscribe((state) => {
+  updateUI(state)
 })
 
 // Use cart methods

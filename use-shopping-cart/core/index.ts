@@ -1,11 +1,13 @@
-// Core exports for use-shopping-cart
 import type { CartDetails, CartEntry } from './types'
 
 export { ShoppingCart, initialState } from './ShoppingCart'
 export { formatCurrencyString } from './formatters'
+export { CartError, isCartError } from './errors'
+export { redirectToCheckout } from './checkout'
+export type { CartErrorCode } from './errors'
 export {
   createLocalStorage,
-  createNoopStorage,
+  createSessionStorage,
   createMemoryStorage
 } from './storage'
 
@@ -16,7 +18,6 @@ export type {
   CartEntryAttributes,
   CartDetails,
   CartState,
-  RedirectToCheckoutInput,
   CartConfig,
   AddItemOptions,
   IncrementOptions,
@@ -26,16 +27,15 @@ export type {
   FormatCurrencyStringOptions
 } from './types'
 
-// Helper function for filtering cart
 export async function filterCart(
   cartDetails: CartDetails,
   filter: (entry: CartEntry) => Promise<boolean> | boolean
 ): Promise<CartDetails> {
   const filteredCart: CartDetails = {}
 
-  for (const sku in cartDetails) {
-    const entry = cartDetails[sku]
-    if (await filter(entry)) filteredCart[sku] = entry
+  for (const id in cartDetails) {
+    const entry = cartDetails[id]
+    if (await filter(entry)) filteredCart[id] = entry
   }
 
   return filteredCart

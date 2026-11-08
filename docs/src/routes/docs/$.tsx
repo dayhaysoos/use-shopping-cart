@@ -70,7 +70,7 @@ function Page() {
   }, [data.path])
 
   return (
-    <CartProvider stripe={''} currency="USD" shouldPersist={false}>
+    <CartProvider currency="USD" shouldPersist={false}>
       <DocsLayout {...baseOptions()} tree={data.pageTree}>
         <Suspense>{clientLoader.useContent(data.path)}</Suspense>
       </DocsLayout>

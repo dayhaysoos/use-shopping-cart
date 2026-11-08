@@ -18,14 +18,14 @@ type HomeLoaderData = {
   metrics: HomeMetrics
 }
 
-const INSTALL_SNIPPET = 'npm install @stripe/stripe-js use-shopping-cart'
+const INSTALL_SNIPPET = 'npm install use-shopping-cart'
 const CODE_THEME = themes.nightOwl
 
 const PRIMARY_FEATURES = [
   {
     title: 'Optimistic cart UX',
     description:
-      'useOptimisticCart mirrors server state so quantity and price changes feel instant while requests settle.'
+      'useOptimisticCart shows each change instantly while your backend request settles, and rolls it back if the request fails.'
   },
   {
     title: 'State persistence controls',
@@ -60,19 +60,13 @@ const SECONDARY_FEATURES = [
 const WORKFLOW_STEPS = [
   {
     title: 'Wrap your app',
-    description:
-      'Drop `<CartProvider>` at the root and pass your Stripe publishable key.',
+    description: 'Drop `<CartProvider>` at the root and pick a currency.',
     language: 'tsx',
     code: `import { CartProvider } from 'use-shopping-cart'
 
 export function Root() {
   return (
-    <CartProvider
-      mode="payment"
-      cartMode="checkout-session"
-      stripe={import.meta.env.VITE_STRIPE_KEY}
-      currency="USD"
-    >
+    <CartProvider currency="USD">
       <App />
     </CartProvider>
   )
@@ -97,19 +91,24 @@ export function Root() {
   {
     title: 'Build the frontend',
     description:
-      'Use the hook to format currency, add items, or kick off Checkout.',
+      'Use the hook to add products and read totals, and formatCurrencyString to format prices.',
     language: 'tsx',
     code: `import { useShoppingCart, formatCurrencyString } from 'use-shopping-cart'
 
 function Product({ product }) {
-  const { addItem } = useShoppingCart()
+  const { addItem, language } = useShoppingCart()
 
   return (
     <button
       onClick={() => addItem(product)}
       className="rounded-full bg-white/10 px-4 py-2"
     >
-      Add {formatCurrencyString({ value: product.price, currency: 'USD' })}
+      Add{' '}
+      {formatCurrencyString({
+        value: product.price,
+        currency: 'USD',
+        language
+      })}
     </button>
   )
 }`
@@ -134,7 +133,7 @@ export const handler = async (event) => {
     cancel_url: process.env.CANCEL_URL
   })
 
-  return { statusCode: 200, body: JSON.stringify({ sessionId: session.id }) }
+  return { statusCode: 200, body: JSON.stringify({ sessionUrl: session.url }) }
 }`
   }
 ]
@@ -154,11 +153,7 @@ import App from './App'
 
 export function Root() {
   return (
-    <CartProvider
-      stripe={import.meta.env.VITE_STRIPE_KEY}
-      currency="USD"
-      shouldPersist
-    >
+    <CartProvider currency="USD" shouldPersist>
       <App />
     </CartProvider>
   )
@@ -167,7 +162,7 @@ export function Root() {
   {
     id: 'next',
     label: 'Next.js',
-    description: 'App Router layout with checkout-session mode.',
+    description: 'App Router layout.',
     language: 'tsx',
     code: `'use client'
 import { CartProvider } from 'use-shopping-cart'
@@ -178,11 +173,7 @@ export default function RootLayout({
   children: React.ReactNode
 }) {
   return (
-    <CartProvider
-      stripe={process.env.NEXT_PUBLIC_STRIPE_KEY!}
-      currency="USD"
-      shouldPersist
-    >
+    <CartProvider currency="USD" shouldPersist>
       {children}
     </CartProvider>
   )
@@ -199,7 +190,7 @@ import { CartProvider } from 'use-shopping-cart'
 export default function App() {
   return (
     <Document>
-      <CartProvider stripe={process.env.STRIPE_KEY!} currency="USD">
+      <CartProvider currency="USD">
         <Outlet />
       </CartProvider>
     </Document>

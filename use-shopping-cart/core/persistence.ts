@@ -1,13 +1,14 @@
-import type { CartDetails, CartEntry, CartState, StorageAdapter } from './types'
+import type { CartDetails, CartState, StorageAdapter } from './types'
+import { isValidCartEntry } from './validation'
 
-export interface StoredCart {
+export interface SavedCart {
   cartDetails: CartDetails
   currency?: string
   language?: string
 }
 
 export interface CartPersister {
-  load(onLoad: (stored: StoredCart) => void): void
+  load(onLoad: (saved: SavedCart) => void): void
   save(state: Readonly<CartState>): void
 }
 
@@ -19,6 +20,18 @@ export function createCartPersister(
   initial: Readonly<PersistedFields>
 ): CartPersister {
   let lastSaved: Readonly<PersistedFields> | null = initial
+  let lastSeen: Readonly<PersistedFields> = initial
+  let loading = true
+  let entriesChanged = false
+  let settingsChanged = false
+
+  function finishLoad(raw: string | null, onLoad: (saved: SavedCart) => void) {
+    loading = false
+    if (entriesChanged) return
+    const saved = raw ? parseSavedCart(raw) : null
+    if (!saved) return
+    onLoad(settingsChanged ? { cartDetails: saved.cartDetails } : saved)
+  }
 
   return {
     load(onLoad) {
@@ -26,24 +39,34 @@ export function createCartPersister(
         const raw = storage.getItem(key)
         if (raw instanceof Promise) {
           raw
-            .then((data) => {
-              const stored = data ? parseStoredCart(data) : null
-              if (stored) onLoad(stored)
-            })
+            .then((data) => finishLoad(data, onLoad))
             .catch((error) => {
+              loading = false
               console.warn('Failed to load cart from storage:', error)
             })
           return
         }
 
-        const stored = raw ? parseStoredCart(raw) : null
-        if (stored) onLoad(stored)
+        finishLoad(raw, onLoad)
       } catch (error) {
+        loading = false
         console.warn('Failed to load cart from storage:', error)
       }
     },
 
     save(state) {
+      if (loading) {
+        if (
+          state.currency !== lastSeen.currency ||
+          state.language !== lastSeen.language
+        ) {
+          settingsChanged = true
+        } else if (state.cartDetails !== lastSeen.cartDetails) {
+          entriesChanged = true
+        }
+      }
+      lastSeen = state
+
       if (
         lastSaved &&
         lastSaved.cartDetails === state.cartDetails &&
@@ -70,12 +93,12 @@ export function createCartPersister(
   }
 }
 
-export function parseStoredCart(raw: string): StoredCart | null {
+export function parseSavedCart(raw: string): SavedCart | null {
   let parsed: unknown
   try {
     parsed = JSON.parse(raw)
   } catch (error) {
-    console.warn('Failed to parse stored cart data:', error)
+    console.warn('Failed to parse saved cart data:', error)
     return null
   }
   if (!parsed || typeof parsed !== 'object') return null
@@ -109,24 +132,6 @@ function serializeCart(state: Readonly<CartState>): string {
     currency: state.currency,
     language: state.language
   })
-}
-
-function isValidCartEntry(entry: unknown): entry is CartEntry {
-  if (!entry || typeof entry !== 'object') return false
-
-  const e = entry as Record<string, unknown>
-  return (
-    typeof e.id === 'string' &&
-    typeof e.price === 'number' &&
-    Number.isFinite(e.price) &&
-    typeof e.quantity === 'number' &&
-    Number.isInteger(e.quantity) &&
-    e.quantity > 0 &&
-    typeof e.value === 'number' &&
-    Number.isFinite(e.value) &&
-    typeof e.name === 'string' &&
-    typeof e.currency === 'string'
-  )
 }
 
 function nonEmptyString(value: unknown): string | undefined {

@@ -5,8 +5,6 @@ import { act } from 'react'
 import { CartProvider } from './CartProvider'
 import { useCartActions } from './useCartActions'
 
-// Suppress console errors/warnings in tests
-// These are expected in tests but not in real usage
 const originalError = console.error
 const originalWarn = console.warn
 
@@ -44,7 +42,6 @@ const wrapper = ({ children }) => (
   <CartProvider
     mode="payment"
     cartMode="client-only"
-    stripe="pk_test_123"
     successUrl="https://example.com/success"
     cancelUrl="https://example.com/cancel"
     currency="USD"
@@ -84,13 +81,15 @@ describe('useCartActions', () => {
 
       expect(result.current.addItemState.error).toBeNull()
       expect(result.current.addItemState.productId).toBe(mockProduct.id)
+      expect(result.current.addItemState.errorCode).toBeNull()
     })
 
     test('should handle missing product data', async () => {
       const { result } = renderHook(() => useCartActions(), { wrapper })
 
+      expect(result.current.addItemState.errorCode).toBeNull()
+
       const formData = new FormData()
-      // No product data
 
       await act(async () => {
         await result.current.addToCartAction(formData)
@@ -101,6 +100,7 @@ describe('useCartActions', () => {
       })
 
       expect(result.current.addItemState.error).toBe('Product data is required')
+      expect(result.current.addItemState.errorCode).toBe('INVALID_FORM_DATA')
     })
 
     test('should reject invalid JSON product data', async () => {
@@ -156,8 +156,8 @@ describe('useCartActions', () => {
         expect(result.current.addItemState.status).toBe('error')
       })
 
-      expect(result.current.addItemState.error).toBe(
-        'count must be a positive integer'
+      expect(result.current.addItemState.error).toContain(
+        'count must be an integer'
       )
     })
 
@@ -176,8 +176,8 @@ describe('useCartActions', () => {
         expect(result.current.addItemState.status).toBe('error')
       })
 
-      expect(result.current.addItemState.error).toBe(
-        'count must be a positive integer'
+      expect(result.current.addItemState.error).toContain(
+        'count must be a finite number'
       )
     })
 
@@ -196,8 +196,8 @@ describe('useCartActions', () => {
         expect(result.current.addItemState.status).toBe('error')
       })
 
-      expect(result.current.addItemState.error).toBe(
-        'count must be a positive integer'
+      expect(result.current.addItemState.error).toContain(
+        'count must be greater than 0'
       )
     })
 
@@ -206,7 +206,6 @@ describe('useCartActions', () => {
 
       const formData = new FormData()
       formData.append('product', JSON.stringify(mockProduct))
-      // No count provided
 
       await act(async () => {
         await result.current.addToCartAction(formData)
@@ -222,7 +221,6 @@ describe('useCartActions', () => {
     test('should remove item via form action', async () => {
       const { result } = renderHook(() => useCartActions(), { wrapper })
 
-      // First add an item
       const addFormData = new FormData()
       addFormData.append('product', JSON.stringify(mockProduct))
 
@@ -234,7 +232,6 @@ describe('useCartActions', () => {
         expect(result.current.addItemState.status).toBe('success')
       })
 
-      // Then remove it
       const removeFormData = new FormData()
       removeFormData.append('itemId', mockProduct.id)
 
@@ -253,7 +250,6 @@ describe('useCartActions', () => {
       const { result } = renderHook(() => useCartActions(), { wrapper })
 
       const formData = new FormData()
-      // No itemId
 
       await act(async () => {
         await result.current.removeFromCartAction(formData)
@@ -271,7 +267,6 @@ describe('useCartActions', () => {
     test('should update quantity via form action', async () => {
       const { result } = renderHook(() => useCartActions(), { wrapper })
 
-      // First add an item
       const addFormData = new FormData()
       addFormData.append('product', JSON.stringify(mockProduct))
 
@@ -283,7 +278,6 @@ describe('useCartActions', () => {
         expect(result.current.addItemState.status).toBe('success')
       })
 
-      // Then update quantity
       const updateFormData = new FormData()
       updateFormData.append('itemId', mockProduct.id)
       updateFormData.append('quantity', '5')
@@ -303,7 +297,6 @@ describe('useCartActions', () => {
       const { result } = renderHook(() => useCartActions(), { wrapper })
 
       const formData = new FormData()
-      // Missing itemId and quantity
 
       await act(async () => {
         await result.current.updateQuantityAction(formData)
@@ -314,7 +307,7 @@ describe('useCartActions', () => {
       })
 
       expect(result.current.updateQuantityState.error).toBe(
-        'Item ID and quantity are required'
+        'Item ID is required'
       )
     })
 
@@ -333,8 +326,8 @@ describe('useCartActions', () => {
         expect(result.current.updateQuantityState.status).toBe('error')
       })
 
-      expect(result.current.updateQuantityState.error).toBe(
-        'quantity must be a non-negative integer'
+      expect(result.current.updateQuantityState.error).toContain(
+        'quantity must be a finite number'
       )
     })
 
@@ -353,8 +346,8 @@ describe('useCartActions', () => {
         expect(result.current.updateQuantityState.status).toBe('error')
       })
 
-      expect(result.current.updateQuantityState.error).toBe(
-        'quantity must be a non-negative integer'
+      expect(result.current.updateQuantityState.error).toContain(
+        'quantity must be greater than or equal to 0'
       )
     })
 
@@ -373,8 +366,8 @@ describe('useCartActions', () => {
         expect(result.current.updateQuantityState.status).toBe('error')
       })
 
-      expect(result.current.updateQuantityState.error).toBe(
-        'quantity must be a non-negative integer'
+      expect(result.current.updateQuantityState.error).toContain(
+        'quantity must be an integer'
       )
     })
 
@@ -393,8 +386,8 @@ describe('useCartActions', () => {
         expect(result.current.updateQuantityState.status).toBe('error')
       })
 
-      expect(result.current.updateQuantityState.error).toBe(
-        'quantity must be a non-negative integer'
+      expect(result.current.updateQuantityState.error).toContain(
+        'quantity must be a finite number'
       )
     })
   })
@@ -403,7 +396,6 @@ describe('useCartActions', () => {
     test('should increment item via form action', async () => {
       const { result } = renderHook(() => useCartActions(), { wrapper })
 
-      // First add an item
       const addFormData = new FormData()
       addFormData.append('product', JSON.stringify(mockProduct))
 
@@ -415,7 +407,6 @@ describe('useCartActions', () => {
         expect(result.current.addItemState.status).toBe('success')
       })
 
-      // Then increment
       const incrementFormData = new FormData()
       incrementFormData.append('itemId', mockProduct.id)
       incrementFormData.append('count', '2')
@@ -432,7 +423,6 @@ describe('useCartActions', () => {
     test('should default count to 1', async () => {
       const { result } = renderHook(() => useCartActions(), { wrapper })
 
-      // First, add an item to the cart
       const addFormData = new FormData()
       addFormData.append('product', JSON.stringify(mockProduct))
 
@@ -444,10 +434,8 @@ describe('useCartActions', () => {
         expect(result.current.addItemState.status).toBe('success')
       })
 
-      // Now increment it without providing count (should default to 1)
       const formData = new FormData()
       formData.append('itemId', mockProduct.id)
-      // No count provided - should default to 1
 
       await act(async () => {
         await result.current.incrementItemAction(formData)
@@ -462,7 +450,6 @@ describe('useCartActions', () => {
       const { result } = renderHook(() => useCartActions(), { wrapper })
 
       const formData = new FormData()
-      // No itemId
 
       await act(async () => {
         await result.current.incrementItemAction(formData)
@@ -492,8 +479,8 @@ describe('useCartActions', () => {
         expect(result.current.incrementItemState.status).toBe('error')
       })
 
-      expect(result.current.incrementItemState.error).toBe(
-        'count must be a positive integer'
+      expect(result.current.incrementItemState.error).toContain(
+        'count must be greater than 0'
       )
     })
   })
@@ -502,7 +489,6 @@ describe('useCartActions', () => {
     test('should decrement item via form action', async () => {
       const { result } = renderHook(() => useCartActions(), { wrapper })
 
-      // First add an item with quantity 3
       const addFormData = new FormData()
       addFormData.append('product', JSON.stringify(mockProduct))
       addFormData.append('count', '3')
@@ -515,7 +501,6 @@ describe('useCartActions', () => {
         expect(result.current.addItemState.status).toBe('success')
       })
 
-      // Then decrement
       const decrementFormData = new FormData()
       decrementFormData.append('itemId', mockProduct.id)
       decrementFormData.append('count', '1')
@@ -533,7 +518,6 @@ describe('useCartActions', () => {
       const { result } = renderHook(() => useCartActions(), { wrapper })
 
       const formData = new FormData()
-      // No itemId
 
       await act(async () => {
         await result.current.decrementItemAction(formData)
@@ -563,8 +547,8 @@ describe('useCartActions', () => {
         expect(result.current.decrementItemState.status).toBe('error')
       })
 
-      expect(result.current.decrementItemState.error).toBe(
-        'count must be a positive integer'
+      expect(result.current.decrementItemState.error).toContain(
+        'count must be greater than 0'
       )
     })
   })
@@ -573,7 +557,6 @@ describe('useCartActions', () => {
     test('should clear cart via form action', async () => {
       const { result } = renderHook(() => useCartActions(), { wrapper })
 
-      // First add some items
       const addFormData = new FormData()
       addFormData.append('product', JSON.stringify(mockProduct))
 
@@ -585,7 +568,6 @@ describe('useCartActions', () => {
         expect(result.current.addItemState.status).toBe('success')
       })
 
-      // Then clear the cart
       const clearFormData = new FormData()
 
       await act(async () => {
@@ -614,8 +596,6 @@ describe('useCartActions', () => {
         actionPromise = result.current.addToCartAction(formData)
       })
 
-      // During action execution, isPending might be true
-      // But since actions are fast, we just verify it completes
       await act(async () => {
         await actionPromise
       })
@@ -630,7 +610,6 @@ describe('useCartActions', () => {
     test('should maintain separate states for different actions', async () => {
       const { result } = renderHook(() => useCartActions(), { wrapper })
 
-      // All states should start idle
       expect(result.current.addItemState.status).toBe('idle')
       expect(result.current.removeItemState.status).toBe('idle')
       expect(result.current.updateQuantityState.status).toBe('idle')
@@ -642,9 +621,7 @@ describe('useCartActions', () => {
     test('should handle errors without affecting other actions', async () => {
       const { result } = renderHook(() => useCartActions(), { wrapper })
 
-      // Trigger error on addItem
       const badFormData = new FormData()
-      // No product data
 
       await act(async () => {
         await result.current.addToCartAction(badFormData)
@@ -654,9 +631,29 @@ describe('useCartActions', () => {
         expect(result.current.addItemState.status).toBe('error')
       })
 
-      // Other action states should still be idle
       expect(result.current.removeItemState.status).toBe('idle')
       expect(result.current.clearCartState.status).toBe('idle')
+    })
+  })
+
+  describe('errorCode', () => {
+    test('carries the CartError code from the cart', async () => {
+      const { result } = renderHook(() => useCartActions(), { wrapper })
+
+      const formData = new FormData()
+      formData.append('itemId', 'missing')
+
+      await act(async () => {
+        await result.current.incrementItemAction(formData)
+      })
+
+      await waitFor(() => {
+        expect(result.current.incrementItemState.status).toBe('error')
+      })
+
+      expect(result.current.incrementItemState.errorCode).toBe(
+        'ITEM_NOT_IN_CART'
+      )
     })
   })
 })

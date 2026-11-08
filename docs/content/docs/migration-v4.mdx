@@ -7,14 +7,16 @@ Guide for upgrading from v3.x to v4.0.
 
 ## Overview
 
-Version 4.0 brings significant improvements while staying API-compatible with v3.x checkout-session mode. The main changes include:
+Version 4.0 brings significant improvements. Cart methods and state work as before, but some APIs changed (see [Breaking Changes](#breaking-changes)). The main changes include:
 
 - **Redux Removal**: Now uses React's native `useSyncExternalStore`
 - **Modern Stripe Features**: Phone collection, promotion codes, automatic tax, etc.
 - **React 19 Support**: Full compatibility with React 19
-- **Client-Only Deprecation**: Client-only mode is deprecated (still works, but not recommended)
+- **Client-Only Mode Removed**: use checkout sessions created on your server
+- **Standalone `redirectToCheckout`**: import it and pass `session.url`; no Stripe key in the browser
+- **Typed Errors**: every error is a `CartError` with a `code`
 - **Improved TypeScript**: Better type inference and exported types
-- **Smaller Bundle**: Reduced bundle size without Redux
+- **Smaller Bundle**: no Redux; the React entry is about 8 KB gzipped
 
 ## Quick Start
 
@@ -62,7 +64,77 @@ Imports through `use-shopping-cart`, `use-shopping-cart/core` and `use-shopping-
 
 `dist/react.umd.js` and `dist/core.umd.js` keep their names.
 
-**All other APIs**: backward compatible for checkout-session mode users.
+### Errors Are `CartError`s
+
+Errors thrown by the cart, `useCartActions` forms, `validateCartItems` and `redirectToCheckout` are now `CartError`s with a `code` (for example `ITEM_NOT_IN_CART`, `NOT_IN_INVENTORY`). Some messages changed (for example invalid count and quantity errors), so match on `code` rather than `message`. Validation errors previously had `name: 'ValidationError'`; they now have `name: 'CartError'`. `useCartActions` states have a new `errorCode` field. See [error codes](/docs/concepts/shopping-cart-class#error-handling).
+
+### `CartConfig` Is Its Own Type
+
+`CartProvider` props and the `ShoppingCart` constructor take only `cartDetails`, `currency`, `language`, `shouldPersist`, `persistKey` and `storage`. Other fields, like `cartCount` or `shouldDisplayCart`, were accepted before and silently ignored or copied into state; they're now type errors. `shouldPersist` is no longer part of the cart state (`useShoppingCart().shouldPersist` and `initialState.shouldPersist` are gone).
+
+### `validateCartItems` Matches More ID Fields
+
+Inventory is now matched by `id`, `price_id`, `sku_id` and `sku` (first match in `inventory` wins), the same fields the cart uses for product ids. Carts with entries added by `price_id` or `sku_id` alone now validate instead of failing with "not in your inventory". Check your inventory if one product's `price_id` or `sku_id` can equal another product's `id` or `sku`: the earlier product now matches.
+
+### `CartProvider` Renders on the Server; `loading` Removed
+
+`CartProvider` now renders its children during server rendering. The server and the first client render show the cart from your props (`cartDetails`, formatted with `language`, or `en-US` if you don't set it); the cart saved in storage and the browser's language apply right after hydration. Before, the server rendered the `loading` prop instead, which made hydration fail. Remove `loading` from `<CartProvider>`. `cart.getInitialState()` returns that server-side state, and `initialState.language` is now always `en-US` (it used to be the browser's language in the browser).
+
+### `useOptimisticCart` Reports Pending Entries in `pendingIds`
+
+`useOptimisticCart()` no longer adds `_optimistic: true` to cart entries; its `cartDetails` hold plain `CartEntry`s. Read the new `pendingIds` set instead: `pendingIds.has(item.id)` replaces `item._optimistic`. The `OptimisticCartEntry` and `OptimisticCartDetails` types are removed; use `CartEntry` and `CartDetails`.
+
+### `createNoopStorage` Removed
+
+Use `shouldPersist={false}` instead of `storage={createNoopStorage()}`; both store nothing.
+
+### Cart Entry Metadata Moved Under `metadata`
+
+`product_metadata` and `price_metadata` from `addItem` are now stored as the entry's `product_data.metadata` and `price_data.metadata`, instead of being spread into `product_data` and `price_data`. This is what makes `validateCartItems` send `product_metadata` to Stripe Checkout; before, it was silently dropped. `price_metadata` stays in the cart, because Checkout's inline prices can't carry metadata.
+
+```js
+// Before
+entry.product_data.gift_wrap
+
+// After
+entry.product_data.metadata.gift_wrap
+```
+
+### `redirectToCheckout` Is a Standalone Function
+
+Import it instead of reading it from the cart, and pass the Checkout Session URL. Session IDs, the `stripe` prop and `changeStripeKey` are gone: Stripe removed `redirectToCheckout({ sessionId })` from Stripe.js, and a session URL needs no publishable key.
+
+```jsx
+// Before
+const { redirectToCheckout } = useShoppingCart()
+await redirectToCheckout(sessionId)
+
+// After: return session.url from your server
+import { redirectToCheckout } from 'use-shopping-cart'
+redirectToCheckout(sessionUrl)
+```
+
+### `useShoppingCart(selector)` Is Back
+
+As in v3, `useShoppingCart` takes an optional selector, and the component re-renders only when the selected value changes:
+
+```js
+const cartCount = useShoppingCart((cart) => cart.cartCount)
+```
+
+### `loadCart` Checks Its Cart Entries
+
+`loadCart` now throws a `CartError` with code `INVALID_CART`, and leaves the cart unchanged, if `cartDetails` isn't an object or an entry is missing a string `id`, `name` or `currency`, a finite `price`, or a `quantity` that's an integer greater than 0. Before, such entries loaded with `NaN` totals, and `loadCart(null, false)` emptied the cart. `value` and the formatted fields are recomputed, so you can leave them out. If you load carts from your server, pass the cart entries themselves, not an object that wraps them:
+
+```js
+// Before: loaded a broken entry named "cartDetails"
+loadCart(savedCart, false) // savedCart is { cartDetails: { ... } }
+
+// After
+loadCart(savedCart.cartDetails, false)
+```
+
+Apart from the breaking changes above, cart methods (`addItem`, `incrementItem`, `removeItem`, ...) work as before, and so does cart state (`cartCount`, `cartDetails`, ...).
 
 ## What's New in v4.0
 
@@ -70,14 +142,13 @@ Imports through `use-shopping-cart`, `use-shopping-cart/core` and `use-shopping-
 
 Full compatibility with React 19, including support for:
 
-- `useOptimistic` for optimistic cart updates
+- `useOptimistic`, through `useOptimisticCart`, for optimistic changes while your backend syncs
 - `useActionState` for form-based cart actions
 - Concurrent rendering features
 
 ### Improved Performance
 
-- 40% smaller bundle size
-- Faster cart operations
+- No Redux: the React entry is about 8 KB gzipped
 - Better TypeScript support
 
 ## What's Changed
@@ -94,7 +165,7 @@ Full compatibility with React 19, including support for:
 
 **Benefits:**
 
-- **Smaller bundle size**: ~40% smaller
+- **Smaller bundle size**: no Redux, React-Redux or Redux Toolkit
 - **Better performance**: Fewer re-renders
 - **Simpler mental model**: No Redux concepts to understand
 - **React 19 compatible**: Works with React's latest features
@@ -115,32 +186,35 @@ Full compatibility with React 19, including support for:
 
 ```jsx
 import { CartProvider } from 'use-shopping-cart'
-;<CartProvider
-  mode="payment"
-  cartMode="client-only"
-  stripe={STRIPE_KEY}
-  successUrl="https://yoursite.com/success"
-  cancelUrl="https://yoursite.com/cancel"
-  currency="USD"
->
-  <App />
-</CartProvider>
+export const Root = () => (
+  <CartProvider
+    mode="payment"
+    cartMode="client-only"
+    stripe={STRIPE_KEY}
+    successUrl="https://yoursite.com/success"
+    cancelUrl="https://yoursite.com/cancel"
+    currency="USD"
+  >
+    <App />
+  </CartProvider>
+)
 ```
 
 **After (Checkout-Session - v4.0):**
 
 ```jsx
 import { CartProvider } from 'use-shopping-cart'
-;<CartProvider stripe={STRIPE_KEY} currency="USD">
-  <App />
-</CartProvider>
+export const Root = () => (
+  <CartProvider currency="USD">
+    <App />
+  </CartProvider>
+)
 ```
 
 **Additional Steps Required:**
 
 1. Create a server endpoint to generate checkout sessions
 2. Move `successUrl` and `cancelUrl` to server-side
-3. Update product data structure (use `id` instead of `price_id`)
 
 **See:** [Getting Started](/docs/getting-started) for detailed setup guide.
 
@@ -215,33 +289,27 @@ Object.values(cartDetails).forEach((item) => {
 
 ### Reduced Bundle Size
 
-- **Before (v3.x):** ~45 KB (minified + gzipped)
-- **After (v4.0):** ~27 KB (minified + gzipped)
-- **Savings:** ~40% smaller
+v4 drops Redux, React-Redux and Redux Toolkit. The `use-shopping-cart` entry is about 8 KB minified and gzipped, with React as its only dependency.
 
 ### Fewer Re-renders
 
-Thanks to React's `useSyncExternalStore`, components only re-render when the specific cart data they use changes.
+Pass a selector to `useShoppingCart` and a component re-renders only when the value it selects changes (see [`useShoppingCart`](/docs/hooks/useShoppingCart)).
 
 ## API Stability
 
 ### Unchanged APIs
 
-All existing APIs continue to work:
+These work as in v3:
 
-✅ `addItem(product, options?)`
+✅ `addItem(product, options?)` (metadata now lives under `metadata`, see [above](#cart-entry-metadata-moved-under-metadata))
 ✅ `incrementItem(id, options?)`
 ✅ `decrementItem(id, options?)`
 ✅ `setItemQuantity(id, quantity)`
 ✅ `removeItem(id)`
 ✅ `clearCart()`
-✅ `redirectToCheckout()`
-✅ All cart properties (cartCount, totalPrice, etc.)
+✅ Cart state (`cartCount`, `totalPrice`, `formattedTotalPrice`, `cartDetails`, `shouldDisplayCart`, `lastClicked`)
 
-### Deprecated (Still Works)
-
-⚠️ `cartMode="client-only"` - Use `checkout-session` instead
-⚠️ `checkoutSingleItem()` - Only works with client-only mode
+Everything else listed under [Breaking Changes](#breaking-changes) needs updating, including `redirectToCheckout`, the `stripe` prop and client-only mode.
 
 ## Step-by-Step Migration
 
@@ -253,7 +321,7 @@ npm install use-shopping-cart@rc react@19 react-dom@19
 
 ### Step 2: Test Your Application
 
-Run your application. Everything should work as before.
+Update anything listed under [Breaking Changes](#breaking-changes), then run your application and your tests.
 
 ### Step 3: Configure Stripe Features (Server-Side)
 
@@ -313,10 +381,8 @@ npm install -D @types/react@19 @types/react-dom@19
 
 **Check:**
 
-1. `cartMode` is set correctly
-2. For checkout-session: Server endpoint is configured
-3. For client-only: `successUrl` and `cancelUrl` are set
-4. Stripe key is valid
+1. Your server endpoint returns `session.url` (not `session.id`)
+2. You pass that URL to `redirectToCheckout`
 
 ## Getting Help
 
@@ -328,13 +394,13 @@ npm install -D @types/react@19 @types/react-dom@19
 
 ### Mostly Compatible ✅
 
-- Public APIs are backward compatible for checkout-session mode users
-- Existing imports from the package entry points work without changes
+- Cart methods and cart state work as before, apart from the breaking changes above
+- Check the [breaking changes](#breaking-changes): `redirectToCheckout` is now an import that takes `session.url`, `CartConfig` is narrower, and errors are `CartError`s
 - Opt in to new features when ready
 
 ### Major Improvements ✨
 
-- 40% smaller bundle size
+- Smaller bundle (no Redux)
 - Better performance
 - React 19 support
 - Improved TypeScript
@@ -346,5 +412,10 @@ npm install -D @types/react@19 @types/react-dom@19
 - All client-only mode props (`mode`, `cartMode`, `successUrl`, `cancelUrl`, `billingAddressCollection`, `allowedCountries`)
 - Support for Node.js versions below 22
 - The old `dist/*.es.js` / `dist/*.js` file names (use the package entry points)
+- `redirectToCheckout` as a cart method, session-ID redirects, and `RedirectToCheckoutInput` (import `redirectToCheckout` and pass `session.url`)
+- The `stripe` prop and `changeStripeKey`
+- The `RemoveItemState` and `UpdateQuantityState` types (aliases; use `ItemState` and `QuantityState`)
+- `productId`, `itemId` and `quantity` on `ActionState` (they're on `AddItemState`, `ItemState` and `QuantityState`)
+- `shouldPersist` and `stripe` in the cart state, and `CartState` fields as `CartProvider` props
 
-**If you're using checkout-session mode in v3.x, upgrading to v4.0 is seamless. If you're using client-only mode, migration is required but straightforward.**
+**Checkout-session apps mostly need to update how they redirect to checkout. Client-only apps need a server endpoint that creates checkout sessions. Both are covered under [Breaking Changes](#breaking-changes).**

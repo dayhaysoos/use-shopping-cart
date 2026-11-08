@@ -29,6 +29,7 @@ jobs:
       - run: pnpm --filter use-shopping-cart run typecheck
       - run: pnpm --filter use-shopping-cart run build
       - run: pnpm --filter use-shopping-cart run test:types
+      - run: pnpm --filter use-shopping-cart run test:dist
 
   build:
     needs: test

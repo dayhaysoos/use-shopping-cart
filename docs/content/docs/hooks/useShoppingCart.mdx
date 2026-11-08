@@ -9,6 +9,10 @@ The main hook for accessing shopping cart state and methods. Returns all cart pr
 
 ```typescript
 function useShoppingCart(): UseShoppingCartReturn
+function useShoppingCart<T>(
+  selector: (cart: UseShoppingCartReturn) => T,
+  isEqual?: (previous: T, next: T) => boolean
+): T
 ```
 
 ## Usage
@@ -29,14 +33,37 @@ function MyComponent() {
     removeItem,
     incrementItem,
     decrementItem,
-    clearCart,
-
-    // Checkout
-    redirectToCheckout
+    clearCart
   } = useShoppingCart()
 
   // Use cart state and methods
 }
+```
+
+## Selecting Part of the Cart
+
+Pass a selector to read one value. The component re-renders only when that value changes, so a cart badge doesn't re-render when the drawer opens, and a button that only needs `addItem` never re-renders:
+
+```jsx
+function CartBadge() {
+  const cartCount = useShoppingCart((cart) => cart.cartCount)
+  return <span>{cartCount}</span>
+}
+
+function AddToCart({ product }) {
+  const addItem = useShoppingCart((cart) => cart.addItem)
+  return <button onClick={() => addItem(product)}>Add</button>
+}
+```
+
+A selector that builds a new object (`(cart) => ({ a: cart.a })`) re-renders on every change. Pass `isEqual` to keep the previous result when nothing you care about changed:
+
+```jsx
+const totals = useShoppingCart(
+  (cart) => ({ count: cart.cartCount, total: cart.formattedTotalPrice }),
+  (previous, next) =>
+    previous.count === next.count && previous.total === next.total
+)
 ```
 
 ## Return Value
@@ -45,32 +72,30 @@ The hook returns an object with all cart state and methods:
 
 ### Cart State Properties
 
-| Property              | Type      | Description                                   |
-| --------------------- | --------- | --------------------------------------------- |
-| `cartCount`           | `number`  | Total number of items in cart                 |
-| `totalPrice`          | `number`  | Total price in smallest currency unit         |
-| `formattedTotalPrice` | `string`  | Formatted total price with currency symbol    |
-| `cartDetails`         | `object`  | Object containing all cart items with details |
-| `shouldDisplayCart`   | `boolean` | UI helper for displaying cart                 |
-| `lastClicked`         | `string`  | ID of last clicked product                    |
+| Property              | Type      | Description                                     |
+| --------------------- | --------- | ----------------------------------------------- |
+| `cartCount`           | `number`  | Total quantity across all cart entries          |
+| `totalPrice`          | `number`  | Total price in smallest currency unit           |
+| `formattedTotalPrice` | `string`  | Formatted total price with currency symbol      |
+| `cartDetails`         | `object`  | Object containing all cart entries with details |
+| `shouldDisplayCart`   | `boolean` | UI helper for displaying cart                   |
+| `lastClicked`         | `string`  | ID of last clicked product                      |
+| `currency`            | `string`  | Currency used for formatting                    |
+| `language`            | `string`  | Language used for formatting                    |
 
 ### Cart Manipulation Methods
 
 | Method                                                           | Description                    |
 | ---------------------------------------------------------------- | ------------------------------ |
 | [`addItem(product, options?)`](/docs/actions/addItem)            | Add product to cart            |
-| [`incrementItem(id, options?)`](/docs/actions/incrementItem)     | Increase quantity by 1         |
-| [`decrementItem(id, options?)`](/docs/actions/decrementItem)     | Decrease quantity by 1         |
+| [`incrementItem(id, options?)`](/docs/actions/incrementItem)     | Increase quantity (default 1)  |
+| [`decrementItem(id, options?)`](/docs/actions/decrementItem)     | Decrease quantity (default 1)  |
 | [`setItemQuantity(id, quantity)`](/docs/actions/setItemQuantity) | Set specific quantity          |
 | [`removeItem(id)`](/docs/actions/removeItem)                     | Remove item from cart          |
 | [`clearCart()`](/docs/actions/clearCart)                         | Remove all items               |
-| [`loadCart(cartDetails)`](/docs/actions/loadCart)                | Load cart from external source |
-
-### Checkout Methods
-
-| Method                                                               | Description                                                 |
-| -------------------------------------------------------------------- | ----------------------------------------------------------- |
-| [`redirectToCheckout(sessionUrl)`](/docs/actions/redirectToCheckout) | Redirect to Stripe checkout with server-created session URL |
+| [`loadCart(cartDetails, shouldMerge?)`](/docs/actions/loadCart)  | Load cart from external source |
+| `changeCurrency(currency)`                                       | Reformat prices in a currency  |
+| `changeLanguage(language)`                                       | Reformat prices for a language |
 
 ### UI Helper Methods
 
@@ -86,21 +111,12 @@ The hook returns an object with all cart state and methods:
 ### Basic Cart Operations
 
 ```jsx
+import { useShoppingCart } from 'use-shopping-cart'
+
 function ProductCard({ product }) {
-  const { addItem, cartDetails, redirectToCheckout } = useShoppingCart()
+  const { addItem, cartDetails } = useShoppingCart()
 
   const itemInCart = cartDetails[product.id]
-
-  const handleCheckout = async () => {
-    const response = await fetch('/api/checkout', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ cartDetails })
-    })
-
-    const { sessionUrl } = await response.json()
-    await redirectToCheckout(sessionUrl)
-  }
 
   return (
     <div className="product">
@@ -120,6 +136,8 @@ function ProductCard({ product }) {
 ### Cart Display Component
 
 ```jsx
+import { redirectToCheckout, useShoppingCart } from 'use-shopping-cart'
+
 function CartSummary() {
   const {
     cartCount,
@@ -127,8 +145,7 @@ function CartSummary() {
     cartDetails,
     incrementItem,
     decrementItem,
-    removeItem,
-    redirectToCheckout
+    removeItem
   } = useShoppingCart()
 
   const handleCheckout = async () => {
@@ -139,7 +156,7 @@ function CartSummary() {
     })
 
     const { sessionUrl } = await response.json()
-    await redirectToCheckout(sessionUrl)
+    redirectToCheckout(sessionUrl)
   }
 
   if (cartCount === 0) {
@@ -175,32 +192,28 @@ function CartSummary() {
 
 ## TypeScript Support
 
-```typescript
-import { useShoppingCart } from 'use-shopping-cart'
-import type { Product } from 'use-shopping-cart/core'
+```tsx
+import { useShoppingCart, type Product } from 'use-shopping-cart'
 
-function TypeSafeComponent() {
-  const { addItem, cartDetails, incrementItem } = useShoppingCart()
+const banana: Product = {
+  id: 'banana_001',
+  name: 'Bananas',
+  price: 400,
+  currency: 'USD'
+}
 
-  // Fully typed product
-  const product: Product = {
-    id: 'banana_001',
-    name: 'Bananas',
-    price: 400,
-    currency: 'USD'
-  }
+function AddBanana() {
+  const addItem = useShoppingCart((cart) => cart.addItem)
 
-  addItem(product)
+  return <button onClick={() => addItem(banana)}>Add bananas</button>
 }
 ```
 
 ## Notes
 
 - Must be used within a `<CartProvider>` component
-- Returns stable references (safe to use in dependency arrays)
-- All methods are memoized
-- State updates trigger re-renders
-- Works with React 19+ features
+- Methods keep the same identity for the life of the cart, so they're safe in dependency arrays
+- Without a selector, the component re-renders on every cart change, including `shouldDisplayCart` and `lastClicked`
 
 ## See Also
 

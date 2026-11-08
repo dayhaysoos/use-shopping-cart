@@ -8,12 +8,14 @@ Configure custom storage adapters for cart persistence.
 ## Type
 
 ```typescript
-interface Storage {
-  getItem(key: string): string | null
-  setItem(key: string, value: string): void
-  removeItem(key: string): void
+interface StorageAdapter {
+  getItem(key: string): Promise<string | null> | string | null
+  setItem(key: string, value: string): Promise<void> | void
+  removeItem(key: string): Promise<void> | void
 }
 ```
+
+`StorageAdapter` is exported from `use-shopping-cart` and `use-shopping-cart/core`. Each method can return its result directly or as a Promise.
 
 ## Default
 
@@ -25,7 +27,6 @@ interface Storage {
 
 ```jsx
 <CartProvider
-  stripe={STRIPE_KEY}
   currency="USD"
   // Uses localStorage by default
 >
@@ -37,41 +38,34 @@ interface Storage {
 
 ```jsx
 import { createSessionStorage } from 'use-shopping-cart/core'
-;<CartProvider
-  stripe={STRIPE_KEY}
-  currency="USD"
-  storage={createSessionStorage()}
->
-  <App />
-</CartProvider>
+
+export const Root = () => (
+  <CartProvider currency="USD" storage={createSessionStorage()}>
+    <App />
+  </CartProvider>
+)
 ```
 
 ### Memory Storage
 
 ```jsx
 import { createMemoryStorage } from 'use-shopping-cart/core'
-;<CartProvider
-  stripe={STRIPE_KEY}
-  currency="USD"
-  storage={createMemoryStorage()}
->
-  <App />
-</CartProvider>
+
+export const Root = () => (
+  <CartProvider currency="USD" storage={createMemoryStorage()}>
+    <App />
+  </CartProvider>
+)
 ```
 
 ### No Storage
 
 ```jsx
-import { createNoopStorage } from 'use-shopping-cart/core'
-;<CartProvider
-  stripe={STRIPE_KEY}
-  currency="USD"
-  storage={createNoopStorage()}
-  // Or simply:
-  // shouldPersist={false}
->
-  <App />
-</CartProvider>
+export const Root = () => (
+  <CartProvider currency="USD" shouldPersist={false}>
+    <App />
+  </CartProvider>
+)
 ```
 
 ## Built-in Adapters
@@ -80,7 +74,8 @@ import { createNoopStorage } from 'use-shopping-cart/core'
 
 ```typescript
 import { createLocalStorage } from 'use-shopping-cart/core'
-;<CartProvider storage={createLocalStorage()}>
+
+<CartProvider storage={createLocalStorage()}>
   <App />
 </CartProvider>
 ```
@@ -88,19 +83,19 @@ import { createLocalStorage } from 'use-shopping-cart/core'
 - Persists across browser sessions
 - ~5-10MB storage limit
 - Synchronous API
-- Not available in incognito mode
 - **Used by default** if no storage specified
 
 ### createSessionStorage()
 
 ```typescript
 import { createSessionStorage } from 'use-shopping-cart/core'
-;<CartProvider storage={createSessionStorage()}>
+
+<CartProvider storage={createSessionStorage()}>
   <App />
 </CartProvider>
 ```
 
-- Clears when browser closes
+- Clears when the tab closes
 - ~5-10MB storage limit
 - Synchronous API
 - Per-tab storage
@@ -222,7 +217,7 @@ const indexedDBStorage = {
 
 ## Notes
 
-- Storage adapter is called on every cart change
+- `setItem` is called when the cart entries, currency or language change
 - Must implement all three methods: `getItem`, `setItem`, `removeItem`
 - Methods can be async (return Promises)
 - Values are always strings (serialized JSON)

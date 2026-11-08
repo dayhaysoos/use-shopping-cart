@@ -1,15 +1,16 @@
-/**
- * Example usage of useOptimisticCart
- *
- * This file demonstrates how to use the optimistic cart hook
- * for instant UI feedback while cart operations complete.
- */
-
 import { useOptimisticCart } from 'use-shopping-cart'
 
-// Example 1: Product Card with Add to Cart
+async function syncCart(change) {
+  const res = await fetch('/api/cart', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(change)
+  })
+  if (!res.ok) throw new Error('Could not update cart')
+}
+
 export function ProductCard({ product }) {
-  const { addItem, isOptimistic } = useOptimisticCart()
+  const { addItem, isOptimistic } = useOptimisticCart({ onChange: syncCart })
 
   const handleAddToCart = () => {
     addItem(product, { count: 1 })
@@ -28,10 +29,9 @@ export function ProductCard({ product }) {
   )
 }
 
-// Example 2: Cart Item with Quantity Controls
 export function CartItem({ item }) {
-  const { incrementItem, decrementItem, removeItem, isOptimistic } =
-    useOptimisticCart()
+  const { incrementItem, decrementItem, removeItem, isOptimistic, pendingIds } =
+    useOptimisticCart({ onChange: syncCart })
 
   return (
     <div className="cart-item">
@@ -57,14 +57,13 @@ export function CartItem({ item }) {
         Remove
       </button>
 
-      {item._optimistic && (
+      {pendingIds.has(item.id) && (
         <small className="optimistic-badge">Updating...</small>
       )}
     </div>
   )
 }
 
-// Example 3: Shopping Cart with Optimistic Updates
 export function ShoppingCart() {
   const {
     cartDetails,
@@ -72,7 +71,7 @@ export function ShoppingCart() {
     formattedTotalPrice,
     clearCart,
     isOptimistic
-  } = useOptimisticCart()
+  } = useOptimisticCart({ onChange: syncCart })
 
   const items = Object.values(cartDetails)
 
@@ -114,16 +113,8 @@ export function ShoppingCart() {
   )
 }
 
-// Example 4: Comparison - Before and After
 export function ProductCardComparison({ product }) {
-  // ❌ OLD WAY - No optimistic updates
-  // const { addItem } = useShoppingCart()
-
-  // ✅ NEW WAY - With optimistic updates
-  const { addItem, isOptimistic } = useOptimisticCart()
-
-  // Everything else stays the same!
-  // Just replace useShoppingCart with useOptimisticCart
+  const { addItem, isOptimistic } = useOptimisticCart({ onChange: syncCart })
 
   return (
     <button onClick={() => addItem(product)}>
@@ -132,12 +123,13 @@ export function ProductCardComparison({ product }) {
   )
 }
 
-// Example 5: Advanced - Custom Loading UI
 export function ProductCardAdvanced({ product }) {
-  const { addItem, cartDetails, isOptimistic } = useOptimisticCart()
+  const { addItem, cartDetails, pendingIds } = useOptimisticCart({
+    onChange: syncCart
+  })
 
   const itemInCart = cartDetails[product.id]
-  const isThisItemOptimistic = itemInCart?._optimistic === true
+  const isThisItemOptimistic = pendingIds.has(product.id)
 
   const handleAddToCart = () => {
     addItem(product, { count: 1 })
@@ -174,9 +166,10 @@ export function ProductCardAdvanced({ product }) {
   )
 }
 
-// Example 6: Form-based quantity update
 export function QuantityForm({ itemId }) {
-  const { setItemQuantity, cartDetails, isOptimistic } = useOptimisticCart()
+  const { setItemQuantity, cartDetails, isOptimistic } = useOptimisticCart({
+    onChange: syncCart
+  })
   const item = cartDetails[itemId]
 
   const handleSubmit = (e) => {
@@ -202,7 +195,6 @@ export function QuantityForm({ itemId }) {
   )
 }
 
-// Helper component for spinner
 function Spinner() {
   return (
     <svg className="spinner" viewBox="0 0 24 24">

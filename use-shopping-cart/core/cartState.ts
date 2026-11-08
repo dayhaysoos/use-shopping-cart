@@ -1,4 +1,4 @@
-import { createCartEntry, getProductId } from './Entry'
+import { createCartEntry, updateCartEntry } from './Entry'
 import { calculateFormattedTotalPrice } from './formatters'
 import type { AddItemOptions, CartDetails, CartState, Product } from './types'
 
@@ -45,14 +45,10 @@ export function normalizeCartDetails(
   const normalized: CartDetails = {}
 
   for (const id in cartDetails) {
-    const entry = cartDetails[id]
-    const rebuilt = createCartEntry(id, entry, entry.quantity, {
+    normalized[id] = updateCartEntry(id, cartDetails[id], {
       currency,
       language
     })
-    normalized[id] = entry.timestamp
-      ? { ...rebuilt, timestamp: entry.timestamp }
-      : rebuilt
   }
 
   return normalized
@@ -61,9 +57,10 @@ export function normalizeCartDetails(
 export type CartChange =
   | {
       type: 'add'
+      id: string
       product: Product
       count: number
-      metadata?: Pick<AddItemOptions, 'price_metadata' | 'product_metadata'>
+      metadata: Pick<AddItemOptions, 'price_metadata' | 'product_metadata'>
     }
   | { type: 'adjust'; id: string; by: number }
   | { type: 'set'; id: string; quantity: number }
@@ -77,19 +74,19 @@ export function applyCartChange(
 ): CartDetails {
   switch (change.type) {
     case 'add': {
-      const id = getProductId(change.product)
-      const existing = cartDetails[id]
-      const entry = createCartEntry(
-        id,
-        existing ?? change.product,
-        (existing?.quantity ?? 0) + change.count,
-        {
-          ...format,
-          price_metadata: change.metadata?.price_metadata,
-          product_metadata: change.metadata?.product_metadata
-        }
-      )
-      return { ...cartDetails, [id]: entry }
+      const existing = cartDetails[change.id]
+      const options = {
+        ...format,
+        price_metadata: change.metadata.price_metadata,
+        product_metadata: change.metadata.product_metadata
+      }
+      const entry = existing
+        ? updateCartEntry(change.id, existing, {
+            ...options,
+            quantity: existing.quantity + change.count
+          })
+        : createCartEntry(change.id, change.product, change.count, options)
+      return { ...cartDetails, [change.id]: entry }
     }
 
     case 'adjust':
@@ -105,7 +102,10 @@ export function applyCartChange(
 
       return {
         ...cartDetails,
-        [change.id]: createCartEntry(change.id, existing, quantity, format)
+        [change.id]: updateCartEntry(change.id, existing, {
+          ...format,
+          quantity
+        })
       }
     }
 
@@ -120,9 +120,7 @@ export function applyCartChange(
 }
 
 export function changedEntryId(change: CartChange): string | undefined {
-  if (change.type === 'add') return getProductId(change.product)
-  if (change.type === 'clear') return undefined
-  return change.id
+  return change.type === 'clear' ? undefined : change.id
 }
 
 function removeEntry(cartDetails: CartDetails, id: string): CartDetails {

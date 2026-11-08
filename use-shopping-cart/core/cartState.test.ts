@@ -2,7 +2,8 @@ import { describe, it, expect } from 'vitest'
 import {
   withCartDetails,
   normalizeCartDetails,
-  applyCartChange
+  applyCartChange,
+  type CartChange
 } from './cartState'
 import { initialState } from './ShoppingCart'
 import type { CartDetails, CartState } from './types'
@@ -118,7 +119,33 @@ describe('normalizeCartDetails', () => {
 describe('applyCartChange', () => {
   const format = { currency: 'USD', language: 'en-US' }
   const product = { id: 'a', name: 'A', price: 150, currency: 'USD' }
-  const withA = applyCartChange({}, { type: 'add', product, count: 2 }, format)
+
+  it.each<[string, CartChange]>([
+    [
+      'adding it again',
+      { type: 'add', id: 'a', product, count: 1, metadata: {} }
+    ],
+    ['adjusting its quantity', { type: 'adjust', id: 'a', by: 2 }],
+    ['setting its quantity', { type: 'set', id: 'a', quantity: 5 }]
+  ])('keeps when an item was added after %s', (_name, change) => {
+    const added = applyCartChange(
+      {},
+      { type: 'add', id: 'a', product, count: 1, metadata: {} },
+      format
+    )
+    const stamped = {
+      a: { ...added.a, timestamp: '2020-01-01T00:00:00.000Z' }
+    }
+
+    const result = applyCartChange(stamped, change, format)
+
+    expect(result.a.timestamp).toBe('2020-01-01T00:00:00.000Z')
+  })
+  const withA = applyCartChange(
+    {},
+    { type: 'add', id: 'a', product, count: 2, metadata: {} },
+    format
+  )
 
   it('adds a new entry with derived value and formatting', () => {
     expect(withA.a).toMatchObject({
@@ -135,6 +162,7 @@ describe('applyCartChange', () => {
       withA,
       {
         type: 'add',
+        id: 'a',
         product,
         count: 1,
         metadata: {
@@ -147,8 +175,8 @@ describe('applyCartChange', () => {
 
     expect(next.a.quantity).toBe(3)
     expect(next.a.value).toBe(450)
-    expect(next.a.price_data).toEqual({ tax: 'incl' })
-    expect(next.a.product_data).toEqual({ kind: 'x' })
+    expect(next.a.price_data).toEqual({ metadata: { tax: 'incl' } })
+    expect(next.a.product_data).toEqual({ metadata: { kind: 'x' } })
   })
 
   it('only takes price and product metadata from the add options', () => {
@@ -156,6 +184,7 @@ describe('applyCartChange', () => {
       {},
       {
         type: 'add',
+        id: 'a',
         product,
         count: 1,
         metadata: { currency: 'EUR', language: 'de-DE' } as any

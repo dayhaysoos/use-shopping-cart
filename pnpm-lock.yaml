@@ -283,9 +283,6 @@ importers:
       '@rollup/plugin-sucrase':
         specifier: ^5.1.0
         version: 5.1.0(rollup@4.67.3)
-      '@stripe/stripe-js':
-        specifier: ^10.2.0
-        version: 10.2.0
       '@testing-library/dom':
         specifier: ^10.4.2
         version: 10.4.2
@@ -2384,10 +2381,6 @@ packages:
 
   '@standard-schema/spec@1.1.0':
     resolution: {integrity: sha512-l2aFy5jALhniG5HgqrD6jXLi/rUWrKvqN/qJx6yoJsgKhblVd+iqqU4RCXavm/jPityDo5TCvKMnpjKnOriy0w==}
-
-  '@stripe/stripe-js@10.2.0':
-    resolution: {integrity: sha512-C0F6LKxvsa9ONtxfJ4JG/vo8XjramVyy7tOZNZvoaZkw0M82OTm9LD3Ifcvw0QMDI7qPA14h+IP3qagkuC3b2Q==}
-    engines: {node: '>=12.16'}
 
   '@tailwindcss/node@4.3.3':
     resolution: {integrity: sha512-/T8IKEsf9VTU6tLjgC7+sv2mOPtQxzE2jMw7u4Tt40Tx+QSZxpzh95/H6cMKoja9XuW7iMdLJYBB0o9G1CaAgg==}
@@ -8358,8 +8351,6 @@ snapshots:
       text-hex: 1.0.0
 
   '@standard-schema/spec@1.1.0': {}
-
-  '@stripe/stripe-js@10.2.0': {}
 
   '@tailwindcss/node@4.3.3':
     dependencies:

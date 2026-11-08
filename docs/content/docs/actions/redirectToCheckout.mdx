@@ -3,59 +3,43 @@ title: redirectToCheckout()
 id: redirect-to-checkout
 ---
 
-Redirects the user to Stripe's Checkout page using a server-created session URL.
+Sends the browser to Stripe Checkout using the `session.url` your server created. It's a standalone function, not a cart method, and needs no Stripe key in the browser.
 
 ## Signature
 
 ```typescript
-type RedirectToCheckoutInput =
-  | string
-  | { sessionUrl?: string; sessionId?: string }
-
-redirectToCheckout(input: RedirectToCheckoutInput): Promise<
-  { error: any } | undefined
->
+function redirectToCheckout(sessionUrl: string): void
 ```
 
 ## Parameters
 
-- `input` (string or object, required):
-  - `sessionUrl` (string): The `session.url` returned from your server endpoint (recommended)
-  - `sessionId` (string): Legacy checkout session ID for older Stripe.js versions
+- `sessionUrl` (string, required): the `session.url` returned by `stripe.checkout.sessions.create()` on your server
 
 ## How It Works
 
-1. Your server creates a Stripe checkout session
-2. Server returns the `session.url`
+1. Your server creates a Stripe Checkout Session
+2. The server returns `session.url`
 3. Call `redirectToCheckout(sessionUrl)` on the client
-4. User is redirected to Stripe's checkout page
+4. The browser navigates to Stripe's checkout page
 
 ## Basic Usage
 
-```typescript
-import { useShoppingCart } from 'use-shopping-cart'
+```tsx
+import { redirectToCheckout, useShoppingCart } from 'use-shopping-cart'
 
 function CheckoutButton() {
-  const { redirectToCheckout, cartDetails, cartCount } = useShoppingCart()
+  const cartDetails = useShoppingCart((cart) => cart.cartDetails)
+  const cartCount = useShoppingCart((cart) => cart.cartCount)
 
   const handleCheckout = async () => {
-    if (cartCount === 0) return
-
-    // 1. Call your server to create a checkout session
     const response = await fetch('/api/checkout', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ cartDetails })
     })
-
     const { sessionUrl } = await response.json()
 
-    // 2. Redirect to Stripe checkout
-    const result = await redirectToCheckout(sessionUrl)
-
-    if (result?.error) {
-      console.error('Redirect failed:', result.error)
-    }
+    redirectToCheckout(sessionUrl)
   }
 
   return (
@@ -68,18 +52,17 @@ function CheckoutButton() {
 
 ## With Loading States
 
-```typescript
+```tsx
 import { useState } from 'react'
-import { useShoppingCart } from 'use-shopping-cart'
+import { redirectToCheckout, useShoppingCart } from 'use-shopping-cart'
 
 function CheckoutButton() {
-  const { redirectToCheckout, cartDetails, cartCount } = useShoppingCart()
+  const cartDetails = useShoppingCart((cart) => cart.cartDetails)
+  const cartCount = useShoppingCart((cart) => cart.cartCount)
   const [isLoading, setIsLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
 
   const handleCheckout = async () => {
-    if (cartCount === 0) return
-
     setIsLoading(true)
     setError(null)
 
@@ -89,20 +72,12 @@ function CheckoutButton() {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ cartDetails })
       })
-
-      if (!response.ok) {
-        throw new Error('Failed to create checkout session')
-      }
+      if (!response.ok) throw new Error('Failed to create checkout session')
 
       const { sessionUrl } = await response.json()
-      const result = await redirectToCheckout(sessionUrl)
-
-      if (result?.error) {
-        setError('Unable to redirect to checkout')
-      }
+      redirectToCheckout(sessionUrl)
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Checkout failed')
-    } finally {
       setIsLoading(false)
     }
   }
@@ -112,7 +87,6 @@ function CheckoutButton() {
       <button onClick={handleCheckout} disabled={cartCount === 0 || isLoading}>
         {isLoading ? 'Redirecting...' : 'Checkout'}
       </button>
-
       {error && <p className="error">{error}</p>}
     </div>
   )
@@ -121,34 +95,22 @@ function CheckoutButton() {
 
 ## Server Endpoint Example
 
-Your server endpoint should create the checkout session and return the `session.url`:
+Your server endpoint creates the checkout session and returns `session.url`. Build `line_items` with [`validateCartItems`](/docs/serverless/validateCartItems), which takes prices from your inventory instead of trusting the `cartDetails` the browser sent:
 
 ```typescript
 // app/api/checkout/route.ts (Next.js App Router)
 import { NextRequest, NextResponse } from 'next/server'
 import Stripe from 'stripe'
+import { validateCartItems } from 'use-shopping-cart/utilities'
+import { inventory } from '@/data/products'
 
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!)
 
 export async function POST(req: NextRequest) {
   try {
     const { cartDetails } = await req.json()
+    const line_items = validateCartItems(inventory, cartDetails)
 
-    // Convert cart to line items
-    const line_items = Object.values(cartDetails).map((item: any) => ({
-      price_data: {
-        currency: item.currency.toLowerCase(),
-        product_data: {
-          name: item.name,
-          description: item.description,
-          images: item.image ? [item.image] : []
-        },
-        unit_amount: item.price
-      },
-      quantity: item.quantity
-    }))
-
-    // Create checkout session
     const session = await stripe.checkout.sessions.create({
       mode: 'payment',
       line_items,
@@ -167,12 +129,16 @@ export async function POST(req: NextRequest) {
 }
 ```
 
-## Notes
+## Errors
 
-- Requires a server endpoint to create Stripe checkout sessions
-- `sessionUrl` is required for Stripe.js v8+ (session IDs are legacy)
-- Stripe publishable key is only required when passing a sessionId
-- Returns error object if redirect fails
+| Code                   | Cause                                                                    |
+| ---------------------- | ------------------------------------------------------------------------ |
+| `INVALID_CHECKOUT_URL` | `sessionUrl` isn't an `http(s)` URL, for example a session ID (`cs_...`) |
+| `NOT_IN_BROWSER`       | called on the server                                                     |
+
+## Migrating from Session IDs
+
+Stripe removed `stripe.redirectToCheckout({ sessionId })` from Stripe.js, so session IDs are no longer supported. Return `session.url` from your server instead of `session.id`, and drop the `stripe` prop from `<CartProvider>`.
 
 ## See Also
 

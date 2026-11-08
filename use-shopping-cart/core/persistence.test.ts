@@ -1,5 +1,5 @@
 import { describe, it, expect, vi, afterEach } from 'vitest'
-import { createCartPersister, parseStoredCart } from './persistence'
+import { createCartPersister, parseSavedCart } from './persistence'
 import { createMemoryStorage } from './storage'
 import { initialState } from './ShoppingCart'
 import type { CartState, StorageAdapter } from './types'
@@ -17,10 +17,10 @@ const entry = {
   value: 200
 }
 
-describe('parseStoredCart', () => {
+describe('parseSavedCart', () => {
   it('returns cartDetails, currency and language', () => {
     expect(
-      parseStoredCart(
+      parseSavedCart(
         JSON.stringify({
           cartDetails: { a: entry },
           currency: 'EUR',
@@ -34,7 +34,7 @@ describe('parseStoredCart', () => {
   it('skips invalid entries with a warning', () => {
     const warn = vi.spyOn(console, 'warn').mockImplementation(() => {})
 
-    const stored = parseStoredCart(
+    const stored = parseSavedCart(
       JSON.stringify({
         cartDetails: { a: entry, bad: { id: 'bad', quantity: -1 } }
       })
@@ -45,7 +45,7 @@ describe('parseStoredCart', () => {
   })
 
   it('ignores empty or non-string currency and language', () => {
-    const stored = parseStoredCart(
+    const stored = parseSavedCart(
       JSON.stringify({ cartDetails: {}, currency: '', language: 42 })
     )
 
@@ -59,9 +59,9 @@ describe('parseStoredCart', () => {
   it('returns null for unreadable data', () => {
     vi.spyOn(console, 'warn').mockImplementation(() => {})
 
-    expect(parseStoredCart('not json {')).toBeNull()
-    expect(parseStoredCart('"a string"')).toBeNull()
-    expect(parseStoredCart(JSON.stringify({ cartCount: 3 }))).toBeNull()
+    expect(parseSavedCart('not json {')).toBeNull()
+    expect(parseSavedCart('"a string"')).toBeNull()
+    expect(parseSavedCart(JSON.stringify({ cartCount: 3 }))).toBeNull()
   })
 })
 
@@ -100,6 +100,73 @@ describe('createCartPersister', () => {
     expect(onLoad).not.toHaveBeenCalled()
 
     await vi.waitFor(() => expect(onLoad).toHaveBeenCalled())
+  })
+
+  describe('when the cart changes before an async load finishes', () => {
+    function deferred() {
+      let finish!: () => void
+      const storage: StorageAdapter = {
+        getItem: () =>
+          new Promise<string>((resolve) => {
+            finish = () =>
+              resolve(
+                JSON.stringify({
+                  cartDetails: { a: entry },
+                  currency: 'EUR',
+                  language: 'de-DE'
+                })
+              )
+          }),
+        setItem: () => {},
+        removeItem: () => {}
+      }
+      return { storage, finish: () => finish() }
+    }
+
+    it('skips the saved cart after an item change', async () => {
+      const { storage, finish } = deferred()
+      const onLoad = vi.fn()
+      const persister = createCartPersister(storage, 'k', initialState)
+
+      persister.load(onLoad)
+      persister.save(state)
+      finish()
+      await new Promise((r) => setTimeout(r, 0))
+
+      expect(onLoad).not.toHaveBeenCalled()
+    })
+
+    it('restores only the items after a currency or language change', async () => {
+      const { storage, finish } = deferred()
+      const onLoad = vi.fn()
+      const persister = createCartPersister(storage, 'k', initialState)
+
+      persister.load(onLoad)
+      persister.save({ ...initialState, currency: 'GBP', cartDetails: {} })
+      finish()
+
+      await vi.waitFor(() =>
+        expect(onLoad).toHaveBeenCalledWith({ cartDetails: { a: entry } })
+      )
+    })
+
+    it('restores everything after a UI-only change', async () => {
+      const { storage, finish } = deferred()
+      const onLoad = vi.fn()
+      const persister = createCartPersister(storage, 'k', initialState)
+
+      persister.load(onLoad)
+      persister.save({ ...initialState, shouldDisplayCart: true })
+      finish()
+
+      await vi.waitFor(() =>
+        expect(onLoad).toHaveBeenCalledWith({
+          cartDetails: { a: entry },
+          currency: 'EUR',
+          language: 'de-DE'
+        })
+      )
+    })
   })
 
   it('writes the same payload shape as earlier versions', () => {

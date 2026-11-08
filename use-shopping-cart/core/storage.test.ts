@@ -1,15 +1,12 @@
 import { describe, it, expect, beforeEach } from 'vitest'
 import {
   createLocalStorage,
-  createNoopStorage,
+  createSessionStorage,
   createMemoryStorage
 } from './storage'
 import { ShoppingCart } from './ShoppingCart'
 import type { StorageAdapter } from './types'
 
-/**
- * Creates an async storage adapter for testing race conditions
- */
 function createAsyncStorage(delay = 50): StorageAdapter {
   const store = new Map<string, string>()
   return {
@@ -38,7 +35,6 @@ describe('createLocalStorage', () => {
   let storage: ReturnType<typeof createLocalStorage>
 
   beforeEach(() => {
-    // Clear localStorage before each test
     localStorage.clear()
     storage = createLocalStorage()
   })
@@ -65,24 +61,16 @@ describe('createLocalStorage', () => {
   })
 })
 
-describe('createNoopStorage', () => {
-  let storage: ReturnType<typeof createNoopStorage>
+describe('createSessionStorage', () => {
+  beforeEach(() => sessionStorage.clear())
 
-  beforeEach(() => {
-    storage = createNoopStorage()
-  })
+  it('stores items in sessionStorage, not localStorage', () => {
+    localStorage.clear()
+    createSessionStorage().setItem('test-key', 'test-value')
 
-  it('always returns null for getItem', () => {
-    expect(storage.getItem('any-key')).toBeNull()
-  })
-
-  it('setItem does nothing', () => {
-    expect(() => storage.setItem('test-key', 'test-value')).not.toThrow()
-    expect(storage.getItem('test-key')).toBeNull()
-  })
-
-  it('removeItem does nothing', () => {
-    expect(() => storage.removeItem('test-key')).not.toThrow()
+    expect(sessionStorage.getItem('test-key')).toBe('test-value')
+    expect(localStorage.getItem('test-key')).toBeNull()
+    expect(createSessionStorage().getItem('test-key')).toBe('test-value')
   })
 })
 
@@ -158,10 +146,9 @@ describe('async storage', () => {
 })
 
 describe('ShoppingCart with async storage', () => {
-  it('does not overwrite cart items added before async storage loads', async () => {
+  it('does not overwrite cart entries added before async storage loads', async () => {
     const storage = createAsyncStorage(100)
 
-    // Pre-populate async storage with old cart data
     await storage.setItem(
       'cart',
       JSON.stringify({
@@ -180,10 +167,8 @@ describe('ShoppingCart with async storage', () => {
       })
     )
 
-    // Create cart with async storage
     const cart = new ShoppingCart({ storage, persistKey: 'cart' })
 
-    // Immediately add item BEFORE async load completes
     cart.addItem({
       id: 'new-item',
       name: 'New',
@@ -191,12 +176,10 @@ describe('ShoppingCart with async storage', () => {
       currency: 'USD'
     })
 
-    // Wait for async load to complete
     await new Promise((r) => setTimeout(r, 150))
 
     const state = cart.getState()
 
-    // New item should NOT have been overwritten by the async load
     expect(state.cartDetails['new-item']).toBeDefined()
     expect(state.cartDetails['new-item'].quantity).toBe(1)
   })
@@ -204,7 +187,6 @@ describe('ShoppingCart with async storage', () => {
   it('loads from async storage when no modifications made', async () => {
     const storage = createAsyncStorage(50)
 
-    // Pre-populate async storage
     await storage.setItem(
       'cart',
       JSON.stringify({
@@ -225,15 +207,12 @@ describe('ShoppingCart with async storage', () => {
       })
     )
 
-    // Create cart - don't modify it
     const cart = new ShoppingCart({ storage, persistKey: 'cart' })
 
-    // Wait for async load
     await new Promise((r) => setTimeout(r, 100))
 
     const state = cart.getState()
 
-    // Should have loaded from storage
     expect(state.cartDetails['stored-item']).toBeDefined()
     expect(state.cartCount).toBe(3)
     expect(state.currency).toBe('EUR')

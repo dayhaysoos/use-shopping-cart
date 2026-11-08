@@ -1,49 +1,42 @@
 import type { StorageAdapter } from './types'
 
-/**
- * Creates a localStorage-based storage adapter
- */
-export function createLocalStorage(): StorageAdapter {
+function createWebStorage(
+  name: 'localStorage' | 'sessionStorage'
+): StorageAdapter {
   return {
     getItem: (key: string) => {
       try {
-        return localStorage.getItem(key)
+        return window[name].getItem(key)
       } catch (error) {
-        console.warn('Failed to get item from localStorage:', error)
+        console.warn(`Failed to get item from ${name}:`, error)
         return null
       }
     },
     setItem: (key: string, value: string) => {
       try {
-        localStorage.setItem(key, value)
+        window[name].setItem(key, value)
       } catch (error) {
-        console.warn('Failed to set item in localStorage:', error)
+        console.warn(`Failed to set item in ${name}:`, error)
       }
     },
     removeItem: (key: string) => {
       try {
-        localStorage.removeItem(key)
+        window[name].removeItem(key)
       } catch (error) {
-        console.warn('Failed to remove item from localStorage:', error)
+        console.warn(`Failed to remove item from ${name}:`, error)
       }
     }
   }
 }
 
-/**
- * Creates a no-op storage adapter (for server-side rendering)
- */
-export function createNoopStorage(): StorageAdapter {
-  return {
-    getItem: () => null,
-    setItem: () => {},
-    removeItem: () => {}
-  }
+export function createLocalStorage(): StorageAdapter {
+  return createWebStorage('localStorage')
 }
 
-/**
- * Creates an in-memory storage adapter (useful for testing)
- */
+export function createSessionStorage(): StorageAdapter {
+  return createWebStorage('sessionStorage')
+}
+
 export function createMemoryStorage(): StorageAdapter {
   const store = new Map<string, string>()
 

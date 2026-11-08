@@ -14,17 +14,42 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - `dist/react.es.js` → `dist/react.mjs`, `dist/react.js` → `dist/react.cjs` (same for `core`)
   - `utilities/serverless.js` → `dist/utilities.mjs` / `dist/utilities.cjs`
   - Imports through `use-shopping-cart`, `use-shopping-cart/core` and `use-shopping-cart/utilities` are unaffected; only tooling that bypasses the `exports` map and points at a file breaks (absolute paths, Jest `moduleNameMapper`, bundler aliases, CDN URLs pointing at `.es.js`)
+- **Errors are `CartError`s**: everything the library throws is a `CartError` with a `code` (`INVALID_PRODUCT`, `INVALID_COUNT`, `INVALID_QUANTITY`, `ITEM_NOT_IN_CART`, `INVALID_FORM_DATA`, `INVALID_INVENTORY`, `INVALID_CART`, `NOT_IN_INVENTORY`, `INVALID_CHECKOUT_URL`, `NOT_IN_BROWSER`, `NO_CART_PROVIDER`). Some messages changed (for example invalid count, quantity and form-data errors, and `validateCartItems`' messages), so match on `code`; validation errors' `name` changed from `ValidationError` to `CartError` (#359)
+- **`CartConfig` is explicit**: `CartProvider` and `new ShoppingCart()` accept `cartDetails`, `currency`, `language`, `shouldPersist`, `persistKey` and `storage`. Other `CartState` fields are no longer accepted, and config (`shouldPersist`, `storage`, `persistKey`) no longer leaks into `getState()` (#357)
+- **`validateCartItems` matches every product ID field**: inventory is indexed by `id`, `price_id`, `sku_id` and `sku`, the same fields the cart uses for product ids (first match wins). Previously cart entries added by `price_id` or `sku_id` alone failed with "not in your inventory". If one product's `price_id`/`sku_id` equals another product's `id`/`sku`, the earlier product in `inventory` now matches (#358)
+- **`redirectToCheckout` is a standalone function**: `import { redirectToCheckout } from 'use-shopping-cart'` (or `/core`) and pass `session.url`. Removed: the cart method, session-ID redirects, the `stripe` prop/config/state, `changeStripeKey`, the `RedirectToCheckoutInput` type, and the Stripe.js loader. Stripe removed `redirectToCheckout({ sessionId })` from Stripe.js (#360)
+- **Cart entry metadata moved under `metadata`**: `addItem(product, { product_metadata, price_metadata })` now stores them as the entry's `product_data.metadata` and `price_data.metadata`. Before, the keys were spread straight into `product_data`/`price_data`, so `validateCartItems` (which reads `product_data.metadata`) never sent `product_metadata` to Stripe. `price_metadata` stays in the cart, because Checkout's inline prices can't carry metadata. Code that read `entry.product_data.someKey` should read `entry.product_data.metadata.someKey`
+- **`CartProvider` renders its children on the server, and the `loading` prop is gone**: with `shouldPersist` on (the default), the server rendered `loading` (empty by default) while the browser rendered the children, so hydration failed and server-rendered pages shipped without the cart's subtree. Now the server and the first client render show the cart from props (`cartDetails`, formatted with `language` or `en-US`), and the saved cart and browser language apply right after hydration. Remove any `loading` prop. `initialState.language` is now always `en-US` instead of the browser's language
+- **`createNoopStorage` removed**: use `shouldPersist: false`, which also stores nothing
+- **`RemoveItemState` and `UpdateQuantityState` types removed**: they were aliases; use `ItemState` and `QuantityState`
+- **`ActionState` holds only `status`, `error` and `errorCode`**: the optional `productId`, `itemId` and `quantity` fields moved to `AddItemState`, `ItemState` and `QuantityState`; type each `useCartActions` state with its own type
+- **`useOptimisticCart` reports pending entries in `pendingIds`**: entries no longer carry `_optimistic: true`; use `pendingIds.has(item.id)`. `OptimisticCartEntry` and `OptimisticCartDetails` are removed; use `CartEntry` and `CartDetails` (#361)
+- **`loadCart` checks its cart entries**: it throws a `CartError` with code `INVALID_CART`, and leaves the cart unchanged, when `cartDetails` isn't an object or an entry lacks a string `id`, `name` or `currency`, a finite `price`, or a `quantity` that's an integer greater than 0. That's the check a saved cart goes through, which no longer requires `value`, since it's recomputed. Before, such entries loaded with `NaN` totals, and `loadCart(null, false)` emptied the cart
+
+### ✨ Features
+
+- `createSessionStorage()` from `use-shopping-cart/core`: a storage adapter backed by `sessionStorage`
+- `cart.getInitialState()`: the state built from config alone (no saved cart, `language` or `en-US`), which `useShoppingCart` renders on the server and during hydration
+- `CartError`, `isCartError` and the `CartErrorCode` type are exported from `use-shopping-cart`, `/core` and `/utilities`. Use `isCartError` rather than `instanceof`, since each entry point bundles its own copy
+- `useShoppingCart(selector)`: re-render only when the selected value changes (#357)
+- `useShoppingCart(selector, isEqual)`: keep the previous selection when `isEqual(previous, next)` is true, so a selector that builds an object doesn't re-render on every change
+- `useOptimisticCart({ onChange })`: pass an async function to sync each cart change with your backend. Changes show immediately in every `useOptimisticCart` on the cart, run through `onChange` one at a time, are applied to the cart when it resolves and rolled back (with `error` set) when it rejects. Each change names its cart entry's `id` (an `add` change too, next to `product`, `count` and `metadata`), so your backend can match later changes to it. `CartChange` and `UseOptimisticCartOptions` types are exported (#361)
+- `useCartActions` states have an `errorCode` field (`UNKNOWN` for errors that aren't `CartError`s) (#359)
 
 ### 🐛 Bug Fixes
 
 - **Published types fixed**: type declarations are now generated and bundled; rc.1 shipped `.d.ts` files that imported files missing from the tarball
 - `use-shopping-cart/utilities` now has an ESM build and full types (`ValidatedItem`, `LineItem`)
 - Removed runtime dependencies (`date-fns`, `@stripe/stripe-js`); the package has zero runtime dependencies
-- **Cart totals always match the items**: totals are now derived from `cartDetails` on every change. Previously a stored cart (or `cartDetails` passed as config) with stale `value`s loaded with wrong totals, and later changes compounded the error
+- `react-dom` is no longer a peer dependency; nothing in the package imports it, so `react` is the only peer
+- **Cart totals always match the cart entries**: totals are now derived from `cartDetails` on every change. Previously a saved cart (or `cartDetails` passed as config) with stale `value`s loaded with wrong totals, and later changes compounded the error
 - `useOptimisticCart` shows the same entries the cart will: it used its own price formatting and dropped `price_metadata`/`product_metadata` on added items
-- A currency or language set while an async storage adapter is still loading is no longer overwritten by the stored one; the stored items are still restored
+- A currency or language set while an async storage adapter is still loading is no longer overwritten by the saved cart's; the saved cart's entries are still restored
 - Storage is written only when the cart, currency or language changes, not on UI changes like `handleCartHover`; failed async writes now log a warning instead of an unhandled rejection
-- Changing currency or language keeps each item's `timestamp`
+- Changing currency or language keeps each cart entry's `timestamp`, and so do adding a product again and changing its quantity: `timestamp` is when the entry was first added
+- `useOptimisticCart` no longer shows each change twice for one render (adding a product briefly showed two cart entries) (#361)
+- `validateCartItems` keeps the keys set in your inventory's `product_data.metadata`: a cart entry's metadata can add keys but no longer overwrite them, so a shopper can't change inventory metadata (such as a fulfillment SKU) that reaches Stripe
+- Products whose ID fields are numbers, such as database ids in plain JavaScript, work end to end: the cart stores their ID as a string (also when an action is called with the number), so a saved cart restores them instead of dropping them on reload, `loadCart` accepts the cart's own entries, and `validateCartItems` matches them instead of failing with `NOT_IN_INVENTORY` once the cart was sent as JSON
 
 ## [4.0.0-alpha.2] - 2025-12-26
 
@@ -123,6 +148,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### 🔧 Examples
 
 All example projects have been updated:
+
 - `examples/vite-react` - Updated to Vite 5 and React 19
 - `examples/nextjs` - Updated to Next.js 15 and React 19
 - `examples/nextjs-app-router` - Updated to Next.js 15 and React 19
@@ -142,5 +168,3 @@ See [v3.2.0 release notes](https://github.com/dayhaysoos/use-shopping-cart/relea
 ---
 
 For older versions, see the [releases page](https://github.com/dayhaysoos/use-shopping-cart/releases).
-
-

@@ -7,14 +7,14 @@ All of these values are exposed by `useShoppingCart()` so you can render totals,
 badges, or debug panels without reaching into internal state. The linked pages
 go deeper on each property.
 
-| Property                                                      | Type                                    | Purpose                                                                 |
-| ------------------------------------------------------------- | --------------------------------------- | ----------------------------------------------------------------------- |
-| [`cartCount`](/docs/properties/cartCount)                     | `number`                                | Total quantity across every line item.                                  |
-| [`cartDetails`](/docs/properties/cartDetails)                 | `Record<string, CartEntry>`             | Canonical line item map keyed by product id.                            |
-| [`formattedTotalPrice`](/docs/properties/formattedTotalPrice) | `string`                                | Localized currency string you can drop straight into UI.                |
-| [`lastClicked`](/docs/properties/lastClicked)                 | `{ id: string; label: string } \| null` | Metadata describing the last button interaction, useful for animations. |
-| [`shouldDisplayCart`](/docs/properties/shouldDisplayCart)     | `boolean`                               | True when the customer has interacted with the cart UI recently.        |
-| [`totalPrice`](/docs/properties/totalPrice)                   | `number`                                | Raw integer total (in the smallest currency unit) for calculations.     |
+| Property                                                      | Type                        | Purpose                                                               |
+| ------------------------------------------------------------- | --------------------------- | --------------------------------------------------------------------- |
+| [`cartCount`](/docs/properties/cartCount)                     | `number`                    | Total quantity across every cart entry.                               |
+| [`cartDetails`](/docs/properties/cartDetails)                 | `Record<string, CartEntry>` | Canonical cart entry map keyed by product id.                         |
+| [`formattedTotalPrice`](/docs/properties/formattedTotalPrice) | `string`                    | Localized currency string you can drop straight into UI.              |
+| [`lastClicked`](/docs/properties/lastClicked)                 | `string`                    | The ID saved by `storeLastClicked()`, or `''`.                        |
+| [`shouldDisplayCart`](/docs/properties/shouldDisplayCart)     | `boolean`                   | Whether your cart UI should be open; set by the cart display helpers. |
+| [`totalPrice`](/docs/properties/totalPrice)                   | `number`                    | Raw integer total (in the smallest currency unit) for calculations.   |
 
 > ℹ️ Looking for optimistic state or helper functions? See the
 > [`useOptimisticCart`](/docs/hooks/useOptimisticCart) hook and the

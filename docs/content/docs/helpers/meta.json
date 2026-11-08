@@ -2,4 +2,3 @@
   "title": "Helpers",
   "pages": ["formatCurrencyString", "filterCart"]
 }
-

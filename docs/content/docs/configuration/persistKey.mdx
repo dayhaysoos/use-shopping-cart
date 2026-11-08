@@ -16,19 +16,14 @@ This property specifies the localStorage key name used to persist the cart. By d
 ## Usage
 
 ```jsx
-import ReactDOM from 'react-dom'
-import { CartProvider } from 'use-shopping-cart/react'
+import { createRoot } from 'react-dom/client'
+import { CartProvider } from 'use-shopping-cart'
 import App from './App'
 
-ReactDOM.render(
-  <CartProvider
-    stripe={process.env.REACT_APP_STRIPE_API_PUBLIC}
-    currency="USD"
-    persistKey="my-custom-cart"
-  >
+createRoot(document.getElementById('root')).render(
+  <CartProvider currency="USD" persistKey="my-custom-cart">
     <App />
-  </CartProvider>,
-  document.getElementById('root')
+  </CartProvider>
 )
 ```
 
@@ -85,10 +80,12 @@ For multi-tenant applications:
 ```jsx
 const persistKey = `cart-${userId}`
 
-<CartProvider persistKey={persistKey}>
+<CartProvider key={userId} persistKey={persistKey}>
   <App />
 </CartProvider>
 ```
+
+`CartProvider` reads `persistKey` when it mounts. The `key` makes it start a new cart under the new `persistKey` when `userId` changes, for example after the shopper signs in; without it, the cart keeps using the first key.
 
 ### Avoid Conflicts
 
@@ -119,6 +116,7 @@ localStorage.removeItem('my-custom-cart')
 ## Notes
 
 - Only relevant when `shouldPersist={true}` (default)
+- Read once, when `CartProvider` mounts; change the provider's `key` to switch keys
 - The key is used as-is, no prefixes or transformations
 - Choose unique keys to avoid conflicts
 - Keep keys consistent to maintain cart across sessions

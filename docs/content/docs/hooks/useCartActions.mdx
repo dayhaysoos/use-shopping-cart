@@ -3,20 +3,21 @@ title: useCartActions()
 sidebar_position: 3
 ---
 
-**New in v4.0.0** - Form-based cart actions using React 19's `useActionState` for progressive enhancement and better error handling.
+**New in v4.0.0** - Form-based cart actions built on React 19's `useActionState`, with pending and error state for each action.
 
 ## Overview
 
-`useCartActions()` provides form-friendly cart operations that work with HTML forms and support progressive enhancement. Unlike `useShoppingCart()` which uses imperative methods (onClick), this hook returns actions designed for the `action` attribute of forms.
+`useCartActions()` provides cart operations for the `action` attribute of forms. Unlike `useShoppingCart()`, whose methods you call from handlers like `onClick`, each action reads its input from the form's fields and tracks its own pending and error state.
+
+The actions run in the browser, because the cart lives there. A form only works once React has hydrated; without JavaScript, submitting it does nothing.
 
 ## When to Use
 
 **Use `useCartActions()` when:**
 
 - Building forms for cart operations
-- You want progressive enhancement (works without JS)
-- You need built-in loading states
-- Working with Next.js App Router server actions
+- You want built-in pending and error states
+- Your product data is already in the form (for example a hidden `product` field)
 
 **Use `useShoppingCart()` or `useOptimisticCart()` when:**
 
@@ -56,7 +57,7 @@ function ProductCard({ product }) {
 #### Add Item
 
 - **`addToCartAction`**: Form action for adding items
-- **`addItemState`**: `{ status, error, productId }`
+- **`addItemState`**: `{ status, error, errorCode, productId }`
 - **`isAddingItem`**: Boolean pending state
 
 **Form fields:**
@@ -75,7 +76,7 @@ function ProductCard({ product }) {
 #### Remove Item
 
 - **`removeFromCartAction`**: Form action for removing items
-- **`removeItemState`**: `{ status, error, itemId }`
+- **`removeItemState`**: `{ status, error, errorCode, itemId }`
 - **`isRemovingItem`**: Boolean pending state
 
 **Form fields:**
@@ -92,7 +93,7 @@ function ProductCard({ product }) {
 #### Update Quantity
 
 - **`updateQuantityAction`**: Form action for setting quantity
-- **`updateQuantityState`**: `{ status, error, itemId, quantity }`
+- **`updateQuantityState`**: `{ status, error, errorCode, itemId, quantity }`
 - **`isUpdatingQuantity`**: Boolean pending state
 
 **Form fields:**
@@ -111,7 +112,7 @@ function ProductCard({ product }) {
 #### Increment Item
 
 - **`incrementItemAction`**: Form action for incrementing
-- **`incrementItemState`**: `{ status, error, itemId }`
+- **`incrementItemState`**: `{ status, error, errorCode, itemId }`
 - **`isIncrementingItem`**: Boolean pending state
 
 **Form fields:**
@@ -122,7 +123,7 @@ function ProductCard({ product }) {
 #### Decrement Item
 
 - **`decrementItemAction`**: Form action for decrementing
-- **`decrementItemState`**: `{ status, error, itemId }`
+- **`decrementItemState`**: `{ status, error, errorCode, itemId }`
 - **`isDecrementingItem`**: Boolean pending state
 
 **Form fields:**
@@ -133,7 +134,7 @@ function ProductCard({ product }) {
 #### Clear Cart
 
 - **`clearCartAction`**: Form action for clearing cart
-- **`clearCartState`**: `{ status, error }`
+- **`clearCartState`**: `{ status, error, errorCode }`
 - **`isClearingCart`**: Boolean pending state
 
 #### Global State
@@ -214,27 +215,6 @@ function CartItem({ item }) {
 }
 ```
 
-### Progressive Enhancement Example
-
-This form works even without JavaScript loaded!
-
-```jsx
-function ProductCard({ product }) {
-  const { addToCartAction, isAddingItem } = useCartActions()
-
-  return (
-    <form action={addToCartAction}>
-      <input type="hidden" name="product" value={JSON.stringify(product)} />
-
-      {/* Works without JS! */}
-      <button type="submit" disabled={isAddingItem}>
-        {isAddingItem ? 'Adding...' : 'Add to Cart'}
-      </button>
-    </form>
-  )
-}
-```
-
 ## Comparison: Actions vs Methods
 
 ### onClick Handler (use `useShoppingCart` or `useOptimisticCart`)
@@ -273,15 +253,12 @@ function ProductCard({ product }) {
 
 **Best for:**
 
-- Progressive enhancement
-- Next.js App Router
-- Accessibility
-- SEO-friendly interactions
-- Works without JavaScript
+- Forms whose fields carry the input (quantity inputs, hidden product data)
+- Built-in pending and error state per action
 
 ## Error Handling
 
-All actions return state with error handling:
+When an action fails, its state has `status: 'error'`, a readable `error` message, and an `errorCode` to branch on (see [error codes](/docs/concepts/shopping-cart-class#error-handling)). Both are `null` otherwise.
 
 ```jsx
 function ProductCard({ product }) {
@@ -295,12 +272,15 @@ function ProductCard({ product }) {
         {isAddingItem ? 'Adding...' : 'Add to Cart'}
       </button>
 
-      {/* Error display */}
-      {addItemState.status === 'error' && (
-        <div className="error-message">
-          <strong>Error:</strong> {addItemState.error}
-        </div>
+      {addItemState.errorCode === 'INVALID_PRODUCT' && (
+        <div className="error-message">This product can't be added.</div>
       )}
+      {addItemState.status === 'error' &&
+        addItemState.errorCode !== 'INVALID_PRODUCT' && (
+          <div className="error-message">
+            <strong>Error:</strong> {addItemState.error}
+          </div>
+        )}
 
       {/* Success feedback */}
       {addItemState.status === 'success' && (
@@ -333,12 +313,9 @@ function ProductCard({ product }: { product: Product }) {
 
 ## Benefits
 
-✅ **Progressive Enhancement** - Works without JavaScript  
-✅ **Built-in Loading States** - No manual state management  
-✅ **Error Handling** - Automatic error capture and display  
-✅ **Accessibility** - Better keyboard and screen reader support  
-✅ **SEO Friendly** - Forms work before JS loads  
-✅ **Next.js Ready** - Integrates with App Router patterns
+✅ **Built-in Pending States** - `isAddingItem`, `isPending` and the rest, no manual state  
+✅ **Error Handling** - Each action's state carries `error` and `errorCode`  
+✅ **Plain Forms** - Native `<form>` and `<button>` elements, so keyboard submit works as usual
 
 ## Interactive Demo
 
@@ -351,5 +328,5 @@ Try the form-based actions above! Notice how they provide automatic loading stat
 ## See Also
 
 - [useShoppingCart()](/docs/hooks/useShoppingCart) - Imperative cart methods
-- [useOptimisticCart()](/docs/hooks/useOptimisticCart) - Optimistic updates
+- [useOptimisticCart()](/docs/hooks/useOptimisticCart) - Optimistic changes
 - [React 19 useActionState](https://react.dev/reference/react/useActionState) - Official docs
