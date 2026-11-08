@@ -49,7 +49,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Changing currency or language keeps each cart entry's `timestamp`, and so do adding a product again and changing its quantity: `timestamp` is when the entry was first added
 - `useOptimisticCart` no longer shows each change twice for one render (adding a product briefly showed two cart entries) (#361)
 - `validateCartItems` keeps the keys set in your inventory's `product_data.metadata`: a cart entry's metadata can add keys but no longer overwrite them, so a shopper can't change inventory metadata (such as a fulfillment SKU) that reaches Stripe
-- `validateCartItems` matches inventory products whose ID fields are numbers, such as database ids in plain JavaScript; they used to fail with `NOT_IN_INVENTORY` once the cart was sent as JSON
+- Products whose ID fields are numbers, such as database ids in plain JavaScript, work end to end: the cart stores their ID as a string (also when an action is called with the number), so a saved cart restores them instead of dropping them on reload, `loadCart` accepts the cart's own entries, and `validateCartItems` matches them instead of failing with `NOT_IN_INVENTORY` once the cart was sent as JSON
 
 ## [4.0.0-alpha.2] - 2025-12-26
 

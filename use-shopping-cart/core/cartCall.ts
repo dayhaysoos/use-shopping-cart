@@ -78,22 +78,27 @@ export function toCartChange(
     }
     case 'incrementItem':
     case 'decrementItem': {
+      const id = String(call.id)
       const count = call.options.count ?? 1
       validateCount(count, call.action)
-      validateItemExists(call.id, cartDetails, call.action)
+      validateItemExists(id, cartDetails, call.action)
       return {
         type: 'adjust',
-        id: call.id,
+        id,
         by: call.action === 'incrementItem' ? count : -count
       }
     }
-    case 'setItemQuantity':
+    case 'setItemQuantity': {
+      const id = String(call.id)
       validateQuantity(call.quantity, call.action)
-      validateItemExists(call.id, cartDetails, call.action)
-      return { type: 'set', id: call.id, quantity: call.quantity }
-    case 'removeItem':
-      validateItemExists(call.id, cartDetails, call.action)
-      return { type: 'remove', id: call.id }
+      validateItemExists(id, cartDetails, call.action)
+      return { type: 'set', id, quantity: call.quantity }
+    }
+    case 'removeItem': {
+      const id = String(call.id)
+      validateItemExists(id, cartDetails, call.action)
+      return { type: 'remove', id }
+    }
     case 'clearCart':
       return { type: 'clear' }
   }

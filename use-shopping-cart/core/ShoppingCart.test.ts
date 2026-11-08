@@ -1167,6 +1167,51 @@ describe('ShoppingCart', () => {
     })
   })
 
+  describe('products whose ids are numbers', () => {
+    const seven = { id: 7, name: 'Seven', price: 700, currency: 'USD' } as any
+
+    it('stores the id as a string, so a saved cart restores the entry', () => {
+      const storage = createMemoryStorage()
+      const cart = new ShoppingCart({
+        storage,
+        currency: 'USD',
+        language: 'en-US'
+      })
+      cart.addItem(seven, { count: 2 })
+
+      expect(cart.getState().cartDetails['7'].id).toBe('7')
+      const reloaded = new ShoppingCart({
+        storage,
+        currency: 'USD',
+        language: 'en-US'
+      })
+      expect(reloaded.getState().cartDetails['7']?.quantity).toBe(2)
+    })
+
+    it('loads its own cart entries back after a JSON round trip', () => {
+      const cart = new ShoppingCart({ shouldPersist: false })
+      cart.addItem(seven)
+      const posted = JSON.parse(JSON.stringify(cart.getState().cartDetails))
+
+      cart.loadCart(posted, false)
+
+      expect(cart.getState().cartCount).toBe(1)
+    })
+
+    it('keeps the id a string when an action is called with the number', () => {
+      const cart = new ShoppingCart({ shouldPersist: false })
+      cart.addItem(seven)
+
+      cart.incrementItem(7 as any)
+      cart.setItemQuantity(7 as any, 5)
+
+      expect(cart.getState().cartDetails['7']).toMatchObject({
+        id: '7',
+        quantity: 5
+      })
+    })
+  })
+
   describe('totals invariant', () => {
     function expectTotalsMatchEntries(cart: ShoppingCart) {
       const { cartDetails, totalPrice, cartCount } = cart.getState()
