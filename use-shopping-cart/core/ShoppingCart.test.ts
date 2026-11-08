@@ -1196,6 +1196,61 @@ describe('ShoppingCart', () => {
       expect(setItem).toHaveBeenCalledTimes(1)
     })
 
+    it('two tabs syncing through storage events settle on the final cart when one tab reprices', async () => {
+      const saved = new Map<string, string>()
+      let writes = 0
+      const tabs: Array<{
+        cart: ShoppingCart
+        onStorage: (value: string) => void
+      }> = []
+      const tabStorage = (self: number) => ({
+        getItem: (key: string) => saved.get(key) ?? null,
+        setItem: (key: string, value: string) => {
+          if (saved.get(key) === value) return
+          saved.set(key, value)
+          writes++
+          tabs.forEach((tab, index) => {
+            if (index !== self) setTimeout(() => tab.onStorage(value), 0)
+          })
+        },
+        removeItem: () => {}
+      })
+      for (const index of [0, 1]) {
+        const cart = new ShoppingCart({
+          storage: tabStorage(index),
+          currency: 'EUR',
+          language: 'en-US'
+        })
+        tabs.push({
+          cart,
+          onStorage: (value) => {
+            const next = JSON.parse(value)
+            cart.changeCurrency(next.currency)
+            cart.changeLanguage(next.language)
+            cart.loadCart(next.cartDetails, false)
+          }
+        })
+      }
+      const [a, b] = tabs.map((tab) => tab.cart)
+      a.addItem({ id: 'banana', name: 'Banana', price: 380, currency: 'EUR' })
+      await new Promise((r) => setTimeout(r, 20))
+
+      b.changeCurrency('USD')
+      b.loadCart(
+        { banana: { ...b.getState().cartDetails.banana, price: 400 } },
+        false
+      )
+      await new Promise((r) => setTimeout(r, 50))
+      const writesWhenSettled = writes
+      await new Promise((r) => setTimeout(r, 50))
+
+      expect(writes).toBe(writesWhenSettled)
+      for (const cart of [a, b]) {
+        expect(cart.getState().currency).toBe('USD')
+        expect(cart.getState().cartDetails.banana.price).toBe(400)
+      }
+    })
+
     it('writes once for changes made in the same task', async () => {
       const storage = createMemoryStorage()
       const cart = new ShoppingCart({ storage, currency: 'EUR' })

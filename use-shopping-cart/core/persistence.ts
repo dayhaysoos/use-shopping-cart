@@ -21,7 +21,7 @@ export function createCartPersister(
 ): CartPersister {
   let lastSaved: Readonly<PersistedFields> | null = initial
   let lastSeen: Readonly<PersistedFields> = initial
-  let pending: Readonly<CartState> | null = null
+  let queuedState: Readonly<CartState> | null = null
   let loading = true
   let entriesChanged = false
   let currencyChanged = false
@@ -62,13 +62,13 @@ export function createCartPersister(
 
     save(state) {
       if (loading) {
-        const currencyChange = state.currency !== lastSeen.currency
-        const languageChange = state.language !== lastSeen.language
-        if (currencyChange) currencyChanged = true
-        if (languageChange) languageChanged = true
+        const currencyDiffers = state.currency !== lastSeen.currency
+        const languageDiffers = state.language !== lastSeen.language
+        if (currencyDiffers) currencyChanged = true
+        if (languageDiffers) languageChanged = true
         if (
-          !currencyChange &&
-          !languageChange &&
+          !currencyDiffers &&
+          !languageDiffers &&
           state.cartDetails !== lastSeen.cartDetails
         ) {
           entriesChanged = true
@@ -76,14 +76,14 @@ export function createCartPersister(
       }
       lastSeen = state
 
-      if (!pending) queueMicrotask(write)
-      pending = state
+      if (!queuedState) queueMicrotask(write)
+      queuedState = state
     }
   }
 
   function write() {
-    const state = pending!
-    pending = null
+    const state = queuedState!
+    queuedState = null
     if (
       lastSaved &&
       lastSaved.cartDetails === state.cartDetails &&

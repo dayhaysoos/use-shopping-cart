@@ -32,6 +32,9 @@ _Avoid_: basket, store
 One product in a cart, with its quantity, value, metadata and when it was first added. Action names shorten it to "item".
 _Avoid_: line item, cart item
 
+**Cart entry input**:
+A cart entry as handed to the cart from outside, such as from a server or the cart config, before the cart works out its value, formatted prices and when it was first added.
+
 **Quantity**:
 How many of a product a cart entry holds; always a whole number of at least 1.
 
