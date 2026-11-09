@@ -68,6 +68,9 @@ jobs:
           if [[ "$VERSION" == *"-"* ]]; then
             DIST_TAG="${VERSION#*-}"
             DIST_TAG="${DIST_TAG%%.*}"
+            if [[ "$DIST_TAG" == "rc" ]]; then
+              DIST_TAG="next"
+            fi
           fi
 
           echo "Publishing use-shopping-cart@$VERSION with dist-tag: $DIST_TAG"
