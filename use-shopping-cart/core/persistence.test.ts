@@ -195,6 +195,7 @@ describe('createCartPersister', () => {
       await new Promise((r) => setTimeout(r, 0))
 
       expect(onLoad).not.toHaveBeenCalled()
+      expect(storage.setItem).toHaveBeenCalledTimes(1)
     })
 
     it('keeps a currency set during the load and restores the saved language', async () => {
