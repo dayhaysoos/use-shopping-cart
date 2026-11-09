@@ -1,6 +1,12 @@
 import { createCartEntry, updateCartEntry } from './Entry'
 import { calculateFormattedTotalPrice } from './formatters'
-import type { AddItemOptions, CartDetails, CartState, Product } from './types'
+import type {
+  AddItemOptions,
+  CartDetails,
+  CartDetailsInput,
+  CartState,
+  Product
+} from './types'
 
 export interface CartFormat {
   currency: string
@@ -38,7 +44,7 @@ export function withCartDetails(
 }
 
 export function normalizeCartDetails(
-  cartDetails: CartDetails,
+  cartDetails: CartDetailsInput,
   currency: string,
   language: string
 ): CartDetails {

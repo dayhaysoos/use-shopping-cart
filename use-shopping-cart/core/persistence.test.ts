@@ -65,6 +65,8 @@ describe('parseSavedCart', () => {
   })
 })
 
+const flush = () => Promise.resolve()
+
 describe('createCartPersister', () => {
   const state: CartState = { ...initialState, cartDetails: { a: entry as any } }
 
@@ -78,6 +80,34 @@ describe('createCartPersister', () => {
     expect(onLoad).toHaveBeenCalledWith(
       expect.objectContaining({ cartDetails: { a: entry } })
     )
+  })
+
+  it('does not write back a saved cart it restored unchanged', async () => {
+    const storage = createMemoryStorage()
+    storage.setItem('k', JSON.stringify({ cartDetails: { a: entry } }))
+    const setItem = vi.spyOn(storage, 'setItem')
+    const persister = createCartPersister(storage, 'k', initialState)
+
+    persister.load(() => persister.save(state))
+    await flush()
+
+    expect(setItem).not.toHaveBeenCalled()
+  })
+
+  it('does not write when storage already holds the same saved cart', async () => {
+    const storage = createMemoryStorage()
+    const persister = createCartPersister(storage, 'k', initialState)
+    persister.load(() => {})
+    persister.save(state)
+    await flush()
+    const written = storage.getItem('k') as string
+    const setItem = vi.spyOn(storage, 'setItem')
+
+    persister.save({ ...state, cartDetails: { ...state.cartDetails } })
+    await flush()
+
+    expect(storage.getItem('k')).toBe(written)
+    expect(setItem).not.toHaveBeenCalled()
   })
 
   it('does not call onLoad when nothing is stored', () => {
@@ -136,13 +166,48 @@ describe('createCartPersister', () => {
       expect(onLoad).not.toHaveBeenCalled()
     })
 
-    it('restores only the items after a currency or language change', async () => {
+    it('keeps a currency set during the load and restores the saved language', async () => {
       const { storage, finish } = deferred()
       const onLoad = vi.fn()
       const persister = createCartPersister(storage, 'k', initialState)
 
       persister.load(onLoad)
       persister.save({ ...initialState, currency: 'GBP', cartDetails: {} })
+      finish()
+
+      await vi.waitFor(() =>
+        expect(onLoad).toHaveBeenCalledWith({
+          cartDetails: { a: entry },
+          language: 'de-DE'
+        })
+      )
+    })
+
+    it('keeps a language set during the load and restores the saved currency', async () => {
+      const { storage, finish } = deferred()
+      const onLoad = vi.fn()
+      const persister = createCartPersister(storage, 'k', initialState)
+
+      persister.load(onLoad)
+      persister.save({ ...initialState, language: 'ja-JP' })
+      finish()
+
+      await vi.waitFor(() =>
+        expect(onLoad).toHaveBeenCalledWith({
+          cartDetails: { a: entry },
+          currency: 'EUR'
+        })
+      )
+    })
+
+    it('keeps both when both are set during the load', async () => {
+      const { storage, finish } = deferred()
+      const onLoad = vi.fn()
+      const persister = createCartPersister(storage, 'k', initialState)
+
+      persister.load(onLoad)
+      persister.save({ ...initialState, currency: 'GBP' })
+      persister.save({ ...initialState, currency: 'GBP', language: 'ja-JP' })
       finish()
 
       await vi.waitFor(() =>
@@ -169,10 +234,11 @@ describe('createCartPersister', () => {
     })
   })
 
-  it('writes the same payload shape as earlier versions', () => {
+  it('writes the same payload shape as earlier versions', async () => {
     const storage = createMemoryStorage()
 
     createCartPersister(storage, 'k', initialState).save(state)
+    await flush()
 
     expect(JSON.parse(storage.getItem('k') as string)).toEqual({
       cartDetails: state.cartDetails,
@@ -184,19 +250,38 @@ describe('createCartPersister', () => {
     })
   })
 
-  it('does not write until the cart differs from its initial state', () => {
+  it('does not write until the cart differs from its initial state', async () => {
     const storage = createMemoryStorage()
     const setItem = vi.spyOn(storage, 'setItem')
     const persister = createCartPersister(storage, 'k', initialState)
 
     persister.save({ ...initialState, shouldDisplayCart: true })
+    await flush()
     expect(setItem).not.toHaveBeenCalled()
 
     persister.save(state)
+    await flush()
     expect(setItem).toHaveBeenCalledTimes(1)
   })
 
-  it('retries a failed write on the next save', () => {
+  it('writes once, with the last state, for changes made together', async () => {
+    const storage = createMemoryStorage()
+    const setItem = vi.spyOn(storage, 'setItem')
+    const persister = createCartPersister(storage, 'k', initialState)
+
+    persister.save({ ...state, currency: 'GBP' })
+    persister.save({ ...state, currency: 'GBP', cartDetails: {} })
+    expect(setItem).not.toHaveBeenCalled()
+    await flush()
+
+    expect(setItem).toHaveBeenCalledTimes(1)
+    expect(JSON.parse(storage.getItem('k') as string)).toMatchObject({
+      currency: 'GBP',
+      cartDetails: {}
+    })
+  })
+
+  it('retries a failed write on the next save', async () => {
     vi.spyOn(console, 'warn').mockImplementation(() => {})
     const storage = createMemoryStorage()
     const setItem = vi.spyOn(storage, 'setItem').mockImplementationOnce(() => {
@@ -205,7 +290,9 @@ describe('createCartPersister', () => {
     const persister = createCartPersister(storage, 'k', initialState)
 
     persister.save(state)
+    await flush()
     persister.save(state)
+    await flush()
 
     expect(setItem).toHaveBeenCalledTimes(2)
     expect(storage.getItem('k')).not.toBeNull()
@@ -227,20 +314,24 @@ describe('createCartPersister', () => {
     persister.save(state)
     await new Promise((r) => setTimeout(r, 0))
     persister.save(state)
+    await flush()
 
     expect(setItem).toHaveBeenCalledTimes(2)
   })
 
-  it('skips writes when nothing persisted changed', () => {
+  it('skips writes when nothing persisted changed', async () => {
     const storage = createMemoryStorage()
     const setItem = vi.spyOn(storage, 'setItem')
     const persister = createCartPersister(storage, 'k', initialState)
 
     persister.save(state)
+    await flush()
     persister.save({ ...state, shouldDisplayCart: true, lastClicked: 'a' })
+    await flush()
     expect(setItem).toHaveBeenCalledTimes(1)
 
     persister.save({ ...state, currency: 'EUR' })
+    await flush()
     expect(setItem).toHaveBeenCalledTimes(2)
   })
 

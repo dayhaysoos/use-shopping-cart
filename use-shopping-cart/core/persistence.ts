@@ -1,8 +1,8 @@
-import type { CartDetails, CartState, StorageAdapter } from './types'
+import type { CartDetailsInput, CartState, StorageAdapter } from './types'
 import { isValidCartEntry } from './validation'
 
 export interface SavedCart {
-  cartDetails: CartDetails
+  cartDetails: CartDetailsInput
   currency?: string
   language?: string
 }
@@ -21,22 +21,31 @@ export function createCartPersister(
 ): CartPersister {
   let lastSaved: Readonly<PersistedFields> | null = initial
   let lastSeen: Readonly<PersistedFields> = initial
+  let queuedState: Readonly<CartState> | null = null
+  let readsSynchronously = false
   let loading = true
   let entriesChanged = false
-  let settingsChanged = false
+  let currencyChanged = false
+  let languageChanged = false
 
   function finishLoad(raw: string | null, onLoad: (saved: SavedCart) => void) {
     loading = false
     if (entriesChanged) return
     const saved = raw ? parseSavedCart(raw) : null
     if (!saved) return
-    onLoad(settingsChanged ? { cartDetails: saved.cartDetails } : saved)
+    const restored: SavedCart = { cartDetails: saved.cartDetails }
+    if (!currencyChanged && saved.currency) restored.currency = saved.currency
+    if (!languageChanged && saved.language) restored.language = saved.language
+    onLoad(restored)
+    const restoredAsSaved = !currencyChanged && !languageChanged
+    if (restoredAsSaved) lastSaved = lastSeen
   }
 
   return {
     load(onLoad) {
       try {
         const raw = storage.getItem(key)
+        readsSynchronously = !(raw instanceof Promise)
         if (raw instanceof Promise) {
           raw
             .then((data) => finishLoad(data, onLoad))
@@ -56,39 +65,51 @@ export function createCartPersister(
 
     save(state) {
       if (loading) {
+        const currencyDiffers = state.currency !== lastSeen.currency
+        const languageDiffers = state.language !== lastSeen.language
+        if (currencyDiffers) currencyChanged = true
+        if (languageDiffers) languageChanged = true
         if (
-          state.currency !== lastSeen.currency ||
-          state.language !== lastSeen.language
+          !currencyDiffers &&
+          !languageDiffers &&
+          state.cartDetails !== lastSeen.cartDetails
         ) {
-          settingsChanged = true
-        } else if (state.cartDetails !== lastSeen.cartDetails) {
           entriesChanged = true
         }
       }
       lastSeen = state
 
-      if (
-        lastSaved &&
-        lastSaved.cartDetails === state.cartDetails &&
-        lastSaved.currency === state.currency &&
-        lastSaved.language === state.language
-      ) {
-        return
-      }
-      lastSaved = state
+      if (!queuedState) queueMicrotask(write)
+      queuedState = state
+    }
+  }
 
-      try {
-        const result = storage.setItem(key, serializeCart(state))
-        if (result instanceof Promise) {
-          result.catch((error) => {
-            if (lastSaved === state) lastSaved = null
-            console.warn('Failed to persist cart to storage:', error)
-          })
-        }
-      } catch (error) {
-        lastSaved = null
-        console.warn('Failed to persist cart to storage:', error)
+  function write() {
+    const state = queuedState!
+    queuedState = null
+    if (
+      lastSaved &&
+      lastSaved.cartDetails === state.cartDetails &&
+      lastSaved.currency === state.currency &&
+      lastSaved.language === state.language
+    ) {
+      return
+    }
+    lastSaved = state
+
+    try {
+      const serialized = serializeCart(state)
+      if (readsSynchronously && storage.getItem(key) === serialized) return
+      const result = storage.setItem(key, serialized)
+      if (result instanceof Promise) {
+        result.catch((error) => {
+          if (lastSaved === state) lastSaved = null
+          console.warn('Failed to persist cart to storage:', error)
+        })
       }
+    } catch (error) {
+      lastSaved = null
+      console.warn('Failed to persist cart to storage:', error)
     }
   }
 }
@@ -106,7 +127,7 @@ export function parseSavedCart(raw: string): SavedCart | null {
   const { cartDetails, currency, language } = parsed as Record<string, unknown>
   if (!cartDetails || typeof cartDetails !== 'object') return null
 
-  const validCartDetails: CartDetails = {}
+  const validCartDetails: CartDetailsInput = {}
   for (const id in cartDetails) {
     const entry = (cartDetails as Record<string, unknown>)[id]
     if (isValidCartEntry(entry)) {

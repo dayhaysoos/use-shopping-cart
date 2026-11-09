@@ -1,4 +1,9 @@
-import type { CartState, CartEntry, Product } from 'use-shopping-cart/core'
+import type {
+  CartState,
+  CartEntry,
+  CartDetailsInput,
+  Product
+} from 'use-shopping-cart/core'
 import {
   ShoppingCart,
   formatCurrencyString,
@@ -14,6 +19,24 @@ const cart = new ShoppingCart({
 new ShoppingCart({
   // @ts-expect-error totals are derived, not config
   cartCount: 3
+})
+
+const serverCart: CartDetailsInput = {
+  apple: {
+    id: 'apple',
+    name: 'Apple',
+    price: 300,
+    currency: 'USD',
+    quantity: 2
+  }
+}
+cart.loadCart(serverCart, false)
+new ShoppingCart({ cartDetails: serverCart })
+const savedEntries: CartDetailsInput = cart.getState().cartDetails
+cart.loadCart(savedEntries)
+cart.loadCart({
+  // @ts-expect-error a cart entry needs a quantity
+  apple: { id: 'apple', name: 'Apple', price: 300, currency: 'USD' }
 })
 
 let state: CartState = cart.getState()
