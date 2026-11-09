@@ -147,11 +147,42 @@ describe('createCartPersister', () => {
                 })
               )
           }),
-        setItem: () => {},
+        setItem: vi.fn(),
         removeItem: () => {}
       }
       return { storage, finish: () => finish() }
     }
+
+    it('writes the change once the load finishes, not before', async () => {
+      const { storage, finish } = deferred()
+      const persister = createCartPersister(storage, 'k', initialState)
+
+      persister.load(() => {})
+      persister.save(state)
+      await new Promise((r) => setTimeout(r, 0))
+      expect(storage.setItem).not.toHaveBeenCalled()
+      finish()
+
+      await vi.waitFor(() => expect(storage.setItem).toHaveBeenCalledTimes(1))
+      expect(
+        JSON.parse(vi.mocked(storage.setItem).mock.calls[0][1])
+      ).toMatchObject({ cartDetails: state.cartDetails })
+    })
+
+    it('writes the change after a failed load', async () => {
+      vi.spyOn(console, 'warn').mockImplementation(() => {})
+      const storage: StorageAdapter = {
+        getItem: () => Promise.reject(new Error('offline')),
+        setItem: vi.fn(),
+        removeItem: () => {}
+      }
+      const persister = createCartPersister(storage, 'k', initialState)
+
+      persister.load(() => {})
+      persister.save(state)
+
+      await vi.waitFor(() => expect(storage.setItem).toHaveBeenCalledTimes(1))
+    })
 
     it('skips the saved cart after an item change', async () => {
       const { storage, finish } = deferred()
@@ -164,6 +195,7 @@ describe('createCartPersister', () => {
       await new Promise((r) => setTimeout(r, 0))
 
       expect(onLoad).not.toHaveBeenCalled()
+      expect(storage.setItem).toHaveBeenCalledTimes(1)
     })
 
     it('keeps a currency set during the load and restores the saved language', async () => {

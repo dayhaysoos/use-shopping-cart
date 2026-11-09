@@ -23,13 +23,23 @@ export function createCartPersister(
   let lastSeen: Readonly<PersistedFields> = initial
   let queuedState: Readonly<CartState> | null = null
   let readsSynchronously = false
-  let loading = true
+  let loading = false
   let entriesChanged = false
   let currencyChanged = false
   let languageChanged = false
 
-  function finishLoad(raw: string | null, onLoad: (saved: SavedCart) => void) {
+  function endLoadAndFlush() {
     loading = false
+    if (queuedState) queueMicrotask(write)
+  }
+
+  function failLoad(error: unknown) {
+    endLoadAndFlush()
+    console.warn('Failed to load cart from storage:', error)
+  }
+
+  function finishLoad(raw: string | null, onLoad: (saved: SavedCart) => void) {
+    endLoadAndFlush()
     if (entriesChanged) return
     const saved = raw ? parseSavedCart(raw) : null
     if (!saved) return
@@ -43,23 +53,18 @@ export function createCartPersister(
 
   return {
     load(onLoad) {
+      loading = true
       try {
         const raw = storage.getItem(key)
         readsSynchronously = !(raw instanceof Promise)
         if (raw instanceof Promise) {
-          raw
-            .then((data) => finishLoad(data, onLoad))
-            .catch((error) => {
-              loading = false
-              console.warn('Failed to load cart from storage:', error)
-            })
+          raw.then((data) => finishLoad(data, onLoad)).catch(failLoad)
           return
         }
 
         finishLoad(raw, onLoad)
       } catch (error) {
-        loading = false
-        console.warn('Failed to load cart from storage:', error)
+        failLoad(error)
       }
     },
 
@@ -79,7 +84,7 @@ export function createCartPersister(
       }
       lastSeen = state
 
-      if (!queuedState) queueMicrotask(write)
+      if (!queuedState && !loading) queueMicrotask(write)
       queuedState = state
     }
   }

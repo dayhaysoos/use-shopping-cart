@@ -1130,6 +1130,32 @@ describe('ShoppingCart', () => {
       expect(stored.cartDetails.a.quantity).toBe(2)
     })
 
+    it('keeps the saved cart when a setting changes during the load, even if storage answers the read after the write', async () => {
+      const saved = new Map([['use-shopping-cart', JSON.stringify(storedCart)]])
+      let finishLoad!: () => void
+      const storage = {
+        getItem: (key: string) =>
+          new Promise<string | null>((r) => {
+            finishLoad = () => r(saved.get(key) ?? null)
+          }),
+        setItem: (key: string, value: string) => {
+          saved.set(key, value)
+        },
+        removeItem: () => {}
+      }
+      const cart = new ShoppingCart({ storage })
+
+      cart.changeLanguage('ja-JP')
+      await new Promise((r) => setTimeout(r, 0))
+      expect(saved.get('use-shopping-cart')).toBe(JSON.stringify(storedCart))
+      finishLoad()
+
+      await vi.waitFor(() => expect(cart.getState().cartCount).toBe(2))
+      const stored = JSON.parse(saved.get('use-shopping-cart') as string)
+      expect(stored.language).toBe('ja-JP')
+      expect(stored.cartDetails.a.quantity).toBe(2)
+    })
+
     it('restores the stored cart when the load finishes', async () => {
       const { storage, finishLoad } = deferredStorage(storedCart)
       const cart = new ShoppingCart({ storage, currency: 'EUR' })

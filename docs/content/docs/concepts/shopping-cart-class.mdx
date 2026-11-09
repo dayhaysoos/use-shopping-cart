@@ -64,7 +64,7 @@ Subscribers are called synchronously after every change, with the new state.
 With `shouldPersist` on (the default) and in a browser, the cart:
 
 - **Loads** the saved cart from `storage` under `persistKey` when it's created. With an async adapter, the saved cart is applied when the Promise resolves. If cart entries changed in the meantime, the saved cart is skipped; a currency or language set in the meantime is kept, and the saved entries are still restored.
-- **Saves** `cartDetails`, `currency` and `language` (plus the totals) whenever the cart entries, currency or language change. Changes made together in the same task are saved once, right after it. Opening the cart or `storeLastClicked` doesn't write to storage.
+- **Saves** `cartDetails`, `currency` and `language` (plus the totals) whenever the cart entries, currency or language change. Changes made together in the same task are saved once, right after it. With an async storage adapter, nothing is saved until the saved cart has loaded. Opening the cart or `storeLastClicked` doesn't write to storage.
 - **Ignores** saved data it can't parse, and drops entries that aren't valid cart entries.
 
 See [Persistence](/docs/concepts/persistence) for adapters and examples.
