@@ -62,7 +62,7 @@ jobs:
       - name: Publish to npm
         working-directory: use-shopping-cart
         run: |
-          VERSION="$(node -p \"require('./package.json').version\")"
+          VERSION="$(node -p "require('./package.json').version")"
           DIST_TAG="latest"
 
           if [[ "$VERSION" == *"-"* ]]; then
